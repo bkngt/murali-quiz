@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0284c7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Murali Quiz">
+    <title>Murali Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        /* Premium Colorful Root Variables - 28.4 Update */
+        :root {
+            --bg-color: #f1f5f9; 
+            --card-bg: #ffffff; 
+            --text-color: #1e293b; 
+            --primary-color: #0284c7; 
+            --primary-hover: #0369a1; 
+            
+            /* Colorful Buttons */
+            --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
+            --primary-hover-gradient: linear-gradient(135deg, #0369a1, #7c3aed);
+            --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
+            --submit-hover-gradient: linear-gradient(135deg, #15803d, #047857);
+            
+            --success-color: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
+            --danger-color: #dc2626; --danger-bg: #fef2f2; --danger-border: #fecaca;
+            --warning-color: #d97706; --border-color: #cbd5e1; 
+            
+            /* Highly distinct colorful text for Q&A */
+            --q-text-color: #0c4a6e; /* गाढा रोयल नीलो (Deep Navy Blue) */
+            --opt-text-color: #0f766e; /* गाढा हरियो/टीयल (Deep Teal) */
+            
+            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --font-size: 18px; 
+        }
+        [data-theme="dark"] {
+            --bg-color: #0b0f19; 
+            --card-bg: #1e293b; 
+            --text-color: #f8fafc; 
+            --primary-color: #38bdf8; 
+            --primary-hover: #7dd3fc;
+            
+            --primary-gradient: linear-gradient(135deg, #38bdf8, #a78bfa);
+            --primary-hover-gradient: linear-gradient(135deg, #7dd3fc, #c4b5fd);
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-bg: rgba(22, 163, 74, 0.15); --success-border: rgba(22, 163, 74, 0.4);
+            --danger-bg: rgba(220, 38, 38, 0.15); --danger-border: rgba(220, 38, 38, 0.4);
+            
+            /* Colorful text for Dark Mode */
+            --q-text-color: #fbbf24; /* उज्यालो सुनौलो (Bright Gold) */
+            --opt-text-color: #7dd3fc; /* उज्यालो नीलो (Bright Sky Blue) */
+            
+            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(15, 23, 42, 0.85);
+        }
+        
+        body {
+            background-color: var(--bg-color); 
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230284c7' fill-opacity='0.03'%3E%3Cpath d='M40 45v-5h-5v5h-5v5h5v5h5v-5h5v-5h-5zm0-40V0h-5v5h-5v5h5v5h5v-5h5V5h-5zM5 45v-5H0v5h-5v5h5v5h5v-5h5v-5H5zM5 5V0H0v5h-5v5h5v5h5v-5h5V5H5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color);
+            font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: var(--font-size); 
+            line-height: 1.5; margin: 0; padding: 0;
+            transition: background-color 0.3s, color 0.3s; display: flex; justify-content: center;
+        }
+        
+        .container { width: 100%; max-width: 760px; background: var(--card-bg); min-height: 100vh; padding: 0.6rem; padding-bottom: 85px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+        
+        @media (min-width: 600px) { 
+            .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} 
+            .option-text { padding: 0.4rem 0.6rem; font-size: 0.95rem; }
+            .options-group { gap: 8px; }
+            .question-block { margin-bottom: 0.5rem; padding: 1rem; border-radius: 16px; }
+        }
+
+        @media (max-width: 600px) {
+            .app-header-area { flex-wrap: wrap !important; justify-content: space-between; gap: 8px !important; margin-bottom: 0.6rem; }
+            #app-title { font-size: 1.3rem !important; letter-spacing: -0.5px; white-space: nowrap; }
+            
+            .toolbar { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; scrollbar-width: none; align-items: center !important; justify-content: space-between !important; gap: 8px !important; padding: 0.4rem !important; }
+            .toolbar::-webkit-scrollbar { display: none; }
+            
+            .pin-box { padding: 1.2rem 1rem; border-radius: 20px; }
+            .input-field, .select-field { padding: 0.5rem; font-size: 0.95rem; margin: 0.25rem 0; }
+            .pin-input { font-size: 1.1rem; }
+            .pin-input::-webkit-input-placeholder { font-size: 0.85rem; }
+            
+            .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; }
+            .option-text { font-size: 0.95rem !important; padding: 0.5rem 0.6rem; line-height: 1.3; } 
+            .question-text { font-size: 1rem !important; line-height: 1.4; } 
+            #quiz-date-text { font-size: 0.8rem; white-space: nowrap; }
+            .calendar-grid { gap: 4px !important; }
+            .cal-day { padding: 6px 2px !important; font-size: 0.9rem !important; }
+        }
+        
+        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
+        
+        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
+
+        /* Colorful Gradient Title */
+        #app-title { 
+            margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
+            background: linear-gradient(to right, #0284c7, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--primary-color);
+        }
+        [data-theme="dark"] #app-title {
+            background: linear-gradient(to right, #38bdf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .murli-icon-btn { color: var(--primary-color); display: inline-flex; align-items: center; justify-content: center; padding: 4px; background: rgba(2, 132, 199, 0.1); border-radius: 50%; border: 1px dashed var(--primary-color); transition: all 0.3s ease; text-decoration: none;}
+        .murli-icon-btn:hover { background: var(--primary-color); color: #fff; transform: translateY(-1px); }
+
+        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
+        .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
+        .input-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s;}
+        .pin-input { font-size: 1.2rem; font-weight: 800; letter-spacing: 2px;}
+        .input-field:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
+        .input-field:disabled { opacity: 0.7; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
+        .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 0.95rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-weight: 600; font-family: inherit; outline: none; transition: all 0.2s; text-align: center; }
+        .select-field:focus { border-color: var(--primary-color); }
+        .select-field:disabled { opacity: 0.7; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
+
+        button { background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.25);}
+        button:hover:not(:disabled) { background: var(--primary-hover-gradient); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; background: #64748b; box-shadow: none; transform: none; }
+        
+        .btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); width: auto; border-radius: 50px; font-weight: 600; box-shadow: none;}
+        .btn-small:hover { background: var(--bg-color); border-color: var(--primary-color); color: var(--primary-color); transform: translateY(0); box-shadow: none;}
+        
+        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid var(--border-color); background: transparent; color: var(--text-color); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; transition: all 0.2s ease; flex-shrink: 0; box-shadow: none;}
+        .btn-icon:hover { background: var(--bg-color); border-color: var(--primary-color); color: var(--primary-color); transform: translateY(0); box-shadow: none;}
+
+        .btn-submit { background: var(--submit-gradient) !important; color: white !important; padding: 0.6rem; font-size: 1rem; font-weight: 700; border-radius: 50px; box-shadow: 0 6px 15px rgba(22, 163, 74, 0.3) !important; width: auto; min-width: 120px; border: none;}
+        .btn-submit:hover:not(:disabled) { background: var(--submit-hover-gradient) !important; box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4) !important; }
+
+        select { padding: 0.3rem 0.4rem; border-radius: 8px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); cursor: pointer; font-size: 0.85rem; font-family: inherit; font-weight: 600; outline: none;}
+        
+        .nav-tabs button { background: transparent; color: var(--text-color); border: none; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; width: auto; font-size: 0.9rem; opacity: 0.85; transition: all 0.2s; box-shadow: none;}
+        .nav-tabs button.active { background: var(--primary-gradient); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        
+        textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 0.95rem; height: 45vh; min-height: 280px; resize: vertical; outline: none; transition: all 0.2s;}
+        textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+
+        .question-block { margin-bottom: 0.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--box-shadow-main); position: relative; scroll-margin-top: 10px; }
+        .question-header { margin-bottom: 0.8rem; }
+        .question-meta { font-size: 0.75rem; color: #8b5cf6; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .q-tag { background: rgba(139, 92, 246, 0.1); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.2);}
+        [data-theme="dark"] .q-tag { color: #c4b5fd; background: rgba(139, 92, 246, 0.2); }
+        
+        /* Colorful Question Text explicitly set with !important */
+        .question-text { font-weight: 800; font-size: 1.05rem; margin: 0; color: var(--q-text-color) !important; line-height: 1.4; }
+        
+        .options-group { display: flex; flex-direction: column; gap: 10px; }
+        .option-container { border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); overflow: hidden; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; }
+        
+        @media (hover: hover) { 
+            .option-container:hover { border-color: var(--primary-color); background: linear-gradient(90deg, rgba(2, 132, 199, 0.05), transparent); transform: translateX(6px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); } 
+            [data-theme="dark"] .option-container:hover { background: linear-gradient(90deg, rgba(56, 189, 248, 0.08), transparent); box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
+        }
+        .option-container * { pointer-events: none; }
+        .option-container.keyboard-focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.3); background: rgba(2, 132, 199, 0.08); }
+        
+        /* Colorful Option Text explicitly set with !important */
+        .option-text { padding: 0.5rem 0.6rem; display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--opt-text-color) !important; line-height: 1.3;}
+        .option-text span:last-child { flex: 1; word-wrap: break-word; white-space: normal; }
+        
+        /* Colorful Option Letters */
+        .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3); }
+        
+        .option-container.selected-temp { background-color: rgba(2, 132, 199, 0.1); border-color: var(--primary-color); transform: translateX(4px); }
+        .option-container.selected-wrong { background-color: var(--danger-bg); border-color: var(--danger-color); }
+        .option-container.selected-wrong .option-letter { background: var(--danger-color); box-shadow: none; }
+        .option-container.selected-right { background-color: var(--success-bg); border-color: var(--success-color); }
+        .option-container.selected-right .option-letter { background: var(--success-color); box-shadow: none; }
+        .option-container.disabled { cursor: default; pointer-events: none; opacity: 0.8; }
+        
+        .feedback-box { display: none; padding: 0.8rem 1rem; font-size: 0.9rem; background: var(--bg-color); border-top: 1px dashed var(--border-color); }
+        .selected-wrong .feedback-box, .selected-right .feedback-box { display: block; }
+        .feedback-title { font-weight: 800; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem; font-size: 1rem;}
+        .selected-wrong .feedback-title { color: var(--danger-color); }
+        .selected-right .feedback-title { color: var(--success-color); }
+        .feedback-desc { color: var(--text-color); opacity: 0.95; line-height: 1.5;}
+        .explanation-box { margin-top: 10px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 4px solid #8b5cf6; border-radius: 8px; color: var(--text-color); font-weight: 600;}
+
+        .sticky-scorebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); max-width: 760px; background: var(--glass-bg) !important; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 16px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; z-index: 998; box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        [data-theme="dark"] .sticky-scorebar { border-color: rgba(255,255,255,0.1); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+        .scorebar-info { font-weight: 800; font-size: 1rem; color: var(--text-color); display: flex; align-items: center; gap: 10px; }
+        .scorebar-pill { background: rgba(2, 132, 199, 0.15); color: var(--primary-color); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.95rem; border: 1px solid rgba(2, 132, 199, 0.2); }
+
+        #result-screen { display: none; text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem; }
+        .result-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);}
+        .result-msg { font-size: 1.6rem; font-weight: 800; color: var(--primary-color); margin-bottom: 0.5rem; }
+        .result-submsg { color: var(--text-color); margin-bottom: 2rem; font-size: 1.1rem; font-weight: 600;}
+        .result-actions { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;}
+        .result-actions button { width: auto; padding: 0.8rem 1.5rem; border-radius: 50px; font-size: 1rem; }
+
+        /* Calendar Styles for V28.4 */
+        .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .calendar-header h3 { margin: 0; font-size: 1.2rem; color: var(--primary-color); font-weight: 800; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .cal-day-name { font-size: 0.75rem; font-weight: 800; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
+        .cal-day { padding: 8px 4px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; align-items: center; justify-content: center; min-height: 40px; position: relative; }
+        .cal-day.empty { background: transparent; border: none; }
+        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+        .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .cal-day.excellent { background: var(--success-bg); color: var(--success-color); border-color: var(--success-border); }
+        .cal-day.good { background: #fffbeb; color: var(--warning-color); border-color: #fde68a; }
+        .cal-day.poor { background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); }
+        
+        .dashboard-stats { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .stat-card { flex: 1; min-width: 110px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 12px; text-align: center;}
+        .stat-card h3 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-weight: 800; line-height: 1;}
+        .stat-card p { margin: 0.4rem 0 0; font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;}
+
+        .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);}
+        .prog-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; color: var(--primary-color);}
+        .prog-remark { font-size: 0.85rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 50px; margin-top: 0.4rem; display: inline-block;}
+        .remark-excellent { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;}
+        .remark-good { background: #fffbeb; color: #d97706; border: 1px solid #fde68a;}
+        .remark-poor { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; box-shadow: var(--box-shadow-main); width: 100%; max-width: 440px; position: relative; max-height: 90vh; overflow-y: auto;}
+        .close-modal { position: absolute; top: 1.2rem; right: 1.2rem; background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; color: var(--text-color); border-radius: 50%; box-shadow: none; transition: all 0.2s;}
+        .close-modal:hover { background: var(--danger-bg); color: var(--danger-color); transform: rotate(90deg);}
+        
+        .meta-info { font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px; }
+        
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
+        .toast { background: var(--card-bg); color: var(--text-color); padding: 14px 18px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.15); font-size: 1rem; font-weight: 700; opacity: 0; animation: slideDown 0.3s forwards; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); pointer-events: auto; }
+        .toast.error { border-left: 5px solid var(--danger-color); }
+        .toast.success { border-left: 5px solid var(--success-color); }
+        .toast.info { border-left: 5px solid var(--primary-color); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        .timer-badge { font-size: 0.9rem; color: #0284c7; display: flex; align-items: center; gap: 6px; font-weight: 800; background: rgba(2,132,199,0.1); padding: 4px 12px; border-radius: 50px; border: 1px solid rgba(2,132,199,0.2); }
+        [data-theme="dark"] .timer-badge { color: #38bdf8; background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.2);}
+        
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+    </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="toast-container"></div>
+
+<div id="lock-screen">
+    <div class="pin-box">
+        <form id="login-form" onsubmit="event.preventDefault(); handlePIN();" style="width: 100%; margin: 0; padding: 0;">
+            <h2 id="pin-title" style="margin-top: 0; color: var(--primary-color); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Login
+            </h2>
+            <p id="pin-msg" style="font-size: 0.95rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">Please enter your credentials</p>
+            
+            <div id="pic-upload-container" style="margin-bottom: 15px;">
+                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
+                     <div class="baba-logo-container">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            <radialGradient id="auraLock" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+                              <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
+                              <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
+                              <stop offset="100%" stop-color="#f00" stop-opacity="0" />
+                            </radialGradient>
+                          </defs>
+                          <circle cx="100" cy="100" r="95" fill="url(#auraLock)"/>
+                          <g transform="translate(100 100)" stroke="#ff0" stroke-width="2">
+                              <line y1="-85" y2="85"/>
+                              <line y1="-85" y2="85" transform="rotate(45)"/>
+                              <line y1="-85" y2="85" transform="rotate(90)"/>
+                              <line y1="-85" y2="85" transform="rotate(135)"/>
+                          </g>
+                          <circle cx="100" cy="100" r="12" fill="gold"/>
+                        </svg>
+                     </div>
+                </div>
+            </div>
+
+            <div id="warning-msg" style="background: var(--danger-bg); color: var(--danger-color); padding: 12px; border-radius: 12px; font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; border: 1px solid var(--danger-border); text-align: left; line-height: 1.5;">
+                ⚠️ ध्यान दिनुहोस्: कृपया आफ्नो वास्तविक नाम, सही फोन नम्बर र सेवा केन्द्र भर्नुहोला। <br>
+                (सर्टकट नामहरू मान्य हुने छैनन्।)
+            </div>
+
+            <div style="display: flex; gap: 8px; margin: 0.25rem 0;">
+                <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (First Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+                <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+            </div>
+            
+            <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next">
+            
+            <select id="country-select" class="select-field" onchange="checkOtherCountry()">
+                <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
+                <option value="Nepal">नेपाल (Nepal)</option>
+                <option value="India">भारत (India)</option>
+                <option value="USA">अमेरिका (USA)</option>
+                <option value="Australia">अष्ट्रेलिया (Australia)</option>
+                <option value="UK">बेलायत (UK)</option>
+                <option value="UAE">यूएई (UAE)</option>
+                <option value="Qatar">कतार (Qatar)</option>
+                <option value="Malaysia">मलेसिया (Malaysia)</option>
+                <option value="Japan">जापान (Japan)</option>
+                <option value="Canada">क्यानडा (Canada)</option>
+                <option value="Other">अन्य (Other)</option>
+            </select>
+            
+            <input type="text" id="country-input-other" class="input-field" placeholder="आफ्नो देशको नाम लेख्नुहोस्" style="display: none; border-color: var(--warning-color);" autocomplete="off">
+            <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्र (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
+            
+            <div style="margin: 0.4rem 0;">
+                <p id="pin-instruction" style="font-size: 0.85rem; color: #64748b; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; padding-right: 45px; text-align: center; letter-spacing: 4px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric" enterkeyhint="go">
+                    <button type="button" id="toggle-pin-btn" onclick="togglePinVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--primary-color); padding: 8px; width: auto; cursor: pointer; box-shadow: none;">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <select id="month-select" class="select-field">
+                <option value="" disabled selected>अलौकिक जन्म महिना छान्नुहोस्</option>
+                <option value="1">बैशाख (Baisakh)</option>
+                <option value="2">जेठ (Jestha)</option>
+                <option value="3">असार (Ashadh)</option>
+                <option value="4">साउन (Shrawan)</option>
+                <option value="5">भदौ (Bhadra)</option>
+                <option value="6">असोज (Ashwin)</option>
+                <option value="7">कार्तिक (Kartik)</option>
+                <option value="8">मंसिर (Mangsir)</option>
+                <option value="9">पुष (Poush)</option>
+                <option value="10">माघ (Magh)</option>
+                <option value="11">फागुन (Falgun)</option>
+                <option value="12">चैत (Chaitra)</option>
+            </select>
+            
+            <button type="submit" id="btn-login-submit" style="padding: 1rem; font-size: 1.2rem; margin-top: 20px; border-radius: 14px;">
+                Enter <svg class="icon" viewBox="0 0 24 24"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+            </button>
+        </form>
+        
+        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
+            <a href="#" onclick="cancelForgotPIN()" id="cancel-forgot-btn" style="color: var(--danger-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">Cancel Recovery</a>
+        </div>
+    </div>
+</div>
+
+<div id="main-app" class="container" style="display: none;">
+    <!-- 2-Line Header Area -->
+    <div class="app-header-area" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div id="header-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white;">
+                 <div class="baba-logo-container">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <radialGradient id="auraHeader" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+                          <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
+                          <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
+                          <stop offset="100%" stop-color="#f00" stop-opacity="0" />
+                        </radialGradient>
+                      </defs>
+                      <circle cx="100" cy="100" r="95" fill="url(#auraHeader)"/>
+                      <g transform="translate(100 100)" stroke="#ff0" stroke-width="2">
+                          <line y1="-85" y2="85"/>
+                          <line y1="-85" y2="85" transform="rotate(45)"/>
+                          <line y1="-85" y2="85" transform="rotate(90)"/>
+                          <line y1="-85" y2="85" transform="rotate(135)"/>
+                      </g>
+                      <circle cx="100" cy="100" r="12" fill="gold"/>
+                    </svg>
+                 </div>
+            </div>
+            <h1 id="app-title" style="margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;">Murali Quiz</h1>
+            <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" title="Read Today's Murli" class="murli-icon-btn" style="padding: 4px;">
+                <svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </a>
+        </div>
+        
+        <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn-icon" id="btn-sound-toggle" onclick="toggleSound()" title="Toggle Sound" style="width: 30px; height: 30px;">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+            <button class="btn-icon" onclick="toggleDarkMode()" title="Toggle Theme" style="width: 30px; height: 30px;">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+            <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" title="Settings" style="width: 30px; height: 30px; border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05);">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="toolbar" id="top-toolbar" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 0.4rem; gap: 8px; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); margin-bottom: 0.8rem;">
+        <div class="nav-tabs" id="main-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 50px; border: 1px solid var(--border-color); margin: 0;">
+            <button id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                <svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> 
+                <span id="tab-gen-txt">Exam</span>
+            </button>
+            <button id="tab-prog" onclick="switchTab('prog')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                <svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> 
+                <span id="tab-prog-txt">Stats</span>
+            </button>
+        </div>
+        
+        <div id="online-quiz-actions" style="display: none; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap;">
+            <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;">
+                <span id="quiz-date-text" style="font-size: 0.85rem; white-space: nowrap;"></span>
+            </div>
+            <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.6rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.8rem;">Cancel</button>
+            <button id="btn-export-quiz" class="btn-small" style="color:var(--primary-color); border-color:var(--primary-color); padding: 0.3rem 0.6rem; background: rgba(2,132,199,0.05); margin:0; font-size: 0.8rem;" onclick="exportStandaloneHTML()">Export</button>
+        </div>
+        
+        <div class="toolbar-group" id="quiz-config-tools" style="flex: 1; justify-content: flex-end; display: flex; gap: 6px;">
+            <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;">
+                <option value="ne" selected>🇳🇵 नेपाली</option>
+                <option value="hi">🇮🇳 हिन्दी</option>
+                <option value="en">🇬🇧 English</option>
+            </select>
+            <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;">
+                <option value="5">5 Qs</option>
+                <option value="10">10 Qs</option>
+                <option value="15">15 Qs</option>
+                <option value="20" selected>20 Qs</option>
+                <option value="30">30 Qs</option>
+                <option value="50">50 Qs</option>
+                <option value="100">100 Qs</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeSettings()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800; display:flex; align-items:center; gap:8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> App Settings
+            </h3>
+            
+            <div id="api-config-section">
+                <p style="font-size:0.95rem; color: #64748b; margin-bottom: 8px; font-weight:700;">Gemini API Configuration</p>
+                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
+                    <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
+                </div>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none;"><button style="background: #475569; width: 100%; margin-top: 10px; box-shadow: none;">Get Free Gemini API Key</button></a>
+            </div>
+
+            <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <p style="font-size:0.95rem; color: #64748b; margin: 0 0 10px 0; font-weight:700;">Exam Configuration</p>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #8b5cf6; border-radius: 10px; font-size: 1rem; color: #7c3aed; font-weight: 700;">
+                        <option value="expert" selected>🧠 Expert</option>
+                        <option value="advanced">🔥 Advanced</option>
+                        <option value="standard">🌱 Standard</option>
+                    </select>
+                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                        <option value="gemini-3.6-flash" selected>🚀 Gemini 3.6</option>
+                        <option value="gemini-3.5-flash">🚀 Gemini 3.5</option>
+                        <option value="gemini-2.5-flash">⚡ Gemini 2.5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="profile-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">Profile Edit & Reset</p>
+                
+                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+                    <input type="text" id="edit-first-name" class="input-field" placeholder="पहिलो नाम (First Name)" style="margin:0; flex: 1;">
+                    <input type="text" id="edit-last-name" class="input-field" placeholder="थर (Last Name)" style="margin:0; flex: 1;">
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <input type="tel" id="edit-phone" class="input-field" placeholder="Phone" style="margin:0; flex: 1;">
+                    <input type="text" id="edit-address" class="input-field" placeholder="सेवा केन्द्र (Sewa Kendra)" style="margin:0; flex: 1;">
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="text" id="edit-pin" class="input-field" placeholder="नयाँ ४-अंकको पिन (Optional)" maxlength="4" inputmode="numeric" style="margin:0; flex: 1; letter-spacing: 2px;">
+                </div>
+                
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="saveProfileEdits()" style="background: var(--primary-gradient); flex: 1; padding: 0.8rem; font-size: 1rem;">Save Edits</button>
+                    <button onclick="logoutUser()" style="background: #dc2626; flex: 1; padding: 0.8rem; font-size: 1rem; box-shadow: none;">Log Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-generator">
+        <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
+        
+        <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
+            <button onclick="resumeQuizSession()" id="btn-resume" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: #eab308; color: white; box-shadow: 0 6px 15px rgba(234, 179, 8, 0.3);">Resume Saved Exam</button>
+            
+            <input type="file" id="merge-files-input" multiple accept=".html" style="display: none;" onchange="handleMergeFiles(event)">
+            
+            <button onclick="document.getElementById('merge-files-input').click()" id="btn-merge" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--submit-gradient); box-shadow: 0 6px 15px rgba(22, 163, 74, 0.3);">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg> Merge Files
+            </button>
+
+            <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
+            </button>
+            <button onclick="document.getElementById('murali-text').value=''" title="Clear Text" style="flex:0 0 auto; width: auto; background: var(--danger-color); color: white; border-radius: 50px; padding: 1rem 1.4rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+        
+        <div id="loading-box" style="display:none; text-align:center; padding: 3rem 1rem;">
+            <div style="font-size:1.6rem; font-weight:800; color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <svg class="icon" style="animation: spin 2s linear infinite; width:32px; height:32px;" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                Gemini AI Analyzing...
+            </div>
+            <p style="color:var(--text-color); opacity: 0.8; font-size:1.05rem; margin:0.6rem 0 0;">Drafting compact structural layouts from input source text data.</p>
+            <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+        </div>
+
+        <div id="quiz-area" style="margin-top: 1rem; display: none;"></div>
+        
+        <div id="result-screen" style="display: none;">
+            <div class="result-score-circle" id="rs-score">0/10</div>
+            <div class="result-msg" id="rs-msg">अद्भुत!</div>
+            <div class="result-submsg" id="rs-submsg">हजुरको स्मृति धेरै तीखो छ। बाबा धेरै खुसी हुनुहुन्छ!</div>
+            <div class="result-actions">
+                <button onclick="reviewQuiz()" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">Review Answers</button>
+                <button onclick="shareResult()" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);">Share Result</button>
+                <button onclick="downloadReport()" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3);">Save Report</button>
+                <button onclick="resetToGenerator()" id="btn-new-quiz" style="background: #475569; color: white; box-shadow: none;">New Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-progress" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.4rem;">
+            <h2 id="dash-title" style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.5rem;">Analytics Dashboard</h2>
+        </div>
+        
+        <div class="dashboard-stats" id="dash-stats"></div>
+        
+        <!-- V28.4 Calendar Toggle Button -->
+        <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(2, 132, 199, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span id="cal-toggle-text">View Monthly Calendar</span>
+        </button>
+        
+        <!-- V28.4 Calendar Section (Hidden by default) -->
+        <div id="calendar-wrapper" style="display: none;">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="btn-icon" onclick="changeCalMonth(-1)"><svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                    <h3 id="cal-month-year">...</h3>
+                    <button class="btn-icon" onclick="changeCalMonth(1)"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="cal-day-name" style="color:var(--danger-color);">Sun</div>
+                    <div class="cal-day-name">Mon</div>
+                    <div class="cal-day-name">Tue</div>
+                    <div class="cal-day-name">Wed</div>
+                    <div class="cal-day-name">Thu</div>
+                    <div class="cal-day-name">Fri</div>
+                    <div class="cal-day-name" style="color:var(--primary-color);">Sat</div>
+                </div>
+                <div class="calendar-grid" id="cal-grid-days" style="margin-top: 4px;">
+                    <!-- Dates will be generated here -->
+                </div>
+                <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:12px; font-weight:700;">
+                    <span style="color:var(--success-color);">🟩 >80%</span> &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <span style="color:var(--warning-color);">🟨 >50%</span> &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <span style="color:var(--danger-color);">🟥 <50%</span><br>
+                    (Click colored date to review)
+                </div>
+            </div>
+        </div>
+
+        <div id="weakness-alert"></div>
+        
+        <div style="margin-bottom:0.8rem; font-weight:800; color:var(--text-color); font-size:1.1rem; display:flex; align-items:center; gap:6px;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Records for this Month
+        </div>
+        <div id="progress-list"></div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;">
+            <button onclick="exportBackupData()" class="btn-small" style="background: rgba(2,132,199,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
+            <button onclick="document.getElementById('import-file').click()" class="btn-small" style="background: rgba(22,163,74,0.08); color: var(--success-color); border-color: var(--success-color); padding: 0.8rem; font-size:1rem;">Import Backup</button>
+            <input type="file" id="import-file" onchange="importBackupData(event)" style="display: none;" accept=".json, .txt, text/*">
+        </div>
+    </div>
+
+    <div id="sticky-scorebar" class="sticky-scorebar" style="display: none;">
+        <div class="scorebar-info">
+            <div class="timer-badge" id="quiz-timer"><svg class="icon" viewBox="0 0 24 24" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <span id="timer-text">00:00</span></div>
+            <span id="sb-answered" class="scorebar-pill">0/0</span>
+        </div>
+        <button class="btn-submit" id="sb-submit-btn" onclick="submitQuiz()">
+            <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Submit
+        </button>
+    </div>
+    
+    <div class="meta-info">
+        <div>Engine: Multilingual Smart Architecture</div>
+        <div>Version: 28.4 (Smart Calendar & Back Fix)</div>
+    </div>
+</div>
+
+<script>
+    window.PRELOADED_QUIZ = null;
+    const APP_VERSION = "28.4"; 
+
+    // Global States
+    let currentQuiz = [];
+    let currentScore = 0;
+    let answeredCount = 0;
+    let currentMurliDate = "";
+    let lang = "ne";
+    let userName = "Student";
+    let userPhone = "N/A";
+    let userAddress = "N/A";
+    let userCountry = "N/A";
+    let isSharedApp = false;
+    let currentGlobalFontSize = 18; 
+    let isRecoveryMode = false;
+    let failedAttempts = 0;
+    let isLockedOut = false;
+    let lockoutInterval = null; 
+    let quizStartTime = 0;
+    let timerInterval = null;
+    let totalTimeSec = 0;
+    let isTimerStarted = false;
+    let activeOptionFocus = 0;
+    let audioCtx;
+    let soundEnabled = true;
+    
+    // V28.4 New States
+    let currentCalDate = new Date();
+    let reviewSource = 'current'; // Tracks if we are reviewing a past exam or current exam
+
+    function checkAppVersion() {
+        let savedVersion = localStorage.getItem('murali_app_version');
+        let hasOldData = localStorage.getItem('murali_user_name');
+        
+        if (hasOldData) {
+            let vNum = savedVersion ? parseFloat(savedVersion) : 0;
+            if (vNum < 22.0) {
+                let keysToWipe = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    let key = localStorage.key(i);
+                    if (key && (key.startsWith('murali_') || key.startsWith('m_q_'))) {
+                        keysToWipe.push(key);
+                    }
+                }
+                keysToWipe.forEach(k => localStorage.removeItem(k));
+                
+                alert("सिस्टम ठूलो अपडेट (Version 22.0+) मा गएकोले तपाईंको २२.० भन्दा पुरानो रेकर्डहरू पूर्ण रूपमा रिसेट गरिएको छ। कृपया नयाँ सिराबाट दर्ता गर्नुहोस्।");
+                localStorage.setItem('murali_app_version', APP_VERSION);
+                window.location.reload();
+                return false; 
+            }
+        }
+        
+        if (savedVersion !== APP_VERSION) {
+            localStorage.setItem('murali_app_version', APP_VERSION);
+        }
+        return true;
+    }
+
+    function isProfileValid(name, address) {
+        if (!name || !address) return false;
+        let nameParts = name.trim().split(/\s+/);
+        if (nameParts.length < 2) return false; 
+        
+        let addr = address.trim().toUpperCase();
+        const blacklistedCodes = ["N/A", "KTM", "NGT", "PKR", "BKT", "BRT", "NA"];
+        
+        if (addr.length <= 3 || blacklistedCodes.includes(addr)) {
+            return false;
+        }
+        return true;
+    }
+
+    const dict = {
+        ne: {
+            title: "Murali Quiz", linkUrl: "https://www.madhubanmurli.org/#ne",
+            placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...",
+            statsTotal: "Total Exams", statsAvg: "Avg. Score", errShort: "पाठ धेरै छोटो भयो, कृपया पूरै मुरली पेस्ट गर्नुहोस्।", 
+            dateLbl: "Date", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर",
+            remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice", noRecord: "No records found.",
+            confirmSubmit: "तपाईंले {n} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो? (एकपटक सबमिट गरेपछि आज फेरि परीक्षा दिन मिल्नेछैन)",
+            msg100: "अद्भुत!", sub100: "हजुरको स्मृति धेरै तीखो छ। बाबा धेरै खुसी हुनुहुन्छ!",
+            msg80: "धेरै राम्रो!", sub80: "हजुरले मुरली राम्रोसँग मनन गर्नुभएको छ।",
+            msg50: "राम्रो प्रयास!", sub50: "अझै गहिरो अध्ययनले हजुरलाई पूर्ण सफलता दिनेछ।",
+            msgLow: "अभ्यास बढाउनुहोस्!", subLow: "निरन्तर अभ्यास गरिरहनुहोस्, बाबा हजुरको साथमा हुनुहुन्छ!"
+        },
+        hi: {
+            title: "Murali Quiz", linkUrl: "https://www.madhubanmurli.org/#hi",
+            placeholder: "आज की मुरली यहाँ पेस्ट करें...",
+            statsTotal: "Total Exams", statsAvg: "Avg. Score", errShort: "पाठ बहुत छोटा है। कृपया पूरी मुरली डालें।", 
+            dateLbl: "Date", feedbackWrongTitle: "गलत", feedbackRightTitle: "सही जवाब",
+            remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice", noRecord: "No records found.",
+            confirmSubmit: "आपने {n} प्रश्न छोड़े हैं। क्या आप सबमिट करना चाहते हैं?",
+            msg100: "अदभुत!", sub100: "बाबा बहुत खुश हैं!",
+            msg80: "बहुत अच्छा!", sub80: "आपने मुरली का अच्छा मनन किया है।",
+            msg50: "अच्छा प्रयास!", sub50: "गहन अध्ययन से सफलता मिलेगी।",
+            msgLow: "अभ्यास बढ़ाएं!", subLow: "बाबा आपके साथ हैं!"
+        },
+        en: {
+            title: "Murali Quiz", linkUrl: "https://www.madhubanmurli.org/#en",
+            placeholder: "Paste today's complete Murli text here...",
+            statsTotal: "Total Exams", statsAvg: "Avg. Score", errShort: "Text too short. Please paste the full Murli.", 
+            dateLbl: "Date", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct",
+            remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice", noRecord: "No records found.",
+            confirmSubmit: "You have left {n} questions unanswered. Submit anyway?",
+            msg100: "Amazing!", sub100: "Baba is very pleased!",
+            msg80: "Very Good!", sub80: "You have churned the Murli very well.",
+            msg50: "Good Effort!", sub50: "Deeper study will bring you full success.",
+            msgLow: "Keep Practicing!", subLow: "Continue your practice, Baba is with you!"
+        }
+    };
+
+    function toggleCalendar() {
+        let cal = document.getElementById('calendar-wrapper');
+        let txt = document.getElementById('cal-toggle-text');
+        if (cal.style.display === 'none') {
+            cal.style.display = 'block';
+            txt.innerText = 'Hide Calendar';
+        } else {
+            cal.style.display = 'none';
+            txt.innerText = 'View Monthly Calendar';
+        }
+    }
+
+    function playSound(type) {
+        if(!soundEnabled) return;
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if(type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const loginInputs = document.querySelectorAll('#login-form .input-field, #login-form .select-field');
+        loginInputs.forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); handlePIN(); }
+            });
+        });
+    });
+
+    function checkOtherCountry() {
+        var select = document.getElementById('country-select');
+        var otherInput = document.getElementById('country-input-other');
+        if(select && select.value === 'Other') {
+            otherInput.style.display = 'block';
+            otherInput.focus(); 
+        } else if (otherInput) {
+            otherInput.style.display = 'none';
+            otherInput.value = ''; 
+        }
+    }
+
+    function startLockoutTimer(unlockTime) {
+        isLockedOut = true;
+        document.getElementById('pin-input').disabled = true;
+        document.getElementById('btn-login-submit').disabled = true;
+        document.getElementById('pin-instruction').style.display = 'block';
+
+        const mSelect = document.getElementById('month-select');
+        if(mSelect) mSelect.disabled = true;
+
+        if (lockoutInterval) clearInterval(lockoutInterval);
+
+        lockoutInterval = setInterval(() => {
+            let timeLeft = Math.ceil((unlockTime - Date.now()) / 1000);
+            if(timeLeft <= 0) {
+                clearInterval(lockoutInterval);
+                isLockedOut = false;
+                failedAttempts = 0;
+                localStorage.removeItem('murali_lockout_time');
+                
+                document.getElementById('pin-input').disabled = false;
+                document.getElementById('btn-login-submit').disabled = false;
+                if(mSelect && isRecoveryMode) mSelect.disabled = false;
+                
+                document.getElementById('pin-input').value = "";
+                document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)";
+                document.getElementById('pin-instruction').style.color = '#64748b';
+                
+                if(!isRecoveryMode) document.getElementById('pin-instruction').style.display = 'none';
+            } else {
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                let timeStr = m > 0 ? `${m} मिनेट ${s} सेकेन्ड` : `${s} सेकेन्ड`;
+                document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeStr} पर्खनुहोस्।`;
+                document.getElementById('pin-instruction').style.color = 'var(--danger-color)';
+            }
+        }, 1000);
+        
+        let initialTimeLeft = Math.ceil((unlockTime - Date.now()) / 1000);
+        if(initialTimeLeft > 0) {
+             let m = Math.floor(initialTimeLeft / 60);
+             let s = initialTimeLeft % 60;
+             let timeStr = m > 0 ? `${m} मिनेट ${s} सेकेन्ड` : `${s} सेकेन्ड`;
+             document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeStr} पर्खनुहोस्।`;
+             document.getElementById('pin-instruction').style.color = 'var(--danger-color)';
+        }
+    }
+
+    function hasTakenQuizToday(dateStr) {
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        return history.some(h => h.name === userName && h.date === dateStr);
+    }
+
+    function checkActiveSession() {
+        let session = JSON.parse(localStorage.getItem('murali_active_session_' + userName));
+        if (session && session.answered < session.quiz.length) {
+            return session;
+        }
+        return null;
+    }
+
+    function updateResumeButton() {
+        if (isSharedApp) return;
+        let session = checkActiveSession();
+        if (session) {
+            document.getElementById('btn-resume').style.display = 'block';
+            document.getElementById('btn-generate').style.flex = '0.5';
+        } else {
+            document.getElementById('btn-resume').style.display = 'none';
+            document.getElementById('btn-generate').style.flex = '1';
+        }
+    }
+
+    function saveProfileEdits() {
+        const fName = document.getElementById('edit-first-name').value.trim();
+        const lName = document.getElementById('edit-last-name').value.trim();
+        const phone = document.getElementById('edit-phone').value.trim();
+        const address = document.getElementById('edit-address').value.trim();
+        const newPin = document.getElementById('edit-pin').value.trim();
+        
+        const nameRegex = /^[a-zA-Z\s\u0900-\u097F]+$/;
+        if(fName.length < 2 || !nameRegex.test(fName)) return showToast("कृपया सही पहिलो नाम लेख्नुहोस् (अंक/चिह्न नमिल्ने)।", "error");
+        if(lName.length < 2 || !nameRegex.test(lName)) return showToast("कृपया सही थर लेख्नुहोस्।", "error");
+        
+        let addrUpper = address.toUpperCase();
+        const blacklistedCodes = ["N/A", "KTM", "NGT", "PKR", "BKT", "BRT", "NA"];
+        if (addrUpper.length <= 3 || blacklistedCodes.includes(addrUpper)) {
+            return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
+        }
+        
+        const name = fName + " " + lName;
+        
+        let currentCtry = userCountry; 
+        if (currentCtry === 'Nepal') {
+            const nepalPhoneRegex = /^(98|97|96)\d{8}$/;
+            if(!nepalPhoneRegex.test(phone)) return showToast("नेपालको हकमा फोन नम्बर १० अंकको र ९८, ९७ वा ९६ बाट सुरु भएको हुनुपर्छ।", "error");
+        } else if (currentCtry === 'India') {
+            const indiaPhoneRegex = /^[6-9]\d{9}$/;
+            if(!indiaPhoneRegex.test(phone)) return showToast("भारतको हकमा फोन नम्बर १० अंकको र ६, ७, ८ वा ९ बाट सुरु भएको हुनुपर्छ।", "error");
+        } else {
+            const foreignPhoneRegex = /^\+?[0-9]{7,15}$/;
+            if(!foreignPhoneRegex.test(phone)) return showToast("कृपया सही अन्तर्राष्ट्रिय फोन नम्बर राख्नुहोस्।", "error");
+        }
+        
+        if(newPin && newPin.length !== 4) return showToast("पिन ठ्याक्कै ४ अंकको हुनुपर्छ।", "error");
+        
+        localStorage.setItem('murali_user_name', name);
+        localStorage.setItem('murali_phone', phone);
+        localStorage.setItem('murali_address', address);
+        if(newPin) localStorage.setItem('murali_pin', newPin);
+
+        userName = name; userPhone = phone; userAddress = address;
+        
+        showToast("Profile details saved successfully!", "success");
+        closeSettings();
+    }
+
+    function logoutUser() {
+        if(confirm("तपाईंको एकाउन्ट लगआउट हुनेछ र अर्को व्यक्तिले नयाँ एकाउन्ट बनाएर चलाउन सक्नेछ। के तपाईं निश्चित हुनुहुन्छ? (रेकर्डहरू मेटिँदैन)")) {
+            localStorage.removeItem('murali_user_name');
+            localStorage.removeItem('murali_pin');
+            localStorage.removeItem('murali_month');
+            localStorage.removeItem('murali_phone');
+            localStorage.removeItem('murali_address');
+            localStorage.removeItem('murali_country');
+            window.location.reload();
+        }
+    }
+
+    function setupStandalonePWA() {
+        try {
+            if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+                const manifest = {
+                    name: "Murali Offline Quiz", short_name: "MuraliQuiz", start_url: ".", display: "standalone",
+                    background_color: "#f1f5f9", theme_color: "#0284c7",
+                    icons: [{"src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230284c7'%3E%3Cpath d='M12 2L2 22h20L12 2z'/%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml"}]
+                };
+                const manifestUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+                document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestUrl}">`);
+                const swCode = `self.addEventListener('install', (e) => self.skipWaiting()); self.addEventListener('activate', (e) => self.clients.claim()); self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => console.log('SW Setup fallback mode.'));
+            }
+        } catch(e) { console.log("PWA SW skipped on local file."); }
+    }
+
+    function fireConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        let particles = [];
+        for(let i=0; i<150; i++) {
+            particles.push({
+                x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+                r: Math.random() * 6 + 2, dx: Math.random() * 4 - 2, dy: Math.random() * 4 + 2,
+                color: ['#0284c7', '#16a34a', '#d97706', '#dc2626', '#eab308', '#8b5cf6'][Math.floor(Math.random()*6)]
+            });
+        }
+        function animate() {
+            if(particles.length === 0) return;
+            requestAnimationFrame(animate);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill();
+                p.y += p.dy; p.x += p.dx;
+            });
+        }
+        animate();
+        setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'Enter' && e.target.tagName === 'BUTTON' && !e.target.classList.contains('option-container')) return;
+
+        if (document.getElementById('quiz-area').style.display !== 'block') return;
+        const currentQIndex = answeredCount; 
+        
+        if (currentQIndex >= currentQuiz.length) {
+            if (e.key === 'Enter' && !document.getElementById('sb-submit-btn').disabled) {
+                e.preventDefault();
+                submitQuiz();
+            }
+            return;
+        }
+
+        let block = document.getElementById(`qb-${currentQIndex}`);
+        if (!block || block.style.display === 'none' || block.classList.contains('answered')) return;
+
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            let oldFocus = document.getElementById(`opt-${currentQIndex}-${activeOptionFocus}`);
+            if(oldFocus) oldFocus.classList.remove('keyboard-focus');
+            
+            if (e.key === 'ArrowDown') activeOptionFocus = (activeOptionFocus + 1) % 4;
+            if (e.key === 'ArrowUp') activeOptionFocus = (activeOptionFocus - 1 + 4) % 4;
+            
+            let newFocus = document.getElementById(`opt-${currentQIndex}-${activeOptionFocus}`);
+            if(newFocus) newFocus.classList.add('keyboard-focus');
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            let optElement = document.getElementById(`opt-${currentQIndex}-${activeOptionFocus}`);
+            if(optElement) optElement.click();
+        }
+    });
+
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        let iconSvg = '';
+        if(type === 'error') iconSvg = `<svg class="icon" style="color:var(--danger-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        else if(type === 'success') iconSvg = `<svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+        else iconSvg = `<svg class="icon" style="color:var(--primary-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+        
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `${iconSvg} <span>${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('btn-sound-toggle');
+        if(soundEnabled) {
+            btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+            btn.style.color = 'var(--text-color)';
+            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        } else {
+            btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+            btn.style.color = 'var(--danger-color)';
+        }
+        localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0');
+    }
+
+    function togglePinVisibility() {
+        if(isLockedOut) return;
+        const pinInput = document.getElementById('pin-input');
+        const btn = document.getElementById('toggle-pin-btn');
+        if (pinInput.type === 'password') {
+            pinInput.type = 'text';
+            btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+        } else {
+            pinInput.type = 'password';
+            btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+        }
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function init() {
+        if (!checkAppVersion()) return; 
+
+        setupStandalonePWA();
+        document.getElementById('lock-screen').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+
+        const savedName = localStorage.getItem('murali_user_name');
+        const savedAddressStr = localStorage.getItem('murali_address');
+        
+        if (savedName) {
+            if (!isProfileValid(savedName, savedAddressStr)) {
+                localStorage.removeItem('murali_user_name');
+                localStorage.removeItem('murali_pin');
+                localStorage.removeItem('murali_phone');
+                localStorage.removeItem('murali_address');
+                localStorage.removeItem('murali_country');
+                localStorage.removeItem('murali_month');
+                alert("सुरक्षा अपडेट: तपाईंको विवरणमा थर वा सेवा केन्द्रको पूरा नाम नभएको वा सर्टकट (N/A, KTM आदि) प्रयोग भएकोले प्रोफाइल रिसेट गरिएको छ। कृपया पूरा विवरण भर्नुहोला।\n\n(तपाईंको परीक्षा नतिजाहरू भने सुरक्षित छन्!)");
+                window.location.reload();
+                return;
+            }
+        }
+
+        let savedLockout = localStorage.getItem('murali_lockout_time');
+        if(savedLockout && Date.now() < parseInt(savedLockout)) {
+            startLockoutTimer(parseInt(savedLockout));
+        } else {
+            localStorage.removeItem('murali_lockout_time');
+        }
+        
+        if (window.PRELOADED_QUIZ !== null && window.PRELOADED_QUIZ.quiz && window.PRELOADED_QUIZ.quiz.length > 0) {
+            isSharedApp = true;
+            currentQuiz = window.PRELOADED_QUIZ.quiz;
+            currentQuiz.forEach(q => { if(!q.userSelectedIndex) shuffleArray(q.options); });
+            currentMurliDate = window.PRELOADED_QUIZ.date || "";
+            lang = window.PRELOADED_QUIZ.lang || "ne";
+            document.getElementById('lang-select').value = lang;
+
+            document.getElementById('lang-select').style.display = 'none';
+            document.getElementById('q-count').style.display = 'none';
+            
+            document.getElementById('active-quiz-info').style.display = 'flex';
+            document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
+
+            if(document.getElementById('quiz-level')) document.getElementById('quiz-level').style.display = 'none';
+            if(document.getElementById('ai-model')) document.getElementById('ai-model').style.display = 'none';
+        }
+
+        const savedSound = localStorage.getItem('m_q_sound');
+        if (savedSound === '0') { soundEnabled = false; toggleSound(); toggleSound(); }
+
+        const savedPhoneStr = localStorage.getItem('murali_phone');
+        const savedCountryStr = localStorage.getItem('murali_country');
+        const savedPIN = localStorage.getItem('murali_pin');
+        
+        if (savedName) userName = savedName;
+        if (savedPhoneStr) userPhone = savedPhoneStr;
+        if (savedAddressStr) userAddress = savedAddressStr;
+        if (savedCountryStr) userCountry = savedCountryStr;
+
+        if (savedPIN && savedName) {
+            let nameParts = savedName.split(" ");
+            document.getElementById('first-name-input').value = nameParts[0] || "";
+            document.getElementById('last-name-input').value = nameParts.slice(1).join(" ") || "";
+            
+            document.getElementById('first-name-input').disabled = true; 
+            document.getElementById('last-name-input').disabled = true; 
+            
+            document.getElementById('phone-input').style.display = 'none';
+            document.getElementById('address-input').style.display = 'none';
+            document.getElementById('country-select').style.display = 'none';
+            document.getElementById('country-input-other').style.display = 'none';
+            document.getElementById('warning-msg').style.display = 'none';
+            document.getElementById('month-select').style.display = 'none'; 
+            if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
+            
+            document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Unlock Quiz`;
+            document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`;
+            
+            document.getElementById('forgot-btn').style.display = 'inline-block';
+            document.getElementById('cancel-forgot-btn').style.display = 'none';
+        } else {
+            document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Create Profile`;
+            document.getElementById('pin-msg').innerText = "Set Name, Phone, Sewa Kendra & 4-Digit PIN.";
+            
+            document.getElementById('first-name-input').disabled = false;
+            document.getElementById('last-name-input').disabled = false;
+            
+            document.getElementById('phone-input').style.display = 'block';
+            document.getElementById('address-input').style.display = 'block';
+            document.getElementById('country-select').style.display = 'block';
+            document.getElementById('warning-msg').style.display = 'block';
+            document.getElementById('month-select').style.display = 'block';
+            document.getElementById('pin-instruction').style.display = 'block';
+            
+            document.getElementById('forgot-btn').style.display = 'none';
+            document.getElementById('cancel-forgot-btn').style.display = 'none';
+        }
+        
+        if (!isSharedApp) {
+            const savedKey = localStorage.getItem('murali_gemini_key');
+            if(savedKey) document.getElementById('api-key-input').value = savedKey;
+        }
+        
+        if(localStorage.getItem('m_q_theme') !== 'light') document.body.setAttribute('data-theme', 'dark');
+        
+        updateLanguageUI();
+        updateResumeButton();
+    }
+
+    function handleForgotPIN() {
+        const savedName = localStorage.getItem('murali_user_name');
+        const savedMonth = localStorage.getItem('murali_month');
+        if(!savedName || !savedMonth) return showToast("No active user profile discovered.", "error");
+        
+        isRecoveryMode = true; failedAttempts = 0;
+        document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg> Recover Profile`;
+        document.getElementById('pin-msg').innerText = `Hello ${savedName}, please select your spiritual birth month.`;
+        
+        document.getElementById('pin-instruction').style.display = 'block';
+        document.getElementById('pin-instruction').innerText = "नयाँ ४ अंकको पिन सेट गर्नुहोस्";
+        document.getElementById('pin-input').value = "";
+        
+        const qSelect = document.getElementById('month-select');
+        qSelect.style.display = 'block'; 
+        qSelect.value = ""; 
+        qSelect.disabled = false;
+        
+        document.getElementById('forgot-btn').style.display = 'none';
+        document.getElementById('cancel-forgot-btn').style.display = 'inline-block';
+    }
+
+    function cancelForgotPIN() {
+        isRecoveryMode = false;
+        document.getElementById('month-select').style.display = 'none';
+        document.getElementById('pin-instruction').style.display = 'none';
+        document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)";
+        document.getElementById('pin-input').value = "";
+        
+        document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Unlock Quiz`;
+        document.getElementById('pin-msg').innerText = `Welcome back, ${userName}`;
+        
+        document.getElementById('cancel-forgot-btn').style.display = 'none';
+        document.getElementById('forgot-btn').style.display = 'inline-block';
+    }
+
+    function handlePIN() {
+        if(isLockedOut) return;
+        
+        const fName = document.getElementById('first-name-input').value.trim();
+        const lName = document.getElementById('last-name-input').value.trim();
+        const inputName = fName + " " + lName;
+        
+        const inputPhone = document.getElementById('phone-input').value.trim();
+        const inputAddress = document.getElementById('address-input').value.trim();
+        const inputPIN = document.getElementById('pin-input').value;
+        const selectedMonth = document.getElementById('month-select').value;
+        
+        let inputCountry = "";
+        let countryDropdown = document.getElementById('country-select');
+        if(countryDropdown) {
+            inputCountry = countryDropdown.value;
+            if(inputCountry === 'Other') {
+                inputCountry = document.getElementById('country-input-other').value.trim();
+            }
+        }
+        
+        const savedPIN = localStorage.getItem('murali_pin');
+        const savedMonth = localStorage.getItem('murali_month');
+
+        if (isRecoveryMode) {
+            if (inputPIN.length < 4) return showToast("PIN must be exactly 4-digits.", "error");
+            if (!selectedMonth) return showToast("कृपया महिना छान्नुहोस्।", "error");
+            
+            if (selectedMonth === savedMonth) {
+                localStorage.setItem('murali_pin', inputPIN);
+                showToast("Account recovered completely!", "success"); 
+                unlockApp();
+            } else {
+                showToast(`गलत महिना! सुरक्षाको कारण सिस्टम ५ मिनेटको लागि लक भयो।`, "error");
+                let unlockTime = Date.now() + (5 * 60 * 1000);
+                localStorage.setItem('murali_lockout_time', unlockTime);
+                startLockoutTimer(unlockTime);
+            }
+            return;
+        }
+
+        if (!savedPIN) { 
+            const nameRegex = /^[a-zA-Z\s\u0900-\u097F]+$/;
+            if(fName.length < 2 || !nameRegex.test(fName)) return showToast("कृपया सही पहिलो नाम लेख्नुहोस् (अंक/चिह्न नमिल्ने)।", "error");
+            if(lName.length < 2 || !nameRegex.test(lName)) return showToast("कृपया सही थर लेख्नुहोस्।", "error");
+            
+            let addrUpper = inputAddress.toUpperCase();
+            const blacklistedCodes = ["N/A", "KTM", "NGT", "PKR", "BKT", "BRT", "NA"];
+            if (addrUpper.length <= 3 || blacklistedCodes.includes(addrUpper)) {
+                return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (KTM, N/A जस्ता सर्टकट मान्य छैनन्)।", "error");
+            }
+            
+            if (inputCountry === 'Nepal') {
+                const nepalPhoneRegex = /^(98|97|96)\d{8}$/;
+                if(!nepalPhoneRegex.test(inputPhone)) return showToast("नेपालको हकमा फोन नम्बर १० अंकको र ९८, ९७ वा ९६ बाट सुरु भएको हुनुपर्छ।", "error");
+            } else if (inputCountry === 'India') {
+                const indiaPhoneRegex = /^[6-9]\d{9}$/;
+                if(!indiaPhoneRegex.test(inputPhone)) return showToast("भारतको हकमा फोन नम्बर १० अंकको र ६, ७, ८ वा ९ बाट सुरु भएको हुनुपर्छ।", "error");
+            } else {
+                const foreignPhoneRegex = /^\+?[0-9]{7,15}$/;
+                if(!foreignPhoneRegex.test(inputPhone)) return showToast("कृपया सही अन्तर्राष्ट्रिय फोन नम्बर राख्नुहोस्।", "error");
+            }
+            
+            if(!inputCountry) return showToast("कृपया लिस्टबाट आफ्नो देश छान्नुहोस्।", "error");
+            if(inputAddress.length < 3) return showToast("सेवा केन्द्र कम्तीमा ३ अक्षरको हुनुपर्छ।", "error");
+            if (inputPIN.length < 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
+            if(!selectedMonth) return showToast("अलौकिक जन्म महिना छान्नुहोस्।", "error");
+            
+            localStorage.setItem('murali_pin', inputPIN);
+            localStorage.setItem('murali_user_name', inputName);
+            localStorage.setItem('murali_phone', inputPhone);
+            localStorage.setItem('murali_address', inputAddress);
+            localStorage.setItem('murali_country', inputCountry);
+            localStorage.setItem('murali_month', selectedMonth);
+            
+            showToast("Profile created successfully!", "success");
+            unlockApp(); 
+        } else {
+            if (inputPIN.length < 4) return showToast("PIN must be exactly 4-digits.", "error");
+            if (inputPIN === savedPIN) { 
+                unlockApp(); 
+            } else { 
+                failedAttempts++; 
+                if (failedAttempts >= 4) {
+                    showToast("धेरै पटक गलत पिन! ५ मिनेट पर्खनुहोस्।", "error");
+                    let unlockTime = Date.now() + (5 * 60 * 1000);
+                    localStorage.setItem('murali_lockout_time', unlockTime);
+                    startLockoutTimer(unlockTime);
+                } else { 
+                    showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error"); 
+                    document.getElementById('pin-input').value = ""; 
+                }
+            }
+        }
+    }
+    
+    function unlockApp() { 
+        userName = localStorage.getItem('murali_user_name') || "Student"; 
+        userPhone = localStorage.getItem('murali_phone') || "N/A";
+        userAddress = localStorage.getItem('murali_address') || "N/A";
+        userCountry = localStorage.getItem('murali_country') || "N/A";
+
+        failedAttempts = 0;
+        isRecoveryMode = false;
+        
+        document.getElementById('lock-screen').style.display = 'none'; 
+        document.getElementById('main-app').style.display = 'block'; 
+        
+        if (isSharedApp) {
+            if (hasTakenQuizToday(currentMurliDate)) {
+                document.getElementById('murali-text').style.display = 'none';
+                document.getElementById('generator-actions').style.display = 'none';
+                document.getElementById('btn-new-quiz').style.display = 'none';
+                document.getElementById('tab-gen-txt').innerText = "Done";
+                document.getElementById('quiz-area').innerHTML = `<div style="text-align:center; padding: 4rem 1rem; color: var(--success-color); font-weight: 800; font-size: 1.3rem; border: 2px dashed var(--success-color); border-radius: 16px; margin-top: 1rem;"><svg class="icon" viewBox="0 0 24 24" style="width:50px; height:50px; margin-bottom:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><br>तपाईंले आजको परीक्षा सफलतापूर्वक दिइसक्नुभएको छ।<br><span style="font-size:1rem; color:var(--text-color); font-weight:600; margin-top:10px; display:block;">नियमअनुसार एक दिनमा एकपटक मात्र परीक्षा दिन मिल्छ। नतिजा हेर्न माथिको 'Stats' ट्याबमा जानुहोस्।</span></div>`;
+                document.getElementById('quiz-area').style.display = 'block';
+            } else {
+                document.getElementById('murali-text').style.display = 'none';
+                document.getElementById('generator-actions').style.display = 'none';
+                document.getElementById('btn-new-quiz').style.display = 'none';
+                
+                let session = checkActiveSession();
+                if (session && session.date === currentMurliDate) {
+                    document.getElementById('tab-gen-txt').innerText = "Resume";
+                    resumeQuizSession(session);
+                } else {
+                    document.getElementById('tab-gen-txt').innerText = "Exam";
+                    startQuizSession();
+                }
+            }
+        } else {
+            if(!localStorage.getItem('murali_gemini_key')) { 
+                openSettings(); 
+                showToast("API Key configuration missing.", "info"); 
+            }
+        }
+    }
+
+    function openSettings() { 
+        document.getElementById('settings-modal').style.display = 'flex';
+        
+        let nameParts = userName.split(" ");
+        document.getElementById('edit-first-name').value = nameParts[0] || "";
+        document.getElementById('edit-last-name').value = nameParts.slice(1).join(" ") || "";
+        
+        document.getElementById('edit-phone').value = userPhone !== "N/A" ? userPhone : "";
+        document.getElementById('edit-address').value = userAddress !== "N/A" ? userAddress : "";
+        document.getElementById('edit-pin').value = ""; 
+
+        if (isSharedApp) {
+            document.getElementById('api-config-section').style.display = 'none';
+            document.getElementById('exam-config-section').style.display = 'none';
+        }
+    }
+    
+    function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
+    function closeSettingsOnOverlay(e) { if(e.target.id === 'settings-modal') closeSettings(); }
+    
+    function saveAPIKey() {
+        const key = document.getElementById('api-key-input').value.trim();
+        if(!key) return showToast("Key structure cannot stay empty.", "error");
+        localStorage.setItem('murali_gemini_key', key); showToast("Key stored successfully!", "success"); closeSettings();
+    }
+    
+    function deleteAPIKey() { 
+        if(confirm("Wipe out key architecture?")) { 
+            localStorage.removeItem('murali_gemini_key'); 
+            document.getElementById('api-key-input').value = ""; 
+            closeSettings(); 
+            showToast("API Key removed.", "success");
+        } 
+    }
+
+    function updateLanguageUI() {
+        if(isSharedApp) { lang = window.PRELOADED_QUIZ.lang || "ne"; } 
+        else { lang = document.getElementById('lang-select').value; }
+        
+        const d = dict[lang];
+        document.getElementById('app-title').innerHTML = d.title; 
+        document.getElementById('murli-link').href = d.linkUrl;
+
+        let session = checkActiveSession();
+        if(isSharedApp) { 
+            let hasTaken = hasTakenQuizToday(currentMurliDate);
+            document.getElementById('tab-gen-txt').innerText = hasTaken ? "Done" : (session && session.date === currentMurliDate ? "Resume" : "Exam"); 
+        } else { 
+            document.getElementById('tab-gen-txt').innerText = "Exam"; 
+        }
+        
+        document.getElementById('tab-prog-txt').innerText = "Stats";
+        document.getElementById('murali-text').placeholder = d.placeholder; 
+        
+        if(document.getElementById('view-progress').style.display === 'block') renderDashboard();
+    }
+    
+    function toggleDarkMode() {
+        let isDark = document.body.hasAttribute('data-theme');
+        isDark ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('m_q_theme', isDark ? 'light' : 'dark');
+    }
+    
+    // V28.4 Fix: Clean up past review so Exam tab is fresh
+    function cleanupPastReview() {
+        if (!isSharedApp) {
+            document.getElementById('quiz-area').innerHTML = ''; 
+            document.getElementById('quiz-area').style.display = 'none'; 
+            document.getElementById('murali-text').style.display = 'block';
+            document.getElementById('generator-actions').style.display = 'flex';
+            document.getElementById('quiz-config-tools').style.display = 'flex';
+            document.getElementById('active-quiz-info').style.display = 'none';
+            document.getElementById('online-quiz-actions').style.display = 'none';
+            updateResumeButton();
+        } else {
+            let pDate = window.PRELOADED_QUIZ ? window.PRELOADED_QUIZ.date : currentMurliDate;
+            if (hasTakenQuizToday(pDate)) {
+                document.getElementById('quiz-area').innerHTML = `<div style="text-align:center; padding: 4rem 1rem; color: var(--success-color); font-weight: 800; font-size: 1.3rem; border: 2px dashed var(--success-color); border-radius: 16px; margin-top: 1rem;"><svg class="icon" viewBox="0 0 24 24" style="width:50px; height:50px; margin-bottom:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><br>तपाईंले आजको परीक्षा सफलतापूर्वक दिइसक्नुभएको छ।<br><span style="font-size:1rem; color:var(--text-color); font-weight:600; margin-top:10px; display:block;">नियमअनुसार एक दिनमा एकपटक मात्र परीक्षा दिन मिल्छ। नतिजा हेर्न माथिको 'Stats' ट्याबमा जानुहोस्।</span></div>`;
+                document.getElementById('quiz-area').style.display = 'block';
+            } else {
+                let session = checkActiveSession();
+                if (session) {
+                    currentQuiz = session.quiz;
+                    currentScore = session.score;
+                    answeredCount = session.answered;
+                    totalTimeSec = session.time || 0;
+                    currentMurliDate = session.date;
+                    renderQuizArea();
+                } else {
+                    currentQuiz = window.PRELOADED_QUIZ.quiz;
+                    currentMurliDate = window.PRELOADED_QUIZ.date || "";
+                    lang = window.PRELOADED_QUIZ.lang || "ne";
+                    currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+                    renderQuizArea(); 
+                }
+            }
+        }
+    }
+
+    function switchTab(tab) {
+        document.getElementById('tab-gen').classList.toggle('active', tab === 'gen');
+        document.getElementById('tab-prog').classList.toggle('active', tab === 'prog');
+        document.getElementById('view-generator').style.display = tab === 'gen' ? 'block' : 'none';
+        document.getElementById('view-progress').style.display = tab === 'prog' ? 'block' : 'none';
+        
+        if (tab === 'prog') { 
+            document.getElementById('sticky-scorebar').style.display = 'none'; 
+            renderDashboard(); 
+        } else if (tab === 'gen') {
+            if (reviewSource === 'past') {
+                reviewSource = 'current'; // user manually clicked Exam tab, clean up past view
+                cleanupPastReview();
+            } else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block') { 
+                document.getElementById('sticky-scorebar').style.display = 'flex'; 
+            }
+        }
+    }
+
+    function extractDate(text) {
+        let match = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i);
+        return match ? match[0] : new Date().toLocaleDateString('en-GB');
+    }
+
+    async function handleMergeFiles(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        
+        document.getElementById('murali-text').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('loading-box').style.display = 'block';
+        document.querySelector('#loading-box p').innerText = "फाइलहरू पढेर मेगा क्वीज तयार गर्दै...";
+
+        let allQuestions = [];
+        
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let text = await file.text();
+            
+            let match = text.match(/window\.PRELOADED_QUIZ\s*=\s*(\{.*?\});/s);
+            if (match && match[1]) {
+                try {
+                    let data = JSON.parse(match[1]);
+                    if (data && data.quiz && Array.isArray(data.quiz)) {
+                        allQuestions = allQuestions.concat(data.quiz);
+                    }
+                } catch (e) {
+                    console.error("Error parsing file:", file.name, e);
+                }
+            }
+        }
+        
+        if (allQuestions.length === 0) {
+            document.getElementById('loading-box').style.display = 'none';
+            document.getElementById('murali-text').style.display = 'block'; 
+            document.getElementById('generator-actions').style.display = 'flex';
+            document.querySelector('#loading-box p').innerText = "Drafting compact structural layouts from input source text data.";
+            return showToast("छानिएका फाइलहरूमा कुनै पनि प्रश्न भेटिएन।", "error");
+        }
+        
+        let uniqueQuestionsMap = new Map();
+        allQuestions.forEach(q => {
+            let qText = q.q.trim().toLowerCase();
+            if (!uniqueQuestionsMap.has(qText)) {
+                uniqueQuestionsMap.set(qText, q);
+            }
+        });
+        
+        let uniqueQuestions = Array.from(uniqueQuestionsMap.values());
+        
+        shuffleArray(uniqueQuestions);
+        
+        let targetCount = parseInt(document.getElementById('q-count').value);
+        if (uniqueQuestions.length < targetCount) {
+            showToast(`जम्मा ${uniqueQuestions.length} वटा मात्र फरक प्रश्न भेटिए।`, "info");
+            currentQuiz = uniqueQuestions;
+        } else {
+            currentQuiz = uniqueQuestions.slice(0, targetCount);
+        }
+        
+        currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; shuffleArray(q.options); });
+        
+        let todayStr = new Date().toLocaleDateString('en-GB');
+        let customDate = prompt("कृपया मेगा क्वीजको लागि मिति राख्नुहोस् (तपाईंले यसलाई परिवर्तन गर्न सक्नुहुन्छ):", todayStr);
+        
+        if (!customDate || customDate.trim() === "") {
+            customDate = todayStr;
+        }
+        currentMurliDate = customDate.trim() + " (Mega Quiz)";
+        
+        document.getElementById('loading-box').style.display = 'none';
+        document.querySelector('#loading-box p').innerText = "Drafting compact structural layouts from input source text data.";
+        event.target.value = ""; 
+        
+        startQuizSession();
+    }
+
+    async function generateQuizWithAI() {
+        const apiKey = localStorage.getItem('murali_gemini_key'); if(!apiKey) { openSettings(); return showToast("API Key Missing.", "error"); }
+        const text = document.getElementById('murali-text').value.trim(); if(text.length < 50) return showToast(dict[lang].errShort, "error");
+        const qCount = document.getElementById('q-count').value; 
+        const level = document.getElementById('quiz-level').value; 
+        
+        const aiModelElement = document.getElementById('ai-model');
+        const selectedModel = aiModelElement ? aiModelElement.value : 'gemini-3.6-flash';
+        
+        currentMurliDate = extractDate(text);
+
+        if (hasTakenQuizToday(currentMurliDate)) {
+            showToast(`तपाईंले आज (${currentMurliDate}) को परीक्षा दिइसक्नुभएको छ। भोलि पुनः प्रयास गर्नुहोला।`, "error");
+            return;
+        }
+
+        document.getElementById('murali-text').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('loading-box').style.display = 'block';
+
+        let dynamicInstruction = "";
+        
+        if (level === 'expert') {
+            dynamicInstruction = `CRITICAL INSTRUCTION FOR EXPERT EXAM: This exam MUST be highly logical and exceptionally tricky.
+            1. QUESTIONS: Provide a complex layered scenario or a deep philosophical statement based ONLY on today's text. Ask "Which of the following precise conclusions is correct?" or "Identify the hidden condition in this statement."
+            2. DISTRACTORS: The wrong options MUST be logically sound spiritual concepts from Baba's general teachings that look 100% correct, but they are completely wrong for today's specific context. Do NOT use silly or obvious wrong answers.
+            3. LENGTH: The question text and option text MUST NOT be extremely long paragraphs. Keep them readable, but the logic required to find the correct answer must be extremely high.
+            4. FORMAT: Mix 40% deep reasoning, 30% "True/False" complex identification, 30% "What is the specific hidden meaning?".`;
+        } else if (level === 'advanced') {
+            dynamicInstruction = `CRITICAL INSTRUCTION FOR ADVANCED EXAM: The students taking this quiz are regular students. Do NOT ask basic trivia. 
+            1. QUESTIONS: Formulate questions based on specific nuances, unique examples, or particular conditions mentioned ONLY in today's text. 
+            2. DISTRACTORS (Wrong Options): The 3 incorrect options MUST be valid, positive, and standard spiritual concepts making them look very similar. However, they should NOT be the specific correct answer for today's context.
+            3. DIFFICULTY: High. The options should make the user think deeply before selecting.`;
+        } else {
+            dynamicInstruction = "Generate standard comprehension questions. Ensure the incorrect options are valid concepts, making them tricky.";
+        }
+
+        let fullLangName = lang === 'ne' ? 'Nepali' : (lang === 'hi' ? 'Hindi' : 'English');
+
+        const promptText = `You are an expert examiner. Generate a valid JSON array containing exactly ${qCount} objects representing a quiz.
+        CRITICAL: Do NOT wrap the output in markdown blocks like \`\`\`json. Output ONLY the raw JSON array.
+        CRITICAL: DO NOT truncate options with ellipses (...). Provide the complete text for each option. The exact correct string in 'answer' MUST match character-by-character with one of the items in the 'options' array.
+        
+        CRITICAL INSTRUCTIONS FOR CONCISENESS:
+        1. DO NOT use redundant phrases like "मुरली अनुसार", "बाबाको अनुसार", or "आजको मुरलीमा". Start the question directly.
+        2. Keep the question text highly concise (Strictly under 15 words).
+        3. Keep every option (A, B, C, D) EXTREMELY short (maximum 5 to 8 words). They MUST fit on a single mobile screen line.
+
+        Structure of each object:
+        - "q": The question text (Keep it concise, clear and strictly based on the text).
+        - "options": Array of exactly 4 strings (Keep options short, balanced in length, and plausible).
+        - "answer": The exact correct string. It MUST match character-by-character with one of the items in the "options" array.
+        - "explanation": Exactly 1 precise sentence explaining WHY this answer is correct based on the source text.
+        - "tag": A single short topical keyword (e.g., ज्ञान, योग, धारणा, सेवा, कर्म, स्मृति).
+        - "original": The exact contextual sentence extracted directly from the source text that proves the answer.
+        
+        Language: STRICTLY use natural ${fullLangName} language without mixing others.
+        Formatting: Include standard questions, "True/False" logic variations, and "Fill in the blanks".
+        ${dynamicInstruction}
+        
+        Text Data:
+${text}`;
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    contents: [{ parts: [{ text: promptText }] }],
+                    generationConfig: { response_mime_type: "application/json" }
+                })
+            });
+            
+            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+            const data = await response.json(); 
+            let responseText = data.candidates[0].content.parts[0].text;
+            
+            let startIndex = responseText.indexOf('[');
+            let endIndex = responseText.lastIndexOf(']');
+            if (startIndex !== -1 && endIndex !== -1) {
+                responseText = responseText.substring(startIndex, endIndex + 1);
+            }
+            
+            currentQuiz = JSON.parse(responseText); 
+            
+            currentQuiz.forEach(q => {
+                if (!q.options.includes(q.answer)) {
+                    let cleanAnswer = q.answer.replace(/\.+$/, '').trim().toLowerCase();
+                    let fallbackMatch = q.options.find(o => {
+                        let cleanO = o.replace(/\.+$/, '').trim().toLowerCase();
+                        return cleanO === cleanAnswer || cleanO.includes(cleanAnswer) || cleanAnswer.includes(cleanO);
+                    });
+                    if (fallbackMatch) q.answer = fallbackMatch;
+                }
+                shuffleArray(q.options);
+            });
+            
+            document.getElementById('loading-box').style.display = 'none';
+            startQuizSession();
+        } catch (error) {
+            document.getElementById('loading-box').style.display = 'none';
+            document.getElementById('murali-text').style.display = 'block'; 
+            document.getElementById('generator-actions').style.display = 'flex';
+            showToast("AI Request Failed! Ensure valid key or try later.", "error");
+            console.error(error);
+        }
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            totalTimeSec++; 
+            let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0');
+            let s = (totalTimeSec % 60).toString().padStart(2, '0');
+            document.getElementById('timer-text').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    function stopTimer() { 
+        clearInterval(timerInterval); 
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (isTimerStarted && document.getElementById('quiz-area').style.display === 'block') {
+            if (document.hidden) { stopTimer(); } else { startTimer(); }
+        }
+    });
+
+    function startQuizSession() {
+        stopTimer(); 
+        currentScore = 0; answeredCount = 0; totalTimeSec = 0; isTimerStarted = false; activeOptionFocus = 0;
+        document.getElementById('sb-submit-btn').disabled = false;
+        
+        currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('sticky-scorebar').style.display = 'flex';
+        document.getElementById('timer-text').innerText = "00:00";
+        
+        if (!isSharedApp) {
+            document.getElementById('lang-select').style.display = 'block';
+            document.getElementById('q-count').style.display = 'block';
+            document.getElementById('quiz-config-tools').style.display = 'none';
+            document.getElementById('active-quiz-info').style.display = 'flex';
+            document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
+            document.getElementById('online-quiz-actions').style.display = 'flex';
+        }
+
+        updateStickyBar(); renderQuizArea();
+    }
+
+    function resumeQuizSession(preloadedSession = null) {
+        let session = preloadedSession || checkActiveSession();
+        if(!session) return;
+        
+        currentQuiz = session.quiz;
+        currentScore = session.score;
+        answeredCount = session.answered;
+        totalTimeSec = session.time || 0;
+        currentMurliDate = session.date;
+        isTimerStarted = true;
+        
+        document.getElementById('murali-text').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('sticky-scorebar').style.display = 'flex';
+        
+        if (!isSharedApp) {
+            document.getElementById('quiz-config-tools').style.display = 'none';
+            document.getElementById('active-quiz-info').style.display = 'flex';
+            document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
+            document.getElementById('online-quiz-actions').style.display = 'flex';
+        }
+        
+        startTimer();
+        updateStickyBar();
+        renderQuizArea();
+        showToast("Welcome back! Resuming your saved exam...", "info");
+    }
+
+    function cancelQuiz() {
+        if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ? प्रगति सेभ हुनेछैन।")) {
+            localStorage.removeItem('murali_active_session_' + userName);
+            resetToGenerator();
+        }
+    }
+
+    function resetToGenerator() {
+        if (isSharedApp) { window.location.reload(); return; }
+        document.getElementById('quiz-area').style.display = 'none'; document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('murali-text').style.display = 'block';
+        document.getElementById('generator-actions').style.display = 'flex'; 
+        
+        document.getElementById('quiz-config-tools').style.display = 'flex';
+        document.getElementById('active-quiz-info').style.display = 'none';
+        document.getElementById('online-quiz-actions').style.display = 'none';
+
+        updateResumeButton();
+        window.scrollTo(0, 0); stopTimer(); isTimerStarted = false;
+    }
+
+    function updateStickyBar() { document.getElementById('sb-answered').innerText = `${answeredCount}/${currentQuiz.length}`; }
+
+    function nextQuestion(currentIndex) {
+        let currentEl = document.getElementById(`qb-${currentIndex}`);
+        if(currentEl) currentEl.style.display = 'none'; 
+        let nextIndex = currentIndex + 1;
+        if (nextIndex < currentQuiz.length) {
+            let nextEl = document.getElementById(`qb-${nextIndex}`);
+            if(nextEl) {
+                nextEl.style.display = 'block'; 
+                activeOptionFocus = 0;
+                let firstOpt = document.getElementById(`opt-${nextIndex}-0`);
+                if(firstOpt) firstOpt.classList.add('keyboard-focus');
+            }
+        }
+        window.scrollTo(0, 0); 
+    }
+
+    function renderQuizArea() {
+        const d = dict[lang]; const area = document.getElementById('quiz-area');
+        let htmlString = '';
+        
+        const letters = ['A', 'B', 'C', 'D'];
+        currentQuiz.forEach((item, qIndex) => {
+            let isAnswered = item.userSelectedIndex !== undefined;
+            
+            let optsHTML = item.options.map((opt, oIndex) => {
+                let focusClass = (!isAnswered && qIndex === answeredCount && oIndex === 0) ? 'keyboard-focus' : '';
+                return `
+                <button type="button" class="option-container ${focusClass}" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex})" style="text-align: left; width: 100%; display: block; font-family: inherit; margin: 0; appearance: none;">
+                    <div class="option-text" style="font-size: ${currentGlobalFontSize}px;">
+                        <span class="option-letter">${letters[oIndex]}</span> <span>${opt}</span>
+                    </div>
+                    <div class="feedback-box"><div class="feedback-title" id="fb-title-${qIndex}-${oIndex}"></div><div class="feedback-desc" id="fb-desc-${qIndex}-${oIndex}"></div></div>
+                </button>`;
+            }).join('');
+                
+            let displayStyle = qIndex === answeredCount ? 'block' : 'none'; 
+            let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
+            
+            htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
+                <div class="question-header">
+                    <div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div>
+                    <p class="question-text" style="font-size: ${currentGlobalFontSize}px;">${item.q}</p>
+                </div>
+                <div class="options-group">${optsHTML}</div>
+            </div>`;
+        });
+        
+        area.innerHTML = htmlString;
+    }
+
+    function saveSessionData() {
+        let sessionData = {
+            date: currentMurliDate,
+            quiz: currentQuiz,
+            score: currentScore,
+            answered: answeredCount,
+            time: totalTimeSec
+        };
+        localStorage.setItem('murali_active_session_' + userName, JSON.stringify(sessionData));
+    }
+
+    function selectOption(qIndex, oIndex) {
+        if (!isTimerStarted) { startTimer(); isTimerStarted = true; }
+        
+        let block = document.getElementById(`qb-${qIndex}`); 
+        if(block.classList.contains('answered')) return;
+        block.classList.add('answered'); 
+        
+        for(let i=0; i<4; i++) {
+            let opt = document.getElementById(`opt-${qIndex}-${i}`);
+            opt.classList.add('disabled');
+            if(i === oIndex) opt.classList.add('selected-temp');
+        }
+        
+        let q = currentQuiz[qIndex]; 
+        answeredCount++; 
+        q.userSelectedIndex = oIndex;
+        
+        let selectedVal = q.options[oIndex]; 
+
+        if (selectedVal === q.answer) { 
+            currentScore++; 
+            q.userCorrect = true; 
+            playSound('correct');
+        } else { 
+            q.userCorrect = false; 
+            playSound('wrong');
+        }
+        
+        updateStickyBar();
+        saveSessionData(); 
+        
+        setTimeout(() => {
+            if (qIndex < currentQuiz.length - 1) { nextQuestion(qIndex); } 
+            else { showToast(lang === 'ne' ? "सबै प्रश्न सकियो! नतिजा तयार हुँदैछ..." : "All questions completed! Processing result...", "success"); submitQuiz(); }
+        }, 600); 
+    }
+
+    function submitQuiz() {
+        if (document.getElementById('sb-submit-btn').disabled) return;
+        
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        let existingIndex = history.findIndex(item => item.date === currentMurliDate && item.name === userName);
+        
+        if (existingIndex !== -1) {
+             showToast(lang === 'ne' ? "तपाईंले आजको परीक्षा पहिले नै बुझाइसक्नुभएको छ।" : "You have already submitted today's exam.", "error");
+             stopTimer();
+             showResultScreen();
+             return;
+        }
+
+        let d = dict[lang]; let untouched = currentQuiz.length - answeredCount;
+        
+        if (currentQuiz.length > 0 && answeredCount === 0) {
+            showToast("तपाईंले कुनै पनि प्रश्नको उत्तर दिनुभएको छैन। कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
+            document.getElementById('sb-submit-btn').disabled = false;
+            return;
+        }
+        
+        if (untouched > 0) {
+            if (!confirm(d.confirmSubmit.replace('{n}', untouched))) {
+                document.getElementById('sb-submit-btn').disabled = false;
+                return;
+            }
+        }
+        
+        document.getElementById('sb-submit-btn').disabled = true;
+        stopTimer(); 
+        saveOrReplaceProgress(); 
+        localStorage.removeItem('murali_active_session_' + userName); 
+        updateResumeButton();
+        showResultScreen();
+
+        syncPendingResults();
+    }
+
+    function showResultScreen() {
+        reviewSource = 'current'; // Explicitly set to current quiz result
+        document.getElementById('quiz-area').style.display = 'none'; 
+        document.getElementById('sticky-scorebar').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block'; 
+        
+        let percent = Math.round((currentScore / currentQuiz.length) * 100);
+        document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
+        let d = dict[lang]; let msg = "", sub = "";
+        
+        if(percent === 100) { msg = d.msg100; sub = d.sub100; fireConfetti(); } 
+        else if(percent >= 80) { msg = d.msg80; sub = d.sub80; } 
+        else if(percent >= 50) { msg = d.msg50; sub = d.sub50; } 
+        else { msg = d.msgLow; sub = d.subLow; }
+        document.getElementById('rs-msg').innerText = msg; document.getElementById('rs-submsg').innerText = sub; window.scrollTo(0, 0);
+    }
+    
+    function getReportText() {
+        const nName = userName.replace(/ /g, ' ');
+        const nAddress = userAddress.replace(/ /g, ' ');
+        const nDate = currentMurliDate.replace(/ /g, ' ');
+        const nTime = document.getElementById('timer-text').innerText.replace(/ /g, ' ');
+        const nCountry = userCountry.replace(/ /g, ' ');
+        
+        return `🎯 *Murali Quiz Result*
+👤 नाम: ${nName}
+🌍 देश: ${nCountry}
+📍 सेवा केन्द्र: ${nAddress}
+📞 फोन: ${userPhone}
+📅 मिति: ${nDate}
+📊 नतिजा: ${currentScore}/${currentQuiz.length} (${Math.round((currentScore / currentQuiz.length) * 100)}%)
+⏱️ समय: ${nTime}`; 
+    }
+    
+    async function shareResult() {
+        const reportText = getReportText();
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Murali Quiz Result', text: reportText }); } catch (err) { console.log('Error sharing:', err); }
+        } else {
+            navigator.clipboard.writeText(reportText).then(() => { showToast("नतिजा कपी भयो! अब जहाँ पनि पेस्ट गर्न सक्नुहुन्छ।", "success"); });
+        }
+    }
+
+    function downloadReport() {
+        const reportText = getReportText();
+        const blob = new Blob([reportText], { type: 'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `Murali_Score_${userName}_${currentMurliDate.replace(/\//g, '-')}.txt`;
+        a.click(); showToast("Report saved to device.", "success");
+    }
+
+    function reviewQuiz() {
+        document.getElementById('result-screen').style.display = 'none'; 
+        document.getElementById('quiz-area').style.display = 'block';
+        
+        let backBtn = document.getElementById('back-to-res');
+        if (backBtn) { backBtn.remove(); }
+        
+        backBtn = document.createElement('button'); 
+        backBtn.id = 'back-to-res'; 
+        backBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Go Back`;
+        backBtn.style.margin = "0 0 15px 0"; 
+        backBtn.style.background = "var(--primary-color)"; 
+        backBtn.style.color = "white"; 
+        backBtn.style.borderRadius = "50px"; 
+        backBtn.style.padding = "0.6rem 1.4rem"; 
+        backBtn.style.width = "auto"; 
+        backBtn.style.fontWeight = "800";
+        
+        // V28.4 Smart Go Back Logic
+        backBtn.onclick = () => { 
+            document.getElementById('quiz-area').style.display = 'none'; 
+            if (reviewSource === 'past') {
+                reviewSource = 'current'; // Reset BEFORE cleanup
+                cleanupPastReview();      // Clean up the generator area
+                switchTab('prog');        // Go back to calendar
+            } else {
+                document.getElementById('result-screen').style.display = 'block'; 
+            }
+        };
+        document.getElementById('quiz-area').prepend(backBtn);
+        
+        currentQuiz.forEach((q, qIndex) => {
+            let qb = document.getElementById(`qb-${qIndex}`); if (qb) qb.style.display = 'block';
+            
+            if (q.userSelectedIndex !== undefined) {
+                let d = dict[lang]; let oIndex = q.userSelectedIndex; let rightIndex = q.options.indexOf(q.answer);
+                let selectedContainer = document.getElementById(`opt-${qIndex}-${oIndex}`);
+                selectedContainer.classList.remove('selected-temp');
+
+                const successIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+                const errorIcon = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+
+                let expHtml = q.explanation ? `<div class="explanation-box">💡 <strong>Reason:</strong> ${q.explanation}</div>` : '';
+
+                if (q.userCorrect) {
+                    selectedContainer.classList.add('selected-right');
+                    document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${successIcon} ${d.feedbackRightTitle}`;
+                    document.getElementById(`fb-desc-${qIndex}-${oIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}" ${expHtml}`;
+                } else {
+                    selectedContainer.classList.add('selected-wrong');
+                    document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${errorIcon} ${d.feedbackWrongTitle}`;
+                    let correctLetter = rightIndex !== -1 ? ['A','B','C','D'][rightIndex] : '';
+                    let letterDisplay = correctLetter ? `(${correctLetter}) ` : '';
+                    
+                    document.getElementById(`fb-desc-${qIndex}-${oIndex}`).innerHTML = `
+                        <div style="margin-top: 4px; padding: 8px 10px; background: rgba(22, 163, 74, 0.15); border-left: 4px solid var(--success-color); border-radius: 6px; color: var(--text-color); font-weight:700;">
+                            <strong>${d.feedbackRightTitle}:</strong> ${letterDisplay}${q.answer}
+                        </div>
+                        <div style="margin-top: 8px;"><strong>Context:</strong> "${q.original}"</div>
+                        ${expHtml}
+                    `;
+
+                    if (rightIndex !== -1) {
+                        let rightContainer = document.getElementById(`opt-${qIndex}-${rightIndex}`);
+                        if(rightContainer) rightContainer.classList.add('selected-right');
+                        document.getElementById(`fb-title-${qIndex}-${rightIndex}`).innerHTML = `${successIcon} ${d.feedbackRightTitle}`;
+                        document.getElementById(`fb-desc-${qIndex}-${rightIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}"`;
+                    }
+                }
+            }
+        });
+        window.scrollTo(0, 0);
+    }
+
+    function saveOrReplaceProgress() {
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        let percent = Math.round((currentScore / currentQuiz.length) * 100);
+        let timeNow = new Date().toLocaleString('en-GB');
+        
+        let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
+
+        let existingIndex = history.findIndex(item => item.date === currentMurliDate && item.name === userName);
+        
+        if (existingIndex !== -1) { 
+            return; 
+        }
+        
+        let newRecord = { 
+            id: Date.now(), 
+            name: userName, 
+            phone: userPhone, 
+            address: userAddress,
+            country: userCountry,
+            date: currentMurliDate, 
+            score: currentScore, 
+            total: currentQuiz.length, 
+            percent: percent, 
+            lang: lang, 
+            timeTaken: document.getElementById('timer-text').innerText, 
+            time: timeNow, 
+            timestamp: Date.now(),
+            weakTags: incorrectTags,
+            quizData: currentQuiz, 
+            synced: false 
+        };
+        history.unshift(newRecord);
+        localStorage.setItem('murali_progress', JSON.stringify(history));
+    }
+
+    window.reviewPastQuiz = function(id) {
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        let record = history.find(item => item.id === id);
+        if(record && record.quizData) {
+            currentQuiz = record.quizData;
+            currentScore = record.score;
+            currentMurliDate = record.date;
+            lang = record.lang || 'ne';
+            
+            document.getElementById('murali-text').style.display = 'none';
+            document.getElementById('generator-actions').style.display = 'none';
+            
+            reviewSource = 'past'; // Mark source to handle Go Back button correctly
+            
+            // V28.4 Fix: Manual switch to avoid triggering switchTab cleanup
+            document.getElementById('tab-gen').classList.add('active');
+            document.getElementById('tab-prog').classList.remove('active');
+            document.getElementById('view-generator').style.display = 'block';
+            document.getElementById('view-progress').style.display = 'none';
+            document.getElementById('sticky-scorebar').style.display = 'none';
+            
+            renderQuizArea();
+            reviewQuiz();
+        } else {
+            showToast("माफ गर्नुहोला, यो पुरानो प्रश्नपत्रको डाटा उपलब्ध छैन।", "error");
+        }
+    };
+
+    async function exportBackupData() {
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        
+        if (history.length === 0) {
+            return showToast("कुनै पनि पुरानो नतिजा छैन। कृपया पहिले परीक्षा दिनुहोस्।", "error");
+        }
+
+        let backupObject = { app_version: APP_VERSION, export_date: new Date().toISOString(), data: history };
+        let jsonString = JSON.stringify(backupObject, null, 2);
+        
+        // Use text/plain and .txt to safely bypass Mobile OS share restrictions
+        let blob = new Blob([jsonString], { type: 'text/plain' });
+        let filename = `Murali_Quiz_Backup_${userName.replace(/ /g, '_')}.txt`;
+        
+        let file = new File([blob], filename, { type: "text/plain" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: 'Quiz Backup', text: 'Murali Quiz Data Backup' });
+                showToast("फाइल सेयर मेनुमा पठाइयो!", "success");
+                return;
+            } catch(e) { 
+                console.log(e); 
+                if (e.name === 'AbortError') return; 
+            }
+        }
+        
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        showToast("Backup exported successfully.", "success");
+    }
+
+    function importBackupData(event) {
+        let file = event.target.files[0]; if (!file) return;
+        let reader = new FileReader(); reader.onload = function(e) {
+            try {
+                let importedFile = JSON.parse(e.target.result);
+                let importedData = Array.isArray(importedFile) ? importedFile : (importedFile.data || []); 
+                
+                if (Array.isArray(importedData)) {
+                    let localData = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+                    let merged = [...importedData, ...localData];
+                    let uniqueMap = new Map();
+                    merged.forEach(item => {
+                        let uniqueKey = item.id || (item.date + "_" + item.name);
+                        if(!uniqueMap.has(uniqueKey)) { uniqueMap.set(uniqueKey, item); }
+                    });
+                    
+                    let finalArray = Array.from(uniqueMap.values());
+                    finalArray.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    localStorage.setItem('murali_progress', JSON.stringify(finalArray)); 
+                    showToast("Backup Restored successfully!", "success"); renderDashboard();
+                } else { showToast("Malformed architecture data layout.", "error"); }
+            } catch(err) { showToast("Parsing engine crashed. Ensure valid JSON backup file.", "error"); }
+        };
+        reader.readAsText(file);
+    }
+
+    // Helper to properly extract the exact Murli Date from h.date string, ignoring when it was submitted
+    function getValidDate(h) {
+        if (!h.date) {
+            return h.timestamp ? new Date(h.timestamp) : null;
+        }
+        
+        let cleanDateStr = h.date.replace(/\s*\(.*?\)\s*/g, '').trim(); 
+        
+        let parts = cleanDateStr.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
+        if (parts) {
+            let py = parseInt(parts[3], 10);
+            if (py < 100) py += 2000;
+            return new Date(py, parseInt(parts[2], 10) - 1, parseInt(parts[1], 10));
+        }
+        
+        let strParts = cleanDateStr.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
+        if (strParts) {
+            let monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+            let mIndex = monthNames.indexOf(strParts[2].toLowerCase());
+            let py = parseInt(strParts[3], 10);
+            if (py < 100) py += 2000;
+            return new Date(py, mIndex, parseInt(strParts[1], 10));
+        }
+
+        let d = new Date(cleanDateStr);
+        if (!isNaN(d.getTime())) return d;
+        
+        if (h.timestamp) return new Date(h.timestamp);
+        return null;
+    }
+
+    function calculateStreak(history) {
+        if (!history.length) return 0;
+        let uniqueDays = new Set();
+        history.forEach(h => {
+            let d = getValidDate(h);
+            if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime());
+        });
+        
+        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a);
+        if (sortedDays.length === 0) return 0;
+        
+        let streak = 0;
+        let today = new Date();
+        let todayTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+        let yesterdayTime = todayTime - 86400000;
+        
+        let expectedTime = todayTime;
+        if (sortedDays[0] === todayTime) {
+            // Started today
+        } else if (sortedDays[0] === yesterdayTime) {
+            expectedTime = yesterdayTime;
+        } else {
+            return 0; // Missed both yesterday and today
+        }
+        
+        for (let time of sortedDays) {
+            if (time === expectedTime) {
+                streak++;
+                expectedTime -= 86400000;
+            } else if (time > expectedTime) {
+                continue; 
+            } else {
+                break; 
+            }
+        }
+        return streak;
+    }
+
+    window.changeCalMonth = function(dir) {
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+        renderDashboard();
+    };
+
+    function renderDashboard() {
+        const d = dict[lang]; 
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        
+        let streak = calculateStreak(history);
+        
+        let cy = currentCalDate.getFullYear();
+        let cm = currentCalDate.getMonth();
+        
+        // Month records filter based on exact Murli date
+        let filteredHistory = history.filter(h => {
+            let dObj = getValidDate(h);
+            return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm;
+        });
+
+        // 1. Stats Setup 
+        let totalTaken = filteredHistory.length; 
+        let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0;
+        let excellentCount = filteredHistory.filter(h => h.percent >= 80).length;
+        let excRate = totalTaken ? Math.round((excellentCount / totalTaken) * 100) : 0;
+        
+        document.getElementById('dash-stats').innerHTML = `
+            <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
+            <div class="stat-card"><h3>${avgPercent}%</h3><p>${d.statsAvg}</p></div>
+            <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
+            <div class="stat-card" style="background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3);"><h3 style="color: #7c3aed;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #7c3aed;">Current Streak</p></div>
+        `;
+
+        // 2. Calendar Setup
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('cal-month-year').innerText = `${monthNames[cm]} ${cy}`;
+        
+        let firstDay = new Date(cy, cm, 1).getDay();
+        let daysInMonth = new Date(cy, cm + 1, 0).getDate();
+        let today = new Date();
+        
+        let monthMap = {};
+        filteredHistory.forEach(h => {
+            let dObj = getValidDate(h);
+            if (dObj) {
+                let day = dObj.getDate();
+                if (!monthMap[day] || h.percent > monthMap[day].percent) { monthMap[day] = h; }
+            }
+        });
+        
+        let calHtml = '';
+        for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
+        
+        for (let i = 1; i <= daysInMonth; i++) {
+            let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear());
+            let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
+            
+            if (monthMap[i]) {
+                let h = monthMap[i];
+                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor');
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" title="Score: ${h.score}/${h.total} (${h.percent}%)" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
+            } else {
+                calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`;
+            }
+        }
+        document.getElementById('cal-grid-days').innerHTML = calHtml;
+
+        // 3. Weakness Alert Check
+        let allWeakTags = [];
+        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
+        if (allWeakTags.length > 0) {
+            let tagCounts = {};
+            allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1);
+            let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]);
+            document.getElementById('weakness-alert').innerHTML = `<div class="weakness-box" style="margin-top: 15px;">
+                <svg class="icon" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>यस महिनाको गल्तीहरूको आधारमा <b>'${sortedTags[0]}'</b> ${sortedTags[1] ? `र <b>'${sortedTags[1]}'</b>` : ''} विषयमा अलि बढी ध्यान दिनुहोला।</div>
+            </div>`;
+        } else {
+            document.getElementById('weakness-alert').innerHTML = '';
+        }
+
+        // 4. Progress List Below
+        const list = document.getElementById('progress-list'); 
+        if (totalTaken === 0) { 
+            list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: gray; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; 
+            return; 
+        }
+        
+        let summaryBtnHtml = `<button onclick="shareDashboardSummary()" class="btn-small" style="background: rgba(37,211,102,0.1); color: #16a34a; border-color: #16a34a; padding: 0.7rem; width: 100%; margin-bottom: 15px; font-weight:700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;"><svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share Summary Report</button>`;
+        
+        list.innerHTML = summaryBtnHtml + filteredHistory.map(h => {
+            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor);
+            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+            let timerHtml = h.timeTaken ? `<span style="background: rgba(2,132,199,0.1); color: var(--primary-color); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; margin-left: 6px;">⏱️ ${h.timeTaken}</span>` : "";
+            
+            let shareBtn = `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: #25D366; color: #25D366; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" onclick="sharePastResult('${h.date}', ${h.score}, ${h.total}, '${h.timeTaken || '--:--'}', '${h.percent}', '${h.country || 'N/A'}')"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share</button>`;
+            let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;" onclick="reviewPastQuiz(${h.id})"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Review</button>` : '';
+
+            return `<div class="progress-item"><div style="flex-grow: 1;"><div style="font-weight:800; font-size:1.15rem; color:var(--primary-color);">📅 ${h.date}</div><div style="font-size:0.85rem; color:var(--text-color); opacity: 0.7; font-weight: 600;">👤 ${h.name} | ${h.time}</div><div class="prog-remark ${rClass}">${rText}</div>${timerHtml}<div style="display:flex; gap:6px;">${shareBtn}${reviewBtn}</div></div><div style="text-align: right;"><div class="prog-percent">${h.percent}%</div><div style="font-size:0.95rem; color:var(--text-color); opacity: 0.7; font-weight:800;">${h.score} / ${h.total}</div></div></div>`;
+        }).join('');
+    }
+
+    async function exportStandaloneHTML() {
+        if(currentQuiz.length === 0) return showToast("No active data array elements found.", "error");
+        
+        let oldTimerText = document.getElementById('timer-text').innerText;
+        document.getElementById('timer-text').innerText = "00:00";
+        
+        let exportBtn = document.getElementById('btn-export-quiz');
+        if(exportBtn) exportBtn.style.display = 'none';
+        
+        let fullSource = document.documentElement.outerHTML;
+        
+        if(exportBtn) exportBtn.style.display = 'inline-block';
+        document.getElementById('timer-text').innerText = oldTimerText; 
+        
+        let preloadedData = { date: currentMurliDate, lang: lang, quiz: currentQuiz };
+        let outputSourceCode = fullSource.replace("window.PRELOADED_QUIZ = null;", `window.PRELOADED_QUIZ = ${JSON.stringify(preloadedData)};`);
+        let blob = new Blob(["<!DOCTYPE html>\n" + outputSourceCode], { type: 'text/html;charset=utf-8' });
+        let filename = `MuraliQuiz-${currentMurliDate.replace(/\//g, '-')}.html`;
+
+        let file = new File([blob], filename, { type: "text/html" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: 'Murali Quiz Offline', text: 'Offline Quiz HTML File' });
+                showToast("फाइल सफलतापूर्वक सेयर भयो!", "success");
+                return;
+            } catch(e) { 
+                console.log(e); 
+                if (e.name === 'AbortError') return; 
+            }
+        }
+        
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
+        a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        showToast("HTML exported for offline usage.", "success");
+    }
+
+    window.sharePastResult = async function(date, score, total, time, percent, ctry) {
+        const nName = userName.replace(/ /g, ' ');
+        const nAddress = userAddress.replace(/ /g, ' ');
+        const nCountry = (ctry && ctry !== 'undefined') ? ctry.replace(/ /g, ' ') : 'N/A';
+        const nDate = date.replace(/ /g, ' ');
+        const nTime = time.replace(/ /g, ' ');
+        
+        let reportText = `🎯 *Murali Quiz Result*\n👤 नाम: ${nName}\n🌍 देश: ${nCountry}\n📍 सेवा केन्द्र: ${nAddress}\n📞 फोन: ${userPhone}\n📅 मिति: ${nDate}\n📊 नतिजा: ${score}/${total} (${percent}%)\n⏱️ समय: ${nTime}`;
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Murali Quiz Result', text: reportText }); } catch (err) { console.log('Error sharing:', err); }
+        } else {
+            navigator.clipboard.writeText(reportText).then(() => { showToast("नतिजा कपी भयो! अब जहाँ पनि पेस्ट गर्न सक्नुहुन्छ।", "success"); });
+        }
+    };
+
+    window.shareDashboardSummary = async function() {
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        
+        let cy = currentCalDate.getFullYear();
+        let cm = currentCalDate.getMonth();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let filterName = `${monthNames[cm]} ${cy}`;
+        
+        let filteredHistory = history.filter(h => {
+            let dObj = getValidDate(h);
+            return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm;
+        });
+        
+        if (filteredHistory.length === 0) return showToast("No records to share for this month.", "error");
+
+        let totalTaken = filteredHistory.length; 
+        let avgPercent = Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken);
+        let streak = calculateStreak(history);
+        
+        let reportText = `*Murali Quiz Progress Summary*\n👤 Name: ${userName}\n📞 Phone: ${userPhone}\n🌍 Country: ${userCountry}\n📍 Sewa Kendra: ${userAddress}\n📅 Timeline: ${filterName}\n📊 Monthly Exams: ${totalTaken}\n📈 Avg Score: ${avgPercent}%\n🔥 Current Streak: ${streak} Days\n\n*Recent Scores:*\n`;
+        
+        filteredHistory.slice(0, 7).forEach(h => {
+            reportText += `- ${h.date}: ${h.score}/${h.total} (${h.percent}%)\n`;
+        });
+        reportText += `\nPracticed on Premium Edition 28.4`;
+        
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Murali Quiz Summary', text: reportText }); } catch (err) { console.log('Error sharing:', err); }
+        } else {
+            navigator.clipboard.writeText(reportText).then(() => { showToast("समरी कपी भयो! अब जहाँ पनि पेस्ट गर्न सक्नुहुन्छ।", "success"); });
+        }
+    };
+
+    window.addEventListener('online', syncPendingResults);
+
+    function syncPendingResults() {
+        if (!navigator.onLine) return;
+
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        let pendingData = history.filter(item => item.synced === false);
+
+        if (pendingData.length === 0) return;
+
+        const fetchUrl = "https://script.google.com/macros/s/AKfycbwlliPxngf3WRdtDoUraukaFfwamhqYyevi-Sp0nsJJVZ8VE0YsLhfgx_yhLjFmwi0QPw/exec";
+
+        pendingData.forEach(data => {
+            fetch(fetchUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(data),
+                redirect: 'follow'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP Error: " + response.status);
+                }
+                return response.text(); 
+            })
+            .then(result => {
+                data.synced = true;
+                localStorage.setItem('murali_progress', JSON.stringify(history));
+                console.log("नतिजा अटोमेटिक रूपमा डाटाबेसमा सेभ भयो!");
+            })
+            .catch(err => {
+                console.error("सिंक गर्न समस्या भयो, पछि पुनः प्रयास हुनेछ।", err);
+            });
+        });
+    }
+
+    setTimeout(syncPendingResults, 3000); 
+
+    window.onload = init;
+</script>
+</body>
+</html>
