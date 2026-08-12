@@ -2403,5 +2403,55 @@ ${text}`;
 
     window.onload = init;
 </script>
+    <!-- ONLINE DATABASE SYNC (PHASE 2) -->
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
+
+    // इन्टरनेट आउनेबित्तिकै नतिजा गुगल सिटमा पठाउने सिस्टम
+    window.addEventListener('online', syncPendingResults);
+
+    function syncPendingResults() {
+        if (!navigator.onLine) return;
+
+        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
+        // जुन नतिजा सिंक भएको छैन (synced: false), त्यसलाई मात्र छान्ने
+        let pendingData = history.filter(item => item.synced === false);
+
+        if (pendingData.length === 0) return;
+
+        pendingData.forEach(data => {
+            let payload = {
+                action: "saveResult",
+                name: data.name || "Student",
+                phone: data.phone || "N/A",
+                date: data.date || new Date().toLocaleDateString(),
+                score: data.score || 0,
+                total: data.total || 0,
+                percent: data.percent || 0,
+                timeTaken: data.timeTaken || "00:00",
+                weakTags: data.weakTags || []
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload),
+                redirect: 'follow'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if(result.status === "success") {
+                    data.synced = true; // सिंक भयो भनेर चिनो लगाउने
+                    localStorage.setItem('murali_progress', JSON.stringify(history));
+                    console.log("नतिजा सफलतापूर्वक Google Sheet मा सेभ भयो!");
+                }
+            })
+            .catch(err => console.error("सिंक गर्न समस्या भयो: ", err));
+        });
+    }
+
+    // पेज खुलेको ३ सेकेन्डपछि एकपटक अटोमेटिक चेक गर्ने
+    setTimeout(syncPendingResults, 3000);
+</script>
 </body>
 </html>
