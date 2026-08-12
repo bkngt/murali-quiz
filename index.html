@@ -131,7 +131,7 @@
 <canvas id="confetti-canvas"></canvas>
 <div id="toast-container"></div>
 
-<!-- Login Screen (Restored Strict UI) -->
+<!-- Lock / Registration / Recovery Screen -->
 <div id="lock-screen">
     <div class="pin-box">
         <form id="login-form" onsubmit="event.preventDefault(); handlePIN();" style="width: 100%; margin: 0; padding: 0;">
@@ -166,20 +166,22 @@
                 ⚠️ ध्यान दिनुहोस्: कृपया आफ्नो वास्तविक नाम, सही फोन नम्बर र सेवा केन्द्र भर्नुहोला। (सर्टकट मान्य छैन)
             </div>
 
-            <div style="display: flex; gap: 8px; margin: 0.25rem 0;">
-                <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (First Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
-                <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+            <div id="reg-fields">
+                <div style="display: flex; gap: 8px; margin: 0.25rem 0;">
+                    <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (First Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+                    <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+                </div>
+                
+                <select id="country-select" class="select-field" onchange="checkOtherCountry()">
+                    <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
+                    <option value="Nepal">नेपाल (Nepal)</option><option value="India">भारत (India)</option><option value="USA">अमेरिका (USA)</option><option value="Australia">अष्ट्रेलिया (Australia)</option><option value="UK">बेलायत (UK)</option><option value="UAE">यूएई (UAE)</option><option value="Qatar">कतार (Qatar)</option><option value="Malaysia">मलेसिया (Malaysia)</option><option value="Japan">जापान (Japan)</option><option value="Canada">क्यानडा (Canada)</option><option value="Other">अन्य (Other)</option>
+                </select>
+                
+                <input type="text" id="country-input-other" class="input-field" placeholder="आफ्नो देशको नाम लेख्नुहोस्" style="display: none; border-color: var(--warning-color);" autocomplete="off">
+                <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
             </div>
-            
+
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next">
-            
-            <select id="country-select" class="select-field" onchange="checkOtherCountry()">
-                <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
-                <option value="Nepal">नेपाल (Nepal)</option><option value="India">भारत (India)</option><option value="USA">अमेरिका (USA)</option><option value="Australia">अष्ट्रेलिया (Australia)</option><option value="UK">बेलायत (UK)</option><option value="UAE">यूएई (UAE)</option><option value="Qatar">कतार (Qatar)</option><option value="Malaysia">मलेसिया (Malaysia)</option><option value="Japan">जापान (Japan)</option><option value="Canada">क्यानडा (Canada)</option><option value="Other">अन्य (Other)</option>
-            </select>
-            
-            <input type="text" id="country-input-other" class="input-field" placeholder="आफ्नो देशको नाम लेख्नुहोस्" style="display: none; border-color: var(--warning-color);" autocomplete="off">
-            <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
             
             <div style="margin: 0.4rem 0;">
                 <p id="pin-instruction" style="font-size: 0.85rem; color: #64748b; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
@@ -197,6 +199,7 @@
         </form>
         
         <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <a href="#" onclick="toggleDirectLogin()" id="direct-login-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none;">पहिले नै खाता छ? (Direct Login)</a>
             <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
             <a href="#" onclick="cancelForgotPIN()" id="cancel-forgot-btn" style="color: var(--danger-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">Cancel Recovery</a>
         </div>
@@ -407,8 +410,9 @@
     let audioCtx; let soundEnabled = true;
     let currentCalDate = new Date(); let reviewSource = 'current';
     
-    // Security & Recovery States
-    let failedAttempts = 0; let isLockedOut = false; let lockoutInterval = null; let isRecoveryMode = false;
+    // Security, Direct Login & Recovery States
+    let failedAttempts = 0; let isLockedOut = false; let lockoutInterval = null; 
+    let isRecoveryMode = false; let isDirectLogin = false;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -507,11 +511,12 @@
             document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`;
             document.getElementById('forgot-btn').style.display = 'block'; 
             document.getElementById('cancel-forgot-btn').style.display = 'none';
+            document.getElementById('direct-login-btn').style.display = 'none';
         }
         syncServerQuizzes(); 
     }
 
-    // 🔴 LOCKOUT TIMER LOGIC
+    // 🔴 LOCKOUT TIMER LOGIC (1 MINUTE)
     function startLockoutTimer(unlockTime) {
         isLockedOut = true;
         document.getElementById('pin-input').disabled = true;
@@ -533,12 +538,38 @@
                 document.getElementById('pin-input').value = "";
                 document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)";
                 document.getElementById('pin-instruction').style.color = '#64748b';
-                if(!isRecoveryMode) document.getElementById('pin-instruction').style.display = 'none';
+                if(!isRecoveryMode && !isDirectLogin) document.getElementById('pin-instruction').style.display = 'none';
             } else {
                 document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeLeft} सेकेन्ड पर्खनुहोस्।`;
                 document.getElementById('pin-instruction').style.color = 'var(--danger-color)';
             }
         }, 1000);
+    }
+
+    // 🔴 DIRECT LOGIN TOGGLE LOGIC
+    function toggleDirectLogin() {
+        isDirectLogin = !isDirectLogin;
+        isRecoveryMode = false;
+        
+        if(isDirectLogin) {
+            document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg> Direct Login`;
+            document.getElementById('pin-msg').innerText = `फोन नम्बर र ४-अंकको पिन हालेर लगइन गर्नुहोस्।`;
+            
+            document.getElementById('reg-fields').style.display = 'none';
+            document.getElementById('warning-msg').style.display = 'none';
+            document.getElementById('month-select').style.display = 'none';
+            
+            document.getElementById('phone-input').style.display = 'block';
+            document.getElementById('pin-input').style.display = 'block';
+            document.getElementById('pin-instruction').style.display = 'block';
+            
+            document.getElementById('btn-login-submit').innerHTML = `Login`;
+            document.getElementById('direct-login-btn').innerText = `नयाँ दर्ता गर्नुहुन्छ? (Register)`;
+            document.getElementById('forgot-btn').style.display = 'block';
+            document.getElementById('cancel-forgot-btn').style.display = 'none';
+        } else {
+            window.location.reload(); 
+        }
     }
 
     // 🔴 FORGOT PIN LOGIC
@@ -547,6 +578,9 @@
         document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg> Recover Profile`;
         document.getElementById('pin-msg').innerText = `कृपया आफ्नो फोन नम्बर र अलौकिक जन्म महिना भर्नुहोस्।`;
         
+        document.getElementById('reg-fields').style.display = 'none';
+        document.getElementById('warning-msg').style.display = 'none';
+        
         document.getElementById('phone-input').style.display = 'block';
         document.getElementById('month-select').style.display = 'block';
         document.getElementById('month-select').value = "";
@@ -554,6 +588,7 @@
         document.getElementById('pin-input').style.display = 'none';
         document.getElementById('pin-instruction').style.display = 'none';
         document.getElementById('forgot-btn').style.display = 'none';
+        document.getElementById('direct-login-btn').style.display = 'none';
         document.getElementById('cancel-forgot-btn').style.display = 'inline-block';
         
         document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
@@ -593,6 +628,7 @@
             
             fetch(API_URL, {
                 method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
             }).then(r => r.json()).then(data => {
                 document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
@@ -600,10 +636,33 @@
                     alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)");
                     window.location.reload(); 
                 } else {
-                    showToast(data.message, "error");
+                    showToast(data.message || "विवरण मिलेन!", "error");
                 }
             }).catch(e => {
                 document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+                showToast("सर्भर कनेक्सन फेल भयो!", "error");
+            });
+            return;
+        }
+
+        // २. सिधै लगइन मोड (Direct Login Mode)
+        if (isDirectLogin) {
+            if (!inputPhone || inputPIN.length !== 4) return showToast("कृपया सही १० अंकको फोन र ४ अंकको पिन लेख्नुहोस्।", "error");
+            document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
+            }).then(r => r.json()).then(data => {
+                document.getElementById('btn-login-submit').innerHTML = `Login`;
+                if(data.status === "success") {
+                    saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student");
+                    showToast("Server Login Successful!", "success");
+                } else {
+                    handleFailedAttempt();
+                }
+            }).catch(e => {
+                document.getElementById('btn-login-submit').innerHTML = `Login`;
                 showToast("सर्भर कनेक्सन फेल भयो!", "error");
             });
             return;
@@ -615,8 +674,8 @@
         let countryVal = document.getElementById('country-select').value;
         if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
 
-        // २. यदि नयाँ प्रयोगकर्ता (Registration) हो भने (First Name देखिन्छ भने नयाँ हो)
-        if (document.getElementById('first-name-input').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
+        // ३. नयाँ प्रयोगकर्ता दर्ता (Registration Mode)
+        if (document.getElementById('reg-fields').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
             let errorMsg = validateRegistration(fName, lName, inputPhone, address, inputPIN, month, countryVal);
             if(errorMsg) return showToast(errorMsg, "error");
 
@@ -624,6 +683,7 @@
                 document.getElementById('btn-login-submit').innerHTML = `Registering...`;
                 fetch(API_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
                         action: "register", name: fName + " " + lName, phone: inputPhone, 
                         address: address, pin: inputPIN, month: month, country: countryVal 
@@ -647,21 +707,24 @@
             return;
         }
 
-        // ३. पुरानो प्रयोगकर्ता लगइन (Login)
+        // ४. पुरानो सेभ भएको प्रयोगकर्ता लगइन (Saved Returning User)
         if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
         
         let savedPIN = localStorage.getItem('murali_pin');
+        let savedPhone = localStorage.getItem('murali_phone');
+
         if (savedPIN && inputPIN === savedPIN) {
             unlockApp();
-        } else if (navigator.onLine && inputPhone) {
+        } else if (navigator.onLine && savedPhone) {
              document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
              fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN })
              }).then(r => r.json()).then(data => {
                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
                 if(data.status === "success") {
-                     saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", month, data.country || "N/A", inputPIN, data.role || "Student");
+                     saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student");
                      showToast("Server Login Successful!", "success");
                 } else {
                      handleFailedAttempt();
