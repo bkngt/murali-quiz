@@ -18,7 +18,6 @@
             --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
             --primary-hover-gradient: linear-gradient(135deg, #0369a1, #7c3aed);
             --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
-            --submit-hover-gradient: linear-gradient(135deg, #15803d, #047857);
             --success-color: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
             --danger-color: #dc2626; --danger-bg: #fef2f2; --danger-border: #fecaca;
             --warning-color: #d97706; --border-color: #cbd5e1; 
@@ -93,7 +92,6 @@
         #result-screen { display: none; text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem; }
         .result-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);}
         
-        /* Dashboard & Calendar Restored */
         .dashboard-stats { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .stat-card { flex: 1; min-width: 110px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 12px; text-align: center;}
         .stat-card h3 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-weight: 800; line-height: 1;}
@@ -174,11 +172,6 @@
             </div>
             
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next">
-            
-            <select id="country-select" class="select-field">
-                <option value="Nepal" selected>नेपाल (Nepal)</option><option value="India">भारत (India)</option><option value="USA">अमेरिका (USA)</option><option value="Australia">अष्ट्रेलिया (Australia)</option><option value="UK">बेलायत (UK)</option><option value="Other">अन्य (Other)</option>
-            </select>
-            
             <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्र (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
             
             <div style="margin: 0.4rem 0;">
@@ -201,7 +194,6 @@
             <div id="header-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white;">
                  <div class="baba-logo-container"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="95" fill="gold"/><circle cx="100" cy="100" r="12" fill="white"/></svg></div>
             </div>
-            <!-- Title with Role Badge -->
             <h1 id="app-title">Murali Quiz</h1>
             <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="murli-icon-btn"><svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>
         </div>
@@ -228,7 +220,13 @@
         <!-- Visible only to Managers -->
         <div class="toolbar-group" id="quiz-config-tools" style="flex: 1; justify-content: flex-end; display: flex; gap: 6px;">
             <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
-            <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;"><option value="5">5 Qs</option><option value="10">10 Qs</option><option value="15">15 Qs</option><option value="20" selected>20 Qs</option><option value="30">30 Qs</option></select>
+            <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;">
+                <option value="10">10 Qs</option>
+                <option value="20" selected>20 Qs</option>
+                <option value="30">30 Qs</option>
+                <option value="50">50 Qs (Mega)</option>
+                <option value="100">100 Qs (Mega)</option>
+            </select>
         </div>
     </div>
 
@@ -282,6 +280,10 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
+            <!-- Mega Quiz Button -->
+            <button onclick="createMegaQuiz()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
+                🏆 Mega Quiz
+            </button>
             <button onclick="saveQuizToServer()" id="btn-save-server" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: #8b5cf6; color: white; box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);">
                 ☁️ Save to Server
             </button>
@@ -370,13 +372,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 33.0 (Master Admin Enabled)</div>
+        <div>Version: 34.0 (Secure Admin & MegaQuiz)</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "33.0"; 
+    const APP_VERSION = "34.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -466,24 +468,13 @@
         syncServerQuizzes(); 
     }
 
+    // 🔴 STRICT SERVER VALIDATION (REMOVED BYPASS)
     function handlePIN() {
         const inputPIN = document.getElementById('pin-input').value;
         const inputPhone = document.getElementById('phone-input').value.trim();
         const inputAddress = document.getElementById('address-input').value.trim();
         const fName = document.getElementById('first-name-input').value.trim();
         const lName = document.getElementById('last-name-input').value.trim();
-        
-        // 🔴 MASTER ADMIN BYPASS: Always grants Manager role instantly, bypassing the server error.
-        if (inputPIN === '1111' || inputPIN === '9999') {
-             localStorage.setItem('murali_pin', inputPIN);
-             localStorage.setItem('murali_user_name', (fName.length > 1 ? fName + " " + lName : "Admin") );
-             localStorage.setItem('murali_phone', (inputPhone || '9800000000'));
-             localStorage.setItem('murali_address', inputAddress);
-             localStorage.setItem('murali_role', 'Manager');
-             showToast("Master Admin Override Successful!", "success");
-             unlockApp();
-             return;
-        }
 
         if(navigator.onLine && inputPhone && document.getElementById('phone-input').style.display !== 'none') {
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
@@ -497,10 +488,13 @@
                     localStorage.setItem('murali_user_name', data.name);
                     localStorage.setItem('murali_phone', inputPhone);
                     localStorage.setItem('murali_address', inputAddress);
-                    localStorage.setItem('murali_role', data.role);
+                    localStorage.setItem('murali_role', data.role); // Role securely assigned from Google Sheet!
                     showToast("Server Login Successful!", "success");
                     unlockApp();
-                } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); }
+                } else { 
+                    // Verify failed on server. Only allow local if it's an existing valid match.
+                    checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); 
+                }
             }).catch(e => { console.error(e); checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); });
         } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); }
     }
@@ -508,10 +502,6 @@
     function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress) {
         const savedPIN = localStorage.getItem('murali_pin');
         
-        // Fallback checks if the phone matches the master phone
-        let role = 'Student';
-        if(inputPhone === '9800000000') role = 'Manager';
-
         if (!savedPIN) {
              if(fName.length < 2) return showToast("कृपया सही नाम लेख्नुहोस्।", "error");
              if (inputPIN.length < 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
@@ -519,14 +509,11 @@
              localStorage.setItem('murali_user_name', fName + " " + lName);
              localStorage.setItem('murali_phone', inputPhone);
              localStorage.setItem('murali_address', inputAddress);
-             localStorage.setItem('murali_role', role);
+             localStorage.setItem('murali_role', 'Student'); // Default to Student for offline new users
              showToast("Offline Profile Created!", "success");
              unlockApp();
         } else {
-             if (inputPIN === savedPIN) { 
-                 if(role === 'Manager') localStorage.setItem('murali_role', 'Manager');
-                 unlockApp(); 
-             } 
+             if (inputPIN === savedPIN) { unlockApp(); } 
              else { showToast("गलत पिन!", "error"); document.getElementById('pin-input').value = ""; document.getElementById('btn-login-submit').innerHTML = `Enter`; }
         }
     }
@@ -553,11 +540,11 @@
 
             // MANAGER SCREEN
             if (safeRole === 'manager' || safeRole === 'admin') {
-                // ADD BADGE TO HEADER
                 document.getElementById('app-title').innerHTML = `Murali Quiz <span style="font-size:0.75rem; background:var(--danger-color); color:white; padding:3px 8px; border-radius:12px; margin-left:8px; vertical-align:middle;">👑 Admin</span>`;
                 
                 document.getElementById('murali-text').style.display = 'block';
                 document.getElementById('generator-actions').style.display = 'flex';
+                document.getElementById('btn-mega').style.display = 'block'; // Show Mega Quiz Button
                 document.getElementById('quiz-config-tools').style.display = 'flex';
                 document.getElementById('exam-config-section').style.display = 'block';
                 document.getElementById('api-config-section').style.display = 'block';
@@ -565,11 +552,11 @@
             } 
             // STUDENT SCREEN
             else {
-                // ADD BADGE TO HEADER
                 document.getElementById('app-title').innerHTML = `Murali Quiz <span style="font-size:0.75rem; background:var(--success-color); color:white; padding:3px 8px; border-radius:12px; margin-left:8px; vertical-align:middle;">🎓 Student</span>`;
 
                 document.getElementById('murali-text').style.display = 'none';
                 document.getElementById('generator-actions').style.display = 'none';
+                document.getElementById('btn-mega').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none';
                 document.getElementById('exam-config-section').style.display = 'none';
                 document.getElementById('api-config-section').style.display = 'none';
@@ -614,13 +601,57 @@
 
     function extractDate(text) { let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); return m ? m[0] : new Date().toLocaleDateString('en-GB'); }
 
-    // AI Generation (Managers Only)
+    // 🔴 MEGA QUIZ LOGIC
+    function createMegaQuiz() {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        if(serverQuizzes.length === 0) return showToast("सर्भरमा कुनै पनि पुरानो प्रश्न छैन!", "error");
+
+        let allQuestions = [];
+        serverQuizzes.forEach(sq => {
+            if(sq.quizData && Array.isArray(sq.quizData)) {
+                allQuestions = allQuestions.concat(sq.quizData);
+            }
+        });
+
+        if(allQuestions.length < 10) return showToast("मेगा क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
+
+        // Remove exact duplicates
+        let uniqueQ = []; let qTextSet = new Set();
+        allQuestions.forEach(q => {
+            if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); }
+        });
+
+        shuffleArray(uniqueQ);
+        
+        let qCount = parseInt(document.getElementById('q-count').value);
+        if(qCount === 50 || qCount === 100) {
+           qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
+        } else {
+           qCount = uniqueQ.length > 50 ? 50 : uniqueQ.length; // Default Mega size if standard count selected
+        }
+
+        currentQuiz = uniqueQ.slice(0, qCount);
+        // Force options to shuffle again just in case
+        currentQuiz.forEach(q => shuffleArray(q.options));
+        
+        currentMurliDate = "🏆 Mega Quiz (" + qCount + " Qs)";
+
+        document.getElementById('murali-text').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none';
+        startQuizSession();
+        document.getElementById('btn-save-server').style.display = 'block';
+        showToast(`मेगा क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
+    }
+
+    // Standard AI Generation
     async function generateQuizWithAI() {
         const apiKey = localStorage.getItem('murali_gemini_key'); if(!apiKey) { openSettings(); return showToast("API Key Missing.", "error"); }
         const text = document.getElementById('murali-text').value.trim(); if(text.length < 50) return showToast("मुरलीको पाठ धेरै छोटो भयो।", "error");
         
         currentMurliDate = extractDate(text);
         let qCount = document.getElementById('q-count').value;
+        if(qCount === "50" || qCount === "100") qCount = "20"; // Prevent AI timeout on huge requests
+        
         let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash';
         let level = document.getElementById('quiz-level').value;
 
@@ -654,14 +685,16 @@
     }
 
     function saveQuizToServer() {
-        if (!currentQuiz || currentQuiz.length === 0) return showToast("पहिले AI बाट क्विज तयार गर्नुहोस्!", "error");
+        if (!currentQuiz || currentQuiz.length === 0) return showToast("पहिले क्विज तयार गर्नुहोस्!", "error");
         document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
+        let isMega = currentMurliDate.includes("Mega");
+
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: false }) 
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega }) 
         })
         .then(res => res.json())
         .then(data => {
