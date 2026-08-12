@@ -2369,57 +2369,16 @@ ${text}`;
         if (!navigator.onLine) return;
 
         let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
-        let pendingData = history.filter(item => item.synced === false);
-
-        if (pendingData.length === 0) return;
-
-        const fetchUrl = "https://script.google.com/macros/s/AKfycbwlliPxngf3WRdtDoUraukaFfwamhqYyevi-Sp0nsJJVZ8VE0YsLhfgx_yhLjFmwi0QPw/exec";
-
-        pendingData.forEach(data => {
-            fetch(fetchUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(data),
-                redirect: 'follow'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP Error: " + response.status);
-                }
-                return response.text(); 
-            })
-            .then(result => {
-                data.synced = true;
-                localStorage.setItem('murali_progress', JSON.stringify(history));
-                console.log("नतिजा अटोमेटिक रूपमा डाटाबेसमा सेभ भयो!");
-            })
-            .catch(err => {
-                console.error("सिंक गर्न समस्या भयो, पछि पुनः प्रयास हुनेछ।", err);
-            });
-        });
-    }
-
-    setTimeout(syncPendingResults, 3000); 
-
-    window.onload = init;
-</script>
-<!-- ONLINE DATABASE SYNC (PHASE 2) -->
-<script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-
-    window.addEventListener('online', syncPendingResults);
-
-    function syncPendingResults() {
-        if (!navigator.onLine) return;
-
-        let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
-        
-        // 'synced !== true' राख्दा सिंक नभएका र नयाँ सबै नतिजाहरू ट्याप्प टिप्छ
+        // सिंक नभएका नतिजाहरू मात्र छान्ने (false वा undefined दुवै समेट्छ)
         let pendingData = history.filter(item => item.synced !== true);
 
         if (pendingData.length === 0) return;
 
+        // यो तपाईंको नयाँ गुगल सिटको लिङ्क हो
+        const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
+
         pendingData.forEach(data => {
+            // गुगल सिटले बुझ्ने सही ढाँचा
             let payload = {
                 action: "saveResult",
                 name: data.name || "Student",
@@ -2440,10 +2399,10 @@ ${text}`;
             })
             .then(response => response.json())
             .then(result => {
-                if(result.status === "success") {
-                    data.synced = true;
+                if(result.status === "success" || result.message === "Result saved successfully!") {
+                    data.synced = true; // नतिजा सेभ भयो भनेर चिनो लगाउने
                     localStorage.setItem('murali_progress', JSON.stringify(history));
-                    console.log("नतिजा सफलतापूर्वक Google Sheet मा सेभ भयो!");
+                    console.log("नतिजा सफलतापूर्वक नयाँ Google Sheet मा सेभ भयो!");
                 }
             })
             .catch(err => console.error("सिंक गर्न समस्या भयो: ", err));
@@ -2452,6 +2411,8 @@ ${text}`;
 
     // पेज खुलेको ३ सेकेन्डपछि अटोमेटिक सिंक गर्ने
     setTimeout(syncPendingResults, 3000);
+
+    window.onload = init;
 </script>
 </body>
 </html>
