@@ -198,6 +198,7 @@
         
         <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
             <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
+            <a href="#" onclick="cancelForgotPIN()" id="cancel-forgot-btn" style="color: var(--danger-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">Cancel Recovery</a>
         </div>
     </div>
 </div>
@@ -259,7 +260,6 @@
                     <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
                     <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
                 </div>
-                <!-- V36.0 Restored Link -->
                 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none; display: block; margin-top: 10px;">
                     <button style="background: #475569; width: 100%; box-shadow: none;">Get Free Gemini API Key</button>
                 </a>
@@ -397,6 +397,7 @@
 </div>
 
 <script>
+    // ⚠️ महत्त्वपूर्ण: तपाईंले बनाएको Apps Script को Web App URL यहाँ राख्नुहोस्
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
     const APP_VERSION = "36.0"; 
 
@@ -405,6 +406,9 @@
     let timerInterval = null; let totalTimeSec = 0; let isTimerStarted = false;
     let audioCtx; let soundEnabled = true;
     let currentCalDate = new Date(); let reviewSource = 'current';
+    
+    // Security & Recovery States
+    let failedAttempts = 0; let isLockedOut = false; let lockoutInterval = null; let isRecoveryMode = false;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -478,6 +482,13 @@
         if(localStorage.getItem('m_q_theme') !== 'light') document.body.setAttribute('data-theme', 'dark');
         const savedSound = localStorage.getItem('m_q_sound'); if (savedSound === '0') { soundEnabled = false; }
         
+        let savedLockout = localStorage.getItem('murali_lockout_time');
+        if(savedLockout && Date.now() < parseInt(savedLockout)) {
+            startLockoutTimer(parseInt(savedLockout));
+        } else {
+            localStorage.removeItem('murali_lockout_time');
+        }
+        
         const savedName = localStorage.getItem('murali_user_name');
         if (savedName) {
             let nameParts = savedName.split(" ");
@@ -490,16 +501,70 @@
             document.getElementById('country-select').style.display = 'none'; 
             document.getElementById('month-select').style.display = 'none';
             document.getElementById('warning-msg').style.display = 'none';
-            document.getElementById('pin-instruction').style.display = 'none';
+            if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
             
             document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Unlock App`;
             document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`;
-            document.getElementById('forgot-btn').style.display = 'block'; // Show forgot PIN for returning users
+            document.getElementById('forgot-btn').style.display = 'block'; 
+            document.getElementById('cancel-forgot-btn').style.display = 'none';
         }
         syncServerQuizzes(); 
     }
 
-    // 🔴 V36.0 STRICT VALIDATION LOGIC
+    // 🔴 LOCKOUT TIMER LOGIC
+    function startLockoutTimer(unlockTime) {
+        isLockedOut = true;
+        document.getElementById('pin-input').disabled = true;
+        document.getElementById('btn-login-submit').disabled = true;
+        document.getElementById('pin-instruction').style.display = 'block';
+
+        if (lockoutInterval) clearInterval(lockoutInterval);
+
+        lockoutInterval = setInterval(() => {
+            let timeLeft = Math.ceil((unlockTime - Date.now()) / 1000);
+            if(timeLeft <= 0) {
+                clearInterval(lockoutInterval);
+                isLockedOut = false;
+                failedAttempts = 0;
+                localStorage.removeItem('murali_lockout_time');
+                
+                document.getElementById('pin-input').disabled = false;
+                document.getElementById('btn-login-submit').disabled = false;
+                document.getElementById('pin-input').value = "";
+                document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)";
+                document.getElementById('pin-instruction').style.color = '#64748b';
+                if(!isRecoveryMode) document.getElementById('pin-instruction').style.display = 'none';
+            } else {
+                document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeLeft} सेकेन्ड पर्खनुहोस्।`;
+                document.getElementById('pin-instruction').style.color = 'var(--danger-color)';
+            }
+        }, 1000);
+    }
+
+    // 🔴 FORGOT PIN LOGIC
+    function handleForgotPIN() {
+        isRecoveryMode = true;
+        document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg> Recover Profile`;
+        document.getElementById('pin-msg').innerText = `कृपया आफ्नो फोन नम्बर र अलौकिक जन्म महिना भर्नुहोस्।`;
+        
+        document.getElementById('phone-input').style.display = 'block';
+        document.getElementById('month-select').style.display = 'block';
+        document.getElementById('month-select').value = "";
+        
+        document.getElementById('pin-input').style.display = 'none';
+        document.getElementById('pin-instruction').style.display = 'none';
+        document.getElementById('forgot-btn').style.display = 'none';
+        document.getElementById('cancel-forgot-btn').style.display = 'inline-block';
+        
+        document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+    }
+
+    function cancelForgotPIN() {
+        isRecoveryMode = false;
+        window.location.reload();
+    }
+
+    // 🔴 STRICT VALIDATION LOGIC
     function validateRegistration(fName, lName, phone, center, pin, month, countryVal) {
         if(fName.length < 2 || lName.length < 2) return "कृपया सही र पूरा नाम लेख्नुहोस् (कम्तीमा २ अक्षर)।";
         if(phone.length < 10) return "कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।";
@@ -515,91 +580,134 @@
     }
 
     function handlePIN() {
-        const inputPIN = document.getElementById('pin-input').value;
+        if(isLockedOut) return;
+
         const inputPhone = document.getElementById('phone-input').value.trim();
-        const inputAddress = document.getElementById('address-input').value.trim();
-        const fName = document.getElementById('first-name-input').value.trim();
-        const lName = document.getElementById('last-name-input').value.trim();
+        const inputPIN = document.getElementById('pin-input').value;
         const month = document.getElementById('month-select').value;
         
+        // १. रिकभरी मोडमा छ भने
+        if (isRecoveryMode) {
+            if (!inputPhone || !month) return showToast("कृपया फोन र महिना भर्नुहोस्।", "error");
+            document.getElementById('btn-login-submit').innerHTML = `Checking...`;
+            
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
+            }).then(r => r.json()).then(data => {
+                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+                if (data.status === "success") {
+                    alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)");
+                    window.location.reload(); 
+                } else {
+                    showToast(data.message, "error");
+                }
+            }).catch(e => {
+                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+                showToast("सर्भर कनेक्सन फेल भयो!", "error");
+            });
+            return;
+        }
+
+        let fName = document.getElementById('first-name-input').value.trim();
+        let lName = document.getElementById('last-name-input').value.trim();
+        let address = document.getElementById('address-input').value.trim();
         let countryVal = document.getElementById('country-select').value;
         if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
 
-        // If it's a first-time registration (inputs are visible)
-        if(document.getElementById('phone-input').style.display !== 'none') {
-            let errorMsg = validateRegistration(fName, lName, inputPhone, inputAddress, inputPIN, month, countryVal);
+        // २. यदि नयाँ प्रयोगकर्ता (Registration) हो भने (First Name देखिन्छ भने नयाँ हो)
+        if (document.getElementById('first-name-input').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
+            let errorMsg = validateRegistration(fName, lName, inputPhone, address, inputPIN, month, countryVal);
             if(errorMsg) return showToast(errorMsg, "error");
+
+            if(navigator.onLine) {
+                document.getElementById('btn-login-submit').innerHTML = `Registering...`;
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: "register", name: fName + " " + lName, phone: inputPhone, 
+                        address: address, pin: inputPIN, month: month, country: countryVal 
+                    })
+                }).then(r => r.json()).then(data => {
+                    if (data.status === "success") {
+                        saveLocalDataAndUnlock(fName + " " + lName, inputPhone, address, month, countryVal, inputPIN, "Student");
+                        showToast("Registration Successful!", "success");
+                    } else {
+                        document.getElementById('btn-login-submit').innerHTML = `Enter`;
+                        showToast(data.message, "error");
+                    }
+                }).catch(e => {
+                    document.getElementById('btn-login-submit').innerHTML = `Enter`;
+                    showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error");
+                    checkLocalPIN(inputPIN, fName, lName, inputPhone, address, month, countryVal);
+                });
+            } else {
+                checkLocalPIN(inputPIN, fName, lName, inputPhone, address, month, countryVal);
+            }
+            return;
         }
 
-        if(navigator.onLine && inputPhone && document.getElementById('phone-input').style.display !== 'none') {
-            document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
-            fetch(API_URL, {
+        // ३. पुरानो प्रयोगकर्ता लगइन (Login)
+        if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
+        
+        let savedPIN = localStorage.getItem('murali_pin');
+        if (savedPIN && inputPIN === savedPIN) {
+            unlockApp();
+        } else if (navigator.onLine && inputPhone) {
+             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
+             fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
-            }).then(r => r.json()).then(data => {
-                if(data.status === "success" && data.role) {
-                    localStorage.setItem('murali_pin', inputPIN);
-                    localStorage.setItem('murali_user_name', data.name);
-                    localStorage.setItem('murali_phone', inputPhone);
-                    localStorage.setItem('murali_address', inputAddress);
-                    localStorage.setItem('murali_month', month);
-                    localStorage.setItem('murali_country', countryVal);
-                    localStorage.setItem('murali_role', data.role);
-                    showToast("Server Login Successful!", "success");
-                    unlockApp();
-                } else if (data.status === "success" && !data.role) {
-                    document.getElementById('btn-login-submit').innerHTML = `Enter`;
-                    showToast("⚠️ सर्भरमा पुरानो कोड चलिरहेको छ! कृपया Apps Script अपडेट गर्नुहोस्।", "error");
-                } else { 
-                    document.getElementById('btn-login-submit').innerHTML = `Enter`;
-                    showToast("गलत फोन नम्बर वा पिन!", "error");
-                }
-            }).catch(e => { 
+             }).then(r => r.json()).then(data => {
                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
-                showToast("सर्भर कनेक्सन फेल भयो! (Offline Mode)", "error");
-                checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal); 
-            });
-        } else { 
-            checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal); 
+                if(data.status === "success") {
+                     saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", month, data.country || "N/A", inputPIN, data.role || "Student");
+                     showToast("Server Login Successful!", "success");
+                } else {
+                     handleFailedAttempt();
+                }
+             }).catch(e => {
+                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
+                 handleFailedAttempt();
+             });
+        } else {
+            handleFailedAttempt();
+        }
+    }
+    
+    function handleFailedAttempt() {
+        failedAttempts++;
+        if (failedAttempts >= 4) {
+            showToast("४ पटक गलत पिन! १ मिनेट पर्खनुहोस्।", "error");
+            let unlockTime = Date.now() + (60 * 1000); 
+            localStorage.setItem('murali_lockout_time', unlockTime);
+            startLockoutTimer(unlockTime);
+        } else {
+            showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error");
+            document.getElementById('pin-input').value = "";
         }
     }
 
     function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal) {
         const savedPIN = localStorage.getItem('murali_pin');
-        
         if (!savedPIN) {
-             localStorage.setItem('murali_pin', inputPIN);
-             localStorage.setItem('murali_user_name', fName + " " + lName);
-             localStorage.setItem('murali_phone', inputPhone);
-             localStorage.setItem('murali_address', inputAddress);
-             localStorage.setItem('murali_month', month);
-             localStorage.setItem('murali_country', countryVal);
-             localStorage.setItem('murali_role', 'Student'); 
+             saveLocalDataAndUnlock(fName + " " + lName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student');
              showToast("Offline Profile Created!", "success");
-             unlockApp();
         } else {
              if (inputPIN === savedPIN) { unlockApp(); } 
-             else { showToast("गलत पिन!", "error"); document.getElementById('pin-input').value = ""; document.getElementById('btn-login-submit').innerHTML = `Enter`; }
+             else { handleFailedAttempt(); }
         }
     }
 
-    // 🔴 V36.0 FORGOT PIN LOGIC
-    function handleForgotPIN() {
-        let savedPhone = localStorage.getItem('murali_phone');
-        let savedMonth = localStorage.getItem('murali_month');
-        if(!savedPhone) return showToast("कुनै प्रोफाइल भेटिएन।", "error");
-        
-        let askPhone = prompt("सुरक्षा जाँच: आफ्नो दर्ता गरिएको फोन नम्बर लेख्नुहोस्:");
-        if(!askPhone) return;
-        if(askPhone.trim() !== savedPhone) return showToast("फोन नम्बर मिलेन!", "error");
-
-        let askMonth = prompt("सुरक्षा जाँच: आफ्नो 'अलौकिक जन्म महिना' नेपालीमा लेख्नुहोस् (उदा: बैशाख):");
-        if(!askMonth) return;
-        if(askMonth.trim() !== savedMonth) return showToast("महिना मिलेन!", "error");
-
-        let pin = localStorage.getItem('murali_pin');
-        alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + pin + "\n(कृपया यसलाई सुरक्षित राख्नुहोला)");
+    function saveLocalDataAndUnlock(name, phone, address, month, country, pin, role) {
+        localStorage.setItem('murali_user_name', name);
+        localStorage.setItem('murali_phone', phone);
+        localStorage.setItem('murali_address', address);
+        localStorage.setItem('murali_month', month);
+        localStorage.setItem('murali_country', country);
+        localStorage.setItem('murali_pin', pin);
+        localStorage.setItem('murali_role', role);
+        unlockApp();
     }
 
     function unlockApp() { 
