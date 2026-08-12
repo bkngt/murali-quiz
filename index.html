@@ -234,6 +234,8 @@
         
         <div id="online-quiz-actions" style="display: none; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap;">
             <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.85rem; white-space: nowrap;"></span></div>
+            <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save to Server</button>
+            <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export HTML</button>
             <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.6rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.8rem;">Cancel</button>
         </div>
         
@@ -303,12 +305,8 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <!-- Dynamic Mega/Review Quiz Button -->
             <button onclick="createMegaQuiz()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
                 🏆 Mega Quiz
-            </button>
-            <button onclick="saveQuizToServer()" id="btn-save-server" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: #8b5cf6; color: white; box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);">
-                ☁️ Save to Server
             </button>
             <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
@@ -395,14 +393,14 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 36.0 (Ultimate Strict Security)</div>
+        <div>Version: 37.0 (Ultimate Secure & Direct)</div>
     </div>
 </div>
 
 <script>
     // ⚠️ महत्त्वपूर्ण: तपाईंले बनाएको Apps Script को Web App URL यहाँ राख्नुहोस्
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "36.0"; 
+    const APP_VERSION = "37.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -892,7 +890,8 @@
         document.getElementById('murali-text').style.display = 'none';
         document.getElementById('generator-actions').style.display = 'none';
         startQuizSession();
-        document.getElementById('btn-save-server').style.display = 'block';
+        document.getElementById('btn-save-top').style.display = 'inline-block';
+        document.getElementById('btn-export-top').style.display = 'inline-block';
         showToast(`क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
     }
 
@@ -930,7 +929,10 @@
             currentQuiz = JSON.parse(rText); currentQuiz.forEach(q => shuffleArray(q.options));
             document.getElementById('loading-box').style.display = 'none';
             startQuizSession();
-            document.getElementById('btn-save-server').style.display = 'block'; document.getElementById('btn-generate').style.display = 'none';
+            
+            // 🔴 Toolbar Buttons Shown
+            document.getElementById('btn-save-top').style.display = 'inline-block'; 
+            document.getElementById('btn-export-top').style.display = 'inline-block';
         } catch (error) {
             document.getElementById('loading-box').style.display = 'none'; document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex';
             showToast("AI Request Failed! Check API Key.", "error");
@@ -955,12 +957,43 @@
             document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('generator-actions').style.display = 'flex';
             if(data.status === "success") {
                 showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success");
-                document.getElementById('btn-save-server').innerText = "✅ Saved to Server"; document.getElementById('btn-save-server').disabled = true;
+                document.getElementById('btn-save-top').style.display = 'none'; // Hide save button after saving
                 syncServerQuizzes(false); 
             }
         }).catch(err => {
             document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; showToast("इन्टरनेट समस्या!", "error");
         });
+    }
+
+    // --- OFFLINE EXPORT (With Share API) ---
+    function exportStandaloneHTML() {
+        if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
+        
+        // Temporarily hide buttons to avoid rendering them in the HTML export
+        let saveBtn = document.getElementById('btn-save-top'); let exportBtn = document.getElementById('btn-export-top');
+        if(saveBtn) saveBtn.style.display = 'none'; if(exportBtn) exportBtn.style.display = 'none';
+        
+        let html = document.documentElement.outerHTML.replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`);
+        
+        // Restore buttons
+        if(exportBtn) exportBtn.style.display = 'inline-block';
+        
+        let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
+        let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`;
+        let file = new File([b], filename, { type: "text/html" });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: 'Murali Quiz Offline', text: 'Offline Quiz HTML File' })
+            .then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success"))
+            .catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
+        } else {
+            triggerDownload(b, filename);
+        }
+    }
+
+    function triggerDownload(blob, filename) {
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; 
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("HTML Downloaded", "success");
     }
 
     function startTimer() { clearInterval(timerInterval); timerInterval = setInterval(() => { totalTimeSec++; let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); let s = (totalTimeSec % 60).toString().padStart(2, '0'); document.getElementById('timer-text').innerText = `${m}:${s}`; }, 1000); }
@@ -986,11 +1019,13 @@
         document.getElementById('quiz-area').style.display = 'none'; document.getElementById('result-screen').style.display = 'none';
         document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none';
         
+        // Hide top buttons
+        document.getElementById('btn-save-top').style.display = 'none';
+        document.getElementById('btn-export-top').style.display = 'none';
+
         let safeRole = (userRole||"").toString().trim().toLowerCase();
         if (safeRole === 'manager' || safeRole === 'admin') {
             document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; 
-            document.getElementById('btn-generate').style.display = 'block'; document.getElementById('btn-save-server').style.display = 'none'; 
-            document.getElementById('btn-save-server').innerText = "☁️ Save to Server"; document.getElementById('btn-save-server').disabled = false;
             document.getElementById('quiz-config-tools').style.display = 'flex';
         } else {
             loadStudentDashboard();
