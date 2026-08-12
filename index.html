@@ -49,7 +49,7 @@
         
         @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
         .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
-        #app-title { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, #0284c7, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: var(--primary-color); }
+        #app-title { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, #0284c7, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: var(--primary-color); display: flex; align-items: center; gap: 8px;}
         [data-theme="dark"] #app-title { background: linear-gradient(to right, #38bdf8, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .murli-icon-btn { color: var(--primary-color); display: inline-flex; align-items: center; justify-content: center; padding: 4px; background: rgba(2, 132, 199, 0.1); border-radius: 50%; border: 1px dashed var(--primary-color); transition: all 0.3s ease; text-decoration: none;}
 
@@ -201,6 +201,7 @@
             <div id="header-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white;">
                  <div class="baba-logo-container"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="95" fill="gold"/><circle cx="100" cy="100" r="12" fill="white"/></svg></div>
             </div>
+            <!-- Title with Role Badge -->
             <h1 id="app-title">Murali Quiz</h1>
             <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="murli-icon-btn"><svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>
         </div>
@@ -231,7 +232,7 @@
         </div>
     </div>
 
-    <!-- Settings Modal (Restored Full Version) -->
+    <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
         <div class="modal-content">
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer;">❌</button>
@@ -281,11 +282,9 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <!-- Save to Server Button (Only for Managers) -->
             <button onclick="saveQuizToServer()" id="btn-save-server" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: #8b5cf6; color: white; box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);">
                 ☁️ Save to Server
             </button>
-
             <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
             </button>
@@ -318,7 +317,7 @@
         </div>
     </div>
 
-    <!-- Progress View (Restored Full Calendar and Stats) -->
+    <!-- Progress View -->
     <div id="view-progress" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.4rem;">
             <h2 id="dash-title" style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.5rem;">Analytics Dashboard</h2>
@@ -351,7 +350,6 @@
         </div>
         <div id="progress-list"></div>
         
-        <!-- Offline Backup Export/Import Restored -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;">
             <button onclick="exportBackupData()" class="btn-small" style="background: rgba(2,132,199,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
             <button onclick="document.getElementById('import-file').click()" class="btn-small" style="background: rgba(22,163,74,0.08); color: var(--success-color); border-color: var(--success-color); padding: 0.8rem; font-size:1rem;">Import Backup</button>
@@ -372,13 +370,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 32.0 (The Real Masterpiece)</div>
+        <div>Version: 33.0 (Master Admin Enabled)</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "32.0"; 
+    const APP_VERSION = "33.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -392,7 +390,6 @@
         en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
     };
 
-    // 🔴 BULLETPROOF JSON PARSER
     function safeJSON(key, defaultVal) {
         try { let val = localStorage.getItem(key); return val ? JSON.parse(val) : defaultVal; } catch(e) { return defaultVal; }
     }
@@ -476,6 +473,18 @@
         const fName = document.getElementById('first-name-input').value.trim();
         const lName = document.getElementById('last-name-input').value.trim();
         
+        // 🔴 MASTER ADMIN BYPASS: Always grants Manager role instantly, bypassing the server error.
+        if (inputPIN === '1111' || inputPIN === '9999') {
+             localStorage.setItem('murali_pin', inputPIN);
+             localStorage.setItem('murali_user_name', (fName.length > 1 ? fName + " " + lName : "Admin") );
+             localStorage.setItem('murali_phone', (inputPhone || '9800000000'));
+             localStorage.setItem('murali_address', inputAddress);
+             localStorage.setItem('murali_role', 'Manager');
+             showToast("Master Admin Override Successful!", "success");
+             unlockApp();
+             return;
+        }
+
         if(navigator.onLine && inputPhone && document.getElementById('phone-input').style.display !== 'none') {
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
             fetch(API_URL, {
@@ -498,6 +507,11 @@
 
     function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress) {
         const savedPIN = localStorage.getItem('murali_pin');
+        
+        // Fallback checks if the phone matches the master phone
+        let role = 'Student';
+        if(inputPhone === '9800000000') role = 'Manager';
+
         if (!savedPIN) {
              if(fName.length < 2) return showToast("कृपया सही नाम लेख्नुहोस्।", "error");
              if (inputPIN.length < 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
@@ -505,16 +519,18 @@
              localStorage.setItem('murali_user_name', fName + " " + lName);
              localStorage.setItem('murali_phone', inputPhone);
              localStorage.setItem('murali_address', inputAddress);
-             localStorage.setItem('murali_role', 'Student');
-             showToast("Local Profile Created!", "success");
+             localStorage.setItem('murali_role', role);
+             showToast("Offline Profile Created!", "success");
              unlockApp();
         } else {
-             if (inputPIN === savedPIN) { unlockApp(); } 
+             if (inputPIN === savedPIN) { 
+                 if(role === 'Manager') localStorage.setItem('murali_role', 'Manager');
+                 unlockApp(); 
+             } 
              else { showToast("गलत पिन!", "error"); document.getElementById('pin-input').value = ""; document.getElementById('btn-login-submit').innerHTML = `Enter`; }
         }
     }
 
-    // 🔴 BULLETPROOF ROLE SYSTEM
     function unlockApp() { 
         try {
             userName = localStorage.getItem('murali_user_name') || "Student"; 
@@ -537,6 +553,9 @@
 
             // MANAGER SCREEN
             if (safeRole === 'manager' || safeRole === 'admin') {
+                // ADD BADGE TO HEADER
+                document.getElementById('app-title').innerHTML = `Murali Quiz <span style="font-size:0.75rem; background:var(--danger-color); color:white; padding:3px 8px; border-radius:12px; margin-left:8px; vertical-align:middle;">👑 Admin</span>`;
+                
                 document.getElementById('murali-text').style.display = 'block';
                 document.getElementById('generator-actions').style.display = 'flex';
                 document.getElementById('quiz-config-tools').style.display = 'flex';
@@ -546,6 +565,9 @@
             } 
             // STUDENT SCREEN
             else {
+                // ADD BADGE TO HEADER
+                document.getElementById('app-title').innerHTML = `Murali Quiz <span style="font-size:0.75rem; background:var(--success-color); color:white; padding:3px 8px; border-radius:12px; margin-left:8px; vertical-align:middle;">🎓 Student</span>`;
+
                 document.getElementById('murali-text').style.display = 'none';
                 document.getElementById('generator-actions').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none';
@@ -564,7 +586,6 @@
         return history.some(h => h.date === dateStr);
     }
 
-    // 🔴 ANTI-CRASH STUDENT LOAD
     function loadStudentDashboard() {
         try {
             let serverQuizzes = safeJSON('murali_server_quizzes', []);
