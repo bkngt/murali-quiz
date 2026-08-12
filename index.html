@@ -373,14 +373,14 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 31.0 (Ultimate UI + Server Sync)</div>
+        <div>Version: 31.1 (CORS Fixed & Full UI)</div>
     </div>
 </div>
 
 <script>
     // तपाइँको Google Sheet को API लिङ्क यहाँ छ
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "31.0"; 
+    const APP_VERSION = "31.1"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -426,9 +426,14 @@
         animate(); setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
     }
 
+    // 🔴 V31.1 Fix: Added headers to all fetch calls so Google Apps Script doesn't crash on preflight (CORS)
     function syncServerQuizzes(refreshUI = false) {
         if (!navigator.onLine) return;
-        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "fetchQuizzes" }) })
+        fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "fetchQuizzes" }) 
+        })
         .then(res => res.json())
         .then(data => {
             if(data.status === "success") {
@@ -471,8 +476,11 @@
         
         if(navigator.onLine && inputPhone) {
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
+            
+            // 🔴 V31.1 Fix: Added headers to login check
             fetch(API_URL, {
                 method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
             }).then(r => r.json()).then(data => {
                 if(data.status === "success") {
@@ -484,7 +492,7 @@
                     showToast("Server Login Successful!", "success");
                     unlockApp();
                 } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); }
-            }).catch(e => checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress));
+            }).catch(e => { console.error(e); checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); });
         } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); }
     }
 
@@ -615,7 +623,12 @@
         document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
-        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: false }) })
+        // 🔴 V31.1 Fix: Added headers to save Quiz
+        fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: false }) 
+        })
         .then(res => res.json())
         .then(data => {
             document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
@@ -716,7 +729,12 @@
         let history = JSON.parse(localStorage.getItem('murali_progress') || '[]'); let pendingData = history.filter(item => item.synced !== true);
         if (pendingData.length === 0) return;
         pendingData.forEach(data => {
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "saveResult", name: data.name, phone: data.phone, date: data.date, score: data.score, total: data.total, percent: data.percent, timeTaken: data.timeTaken, weakTags: data.weakTags }) })
+            // 🔴 V31.1 Fix: Added headers to save Result
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "saveResult", name: data.name, phone: data.phone, date: data.date, score: data.score, total: data.total, percent: data.percent, timeTaken: data.timeTaken, weakTags: data.weakTags }) 
+            })
             .then(res => res.json())
             .then(result => { if(result.status === "success") { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); console.log("Result synced!"); } });
         });
