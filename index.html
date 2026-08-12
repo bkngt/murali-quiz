@@ -2403,19 +2403,19 @@ ${text}`;
 
     window.onload = init;
 </script>
-    <!-- ONLINE DATABASE SYNC (PHASE 2) -->
+<!-- ONLINE DATABASE SYNC (PHASE 2) -->
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
 
-    // इन्टरनेट आउनेबित्तिकै नतिजा गुगल सिटमा पठाउने सिस्टम
     window.addEventListener('online', syncPendingResults);
 
     function syncPendingResults() {
         if (!navigator.onLine) return;
 
         let history = JSON.parse(localStorage.getItem('murali_progress') || '[]');
-        // जुन नतिजा सिंक भएको छैन (synced: false), त्यसलाई मात्र छान्ने
-        let pendingData = history.filter(item => item.synced === false);
+        
+        // 'synced !== true' राख्दा सिंक नभएका र नयाँ सबै नतिजाहरू ट्याप्प टिप्छ
+        let pendingData = history.filter(item => item.synced !== true);
 
         if (pendingData.length === 0) return;
 
@@ -2441,7 +2441,7 @@ ${text}`;
             .then(response => response.json())
             .then(result => {
                 if(result.status === "success") {
-                    data.synced = true; // सिंक भयो भनेर चिनो लगाउने
+                    data.synced = true;
                     localStorage.setItem('murali_progress', JSON.stringify(history));
                     console.log("नतिजा सफलतापूर्वक Google Sheet मा सेभ भयो!");
                 }
@@ -2450,7 +2450,7 @@ ${text}`;
         });
     }
 
-    // पेज खुलेको ३ सेकेन्डपछि एकपटक अटोमेटिक चेक गर्ने
+    // पेज खुलेको ३ सेकेन्डपछि अटोमेटिक सिंक गर्ने
     setTimeout(syncPendingResults, 3000);
 </script>
 </body>
