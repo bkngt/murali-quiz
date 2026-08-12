@@ -18,7 +18,6 @@
             --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
             --primary-hover-gradient: linear-gradient(135deg, #0369a1, #7c3aed);
             --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
-            --submit-hover-gradient: linear-gradient(135deg, #15803d, #047857);
             --success-color: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
             --danger-color: #dc2626; --danger-bg: #fef2f2; --danger-border: #fecaca;
             --warning-color: #d97706; --border-color: #cbd5e1; 
@@ -93,7 +92,6 @@
         #result-screen { display: none; text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem; }
         .result-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);}
         
-        /* Dashboard & Calendar Restored */
         .dashboard-stats { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .stat-card { flex: 1; min-width: 110px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 12px; text-align: center;}
         .stat-card h3 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-weight: 800; line-height: 1;}
@@ -133,14 +131,14 @@
 <canvas id="confetti-canvas"></canvas>
 <div id="toast-container"></div>
 
-<!-- Login Screen -->
+<!-- Login Screen (Restored Strict UI) -->
 <div id="lock-screen">
     <div class="pin-box">
         <form id="login-form" onsubmit="event.preventDefault(); handlePIN();" style="width: 100%; margin: 0; padding: 0;">
             <h2 id="pin-title" style="margin-top: 0; color: var(--primary-color); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Login
             </h2>
-            <p id="pin-msg" style="font-size: 0.95rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">Please enter your credentials</p>
+            <p id="pin-msg" style="font-size: 0.95rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
@@ -165,7 +163,7 @@
             </div>
 
             <div id="warning-msg" style="background: var(--danger-bg); color: var(--danger-color); padding: 12px; border-radius: 12px; font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; border: 1px solid var(--danger-border); text-align: left; line-height: 1.5;">
-                ⚠️ कृपया आफ्नो वास्तविक नाम, सही फोन नम्बर र सेवा केन्द्र भर्नुहोला।
+                ⚠️ ध्यान दिनुहोस्: कृपया आफ्नो वास्तविक नाम, सही फोन नम्बर र सेवा केन्द्र भर्नुहोला। (सर्टकट मान्य छैन)
             </div>
 
             <div style="display: flex; gap: 8px; margin: 0.25rem 0;">
@@ -174,17 +172,33 @@
             </div>
             
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next">
-            <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्र (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
+            
+            <select id="country-select" class="select-field" onchange="checkOtherCountry()">
+                <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
+                <option value="Nepal">नेपाल (Nepal)</option><option value="India">भारत (India)</option><option value="USA">अमेरिका (USA)</option><option value="Australia">अष्ट्रेलिया (Australia)</option><option value="UK">बेलायत (UK)</option><option value="UAE">यूएई (UAE)</option><option value="Qatar">कतार (Qatar)</option><option value="Malaysia">मलेसिया (Malaysia)</option><option value="Japan">जापान (Japan)</option><option value="Canada">क्यानडा (Canada)</option><option value="Other">अन्य (Other)</option>
+            </select>
+            
+            <input type="text" id="country-input-other" class="input-field" placeholder="आफ्नो देशको नाम लेख्नुहोस्" style="display: none; border-color: var(--warning-color);" autocomplete="off">
+            <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
             
             <div style="margin: 0.4rem 0;">
                 <p id="pin-instruction" style="font-size: 0.85rem; color: #64748b; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
                 <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; text-align: center; letter-spacing: 4px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric">
             </div>
             
+            <select id="month-select" class="select-field">
+                <option value="" disabled selected>अलौकिक जन्म महिना छान्नुहोस्</option>
+                <option value="बैशाख">बैशाख</option><option value="जेठ">जेठ</option><option value="असार">असार</option><option value="साउन">साउन</option><option value="भदौ">भदौ</option><option value="असोज">असोज</option><option value="कार्तिक">कार्तिक</option><option value="मंसिर">मंसिर</option><option value="पुष">पुष</option><option value="माघ">माघ</option><option value="फागुन">फागुन</option><option value="चैत">चैत</option>
+            </select>
+            
             <button type="submit" id="btn-login-submit" style="padding: 1rem; font-size: 1.2rem; margin-top: 20px; border-radius: 14px;">
                 Enter <svg class="icon" viewBox="0 0 24 24"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
             </button>
         </form>
+        
+        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
+        </div>
     </div>
 </div>
 
@@ -245,6 +259,10 @@
                     <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
                     <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
                 </div>
+                <!-- V36.0 Restored Link -->
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none; display: block; margin-top: 10px;">
+                    <button style="background: #475569; width: 100%; box-shadow: none;">Get Free Gemini API Key</button>
+                </a>
             </div>
             
             <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
@@ -374,13 +392,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 35.1 (Dynamic Mega/Review Quiz)</div>
+        <div>Version: 36.0 (Ultimate Strict Security)</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "35.1"; 
+    const APP_VERSION = "36.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -430,6 +448,11 @@
         animate(); setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
     }
 
+    function checkOtherCountry() {
+        let sel = document.getElementById('country-select'); let inp = document.getElementById('country-input-other');
+        if (sel.value === 'Other') { inp.style.display = 'block'; inp.focus(); } else { inp.style.display = 'none'; inp.value = ''; }
+    }
+
     function syncServerQuizzes(refreshUI = false) {
         if (!navigator.onLine) return;
         fetch(API_URL, { 
@@ -461,13 +484,34 @@
             document.getElementById('first-name-input').value = nameParts[0] || "";
             document.getElementById('last-name-input').value = nameParts.slice(1).join(" ") || "";
             document.getElementById('first-name-input').disabled = true; document.getElementById('last-name-input').disabled = true; 
-            document.getElementById('phone-input').style.display = 'none'; document.getElementById('address-input').style.display = 'none';
-            document.getElementById('country-select').style.display = 'none'; document.getElementById('warning-msg').style.display = 'none';
+            
+            document.getElementById('phone-input').style.display = 'none'; 
+            document.getElementById('address-input').style.display = 'none';
+            document.getElementById('country-select').style.display = 'none'; 
+            document.getElementById('month-select').style.display = 'none';
+            document.getElementById('warning-msg').style.display = 'none';
             document.getElementById('pin-instruction').style.display = 'none';
+            
             document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Unlock App`;
             document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`;
+            document.getElementById('forgot-btn').style.display = 'block'; // Show forgot PIN for returning users
         }
         syncServerQuizzes(); 
+    }
+
+    // 🔴 V36.0 STRICT VALIDATION LOGIC
+    function validateRegistration(fName, lName, phone, center, pin, month, countryVal) {
+        if(fName.length < 2 || lName.length < 2) return "कृपया सही र पूरा नाम लेख्नुहोस् (कम्तीमा २ अक्षर)।";
+        if(phone.length < 10) return "कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।";
+        
+        let c = center.trim().toUpperCase();
+        if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NGT" || c === "NONE") return "कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।";
+        
+        if(!countryVal || countryVal === "") return "कृपया देश छान्नुहोस्।";
+        if(!month || month === "") return "कृपया अलौकिक जन्म महिना छान्नुहोस्।";
+        if(pin.length !== 4) return "पिन ठ्याक्कै ४ अंकको हुनुपर्छ।";
+        
+        return null; // All good
     }
 
     function handlePIN() {
@@ -476,6 +520,16 @@
         const inputAddress = document.getElementById('address-input').value.trim();
         const fName = document.getElementById('first-name-input').value.trim();
         const lName = document.getElementById('last-name-input').value.trim();
+        const month = document.getElementById('month-select').value;
+        
+        let countryVal = document.getElementById('country-select').value;
+        if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
+
+        // If it's a first-time registration (inputs are visible)
+        if(document.getElementById('phone-input').style.display !== 'none') {
+            let errorMsg = validateRegistration(fName, lName, inputPhone, inputAddress, inputPIN, month, countryVal);
+            if(errorMsg) return showToast(errorMsg, "error");
+        }
 
         if(navigator.onLine && inputPhone && document.getElementById('phone-input').style.display !== 'none') {
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
@@ -489,7 +543,9 @@
                     localStorage.setItem('murali_user_name', data.name);
                     localStorage.setItem('murali_phone', inputPhone);
                     localStorage.setItem('murali_address', inputAddress);
-                    localStorage.setItem('murali_role', data.role); // Role securely assigned from Google Sheet!
+                    localStorage.setItem('murali_month', month);
+                    localStorage.setItem('murali_country', countryVal);
+                    localStorage.setItem('murali_role', data.role);
                     showToast("Server Login Successful!", "success");
                     unlockApp();
                 } else if (data.status === "success" && !data.role) {
@@ -502,28 +558,48 @@
             }).catch(e => { 
                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
                 showToast("सर्भर कनेक्सन फेल भयो! (Offline Mode)", "error");
-                checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); 
+                checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal); 
             });
-        } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress); }
+        } else { 
+            checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal); 
+        }
     }
 
-    function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress) {
+    function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal) {
         const savedPIN = localStorage.getItem('murali_pin');
         
         if (!savedPIN) {
-             if(fName.length < 2) return showToast("कृपया सही नाम लेख्नुहोस्।", "error");
-             if (inputPIN.length < 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
              localStorage.setItem('murali_pin', inputPIN);
              localStorage.setItem('murali_user_name', fName + " " + lName);
              localStorage.setItem('murali_phone', inputPhone);
              localStorage.setItem('murali_address', inputAddress);
-             localStorage.setItem('murali_role', 'Student'); // STRICTLY Student for offline new users
+             localStorage.setItem('murali_month', month);
+             localStorage.setItem('murali_country', countryVal);
+             localStorage.setItem('murali_role', 'Student'); 
              showToast("Offline Profile Created!", "success");
              unlockApp();
         } else {
              if (inputPIN === savedPIN) { unlockApp(); } 
              else { showToast("गलत पिन!", "error"); document.getElementById('pin-input').value = ""; document.getElementById('btn-login-submit').innerHTML = `Enter`; }
         }
+    }
+
+    // 🔴 V36.0 FORGOT PIN LOGIC
+    function handleForgotPIN() {
+        let savedPhone = localStorage.getItem('murali_phone');
+        let savedMonth = localStorage.getItem('murali_month');
+        if(!savedPhone) return showToast("कुनै प्रोफाइल भेटिएन।", "error");
+        
+        let askPhone = prompt("सुरक्षा जाँच: आफ्नो दर्ता गरिएको फोन नम्बर लेख्नुहोस्:");
+        if(!askPhone) return;
+        if(askPhone.trim() !== savedPhone) return showToast("फोन नम्बर मिलेन!", "error");
+
+        let askMonth = prompt("सुरक्षा जाँच: आफ्नो 'अलौकिक जन्म महिना' नेपालीमा लेख्नुहोस् (उदा: बैशाख):");
+        if(!askMonth) return;
+        if(askMonth.trim() !== savedMonth) return showToast("महिना मिलेन!", "error");
+
+        let pin = localStorage.getItem('murali_pin');
+        alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + pin + "\n(कृपया यसलाई सुरक्षित राख्नुहोला)");
     }
 
     function unlockApp() { 
@@ -623,7 +699,6 @@
 
         if(allQuestions.length < 5) return showToast("क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
 
-        // Remove exact duplicates
         let uniqueQ = []; let qTextSet = new Set();
         allQuestions.forEach(q => {
             if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); }
@@ -632,13 +707,11 @@
         shuffleArray(uniqueQ);
         
         let qCount = parseInt(document.getElementById('q-count').value);
-        // 🔴 FIX: Now it strictly follows whatever number is selected in the dropdown!
         qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
 
         currentQuiz = uniqueQ.slice(0, qCount);
         currentQuiz.forEach(q => shuffleArray(q.options));
         
-        // Dynamic Title
         if(qCount >= 50) {
             currentMurliDate = `🏆 Mega Quiz (${qCount} Qs)`;
         } else {
@@ -728,7 +801,7 @@
         currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
         document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
-        document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
+        document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
         document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
