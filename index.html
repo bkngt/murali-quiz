@@ -226,8 +226,8 @@
                 <option value="10">10 Qs</option>
                 <option value="20" selected>20 Qs</option>
                 <option value="30">30 Qs</option>
-                <option value="50">50 Qs (Mega)</option>
-                <option value="100">100 Qs (Mega)</option>
+                <option value="50">50 Qs (Mega/Weekly)</option>
+                <option value="100">100 Qs (Mega/Monthly)</option>
             </select>
         </div>
     </div>
@@ -282,7 +282,7 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <!-- Mega Quiz Button -->
+            <!-- Dynamic Mega/Review Quiz Button -->
             <button onclick="createMegaQuiz()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
                 🏆 Mega Quiz
             </button>
@@ -321,7 +321,7 @@
         </div>
     </div>
 
-    <!-- Progress View (Restored Full Calendar and Stats) -->
+    <!-- Progress View -->
     <div id="view-progress" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.4rem;">
             <h2 id="dash-title" style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.5rem;">Analytics Dashboard</h2>
@@ -374,13 +374,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 35.0 (Strict Server Auth & MegaQuiz)</div>
+        <div>Version: 35.1 (Dynamic Mega/Review Quiz)</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "35.0"; 
+    const APP_VERSION = "35.1"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userRole = "Student";
@@ -470,7 +470,6 @@
         syncServerQuizzes(); 
     }
 
-    // 🔴 STRICT SERVER VALIDATION (REMOVED BYPASS)
     function handlePIN() {
         const inputPIN = document.getElementById('pin-input').value;
         const inputPhone = document.getElementById('phone-input').value.trim();
@@ -553,7 +552,7 @@
                 
                 document.getElementById('murali-text').style.display = 'block';
                 document.getElementById('generator-actions').style.display = 'flex';
-                document.getElementById('btn-mega').style.display = 'block'; // Show Mega Quiz Button
+                document.getElementById('btn-mega').style.display = 'block'; 
                 document.getElementById('quiz-config-tools').style.display = 'flex';
                 document.getElementById('exam-config-section').style.display = 'block';
                 document.getElementById('api-config-section').style.display = 'block';
@@ -610,7 +609,7 @@
 
     function extractDate(text) { let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); return m ? m[0] : new Date().toLocaleDateString('en-GB'); }
 
-    // 🔴 MEGA QUIZ LOGIC
+    // 🔴 DYNAMIC MEGA / REVIEW QUIZ LOGIC
     function createMegaQuiz() {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         if(serverQuizzes.length === 0) return showToast("सर्भरमा कुनै पनि पुरानो प्रश्न छैन!", "error");
@@ -622,7 +621,7 @@
             }
         });
 
-        if(allQuestions.length < 10) return showToast("मेगा क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
+        if(allQuestions.length < 5) return showToast("क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
 
         // Remove exact duplicates
         let uniqueQ = []; let qTextSet = new Set();
@@ -633,24 +632,24 @@
         shuffleArray(uniqueQ);
         
         let qCount = parseInt(document.getElementById('q-count').value);
-        if(qCount === 50 || qCount === 100) {
-           qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
-        } else {
-           qCount = uniqueQ.length > 50 ? 50 : uniqueQ.length; // Default Mega size if standard count selected
-        }
+        // 🔴 FIX: Now it strictly follows whatever number is selected in the dropdown!
+        qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
 
         currentQuiz = uniqueQ.slice(0, qCount);
-        // Force options to shuffle again just in case
         currentQuiz.forEach(q => shuffleArray(q.options));
         
-        let mm = new Date().getMonth() + 1; let yy = new Date().getFullYear();
-        currentMurliDate = `🏆 Mega Quiz (Month ${mm}-${yy})`;
+        // Dynamic Title
+        if(qCount >= 50) {
+            currentMurliDate = `🏆 Mega Quiz (${qCount} Qs)`;
+        } else {
+            currentMurliDate = `🔄 Review Quiz (${qCount} Qs)`;
+        }
 
         document.getElementById('murali-text').style.display = 'none';
         document.getElementById('generator-actions').style.display = 'none';
         startQuizSession();
         document.getElementById('btn-save-server').style.display = 'block';
-        showToast(`मेगा क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
+        showToast(`क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
     }
 
     // Standard AI Generation
@@ -699,7 +698,7 @@
         document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
-        let isMega = currentMurliDate.includes("Mega");
+        let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
 
         fetch(API_URL, { 
             method: 'POST', 
@@ -729,7 +728,7 @@
         currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
         document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
-        document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
+        document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
         document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
