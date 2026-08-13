@@ -391,13 +391,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 46.0 (Ultimate Auto-BK Formatter) | Engine: Multi-Sync</div>
+        <div>Version: 46.1 (Ultra-Smart Name Formatter) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "46.0"; 
+    const APP_VERSION = "46.1"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -557,7 +557,7 @@
 
     function cancelForgotPIN() { isRecoveryMode = false; window.location.reload(); }
 
-    // 🔴 ULTIMATE SMART NAME FORMATTER (Auto BK / Corrects spelling & length)
+    // 🔴 46.1: ULTRA SMART NAME FORMATTER (Fixes "बि.के.", "बीके", "Brahmakumari" etc.)
     function smartFormatName(fNameRaw, lNameRaw) {
         let fName = fNameRaw.trim();
         let lName = lNameRaw.trim();
@@ -566,29 +566,31 @@
             return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         }
         
-        // 1. Title case for last name always
+        // 1. Title case for last name
         lName = toTitleCase(lName);
         fName = fName.replace(/\s+/g, ' '); 
         
         let isNepali = /[\u0900-\u097F]/.test(fName + lName);
 
-        // Comprehensive Regex to catch BK, B.K., Brahmakumar, Brahmakumari and all possible misspellings
-        let engPrefixRegex = /^(b\.?k\.?|b\s+k|brahma?a?ku?ma?a?ri?|brahma\s+kuma?a?ri?)\b\s*/i;
-        let nepPrefixRegex = /^(बी\.?\s*के\.?|ब्रह?्मा?कुमा?री?|ब्रम्हा?कुमा?री?)\s*/;
+        // English Regex: Catch bk, b.k., brahmakumar, brahmakumari, etc.
+        let engPrefixRegex = /^(b\.?\s*k\.?|brahma?a?\s*ku?ma?a?r(i|y)?)\b\s*/i;
+        
+        // Nepali Regex: Catch बी, बि, ब + के with optional dots/spaces OR ब्रह्माकुमार/कुमारी and all typos
+        let nepPrefixRegex = /^((बी|बि|ब)\.?\s*के\.?|ब्रह?्मा?\s*कुमा?री?|ब्रम्हा?\s*कुमा?री?|ब्रह?्मा?\s*कुमा?र|ब्रम्हा?\s*कुमा?र)\s*/;
 
         if (engPrefixRegex.test(fName)) {
             fName = fName.replace(engPrefixRegex, ""); // Strip matched wrong/long prefix
             fName = toTitleCase(fName); // Title case the actual name remaining
-            fName = "BK " + fName; // Add standard prefix
+            fName = "BK " + fName; // Add standard English prefix
         } else if (nepPrefixRegex.test(fName)) {
             fName = fName.replace(nepPrefixRegex, ""); 
             fName = toTitleCase(fName); 
-            fName = "बी के " + fName; 
+            fName = "बी.के. " + fName; // Add standard Nepali prefix (B.K.)
         } else {
-            // No prefix provided, add automatically based on Nepali/English script
+            // No prefix provided, add automatically
             fName = toTitleCase(fName);
             if (isNepali) {
-                fName = "बी के " + fName;
+                fName = "बी.के. " + fName;
             } else {
                 fName = "BK " + fName;
             }
@@ -736,7 +738,7 @@
                 displayName = editFirstName + " " + editLastName; 
             } else {
                 displayName = editFirstName.split(" ")[0]; // just first word if no BK prefix handled (fallback)
-                if(editFirstName.includes("BK ") || editFirstName.includes("बी के ")) displayName = editFirstName;
+                if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) displayName = editFirstName;
             }
             
             let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
