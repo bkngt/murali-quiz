@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <!-- Settings Modal (Editable Profile Updated) -->
+    <!-- Settings Modal (Editable Profile Updated with Server Sync) -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
         <div class="modal-content">
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -294,7 +294,7 @@
                     <input type="text" id="edit-address" class="input-field" placeholder="सेवा केन्द्र" style="margin:0; flex: 1;">
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button onclick="updateLocalProfile()" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
+                    <button onclick="updateLocalProfile()" id="btn-save-profile" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
                     <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
                 </div>
             </div>
@@ -391,13 +391,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 46.1 (Ultra-Smart Name Formatter) | Engine: Multi-Sync</div>
+        <div>Version: 46.2 (Cloud Auto-Sync Profile) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "46.1"; 
+    const APP_VERSION = "46.2"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -557,7 +557,7 @@
 
     function cancelForgotPIN() { isRecoveryMode = false; window.location.reload(); }
 
-    // 🔴 46.1: ULTRA SMART NAME FORMATTER (Fixes "बि.के.", "बीके", "Brahmakumari" etc.)
+    // 🔴 46.2: ULTRA SMART NAME FORMATTER (Fixes "बि.के.", "बीके", "Brahmakumari" etc. + proper prefixing)
     function smartFormatName(fNameRaw, lNameRaw) {
         let fName = fNameRaw.trim();
         let lName = lNameRaw.trim();
@@ -566,28 +566,24 @@
             return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         }
         
-        // 1. Title case for last name
         lName = toTitleCase(lName);
         fName = fName.replace(/\s+/g, ' '); 
-        
         let isNepali = /[\u0900-\u097F]/.test(fName + lName);
 
-        // English Regex: Catch bk, b.k., brahmakumar, brahmakumari, etc.
+        // Catch bk, b.k., brahmakumar, brahmakumari, etc.
         let engPrefixRegex = /^(b\.?\s*k\.?|brahma?a?\s*ku?ma?a?r(i|y)?)\b\s*/i;
-        
-        // Nepali Regex: Catch बी, बि, ब + के with optional dots/spaces OR ब्रह्माकुमार/कुमारी and all typos
+        // Catch बी, बि, ब + के with optional dots/spaces OR ब्रह्माकुमार/कुमारी and all typos
         let nepPrefixRegex = /^((बी|बि|ब)\.?\s*के\.?|ब्रह?्मा?\s*कुमा?री?|ब्रम्हा?\s*कुमा?री?|ब्रह?्मा?\s*कुमा?र|ब्रम्हा?\s*कुमा?र)\s*/;
 
         if (engPrefixRegex.test(fName)) {
-            fName = fName.replace(engPrefixRegex, ""); // Strip matched wrong/long prefix
-            fName = toTitleCase(fName); // Title case the actual name remaining
-            fName = "BK " + fName; // Add standard English prefix
+            fName = fName.replace(engPrefixRegex, ""); 
+            fName = toTitleCase(fName); 
+            fName = "BK " + fName; 
         } else if (nepPrefixRegex.test(fName)) {
             fName = fName.replace(nepPrefixRegex, ""); 
             fName = toTitleCase(fName); 
-            fName = "बी.के. " + fName; // Add standard Nepali prefix (B.K.)
+            fName = "बी.के. " + fName; 
         } else {
-            // No prefix provided, add automatically
             fName = toTitleCase(fName);
             if (isNepali) {
                 fName = "बी.के. " + fName;
@@ -678,27 +674,61 @@
         localStorage.setItem('murali_month', month); localStorage.setItem('murali_country', country); localStorage.setItem('murali_pin', pin); localStorage.setItem('murali_role', role); unlockApp();
     }
 
-    // 🔴 UPDATE LOCAL PROFILE using Smart Formatter
+    // 🔴 46.2: GOOGLE SHEET CLOUD SYNC FOR PROFILE UPDATE
     window.updateLocalProfile = function() {
         let fNameRaw = document.getElementById('edit-first-name').value.trim();
         let lNameRaw = document.getElementById('edit-last-name').value.trim();
-        let phone = document.getElementById('edit-phone').value.trim();
-        let address = document.getElementById('edit-address').value.trim();
+        let newPhone = document.getElementById('edit-phone').value.trim();
+        let newAddress = document.getElementById('edit-address').value.trim();
+        
+        let oldPhone = localStorage.getItem('murali_phone');
+        let pin = localStorage.getItem('murali_pin');
         
         if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पूरा नाम र थर लेख्नुहोस्।", "error");
-        if(phone.length < 10) return showToast("कृपया सही फोन नम्बर लेख्नुहोस्।", "error");
+        if(newPhone.length < 10) return showToast("कृपया सही फोन नम्बर लेख्नुहोस्।", "error");
         
         let formatted = smartFormatName(fNameRaw, lNameRaw);
+        let finalName = formatted.full;
         
-        localStorage.setItem('murali_user_name', formatted.full);
-        localStorage.setItem('murali_phone', phone);
-        localStorage.setItem('murali_address', address);
+        document.getElementById('btn-save-profile').innerText = "Saving to Cloud...";
         
-        userName = formatted.full; userPhone = phone; userAddress = address;
+        // Optimistic Local Save
+        localStorage.setItem('murali_user_name', finalName);
+        localStorage.setItem('murali_phone', newPhone);
+        localStorage.setItem('murali_address', newAddress);
+        userName = finalName; userPhone = newPhone; userAddress = newAddress;
         
-        showToast("Profile Updated Locally!", "success");
-        closeSettings();
-        unlockApp(); 
+        if(navigator.onLine) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: "updateProfile",
+                    oldPhone: oldPhone,
+                    pin: pin,
+                    newName: finalName,
+                    newPhone: newPhone,
+                    newAddress: newAddress
+                })
+            }).then(r => r.json()).then(data => {
+                document.getElementById('btn-save-profile').innerText = "Save Profile";
+                if(data.status === "success") {
+                    showToast("Profile Synced to Google Sheet! ☁️", "success");
+                } else {
+                    showToast("Google Sheet Sync Error: " + data.message, "error");
+                }
+                closeSettings();
+                unlockApp();
+            }).catch(e => {
+                document.getElementById('btn-save-profile').innerText = "Save Profile";
+                showToast("Saved Locally. (Server sync failed)", "warning");
+                closeSettings(); unlockApp();
+            });
+        } else {
+            document.getElementById('btn-save-profile').innerText = "Save Profile";
+            showToast("Saved Locally! (You are offline)", "success");
+            closeSettings(); unlockApp();
+        }
     };
 
     function getValidDate(h) {
