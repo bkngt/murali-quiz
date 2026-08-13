@@ -3,84 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0b0f19">
+    <meta name="theme-color" id="theme-color-meta" content="#0b0f19">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Murali Quiz">
-    <title>Murali Quiz</title>
+    <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
+    <title>BK Murali Quiz</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
+        
+        /* 🔴 Default Dark Mode Theme */
         :root {
-            --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; 
-            --primary-color: #0284c7; --primary-hover: #0369a1; 
-            --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
-            --primary-hover-gradient: linear-gradient(135deg, #0369a1, #7c3aed);
-            --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
-            --success-color: #16a34a; --success-bg: #f0fdf4; --success-border: #bbf7d0;
-            --danger-color: #dc2626; --danger-bg: #fef2f2; --danger-border: #fecaca;
-            --warning-color: #d97706; --warning-bg: #fffbeb; --border-color: #cbd5e1; 
-            --q-text-color: #0c4a6e; --opt-text-color: #0f766e; 
-            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
-            --glass-bg: rgba(255, 255, 255, 0.85); --font-size: 18px; 
-        }
-        /* Default Dark Mode Theme */
-        [data-theme="dark"] {
             --bg-color: #0b0f19; --card-bg: #1e293b; --text-color: #f8fafc; 
             --primary-color: #38bdf8; --primary-hover: #7dd3fc;
             --primary-gradient: linear-gradient(135deg, #38bdf8, #a78bfa);
             --border-color: rgba(255, 255, 255, 0.1);
             --success-bg: rgba(22, 163, 74, 0.15); --success-border: rgba(22, 163, 74, 0.4);
             --danger-bg: rgba(220, 38, 38, 0.15); --danger-border: rgba(220, 38, 38, 0.4);
-            --warning-bg: rgba(217, 119, 6, 0.15);
+            --warning-bg: rgba(217, 119, 6, 0.15); --warning-color: #fbbf24;
             --q-text-color: #fbbf24; --opt-text-color: #7dd3fc; 
             --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.5); --glass-bg: rgba(15, 23, 42, 0.85);
+            --font-size: 18px; 
+            --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
+            --success-color: #16a34a; --danger-color: #dc2626;
         }
+        
+        /* Light Mode */
+        [data-theme="light"] {
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; 
+            --primary-color: #0284c7; --primary-hover: #0369a1; 
+            --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
+            --border-color: #cbd5e1;
+            --success-bg: #f0fdf4; --success-border: #bbf7d0;
+            --danger-bg: #fef2f2; --danger-border: #fecaca;
+            --warning-bg: #fffbeb; --warning-color: #d97706;
+            --q-text-color: #0c4a6e; --opt-text-color: #0f766e; 
+            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+        }
+
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: var(--font-size); line-height: 1.5; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 760px; background: var(--card-bg); min-height: 100vh; padding: 0.6rem; padding-bottom: 85px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
-        @media (max-width: 600px) {
-            .app-header-area { flex-wrap: wrap !important; justify-content: space-between; gap: 8px !important; margin-bottom: 0.6rem; }
-            #app-title { font-size: 1.3rem !important; letter-spacing: -0.5px; white-space: nowrap; }
-            .toolbar { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto !important; scrollbar-width: none; align-items: center !important; justify-content: space-between !important; gap: 8px !important; padding: 0.4rem !important; }
-            .toolbar::-webkit-scrollbar { display: none; }
-            .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; }
-        }
+        @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
         @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
         .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
-        #app-title { margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(to right, #0284c7, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: var(--primary-color); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
-        [data-theme="dark"] #app-title { background: linear-gradient(to right, #38bdf8, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .murli-icon-btn { color: var(--primary-color); display: inline-flex; align-items: center; justify-content: center; padding: 4px; background: rgba(2, 132, 199, 0.1); border-radius: 50%; border: 1px dashed var(--primary-color); transition: all 0.3s ease; text-decoration: none;}
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
         .input-field, .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s; outline: none;}
-        .input-field:focus, .select-field:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
+        .input-field:focus, .select-field:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
         .input-field:disabled { opacity: 0.7; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
 
-        button { background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.25);}
-        button:hover:not(:disabled) { background: var(--primary-hover-gradient); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35); }
+        button { background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.25);}
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35); }
         button:disabled { opacity: 0.5; cursor: not-allowed; background: #64748b; transform: none; box-shadow: none;}
         .btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); width: auto; border-radius: 50px; box-shadow: none;}
-        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid var(--border-color); background: transparent; color: var(--text-color); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; transition: all 0.2s ease; flex-shrink: 0; box-shadow: none;}
         select { padding: 0.3rem 0.4rem; border-radius: 8px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); cursor: pointer; font-size: 0.85rem; font-weight: 600; outline: none;}
         .nav-tabs button { background: transparent; color: var(--text-color); border: none; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; width: auto; font-size: 0.9rem; opacity: 0.85; transition: all 0.2s; box-shadow: none;}
-        .nav-tabs button.active { background: var(--primary-gradient); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        .nav-tabs button.active { background: var(--primary-gradient); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
         
         textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 0.95rem; height: 45vh; min-height: 280px; resize: vertical; outline: none; transition: all 0.2s;}
-        textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
         
         .question-block { margin-bottom: 0.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--box-shadow-main); padding: 1rem; position: relative; scroll-margin-top: 10px;}
-        .question-meta { font-size: 0.75rem; color: #8b5cf6; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-        .q-tag { background: rgba(139, 92, 246, 0.1); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.2);}
+        .question-meta { font-size: 0.75rem; color: #a78bfa; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .q-tag { background: rgba(167, 139, 250, 0.15); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.3);}
         .question-text { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.8rem 0; color: var(--q-text-color) !important; line-height: 1.4; }
         .options-group { display: flex; flex-direction: column; gap: 10px; }
         .option-container { border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); overflow: hidden; transition: all 0.25s ease; cursor: pointer; position: relative; padding: 0.5rem 0.6rem;}
         .option-text { display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--opt-text-color) !important; line-height: 1.3;}
-        .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3); }
-        .option-container.selected-temp { background-color: rgba(2, 132, 199, 0.1); border-color: var(--primary-color); transform: translateX(4px); }
+        .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3); }
+        .option-container.selected-temp { background-color: rgba(56, 189, 248, 0.15); border-color: var(--primary-color); transform: translateX(4px); }
         .option-container.selected-wrong { background-color: var(--danger-bg); border-color: var(--danger-color); }
         .option-container.selected-wrong .option-letter { background: var(--danger-color); box-shadow: none; }
         .option-container.selected-right { background-color: var(--success-bg); border-color: var(--success-color); }
@@ -88,40 +84,38 @@
         .option-container.disabled { cursor: default; pointer-events: none; opacity: 0.8; }
         .feedback-box { display: none; padding-top: 0.8rem; margin-top: 0.5rem; font-size: 0.9rem; border-top: 1px dashed var(--border-color); }
         .selected-wrong .feedback-box, .selected-right .feedback-box { display: block; }
-        .explanation-box { margin-top: 10px; padding: 10px; background: rgba(139, 92, 246, 0.08); border-left: 4px solid #8b5cf6; border-radius: 8px; font-weight: 600; color: var(--text-color);}
+        .explanation-box { margin-top: 10px; padding: 10px; background: rgba(167, 139, 250, 0.1); border-left: 4px solid #a78bfa; border-radius: 8px; font-weight: 600; color: var(--text-color);}
         
-        .sticky-scorebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); max-width: 760px; background: var(--glass-bg) !important; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 16px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; z-index: 998; box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        .sticky-scorebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); max-width: 760px; background: var(--glass-bg) !important; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; z-index: 998; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         #result-screen { display: none; text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem; }
-        .result-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);}
+        .result-score-circle { width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(56, 189, 248, 0.25);}
         
         .dashboard-stats { display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .stat-card { flex: 1; min-width: 110px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 12px; text-align: center;}
         .stat-card h3 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-weight: 800; line-height: 1;}
-        .stat-card p { margin: 0.4rem 0 0; font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;}
+        .stat-card p { margin: 0.4rem 0 0; font-size: 0.8rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;}
         
-        .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .cal-day { padding: 8px 4px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; align-items: center; justify-content: center; min-height: 40px; position: relative; }
+        .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem 0.5rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .cal-day { padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 50px; position: relative; overflow:hidden; word-break: break-word; line-height: 1.1; }
         .cal-day.empty { background: transparent; border: none; }
-        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
-        .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .cal-day.excellent { background: var(--success-bg); color: var(--success-color); border-color: var(--success-border); }
-        .cal-day.good { background: #fffbeb; color: var(--warning-color); border-color: #fde68a; }
+        .cal-day.good { background: var(--warning-bg); color: var(--warning-color); border-color: var(--warning-color); }
         .cal-day.poor { background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); }
         
-        .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.02);}
+        .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
         .prog-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; color: var(--primary-color);}
         .prog-remark { font-size: 0.85rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 50px; margin-top: 0.4rem; display: inline-block;}
-        .remark-excellent { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;}
-        .remark-good { background: #fffbeb; color: #d97706; border: 1px solid #fde68a;}
-        .remark-poor { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;}
+        .remark-excellent { background: var(--success-bg); color: var(--success-color); border: 1px solid var(--success-border);}
+        .remark-good { background: var(--warning-bg); color: var(--warning-color); border: 1px solid var(--warning-color);}
+        .remark-poor { background: var(--danger-bg); color: var(--danger-color); border: 1px solid var(--danger-border);}
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; box-shadow: var(--box-shadow-main); width: 100%; max-width: 440px; position: relative; max-height: 90vh; overflow-y: auto;}
         
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
-        .toast { background: var(--card-bg); color: var(--text-color); padding: 14px 18px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.15); font-size: 1rem; font-weight: 700; opacity: 0; animation: slideDown 0.3s forwards; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); pointer-events: auto; }
-        .toast.error { border-left: 5px solid var(--danger-color); }
-        .toast.success { border-left: 5px solid var(--success-color); }
+        .toast { background: var(--card-bg); color: var(--text-color); padding: 14px 18px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); font-size: 1rem; font-weight: 700; opacity: 0; animation: slideDown 0.3s forwards; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); pointer-events: auto; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
@@ -138,9 +132,9 @@
     <div class="pin-box">
         <form id="login-form" onsubmit="event.preventDefault(); handlePIN();" style="width: 100%; margin: 0; padding: 0;">
             <h2 id="pin-title" style="margin-top: 0; color: var(--primary-color); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Login
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> BK Murali Quiz
             </h2>
-            <p id="pin-msg" style="font-size: 0.95rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
+            <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
@@ -173,12 +167,10 @@
                     <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (First Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
                     <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
                 </div>
-                
                 <select id="country-select" class="select-field" onchange="checkOtherCountry()">
                     <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
                     <option value="Nepal">नेपाल (Nepal)</option><option value="India">भारत (India)</option><option value="USA">अमेरिका (USA)</option><option value="Australia">अष्ट्रेलिया (Australia)</option><option value="UK">बेलायत (UK)</option><option value="UAE">यूएई (UAE)</option><option value="Qatar">कतार (Qatar)</option><option value="Malaysia">मलेसिया (Malaysia)</option><option value="Japan">जापान (Japan)</option><option value="Canada">क्यानडा (Canada)</option><option value="Other">अन्य (Other)</option>
                 </select>
-                
                 <input type="text" id="country-input-other" class="input-field" placeholder="आफ्नो देशको नाम लेख्नुहोस्" style="display: none; border-color: var(--warning-color);" autocomplete="off">
                 <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next">
             </div>
@@ -186,7 +178,7 @@
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next">
             
             <div style="margin: 0.4rem 0;">
-                <p id="pin-instruction" style="font-size: 0.85rem; color: #64748b; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
+                <p id="pin-instruction" style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
                 <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; text-align: center; letter-spacing: 4px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric">
             </div>
             
@@ -204,47 +196,55 @@
             <a href="#" onclick="toggleDirectLogin()" id="direct-login-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none;">पहिले नै खाता छ? (Direct Login)</a>
             <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
             <a href="#" onclick="cancelForgotPIN()" id="cancel-forgot-btn" style="color: var(--danger-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">Cancel Recovery</a>
-            
-            <a href="#" onclick="clearLocalDataAndReload()" id="clear-data-btn" style="color: #64748b; font-size: 0.85rem; font-weight: 600; text-decoration: underline; margin-top: 5px;">Switch User / Clear Data</a>
+            <a href="#" onclick="clearLocalDataAndReload()" id="clear-data-btn" style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-decoration: underline; margin-top: 5px;">Switch User / Clear Data</a>
         </div>
     </div>
 </div>
 
 <!-- Main App -->
 <div id="main-app" class="container" style="display: none;">
-    <!-- 🔴 UPDATE: App Header - Made settings icon round, removed audio/dark buttons -->
-    <div class="app-header-area" id="main-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <div id="header-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white;">
+    
+    <!-- 🔴 LINE 1: Logo, Badge, Book Mark & Settings (Super Clean!) -->
+    <div class="app-header-area" id="main-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- Baba Logo -->
+            <div id="header-avatar" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white; margin: 0;">
                  <div class="baba-logo-container"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="95" fill="gold"/><circle cx="100" cy="100" r="12" fill="white"/></svg></div>
             </div>
-            <h1 id="app-title">Murali Quiz</h1>
+            <!-- Dynamic Profile Badge goes here, no extra Murali Quiz text to save space -->
+            <div id="profile-badge-container" style="display: flex; align-items: center;"></div>
         </div>
         
-        <div style="display: flex; gap: 6px; align-items: center;">
-            <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" style="border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;">
-                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <!-- 🔴 Restored Book Mark Icon -->
+            <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="btn-icon" style="width: 38px; height: 38px; border-color: var(--primary-color); color: var(--primary-color); background: rgba(56, 189, 248, 0.1); text-decoration: none;">
+                <svg class="icon" viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </a>
+            <!-- Premium Circular Setting Button -->
+            <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" style="width: 38px; height: 38px; border-radius: 50%; border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0;">
+                <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </button>
         </div>
     </div>
     
-    <!-- Toolbar -->
-    <div class="toolbar" id="top-toolbar" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 0.4rem; gap: 8px; background: var(--glass-bg); border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); margin-bottom: 0.8rem;">
+    <!-- 🔴 LINE 2: Toolbar -->
+    <div class="toolbar" id="top-toolbar" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 0.4rem; gap: 8px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
         <div class="nav-tabs" id="main-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 50px; border: 1px solid var(--border-color); margin: 0;">
             <button id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.3rem 0.8rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> <span id="tab-gen-txt">Exam</span></button>
             <button id="tab-prog" onclick="switchTab('prog')" style="padding: 0.3rem 0.8rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
         </div>
         
-        <div id="online-quiz-actions" style="display: none; width: 100%; justify-content: space-between; align-items: center; margin: 0; flex-wrap: wrap;">
-            <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.9rem; white-space: nowrap;"></span></div>
+        <!-- Zen Mode Tools (Only visible during Quiz) -->
+        <div id="online-quiz-actions" style="display: none; width: 100%; justify-content: space-between; align-items: center; margin: 0;">
+            <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.95rem; white-space: nowrap;"></span></div>
             <div style="display:flex; gap:8px;">
                 <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save</button>
                 <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export</button>
-                <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.6rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.85rem; font-weight:700;">Cancel</button>
+                <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.8rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.85rem; font-weight:700;">Cancel</button>
             </div>
         </div>
         
-        <!-- Visible only to Managers -->
+        <!-- Visible only to Managers in Gen Tab -->
         <div class="toolbar-group" id="quiz-config-tools" style="flex: 1; justify-content: flex-end; display: flex; gap: 6px;">
             <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
             <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;">
@@ -260,11 +260,11 @@
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer;">❌</button>
+            <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
             <div id="api-config-section">
-                <p style="font-size:0.95rem; color: #64748b; margin-bottom: 8px; font-weight:700;">Gemini API Configuration (Manager Only)</p>
+                <p style="font-size:0.95rem; color: #94a3b8; margin-bottom: 8px; font-weight:700;">Gemini API Configuration (Manager Only)</p>
                 <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
                     <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
@@ -276,9 +276,9 @@
             </div>
             
             <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <p style="font-size:0.95rem; color: #64748b; margin: 0 0 10px 0; font-weight:700;">Exam Configuration (Manager Only)</p>
+                <p style="font-size:0.95rem; color: #94a3b8; margin: 0 0 10px 0; font-weight:700;">Exam Configuration (Manager Only)</p>
                 <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                    <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #8b5cf6; border-radius: 10px; font-size: 1rem; color: #7c3aed; font-weight: 700;">
+                    <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
                     <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
@@ -287,12 +287,11 @@
                 </div>
             </div>
 
-            <!-- 🔴 UPDATE: App Preferences Added Here -->
             <div id="preferences-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">App Preferences</p>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
-                    <button onclick="toggleSound()" id="modal-sound-btn" style="flex:1; background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🔊 Sound: ON</button>
+                    <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
+                    <button onclick="toggleSound()" id="modal-sound-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🔊 Sound: ON</button>
                 </div>
             </div>
 
@@ -322,7 +321,7 @@
             <button onclick="createMegaQuiz()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
                 🏆 Mega Quiz
             </button>
-            <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);">
+            <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
             </button>
             <button onclick="document.getElementById('murali-text').value=''" title="Clear Text" style="flex:0 0 auto; width: auto; background: var(--danger-color); color: white; border-radius: 50px; padding: 1rem 1.4rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">
@@ -362,7 +361,7 @@
         
         <div class="dashboard-stats" id="dash-stats"></div>
         
-        <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(2, 132, 199, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             <span id="cal-toggle-text">View Monthly Calendar</span>
         </button>
@@ -374,10 +373,10 @@
                     <h3 id="cal-month-year" style="margin:0; font-size:1.2rem; color:var(--primary-color); font-weight:800;">...</h3>
                     <button class="btn-icon" onclick="changeCalMonth(1)"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size:0.75rem; font-weight:800; color:#64748b; margin-bottom:4px;">
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; font-size:0.75rem; font-weight:800; color:#94a3b8; margin-bottom:6px;">
                     <div style="color:var(--danger-color);">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div style="color:var(--primary-color);">Sat</div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center;" id="cal-grid-days"></div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;" id="cal-grid-days"></div>
             </div>
         </div>
 
@@ -387,9 +386,8 @@
         </div>
         <div id="progress-list"></div>
         
-        <!-- MANAGER ONLY: Backup Actions -->
         <div id="backup-actions" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;">
-            <button onclick="exportBackupData()" class="btn-small" style="background: rgba(2,132,199,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
+            <button onclick="exportBackupData()" class="btn-small" style="background: rgba(56,189,248,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
             <button onclick="document.getElementById('import-file').click()" class="btn-small" style="background: rgba(22,163,74,0.08); color: var(--success-color); border-color: var(--success-color); padding: 0.8rem; font-size:1rem;">Import Backup</button>
             <input type="file" id="import-file" onchange="importBackupData(event)" style="display: none;" accept=".json, .txt, text/*">
         </div>
@@ -398,31 +396,30 @@
     <!-- Sticky Bottom Bar -->
     <div id="sticky-scorebar" class="sticky-scorebar" style="display: none;">
         <div style="font-weight: 800; font-size: 1rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
-            <div style="font-size: 0.9rem; color: #0284c7; display: flex; align-items: center; gap: 6px; font-weight: 800; background: rgba(2,132,199,0.1); padding: 4px 12px; border-radius: 50px; border: 1px solid rgba(2,132,199,0.2);" id="quiz-timer"><svg class="icon" viewBox="0 0 24 24" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <span id="timer-text">00:00</span></div>
-            <span id="sb-answered" style="background: rgba(2, 132, 199, 0.15); color: var(--primary-color); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.95rem; border: 1px solid rgba(2, 132, 199, 0.2);">0/0</span>
+            <div style="font-size: 0.9rem; color: var(--primary-color); display: flex; align-items: center; gap: 6px; font-weight: 800; background: rgba(56,189,248,0.15); padding: 4px 12px; border-radius: 50px; border: 1px solid rgba(56,189,248,0.2);" id="quiz-timer"><svg class="icon" viewBox="0 0 24 24" style="width:18px; height:18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <span id="timer-text">00:00</span></div>
+            <span id="sb-answered" style="background: rgba(56, 189, 248, 0.15); color: var(--primary-color); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.95rem; border: 1px solid rgba(56, 189, 248, 0.2);">0/0</span>
         </div>
         <button class="btn-submit" id="sb-submit-btn" onclick="submitQuiz()" style="background: var(--submit-gradient); color: white; padding: 0.6rem; font-size: 1rem; font-weight: 700; border-radius: 50px; width: auto; min-width: 120px; border: none;">
             <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Submit
         </button>
     </div>
     
-    <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
-        <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 41.0 (Mobile UI/UX Refine)</div>
+    <!-- 🔴 NEW: Centered Brand Footer -->
+    <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
+        <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
+        <div>Version: 43.0 (Compact UI) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
-    // ⚠️ महत्त्वपूर्ण: तपाईंले बनाएको Apps Script को Web App URL यहाँ राख्नुहोस्
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "41.0"; 
+    const APP_VERSION = "43.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
     let timerInterval = null; let totalTimeSec = 0; let isTimerStarted = false;
     let audioCtx; let soundEnabled = true;
     let currentCalDate = new Date(); let reviewSource = 'current';
-    
     let failedAttempts = 0; let isLockedOut = false; let lockoutInterval = null; 
     let isRecoveryMode = false; let isDirectLogin = false;
 
@@ -450,25 +447,20 @@
         else { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
     }
 
-    // 🔴 UPDATE: Toggle Sound now updates the modal button
     function toggleSound() { 
         soundEnabled = !soundEnabled; localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); 
-        let btn = document.getElementById('modal-sound-btn');
-        if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+        let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
     }
 
-    // 🔴 UPDATE: Toggle Dark Mode now updates the modal button
     function toggleDarkMode() { 
-        let isDark = document.body.hasAttribute('data-theme'); 
-        let btn = document.getElementById('modal-dark-btn');
-        if(isDark) {
-            document.body.removeAttribute('data-theme'); 
-            localStorage.setItem('m_q_theme', 'light'); 
-            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+        let isLight = document.body.hasAttribute('data-theme'); 
+        let btn = document.getElementById('modal-dark-btn'); let meta = document.getElementById('theme-color-meta');
+        if(isLight) {
+            document.body.removeAttribute('data-theme'); localStorage.setItem('m_q_theme', 'dark'); 
+            if(meta) meta.content = "#0b0f19"; if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
         } else {
-            document.body.setAttribute('data-theme', 'dark'); 
-            localStorage.setItem('m_q_theme', 'dark'); 
-            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+            document.body.setAttribute('data-theme', 'light'); localStorage.setItem('m_q_theme', 'light'); 
+            if(meta) meta.content = "#f1f5f9"; if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
         }
     }
 
@@ -516,20 +508,17 @@
         if (localStorage.getItem('murali_app_version') !== APP_VERSION) localStorage.setItem('murali_app_version', APP_VERSION);
         document.getElementById('lock-screen').style.display = 'flex'; document.getElementById('main-app').style.display = 'none';
         
-        // 🔴 UPDATE: Default to Dark Mode unless explicitly set to light
+        let meta = document.getElementById('theme-color-meta');
         if(localStorage.getItem('m_q_theme') === 'light') {
-            document.body.removeAttribute('data-theme');
+            document.body.setAttribute('data-theme', 'light'); if(meta) meta.content = "#f1f5f9";
             let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
         } else {
-            document.body.setAttribute('data-theme', 'dark'); // Force dark default
+            document.body.removeAttribute('data-theme'); if(meta) meta.content = "#0b0f19";
             let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
         }
 
         const savedSound = localStorage.getItem('m_q_sound'); 
-        if (savedSound === '0') { 
-            soundEnabled = false; 
-            let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = '🔇 Sound: OFF';
-        }
+        if (savedSound === '0') { soundEnabled = false; let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = '🔇 Sound: OFF'; }
         
         let savedLockout = localStorage.getItem('murali_lockout_time');
         if(savedLockout && Date.now() < parseInt(savedLockout)) { startLockoutTimer(parseInt(savedLockout)); } else { localStorage.removeItem('murali_lockout_time'); }
@@ -542,7 +531,8 @@
             document.getElementById('phone-input').style.display = 'none'; document.getElementById('address-input').style.display = 'none';
             document.getElementById('country-select').style.display = 'none'; document.getElementById('month-select').style.display = 'none';
             document.getElementById('warning-msg').style.display = 'none'; if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
-            document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Unlock App`;
+            
+            document.getElementById('pin-title').innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> BK Murali Quiz`;
             document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; document.getElementById('forgot-btn').style.display = 'block'; 
             document.getElementById('cancel-forgot-btn').style.display = 'none'; document.getElementById('direct-login-btn').style.display = 'none';
         }
@@ -679,23 +669,23 @@
             syncPendingResults(); syncMyResults();
 
             let safeRole = userRole.toString().trim().toLowerCase();
-            let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Student');
+            let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
             let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
-            let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '🎓';
+            let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
 
-            // 🔴 UPDATE: Removed the 👤 icon from the name
-            let profileBadgeHtml = `<span style="-webkit-text-fill-color: initial; font-size:0.85rem; color:var(--primary-color); font-weight:800; padding:2px 8px; background:rgba(2,132,199,0.1); border-radius:8px; border: 1px solid rgba(2,132,199,0.2);">${userName}</span> <span style="-webkit-text-fill-color: initial; font-size:0.75rem; background:${badgeBg}; color:white; padding:3px 8px; border-radius:12px; letter-spacing:0.5px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${badgeIcon} ${displayRole}</span>`;
+            let shortName = userName.split(" ")[0]; 
+            let profileBadgeHtml = `<span style="font-size:0.8rem; background:${badgeBg}; color:white; padding:4px 12px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 2px 5px rgba(0,0,0,0.1); white-space:nowrap; font-weight:800;">${badgeIcon} ${shortName} (${displayRole})</span>`;
             
-            document.getElementById('app-title').innerHTML = `Murali Quiz <div style="display:inline-flex; align-items:center; gap:6px; margin-left:8px; flex-wrap:wrap;">${profileBadgeHtml}</div>`;
+            document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
 
             if (safeRole === 'manager' || safeRole === 'admin') {
                 document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('btn-mega').style.display = 'block'; 
                 document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('exam-config-section').style.display = 'block'; document.getElementById('api-config-section').style.display = 'block';
-                document.getElementById('backup-actions').style.display = 'flex'; document.getElementById('quiz-area').style.display = 'none';
+                document.getElementById('quiz-area').style.display = 'none';
             } else {
                 document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('btn-mega').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('exam-config-section').style.display = 'none'; document.getElementById('api-config-section').style.display = 'none';
-                document.getElementById('backup-actions').style.display = 'none'; loadStudentDashboard();
+                loadStudentDashboard();
             }
             switchTab('gen');
         } catch(e) { showToast("Error loading UI", "error"); }
@@ -709,27 +699,31 @@
             let quizMap = {}; serverQuizzes.forEach(sq => { let d = getValidDate({date: sq.quizDate}); if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) { quizMap[d.getDate()] = sq; } });
             let historyMap = {}; history.forEach(h => { let d = getValidDate(h); if(d && d.getMonth() === cm && d.getFullYear() === cy) { historyMap[d.getDate()] = h; } });
 
-            let html = `<div class="calendar-container" style="margin-top:0.5rem; padding: 1.5rem 1rem;"><h3 style="text-align:center; color:var(--primary-color); margin: 0 0 15px 0; font-size:1.4rem;">📅 Exam Calendar <br><span style="font-size:1rem; color:#64748b;">${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}</span></h3><div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size:0.8rem; font-weight:800; color:#64748b; margin-bottom:10px;"><div style="color:var(--danger-color);">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div style="color:var(--primary-color);">Sat</div></div><div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;">`;
+            let html = `<div class="calendar-container">
+                <h3 style="text-align:center; color:var(--primary-color); margin: 0 0 15px 0; font-size:1.3rem;">📅 Exam Calendar <br><span style="font-size:0.9rem; color:#64748b;">${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}</span></h3>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; font-size:0.75rem; font-weight:800; color:#64748b; margin-bottom:10px;">
+                    <div style="color:var(--danger-color);">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div style="color:var(--primary-color);">Sat</div>
+                </div><div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;">`;
 
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
             for (let i = 1; i <= daysInMonth; i++) {
                 let isToday = (i === today.getDate()); let isPast = (i < today.getDate()); let hasQuiz = quizMap[i] ? true : false; let isCompleted = historyMap[i] ? true : false;
-                let boxStyle = `padding: 12px 4px; border-radius: 14px; font-weight: 800; font-size: 1.1rem; border: 2px solid var(--border-color); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:65px; transition:all 0.2s; background:var(--card-bg);`;
+                let boxStyle = `padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; border: 2px solid var(--border-color); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50px; transition:all 0.2s; background:var(--card-bg); overflow:hidden; word-break:break-word; line-height: 1.1;`;
                 let statusIcon = ``; let clickAction = ``; let cursor = `cursor:not-allowed; opacity:0.6;`;
 
                 if (isToday) {
                     if (isCompleted) { boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; statusIcon = `✅`; cursor = `cursor:pointer; opacity:1; box-shadow: 0 4px 10px rgba(22,163,74,0.2);`; clickAction = `onclick="showQuizStatus('completed', '${quizMap[i].quizDate}')"`;
-                    } else if (hasQuiz) { boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.4); transform: scale(1.08); z-index:10;`; statusIcon = `▶️ Play`; cursor = `cursor:pointer; opacity:1;`; clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
+                    } else if (hasQuiz) { boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.4); transform: scale(1.08); z-index:10;`; statusIcon = `▶️ Play`; cursor = `cursor:pointer; opacity:1;`; clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
                     } else { boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; statusIcon = `⏳ Wait`; cursor = `cursor:not-allowed; opacity:1;`; clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; }
                 } else if (isPast) {
                     if (isCompleted) { boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`; statusIcon = `✅`; cursor = `cursor:pointer; opacity:0.8;`; clickAction = `onclick="showQuizStatus('past-completed', '')"`;
                     } else { boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; statusIcon = `❌ Miss`; clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो!', 'error')"`; cursor = `cursor:pointer;`; }
                 } else { statusIcon = `🔒`; clickAction = `onclick="showToast('भोलिको क्वीज भोलि मात्र खुल्नेछ!', 'info')"`; cursor = `cursor:pointer; opacity:0.5;`; }
 
-                let extraTextSize = isToday && hasQuiz && !isCompleted ? 'font-size:0.85rem;' : 'font-size:0.75rem;';
+                let extraTextSize = isToday && hasQuiz && !isCompleted ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
-            html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#64748b; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>🔒 : आगामी दिन (Locked)</div></div></div>`;
+            html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#94a3b8; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>🔒 : आगामी दिन (Locked)</div></div></div>`;
 
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
@@ -802,7 +796,11 @@
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega }) 
-        }).then(res => res.json()).then(data => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('generator-actions').style.display = 'flex';
+        }).then(res => res.json()).then(data => { 
+            document.getElementById('main-header').style.display = 'flex';
+            document.getElementById('main-tabs').style.display = 'flex';
+
+            document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('generator-actions').style.display = 'flex';
             if(data.status === "success") { showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success"); document.getElementById('btn-save-top').style.display = 'none'; syncServerQuizzes(false); }
         }).catch(err => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; showToast("इन्टरनेट समस्या!", "error"); });
     }
@@ -810,7 +808,6 @@
     function exportStandaloneHTML() {
         if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
         
-        // Temporarily exit immersive mode so the exported HTML looks normal
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
 
@@ -821,11 +818,10 @@
         let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
         let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; let file = new File([b], filename, { type: "text/html" });
         
-        // Re-enter immersive mode after generating HTML string
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Murali Quiz Offline', text: 'Offline Quiz HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'BK Murali Quiz Offline', text: 'Offline Quiz HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
         } else { triggerDownload(b, filename); }
     }
 
@@ -841,7 +837,7 @@
         document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
         document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
-        // 🔴 UPDATE: Immersive Mode (Zen Mode) - Hide header and main tabs during quiz
+        // 🔴 Immersive Mode: Hide header and main tabs
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
 
@@ -858,7 +854,6 @@
         document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none';
         document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
         
-        // 🔴 UPDATE: Exit Immersive Mode - Restore header and main tabs
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
 
@@ -897,7 +892,6 @@
         if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) return;
         document.getElementById('sb-submit-btn').disabled = true; stopTimer(); saveOrReplaceProgress(); 
         
-        // Restore header for result screen
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
 
@@ -926,7 +920,6 @@
     function reviewQuiz() {
         document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
         
-        // Hide header again for reviewing
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
 
@@ -939,8 +932,7 @@
             document.getElementById('main-tabs').style.display = 'flex';
             if (reviewSource === 'past') { reviewSource = 'current'; resetToGenerator(); switchTab('prog'); } 
             else { document.getElementById('result-screen').style.display = 'block'; } 
-        }; 
-        document.getElementById('quiz-area').prepend(backBtn);
+        }; document.getElementById('quiz-area').prepend(backBtn);
         
         currentQuiz.forEach((q, qIndex) => {
             let qb = document.getElementById(`qb-${qIndex}`); if (qb) qb.style.display = 'block';
@@ -1002,7 +994,7 @@
         let filteredHistory = history.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; });
 
         let totalTaken = filteredHistory.length; let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
-        document.getElementById('dash-stats').innerHTML = `<div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div><div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div><div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div><div class="stat-card" style="background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3);"><h3 style="color: #7c3aed;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #7c3aed;">Streak</p></div>`;
+        document.getElementById('dash-stats').innerHTML = `<div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div><div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div><div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div><div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>`;
         document.getElementById('cal-month-year').innerText = `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}`;
         let firstDay = new Date(cy, cm, 1).getDay(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let today = new Date(); let monthMap = {}; filteredHistory.forEach(h => { let dObj = getValidDate(h); if (dObj) { let day = dObj.getDate(); if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; } });
         
@@ -1019,7 +1011,7 @@
         } else { document.getElementById('weakness-alert').innerHTML = ''; }
 
         const list = document.getElementById('progress-list'); 
-        if (totalTaken === 0) { list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: gray; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; return; }
+        if (totalTaken === 0) { list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; return; }
         
         list.innerHTML = filteredHistory.map(h => {
             let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
