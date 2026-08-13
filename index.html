@@ -391,13 +391,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 45.0 (Smart Profile) | Engine: Multi-Sync</div>
+        <div>Version: 46.0 (Ultimate Auto-BK Formatter) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "45.0"; 
+    const APP_VERSION = "46.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -557,39 +557,46 @@
 
     function cancelForgotPIN() { isRecoveryMode = false; window.location.reload(); }
 
-    // 🔴 SMART NAME FORMATTER (Auto BK / Title Case)
-    function smartFormatName(fName, lName) {
-        fName = fName.trim();
-        lName = lName.trim();
+    // 🔴 ULTIMATE SMART NAME FORMATTER (Auto BK / Corrects spelling & length)
+    function smartFormatName(fNameRaw, lNameRaw) {
+        let fName = fNameRaw.trim();
+        let lName = lNameRaw.trim();
 
         function toTitleCase(str) {
             return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         }
         
-        lName = toTitleCase(lName); // e.g. khadka -> Khadka
-        fName = fName.replace(/\s+/g, ' ');
-
-        let lowerFname = fName.toLowerCase();
-        let hasEnglishPrefix = /^(bk|b\.k\.|b k|brahmakumar|brahmakumari)\b/.test(lowerFname);
-        let hasNepaliPrefix = /^(बी के|बीके|बी\.के\.|ब्रह्माकुमार|ब्रह्माकुमारी)\b/.test(fName);
+        // 1. Title case for last name always
+        lName = toTitleCase(lName);
+        fName = fName.replace(/\s+/g, ' '); 
+        
         let isNepali = /[\u0900-\u097F]/.test(fName + lName);
 
-        if (hasEnglishPrefix) {
-            fName = fName.replace(/^(bk|b\.k\.|b k)\s*/i, "BK ");
-            let parts = fName.split(" ");
-            for(let i=1; i<parts.length; i++) parts[i] = toTitleCase(parts[i]);
-            fName = parts.join(" ");
-            if (lowerFname.startsWith("brahmakumar") || lowerFname.startsWith("brahmakumari")) {
-                 fName = toTitleCase(fName);
-            }
-        } else if (hasNepaliPrefix) {
-            fName = fName.replace(/^(बीके|बी\.के\.)\s*/, "बी के ");
-        } else {
+        // Comprehensive Regex to catch BK, B.K., Brahmakumar, Brahmakumari and all possible misspellings
+        let engPrefixRegex = /^(b\.?k\.?|b\s+k|brahma?a?ku?ma?a?ri?|brahma\s+kuma?a?ri?)\b\s*/i;
+        let nepPrefixRegex = /^(बी\.?\s*के\.?|ब्रह?्मा?कुमा?री?|ब्रम्हा?कुमा?री?)\s*/;
+
+        if (engPrefixRegex.test(fName)) {
+            fName = fName.replace(engPrefixRegex, ""); // Strip matched wrong/long prefix
+            fName = toTitleCase(fName); // Title case the actual name remaining
+            fName = "BK " + fName; // Add standard prefix
+        } else if (nepPrefixRegex.test(fName)) {
+            fName = fName.replace(nepPrefixRegex, ""); 
             fName = toTitleCase(fName); 
-            if (isNepali) { fName = "बी के " + fName; } else { fName = "BK " + fName; }
+            fName = "बी के " + fName; 
+        } else {
+            // No prefix provided, add automatically based on Nepali/English script
+            fName = toTitleCase(fName);
+            if (isNepali) {
+                fName = "बी के " + fName;
+            } else {
+                fName = "BK " + fName;
+            }
         }
 
-        return { first: fName, last: lName, full: fName + " " + lName };
+        fName = fName.replace(/\s+/g, ' ').trim();
+        let full = (fName + " " + lName).trim();
+        return { first: fName, last: lName, full: full };
     }
 
     function handlePIN() {
@@ -628,7 +635,7 @@
             if(!month || month === "") return showToast("कृपया अलौकिक जन्म महिना छान्नुहोस्।", "error");
             if(inputPIN.length !== 4) return showToast("पिन ठ्याक्कै ४ अंकको हुनुपर्छ।", "error"); 
 
-            // Format Name Automatically
+            // Format Name Automatically using Smart Formatter
             let formattedName = smartFormatName(fNameRaw, lNameRaw);
             let finalFullName = formattedName.full;
 
@@ -669,7 +676,7 @@
         localStorage.setItem('murali_month', month); localStorage.setItem('murali_country', country); localStorage.setItem('murali_pin', pin); localStorage.setItem('murali_role', role); unlockApp();
     }
 
-    // 🔴 UPDATE LOCAL PROFILE
+    // 🔴 UPDATE LOCAL PROFILE using Smart Formatter
     window.updateLocalProfile = function() {
         let fNameRaw = document.getElementById('edit-first-name').value.trim();
         let lNameRaw = document.getElementById('edit-last-name').value.trim();
@@ -708,7 +715,7 @@
             
             document.getElementById('lock-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; 
             
-            // Populate Edit Profile fields
+            // Populate Edit Profile fields gracefully handling prefixed names
             let nameParts = userName.split(" ");
             let editLastName = nameParts.length > 1 ? nameParts.pop() : "";
             let editFirstName = nameParts.join(" ");
