@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0284c7">
+    <meta name="theme-color" content="#0b0f19">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Murali Quiz">
@@ -25,6 +25,7 @@
             --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
             --glass-bg: rgba(255, 255, 255, 0.85); --font-size: 18px; 
         }
+        /* Default Dark Mode Theme */
         [data-theme="dark"] {
             --bg-color: #0b0f19; --card-bg: #1e293b; --text-color: #f8fafc; 
             --primary-color: #38bdf8; --primary-hover: #7dd3fc;
@@ -211,20 +212,19 @@
 
 <!-- Main App -->
 <div id="main-app" class="container" style="display: none;">
-    <!-- Header -->
-    <div class="app-header-area" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 8px;">
+    <!-- 🔴 UPDATE: App Header - Made settings icon round, removed audio/dark buttons -->
+    <div class="app-header-area" id="main-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
             <div id="header-avatar" style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white;">
                  <div class="baba-logo-container"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="95" fill="gold"/><circle cx="100" cy="100" r="12" fill="white"/></svg></div>
             </div>
             <h1 id="app-title">Murali Quiz</h1>
-            <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="murli-icon-btn"><svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>
         </div>
         
         <div style="display: flex; gap: 6px; align-items: center;">
-            <button class="btn-icon" id="btn-sound-toggle" onclick="toggleSound()"><svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
-            <button class="btn-icon" onclick="toggleDarkMode()"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></button>
-            <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" style="border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05);"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+            <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" style="border-color: #8b5cf6; color: #8b5cf6; background: rgba(139, 92, 246, 0.05); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0;">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
         </div>
     </div>
     
@@ -235,11 +235,13 @@
             <button id="tab-prog" onclick="switchTab('prog')" style="padding: 0.3rem 0.8rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
         </div>
         
-        <div id="online-quiz-actions" style="display: none; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap;">
-            <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.85rem; white-space: nowrap;"></span></div>
-            <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save to Server</button>
-            <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export HTML</button>
-            <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.6rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.8rem;">Cancel</button>
+        <div id="online-quiz-actions" style="display: none; width: 100%; justify-content: space-between; align-items: center; margin: 0; flex-wrap: wrap;">
+            <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.9rem; white-space: nowrap;"></span></div>
+            <div style="display:flex; gap:8px;">
+                <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save</button>
+                <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export</button>
+                <button class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.6rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.85rem; font-weight:700;">Cancel</button>
+            </div>
         </div>
         
         <!-- Visible only to Managers -->
@@ -282,6 +284,15 @@
                     <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
                         <option value="gemini-3.6-flash" selected>🚀 Gemini 3.6</option><option value="gemini-2.5-flash">⚡ Gemini 2.5</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- 🔴 UPDATE: App Preferences Added Here -->
+            <div id="preferences-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">App Preferences</p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
+                    <button onclick="toggleSound()" id="modal-sound-btn" style="flex:1; background: var(--card-bg); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🔊 Sound: ON</button>
                 </div>
             </div>
 
@@ -376,7 +387,7 @@
         </div>
         <div id="progress-list"></div>
         
-        <!-- 🔴 MANAGER ONLY: Backup Actions -->
+        <!-- MANAGER ONLY: Backup Actions -->
         <div id="backup-actions" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;">
             <button onclick="exportBackupData()" class="btn-small" style="background: rgba(2,132,199,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
             <button onclick="document.getElementById('import-file').click()" class="btn-small" style="background: rgba(22,163,74,0.08); color: var(--success-color); border-color: var(--success-color); padding: 0.8rem; font-size:1rem;">Import Backup</button>
@@ -397,14 +408,14 @@
     
     <div style="font-size: 0.85rem; color: #64748b; display: flex; justify-content: center; gap: 20px; font-weight: 600; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 20px;">
         <div>Engine: Multi-Sync Architect</div>
-        <div>Version: 40.1 (Dynamic Profile Header)</div>
+        <div>Version: 41.0 (Mobile UI/UX Refine)</div>
     </div>
 </div>
 
 <script>
     // ⚠️ महत्त्वपूर्ण: तपाईंले बनाएको Apps Script को Web App URL यहाँ राख्नुहोस्
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "40.1"; 
+    const APP_VERSION = "41.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -439,8 +450,28 @@
         else { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
     }
 
-    function toggleSound() { soundEnabled = !soundEnabled; localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); }
-    function toggleDarkMode() { let isDark = document.body.hasAttribute('data-theme'); isDark ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'dark'); localStorage.setItem('m_q_theme', isDark ? 'light' : 'dark'); }
+    // 🔴 UPDATE: Toggle Sound now updates the modal button
+    function toggleSound() { 
+        soundEnabled = !soundEnabled; localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); 
+        let btn = document.getElementById('modal-sound-btn');
+        if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+    }
+
+    // 🔴 UPDATE: Toggle Dark Mode now updates the modal button
+    function toggleDarkMode() { 
+        let isDark = document.body.hasAttribute('data-theme'); 
+        let btn = document.getElementById('modal-dark-btn');
+        if(isDark) {
+            document.body.removeAttribute('data-theme'); 
+            localStorage.setItem('m_q_theme', 'light'); 
+            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+        } else {
+            document.body.setAttribute('data-theme', 'dark'); 
+            localStorage.setItem('m_q_theme', 'dark'); 
+            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+        }
+    }
+
     function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
 
     function fireConfetti() {
@@ -484,8 +515,22 @@
     function init() {
         if (localStorage.getItem('murali_app_version') !== APP_VERSION) localStorage.setItem('murali_app_version', APP_VERSION);
         document.getElementById('lock-screen').style.display = 'flex'; document.getElementById('main-app').style.display = 'none';
-        if(localStorage.getItem('m_q_theme') !== 'light') document.body.setAttribute('data-theme', 'dark');
-        const savedSound = localStorage.getItem('m_q_sound'); if (savedSound === '0') { soundEnabled = false; }
+        
+        // 🔴 UPDATE: Default to Dark Mode unless explicitly set to light
+        if(localStorage.getItem('m_q_theme') === 'light') {
+            document.body.removeAttribute('data-theme');
+            let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+        } else {
+            document.body.setAttribute('data-theme', 'dark'); // Force dark default
+            let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+        }
+
+        const savedSound = localStorage.getItem('m_q_sound'); 
+        if (savedSound === '0') { 
+            soundEnabled = false; 
+            let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = '🔇 Sound: OFF';
+        }
+        
         let savedLockout = localStorage.getItem('murali_lockout_time');
         if(savedLockout && Date.now() < parseInt(savedLockout)) { startLockoutTimer(parseInt(savedLockout)); } else { localStorage.removeItem('murali_lockout_time'); }
         
@@ -638,8 +683,8 @@
             let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
             let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '🎓';
 
-            // 🔴 BUG FIX: Added -webkit-text-fill-color: initial; to override transparent gradient text
-            let profileBadgeHtml = `<span style="-webkit-text-fill-color: initial; font-size:0.85rem; color:var(--primary-color); font-weight:800; padding:2px 8px; background:rgba(2,132,199,0.1); border-radius:8px; border: 1px solid rgba(2,132,199,0.2);">👤 ${userName}</span> <span style="-webkit-text-fill-color: initial; font-size:0.75rem; background:${badgeBg}; color:white; padding:3px 8px; border-radius:12px; letter-spacing:0.5px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${badgeIcon} ${displayRole}</span>`;
+            // 🔴 UPDATE: Removed the 👤 icon from the name
+            let profileBadgeHtml = `<span style="-webkit-text-fill-color: initial; font-size:0.85rem; color:var(--primary-color); font-weight:800; padding:2px 8px; background:rgba(2,132,199,0.1); border-radius:8px; border: 1px solid rgba(2,132,199,0.2);">${userName}</span> <span style="-webkit-text-fill-color: initial; font-size:0.75rem; background:${badgeBg}; color:white; padding:3px 8px; border-radius:12px; letter-spacing:0.5px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">${badgeIcon} ${displayRole}</span>`;
             
             document.getElementById('app-title').innerHTML = `Murali Quiz <div style="display:inline-flex; align-items:center; gap:6px; margin-left:8px; flex-wrap:wrap;">${profileBadgeHtml}</div>`;
 
@@ -764,12 +809,22 @@
 
     function exportStandaloneHTML() {
         if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
+        
+        // Temporarily exit immersive mode so the exported HTML looks normal
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('main-tabs').style.display = 'flex';
+
         let saveBtn = document.getElementById('btn-save-top'); let exportBtn = document.getElementById('btn-export-top');
         if(saveBtn) saveBtn.style.display = 'none'; if(exportBtn) exportBtn.style.display = 'none';
         let html = document.documentElement.outerHTML.replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`);
         if(exportBtn) exportBtn.style.display = 'inline-block';
         let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
         let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; let file = new File([b], filename, { type: "text/html" });
+        
+        // Re-enter immersive mode after generating HTML string
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('main-tabs').style.display = 'none';
+
         if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'Murali Quiz Offline', text: 'Offline Quiz HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
         } else { triggerDownload(b, filename); }
     }
@@ -785,6 +840,11 @@
         document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
         document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; document.getElementById('online-quiz-actions').style.display = 'flex'; 
+        
+        // 🔴 UPDATE: Immersive Mode (Zen Mode) - Hide header and main tabs during quiz
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('main-tabs').style.display = 'none';
+
         let safeRole = (userRole||"").toString().trim().toLowerCase(); 
         if(safeRole === 'manager' || safeRole === 'admin') { document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'inline-block'; } 
         else { document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none'; }
@@ -797,6 +857,11 @@
         document.getElementById('quiz-area').style.display = 'none'; document.getElementById('result-screen').style.display = 'none';
         document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none';
         document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
+        
+        // 🔴 UPDATE: Exit Immersive Mode - Restore header and main tabs
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('main-tabs').style.display = 'flex';
+
         let safeRole = (userRole||"").toString().trim().toLowerCase();
         if (safeRole === 'manager' || safeRole === 'admin') { document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('quiz-config-tools').style.display = 'flex';
         } else { loadStudentDashboard(); } window.scrollTo(0, 0); stopTimer(); isTimerStarted = false;
@@ -831,6 +896,11 @@
         if (currentQuiz.length > 0 && answeredCount === 0) return showToast("कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
         if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) return;
         document.getElementById('sb-submit-btn').disabled = true; stopTimer(); saveOrReplaceProgress(); 
+        
+        // Restore header for result screen
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('main-tabs').style.display = 'flex';
+
         document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('result-screen').style.display = 'block'; 
         let percent = Math.round((currentScore / currentQuiz.length) * 100); document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
         let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 50 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!"));
@@ -855,10 +925,22 @@
 
     function reviewQuiz() {
         document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
+        
+        // Hide header again for reviewing
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('main-tabs').style.display = 'none';
+
         let backBtn = document.getElementById('back-to-res'); if (backBtn) backBtn.remove(); backBtn = document.createElement('button'); backBtn.id = 'back-to-res'; 
         backBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Go Back`;
         backBtn.style.cssText = "margin:0 0 15px 0; background:var(--primary-color); color:white; border-radius:50px; padding:0.6rem 1.4rem; width:auto; font-weight:800; border:none; cursor:pointer;";
-        backBtn.onclick = () => { document.getElementById('quiz-area').style.display = 'none'; if (reviewSource === 'past') { reviewSource = 'current'; resetToGenerator(); switchTab('prog'); } else { document.getElementById('result-screen').style.display = 'block'; } }; document.getElementById('quiz-area').prepend(backBtn);
+        backBtn.onclick = () => { 
+            document.getElementById('quiz-area').style.display = 'none'; 
+            document.getElementById('main-header').style.display = 'flex';
+            document.getElementById('main-tabs').style.display = 'flex';
+            if (reviewSource === 'past') { reviewSource = 'current'; resetToGenerator(); switchTab('prog'); } 
+            else { document.getElementById('result-screen').style.display = 'block'; } 
+        }; 
+        document.getElementById('quiz-area').prepend(backBtn);
         
         currentQuiz.forEach((q, qIndex) => {
             let qb = document.getElementById(`qb-${qIndex}`); if (qb) qb.style.display = 'block';
