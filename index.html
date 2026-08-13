@@ -13,7 +13,7 @@
 
         *, *::before, *::after { box-sizing: border-box; }
         
-        /* 🔴 STRICT DEFAULT: Dark Mode Theme */
+        /* 🔴 Default Dark Mode Theme */
         :root {
             --bg-color: #0b0f19; --card-bg: #1e293b; --text-color: #f8fafc; 
             --primary-color: #38bdf8; --primary-hover: #7dd3fc;
@@ -29,7 +29,6 @@
             --success-color: #16a34a; --danger-color: #dc2626;
         }
         
-        /* Light Mode Theme (Only applied if user actively chooses it) */
         [data-theme="light"] {
             --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; 
             --primary-color: #0284c7; --primary-hover: #0369a1; 
@@ -55,7 +54,7 @@
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
         .input-field, .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s; outline: none;}
         .input-field:focus, .select-field:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
-        .input-field:disabled { opacity: 0.7; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
+        .input-field:disabled { opacity: 0.5; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
 
         button { background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.25);}
         button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35); }
@@ -164,8 +163,8 @@
 
             <div id="reg-fields">
                 <div style="display: flex; gap: 8px; margin: 0.25rem 0;">
-                    <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (उदा: BK Sarita)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
-                    <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name) - अनिवार्य" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+                    <input type="text" id="first-name-input" class="input-field" placeholder="पहिलो नाम (First Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
+                    <input type="text" id="last-name-input" class="input-field" placeholder="थर (Last Name)" autocomplete="off" enterkeyhint="next" style="margin:0; flex:1;">
                 </div>
                 <select id="country-select" class="select-field" onchange="checkOtherCountry()">
                     <option value="" disabled selected>देश छान्नुहोस् (Select Country)</option>
@@ -204,26 +203,19 @@
 <!-- Main App -->
 <div id="main-app" class="container" style="display: none;">
     
-    <!-- 🔴 LINE 1: Logo & Profile Badge (Extremely Clean) -->
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- Baba Logo -->
         <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white; margin: 0;">
              <div class="baba-logo-container"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="95" fill="gold"/><circle cx="100" cy="100" r="12" fill="white"/></svg></div>
         </div>
-        <!-- Dynamic Profile Badge Only -->
         <div id="profile-badge-container" style="display: flex; align-items: center;"></div>
     </div>
     
-    <!-- 🔴 LINE 2: Toolbar (Tabs on Left, Icons on Right) -->
     <div class="toolbar" id="top-toolbar" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 0.4rem; gap: 8px; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
-        
-        <!-- Tabs -->
         <div class="nav-tabs" id="main-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 50px; border: 1px solid var(--border-color); margin: 0;">
             <button id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.3rem 0.8rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> <span id="tab-gen-txt">Exam</span></button>
             <button id="tab-prog" onclick="switchTab('prog')" style="padding: 0.3rem 0.8rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 4px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
         </div>
         
-        <!-- Settings & Book Icons -->
         <div id="toolbar-right-actions" style="display: flex; gap: 8px; align-items: center;">
             <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="btn-icon" style="width: 36px; height: 36px; border-color: var(--primary-color); color: var(--primary-color); background: rgba(56, 189, 248, 0.1); text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <svg class="icon" viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
@@ -231,7 +223,6 @@
             <button class="btn-icon" id="btn-toggle-settings" onclick="openSettings()" style="width: 36px; height: 36px; border-radius: 50%; border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.1); display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </button>
-            <!-- Visible only to Managers -->
             <div class="toolbar-group" id="quiz-config-tools" style="display: flex; gap: 6px;">
                 <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
                 <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem;">
@@ -244,7 +235,6 @@
             </div>
         </div>
 
-        <!-- Zen Mode Tools (Only visible during Quiz) -->
         <div id="online-quiz-actions" style="display: none; width: 100%; justify-content: space-between; align-items: center; margin: 0;">
             <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.95rem; white-space: nowrap;"></span></div>
             <div style="display:flex; gap:8px;">
@@ -255,7 +245,7 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
+    <!-- Settings Modal (Editable Profile Updated) -->
     <div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
         <div class="modal-content">
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -268,9 +258,6 @@
                     <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
                     <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
                 </div>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none; display: block; margin-top: 10px;">
-                    <button style="background: #475569; width: 100%; box-shadow: none;">Get Free Gemini API Key</button>
-                </a>
             </div>
             
             <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
@@ -293,18 +280,22 @@
                 </div>
             </div>
 
+            <!-- 🔴 Editable Profile Section -->
             <div id="profile-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">Profile Info & Reset</p>
+                <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800; display:flex; justify-content:space-between; align-items:center;">
+                    Profile Info (Edit) <span style="font-size: 0.75rem; color:#94a3b8; font-weight: 600;">(तपाईं आफैं सच्याउन सक्नुहुन्छ)</span>
+                </p>
                 <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
-                    <input type="text" id="edit-first-name" class="input-field" placeholder="पहिलो नाम" style="margin:0; flex: 1;" disabled>
-                    <input type="text" id="edit-last-name" class="input-field" placeholder="थर" style="margin:0; flex: 1;" disabled>
+                    <input type="text" id="edit-first-name" class="input-field" placeholder="पहिलो नाम" style="margin:0; flex: 1;">
+                    <input type="text" id="edit-last-name" class="input-field" placeholder="थर" style="margin:0; flex: 1;">
                 </div>
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <input type="tel" id="edit-phone" class="input-field" placeholder="Phone" style="margin:0; flex: 1;" disabled>
-                    <input type="text" id="edit-address" class="input-field" placeholder="सेवा केन्द्र" style="margin:0; flex: 1;" disabled>
+                    <input type="tel" id="edit-phone" class="input-field" placeholder="Phone" style="margin:0; flex: 1;">
+                    <input type="text" id="edit-address" class="input-field" placeholder="सेवा केन्द्र" style="margin:0; flex: 1;">
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out & Switch User</button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button onclick="updateLocalProfile()" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
+                    <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
                 </div>
             </div>
         </div>
@@ -312,7 +303,6 @@
 
     <!-- Generator & Quiz View -->
     <div id="view-generator">
-        <!-- Visible only to Managers -->
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
@@ -327,7 +317,6 @@
             </button>
         </div>
         
-        <!-- Loading UI -->
         <div id="loading-box" style="display:none; text-align:center; padding: 3rem 1rem;">
             <div style="font-size:1.6rem; font-weight:800; color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <svg class="icon" style="animation: spin 2s linear infinite; width:32px; height:32px;" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
@@ -336,10 +325,8 @@
             <p id="loading-text" style="color:var(--text-color); opacity: 0.8; font-size:1.05rem; margin:0.6rem 0 0;">Please wait while the system communicates with the server.</p>
         </div>
 
-        <!-- Main Quiz Form / Calendar Area -->
         <div id="quiz-area" style="margin-top: 1rem; display: none;"></div>
         
-        <!-- Result UI -->
         <div id="result-screen" style="display: none;">
             <div class="result-score-circle" id="rs-score">0/10</div>
             <div class="result-msg" id="rs-msg">अद्भुत!</div>
@@ -402,16 +389,15 @@
         </button>
     </div>
     
-    <!-- 🔴 NEW: Centered Brand Footer at the absolute bottom -->
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 44.0 (Compact UI) | Engine: Multi-Sync</div>
+        <div>Version: 45.0 (Smart Profile) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "44.0"; 
+    const APP_VERSION = "45.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -511,7 +497,6 @@
             document.body.setAttribute('data-theme', 'light'); if(meta) meta.content = "#f1f5f9";
             let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
         } else {
-            // Force Default Dark Mode
             document.body.removeAttribute('data-theme'); if(meta) meta.content = "#0b0f19";
             let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
         }
@@ -524,13 +509,12 @@
         
         const savedName = localStorage.getItem('murali_user_name');
         if (savedName) {
-            let nameParts = savedName.split(" ");
-            document.getElementById('first-name-input').value = nameParts[0] || ""; document.getElementById('last-name-input').value = nameParts.slice(1).join(" ") || "";
             document.getElementById('first-name-input').disabled = true; document.getElementById('last-name-input').disabled = true; 
             document.getElementById('phone-input').style.display = 'none'; document.getElementById('address-input').style.display = 'none';
             document.getElementById('country-select').style.display = 'none'; document.getElementById('month-select').style.display = 'none';
             document.getElementById('warning-msg').style.display = 'none'; if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
-            
+            document.getElementById('reg-fields').style.display = 'none';
+
             document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; document.getElementById('forgot-btn').style.display = 'block'; 
             document.getElementById('cancel-forgot-btn').style.display = 'none'; document.getElementById('direct-login-btn').style.display = 'none';
         }
@@ -573,6 +557,41 @@
 
     function cancelForgotPIN() { isRecoveryMode = false; window.location.reload(); }
 
+    // 🔴 SMART NAME FORMATTER (Auto BK / Title Case)
+    function smartFormatName(fName, lName) {
+        fName = fName.trim();
+        lName = lName.trim();
+
+        function toTitleCase(str) {
+            return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        }
+        
+        lName = toTitleCase(lName); // e.g. khadka -> Khadka
+        fName = fName.replace(/\s+/g, ' ');
+
+        let lowerFname = fName.toLowerCase();
+        let hasEnglishPrefix = /^(bk|b\.k\.|b k|brahmakumar|brahmakumari)\b/.test(lowerFname);
+        let hasNepaliPrefix = /^(बी के|बीके|बी\.के\.|ब्रह्माकुमार|ब्रह्माकुमारी)\b/.test(fName);
+        let isNepali = /[\u0900-\u097F]/.test(fName + lName);
+
+        if (hasEnglishPrefix) {
+            fName = fName.replace(/^(bk|b\.k\.|b k)\s*/i, "BK ");
+            let parts = fName.split(" ");
+            for(let i=1; i<parts.length; i++) parts[i] = toTitleCase(parts[i]);
+            fName = parts.join(" ");
+            if (lowerFname.startsWith("brahmakumar") || lowerFname.startsWith("brahmakumari")) {
+                 fName = toTitleCase(fName);
+            }
+        } else if (hasNepaliPrefix) {
+            fName = fName.replace(/^(बीके|बी\.के\.)\s*/, "बी के ");
+        } else {
+            fName = toTitleCase(fName); 
+            if (isNepali) { fName = "बी के " + fName; } else { fName = "BK " + fName; }
+        }
+
+        return { first: fName, last: lName, full: fName + " " + lName };
+    }
+
     function handlePIN() {
         if(isLockedOut) return;
         const inputPhone = document.getElementById('phone-input').value.trim(); const inputPIN = document.getElementById('pin-input').value; const month = document.getElementById('month-select').value;
@@ -595,41 +614,30 @@
             }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Login`; showToast("सर्भर कनेक्सन फेल भयो!", "error"); }); return;
         }
 
-        let fName = document.getElementById('first-name-input').value.trim(); 
-        let lName = document.getElementById('last-name-input').value.trim();
-        let address = document.getElementById('address-input').value.trim(); 
-        let countryVal = document.getElementById('country-select').value;
-        if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
-
         if (document.getElementById('reg-fields').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
-            
-            // 🔴 1. Mandatory Last Name Validation
-            if(fName.length < 2 || lName.length < 2) return showToast("कृपया पहिलो नाम र थर दुवै अनिवार्य भर्नुहोस्।", "error");
+            let fNameRaw = document.getElementById('first-name-input').value.trim(); 
+            let lNameRaw = document.getElementById('last-name-input').value.trim();
+            let address = document.getElementById('address-input').value.trim(); 
+            let countryVal = document.getElementById('country-select').value;
+            if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
+
+            if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पहिलो नाम र थर दुवै अनिवार्य भर्नुहोस्।", "error");
             if(inputPhone.length < 10) return showToast("कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।", "error");
-            let c = address.trim().toUpperCase(); if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NGT" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
+            let c = address.trim().toUpperCase(); if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
             if(!countryVal || countryVal === "") return showToast("कृपया देश छान्नुहोस्।", "error"); 
             if(!month || month === "") return showToast("कृपया अलौकिक जन्म महिना छान्नुहोस्।", "error");
             if(inputPIN.length !== 4) return showToast("पिन ठ्याक्कै ४ अंकको हुनुपर्छ।", "error"); 
 
-            // 🔴 2. Auto-Inject "BK " or "बी के "
-            let isNepali = /[\u0900-\u097F]/.test(fName + lName);
-            let checkFName = fName.toUpperCase();
-            if (isNepali) {
-                if (!checkFName.startsWith("बी के ") && !checkFName.startsWith("बी.के.") && !checkFName.startsWith("BK ")) {
-                    fName = "बी के " + fName;
-                }
-            } else {
-                if (!checkFName.startsWith("BK ")) {
-                    fName = "BK " + fName;
-                }
-            }
+            // Format Name Automatically
+            let formattedName = smartFormatName(fNameRaw, lNameRaw);
+            let finalFullName = formattedName.full;
 
             if(navigator.onLine) {
                 document.getElementById('btn-login-submit').innerHTML = `Registering...`;
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "register", name: fName + " " + lName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
-                }).then(r => r.json()).then(data => { if (data.status === "success") { saveLocalDataAndUnlock(fName + " " + lName, inputPhone, address, month, countryVal, inputPIN, "Student"); showToast("Registration Successful!", "success"); } else { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast(data.message, "error"); }
-                }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); checkLocalPIN(inputPIN, fName, lName, inputPhone, address, month, countryVal); });
-            } else { checkLocalPIN(inputPIN, fName, lName, inputPhone, address, month, countryVal); } return;
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
+                }).then(r => r.json()).then(data => { if (data.status === "success") { saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); showToast("Registration Successful!", "success"); } else { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast(data.message, "error"); }
+                }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); });
+            } else { checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); } return;
         }
 
         if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
@@ -650,9 +658,9 @@
         else { showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error"); document.getElementById('pin-input').value = ""; }
     }
 
-    function checkLocalPIN(inputPIN, fName, lName, inputPhone, inputAddress, month, countryVal) {
+    function checkLocalPIN(inputPIN, finalFullName, inputPhone, inputAddress, month, countryVal) {
         const savedPIN = localStorage.getItem('murali_pin');
-        if (!savedPIN) { saveLocalDataAndUnlock(fName + " " + lName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student'); showToast("Offline Profile Created!", "success"); } 
+        if (!savedPIN) { saveLocalDataAndUnlock(finalFullName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student'); showToast("Offline Profile Created!", "success"); } 
         else { if (inputPIN === savedPIN) { unlockApp(); } else { handleFailedAttempt(); } }
     }
 
@@ -660,6 +668,29 @@
         localStorage.setItem('murali_user_name', name); localStorage.setItem('murali_phone', phone); localStorage.setItem('murali_address', address);
         localStorage.setItem('murali_month', month); localStorage.setItem('murali_country', country); localStorage.setItem('murali_pin', pin); localStorage.setItem('murali_role', role); unlockApp();
     }
+
+    // 🔴 UPDATE LOCAL PROFILE
+    window.updateLocalProfile = function() {
+        let fNameRaw = document.getElementById('edit-first-name').value.trim();
+        let lNameRaw = document.getElementById('edit-last-name').value.trim();
+        let phone = document.getElementById('edit-phone').value.trim();
+        let address = document.getElementById('edit-address').value.trim();
+        
+        if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पूरा नाम र थर लेख्नुहोस्।", "error");
+        if(phone.length < 10) return showToast("कृपया सही फोन नम्बर लेख्नुहोस्।", "error");
+        
+        let formatted = smartFormatName(fNameRaw, lNameRaw);
+        
+        localStorage.setItem('murali_user_name', formatted.full);
+        localStorage.setItem('murali_phone', phone);
+        localStorage.setItem('murali_address', address);
+        
+        userName = formatted.full; userPhone = phone; userAddress = address;
+        
+        showToast("Profile Updated Locally!", "success");
+        closeSettings();
+        unlockApp(); 
+    };
 
     function getValidDate(h) {
         if (!h.date) return h.timestamp ? new Date(h.timestamp) : null; let cleanDateStr = h.date.replace(/\s*\(.*?\)\s*/g, '').trim(); 
@@ -676,8 +707,15 @@
             userAddress = localStorage.getItem('murali_address') || "N/A"; userCountry = localStorage.getItem('murali_country') || "N/A"; userRole = localStorage.getItem('murali_role') || "Student";
             
             document.getElementById('lock-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; 
-            let nameParts = userName.split(" "); document.getElementById('edit-first-name').value = nameParts[0] || ""; document.getElementById('edit-last-name').value = nameParts.slice(1).join(" ") || "";
-            document.getElementById('edit-phone').value = userPhone; document.getElementById('edit-address').value = userAddress;
+            
+            // Populate Edit Profile fields
+            let nameParts = userName.split(" ");
+            let editLastName = nameParts.length > 1 ? nameParts.pop() : "";
+            let editFirstName = nameParts.join(" ");
+            document.getElementById('edit-first-name').value = editFirstName; 
+            document.getElementById('edit-last-name').value = editLastName;
+            document.getElementById('edit-phone').value = userPhone; 
+            document.getElementById('edit-address').value = userAddress;
 
             syncPendingResults(); syncMyResults();
 
@@ -686,16 +724,14 @@
             let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
             let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
 
-            // Extract correct display name (Handle 'BK Nabaraj' vs 'बी के सरिता')
             let displayName = userName;
-            if(nameParts[0].toUpperCase() === "BK" || nameParts[0] === "बी" || nameParts[0] === "बी.") {
-                displayName = nameParts.slice(0, 2).join(" ");
-                if(nameParts[0] === "बी" && nameParts[1] === "के") displayName = nameParts.slice(0, 3).join(" ");
+            if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") {
+                displayName = editFirstName + " " + editLastName; 
             } else {
-                displayName = nameParts[0];
+                displayName = editFirstName.split(" ")[0]; // just first word if no BK prefix handled (fallback)
+                if(editFirstName.includes("BK ") || editFirstName.includes("बी के ")) displayName = editFirstName;
             }
             
-            // Premium profile badge
             let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
             
             document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
@@ -862,7 +898,6 @@
         document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
         document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
-        // 🔴 Immersive Mode: Hide header and icons
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
         document.getElementById('toolbar-right-actions').style.display = 'none';
@@ -880,7 +915,6 @@
         document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none';
         document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
         
-        // 🔴 Restore layout
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
