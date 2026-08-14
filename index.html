@@ -252,16 +252,13 @@
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
             <div id="api-config-section">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
-    </div>
-    <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
-    <div style="display: flex; gap: 8px; margin-top: 10px;">
-        <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
-        <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
-    </div>
-</div>
+                <p style="font-size:0.95rem; color: #94a3b8; margin-bottom: 8px; font-weight:700;">Gemini API Configuration (Manager Only)</p>
+                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
+                    <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
+                </div>
+            </div>
             
             <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <p style="font-size:0.95rem; color: #94a3b8; margin: 0 0 10px 0; font-weight:700;">Exam Configuration (Manager Only)</p>
@@ -269,12 +266,9 @@
                     <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
-                   <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
-    <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
-    <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
-    <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
-    <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash</option>
-</select>
+                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                        <option value="gemini-3.6-flash" selected>🚀 Gemini 3.6</option><option value="gemini-2.5-flash">⚡ Gemini 2.5</option>
+                    </select>
                 </div>
             </div>
 
@@ -322,11 +316,14 @@
             </button>
         </div>
 
-        <!-- 🔴 नयाँ फिचर: सर्भरमा सेभ भएका क्वीज एकै क्लिकमा डाउनलोड गर्ने ठाउँ -->
+        <!-- 🔴 Bulk Export Section -->
         <div id="export-saved-section" style="display:none; margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
-            <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:6px;">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Export Saved Quizzes (Offline HTML)
+            <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
+                <span style="display:flex; align-items:center; gap:6px;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Saved Quizzes
+                </span>
+                <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">Download All</button>
             </p>
             <div style="display: flex; gap: 8px;">
                 <select id="saved-quiz-select" class="select-field" style="flex: 1; margin: 0; text-align: left; padding-left: 10px; font-size:0.9rem;">
@@ -410,13 +407,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 48.0 (Server Quiz Export Tool) | Engine: Multi-Sync</div>
+        <div>Version: 49.1 (Review Date Update) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "48.0"; 
+    const APP_VERSION = "49.1"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -492,7 +489,6 @@
         }).catch(e => console.log("Fetch error: ", e));
     }
 
-    // 🔴 नयाँ फिचर: सर्भर क्वीज लिस्ट देखाउने
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
         if(!select) return;
@@ -771,7 +767,6 @@
                 document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('exam-config-section').style.display = 'block'; document.getElementById('api-config-section').style.display = 'block';
                 document.getElementById('quiz-area').style.display = 'none';
                 
-                // 🔴 नयाँ फिचर: सर्भर क्वीज ड्रपडाउन देखाउने
                 document.getElementById('export-saved-section').style.display = 'block';
                 populateSavedQuizzes();
 
@@ -877,7 +872,10 @@
         let uniqueQ = []; let qTextSet = new Set(); allQuestions.forEach(q => { if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); } });
         shuffleArray(uniqueQ); let qCount = parseInt(document.getElementById('q-count').value); qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
         currentQuiz = uniqueQ.slice(0, qCount); currentQuiz.forEach(q => shuffleArray(q.options));
-        currentMurliDate = qCount >= 50 ? `🏆 Mega Quiz (${qCount} Qs)` : `🔄 Review Quiz (${qCount} Qs)`;
+        
+        // 🔴 नयाँ अपडेट: मिति थपिएको
+        let todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+        currentMurliDate = qCount >= 50 ? `🏆 Mega Quiz (${qCount} Qs) [${todayDate}]` : `🔄 Review Quiz (${qCount} Qs) [${todayDate}]`;
         
         document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; 
         document.getElementById('export-saved-section').style.display = 'none'; startQuizSession(); 
@@ -903,7 +901,77 @@
         }).catch(err => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; showToast("इन्टरनेट समस्या!", "error"); });
     }
 
-    // 🔴 नयाँ फिचर: सर्भर क्वीजलाई सिधै अफलाइन HTML मा डाउनलोड गर्ने
+    window.exportAllSavedQuizzes = async function() {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
+        
+        if(!confirm(`तपाईं ${serverQuizzes.length} वटा सबै क्वीजहरू डाउनलोड गर्दै हुनुहुन्छ। ब्राउजरले एकभन्दा बढी फाइल डाउनलोड गर्न अनुमति (Allow multiple downloads) माग्न सक्छ। अगाडि बढ्ने?`)) return;
+
+        showToast(`${serverQuizzes.length} वटा क्वीजहरू डाउनलोड हुँदैछन्...`, "info");
+
+        document.getElementById('murali-text').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('export-saved-section').style.display = 'none';
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('main-tabs').style.display = 'none';
+        document.getElementById('toolbar-right-actions').style.display = 'none';
+        document.getElementById('loading-box').style.display = 'none';
+
+        document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('sticky-scorebar').style.display = 'flex';
+        document.getElementById('active-quiz-info').style.display = 'flex';
+        document.getElementById('online-quiz-actions').style.display = 'flex';
+        document.getElementById('btn-save-top').style.display = 'none';
+        document.getElementById('btn-export-top').style.display = 'none';
+
+        let backupQuiz = currentQuiz; let backupDate = currentMurliDate;
+
+        for (let i = 0; i < serverQuizzes.length; i++) {
+            let sq = serverQuizzes[i];
+            if (!sq.quizData) continue;
+
+            currentQuiz = sq.quizData;
+            currentMurliDate = sq.quizDate;
+            answeredCount = 0; currentScore = 0;
+            currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+
+            renderQuizArea();
+            document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
+            document.getElementById('sb-answered').innerText = `0/${currentQuiz.length}`;
+            document.getElementById('timer-text').innerText = "00:00";
+
+            let html = document.documentElement.outerHTML.replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`);
+            let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
+            let filename = `OfflineQuiz-${currentMurliDate.replace(/[\/\\]/g,'-')}.html`;
+
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            await new Promise(r => setTimeout(r, 600));
+        }
+
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('sticky-scorebar').style.display = 'none';
+        document.getElementById('active-quiz-info').style.display = 'none';
+        document.getElementById('online-quiz-actions').style.display = 'none';
+
+        document.getElementById('murali-text').style.display = 'block';
+        document.getElementById('generator-actions').style.display = 'flex';
+        document.getElementById('export-saved-section').style.display = 'block';
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('main-tabs').style.display = 'flex';
+        document.getElementById('toolbar-right-actions').style.display = 'flex';
+
+        currentQuiz = backupQuiz; currentMurliDate = backupDate;
+        if(currentQuiz && currentQuiz.length > 0) renderQuizArea();
+
+        showToast("सबै क्वीजहरू सफलतापूर्वक डाउनलोड भए!", "success");
+    };
+
     window.exportSelectedSavedQuiz = function() {
         let select = document.getElementById('saved-quiz-select');
         let idx = select.value;
@@ -915,7 +983,6 @@
         let backupQuiz = currentQuiz; let backupDate = currentMurliDate;
         currentQuiz = sq.quizData; currentMurliDate = sq.quizDate;
         
-        // Hide Admin UI for clean export
         document.getElementById('murali-text').style.display = 'none';
         document.getElementById('generator-actions').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
@@ -924,7 +991,6 @@
         document.getElementById('toolbar-right-actions').style.display = 'none';
         document.getElementById('loading-box').style.display = 'none';
         
-        // Setup Quiz UI for Export
         answeredCount = 0; currentScore = 0;
         currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
         renderQuizArea();
@@ -940,10 +1006,9 @@
         
         let html = document.documentElement.outerHTML.replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`);
         let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
-        let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; 
+        let filename = `OfflineQuiz-${currentMurliDate.replace(/[\/\\]/g,'-')}.html`; 
         triggerDownload(b, filename);
         
-        // Revert Admin UI back to normal
         document.getElementById('quiz-area').style.display = 'none';
         document.getElementById('sticky-scorebar').style.display = 'none';
         document.getElementById('active-quiz-info').style.display = 'none'; 
