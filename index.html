@@ -50,8 +50,8 @@
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
-        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
-        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 2px; }
+        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1); } 100% { transform: rotate(360deg) scale(1); } }
+        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 60s linear infinite; transform-origin: center center; }
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
@@ -123,10 +123,11 @@
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         
-        /* 🔴 स्पष्ट Settings बटन र Toolbar डिजाइन (१ लाइनको लागि) */
+        /* 🔴 स्पष्ट Settings बटन र Toolbar डिजाइन (४ वटै बटन १ लाइनमा) */
         .btn-settings-clear { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
         .btn-settings-clear:hover { border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.05); }
-        .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+        
+        .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px;}
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
     </style>
@@ -146,20 +147,33 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: transparent;">
-                     <!-- 🔴 नयाँ र आकर्षक ब्रह्माकुमारीजको लोगो -->
+                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; border: 2px solid #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
+                     <!-- 🔴 शिवबाबा ज्योति (ओरिजिनल रातो किरण र बीचमा कालो तारा) -->
                      <div class="baba-logo-container">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; filter: drop-shadow(0px 4px 8px rgba(220, 38, 38, 0.4));">
-                          <circle cx="50" cy="50" r="46" fill="#dc2626" stroke="#b91c1c" stroke-width="2"/>
-                          <circle cx="50" cy="50" r="22" fill="#ffffff"/>
-                          <g stroke="#facc15" stroke-width="3.5" stroke-linecap="round">
-                            <line x1="50" y1="8" x2="50" y2="92"/><line x1="8" y1="50" x2="92" y2="50"/>
-                            <line x1="20" y1="20" x2="80" y2="80"/><line x1="20" y1="80" x2="80" y2="20"/>
-                            <line x1="30" y1="12" x2="70" y2="88"/><line x1="70" y1="12" x2="30" y2="88"/>
-                            <line x1="12" y1="30" x2="88" y2="70"/><line x1="12" y1="70" x2="88" y2="30"/>
-                          </g>
-                          <circle cx="50" cy="50" r="14" fill="#ffffff"/>
-                          <circle cx="50" cy="50" r="6" fill="#facc15"/>
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                            <!-- 16 Red Rays -->
+                            <g stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
+                                <line x1="50" y1="50" x2="50" y2="5" />
+                                <line x1="50" y1="50" x2="50" y2="95" />
+                                <line x1="50" y1="50" x2="5" y2="50" />
+                                <line x1="50" y1="50" x2="95" y2="50" />
+                                <line x1="50" y1="50" x2="18" y2="18" />
+                                <line x1="50" y1="50" x2="82" y2="82" />
+                                <line x1="50" y1="50" x2="18" y2="82" />
+                                <line x1="50" y1="50" x2="82" y2="18" />
+                                <line x1="50" y1="50" x2="67" y2="8" />
+                                <line x1="50" y1="50" x2="33" y2="92" />
+                                <line x1="50" y1="50" x2="33" y2="8" />
+                                <line x1="50" y1="50" x2="67" y2="92" />
+                                <line x1="50" y1="50" x2="92" y2="33" />
+                                <line x1="50" y1="50" x2="8" y2="67" />
+                                <line x1="50" y1="50" x2="8" y2="33" />
+                                <line x1="50" y1="50" x2="92" y2="67" />
+                            </g>
+                            <!-- Red Oval Center -->
+                            <ellipse cx="50" cy="50" rx="20" ry="25" fill="#ff0000" />
+                            <!-- Black Star Center -->
+                            <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#000000" />
                         </svg>
                      </div>
                 </div>
@@ -212,18 +226,18 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color); flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: transparent; margin: 0;">
-             <!-- 🔴 सानो लोगो -->
-             <div class="baba-logo-container">
+        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ef4444; background: #000; margin: 0; flex-shrink: 0;">
+             <!-- 🔴 शिवबाबा सानो लोगो -->
+             <div class="baba-logo-container" style="animation: none;">
                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                  <circle cx="50" cy="50" r="46" fill="#dc2626" stroke="#b91c1c" stroke-width="2"/>
-                  <circle cx="50" cy="50" r="22" fill="#ffffff"/>
-                  <g stroke="#facc15" stroke-width="3.5" stroke-linecap="round">
-                    <line x1="50" y1="8" x2="50" y2="92"/><line x1="8" y1="50" x2="92" y2="50"/>
-                    <line x1="20" y1="20" x2="80" y2="80"/><line x1="20" y1="80" x2="80" y2="20"/>
-                  </g>
-                  <circle cx="50" cy="50" r="14" fill="#ffffff"/>
-                  <circle cx="50" cy="50" r="6" fill="#facc15"/>
+                    <g stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
+                        <line x1="50" y1="50" x2="50" y2="5" /><line x1="50" y1="50" x2="50" y2="95" /><line x1="50" y1="50" x2="5" y2="50" /><line x1="50" y1="50" x2="95" y2="50" />
+                        <line x1="50" y1="50" x2="18" y2="18" /><line x1="50" y1="50" x2="82" y2="82" /><line x1="50" y1="50" x2="18" y2="82" /><line x1="50" y1="50" x2="82" y2="18" />
+                        <line x1="50" y1="50" x2="67" y2="8" /><line x1="50" y1="50" x2="33" y2="92" /><line x1="50" y1="50" x2="33" y2="8" /><line x1="50" y1="50" x2="67" y2="92" />
+                        <line x1="50" y1="50" x2="92" y2="33" /><line x1="50" y1="50" x2="8" y2="67" /><line x1="50" y1="50" x2="8" y2="33" /><line x1="50" y1="50" x2="92" y2="67" />
+                    </g>
+                    <ellipse cx="50" cy="50" rx="20" ry="25" fill="#ff0000" />
+                    <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#000000" />
                 </svg>
              </div>
         </div>
@@ -320,9 +334,9 @@
                     <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
                 </div>
                 
-                <!-- 🔴 पुरानो रेकर्ड मेटाउने बटन -->
+                <!-- 🔴 स्मार्ट क्लियर हिस्ट्री: १३ अगस्टभन्दा अगाडिको मात्र मेटाउने -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
-                    <button onclick="clearMyHistory()" style="background: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); flex: 1; padding: 0.8rem; box-shadow: none; border-radius:12px; font-size:0.9rem;">🗑️ Clear Old Records (History)</button>
+                    <button onclick="clearMyHistory()" style="background: transparent; color: var(--danger-color); border: 1px dashed var(--danger-color); flex: 1; padding: 0.8rem; box-shadow: none; border-radius:12px; font-size:0.9rem;">🗑️ Clear Old Records (Before 13 Aug)</button>
                 </div>
             </div>
         </div>
@@ -344,7 +358,6 @@
             </button>
         </div>
 
-        <!-- 🔴 Bulk Export Section -->
         <div id="export-saved-section" style="display:none; margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
                 <span style="display:flex; align-items:center; gap:6px;">
@@ -435,13 +448,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 50.1 (UI Upgrade & Clean History) | Engine: Multi-Sync</div>
+        <div>Version: 50.2 (World Class UI & Smart Clear) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "50.1"; 
+    const APP_VERSION = "50.2"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -512,11 +525,20 @@
         }
     }
     
-    // 🔴 नयाँ फङ्सन: केवल रेकर्ड मात्र मेटाउने
+    // 🔴 स्मार्ट क्लियर हिस्ट्री: १३ अगस्ट भन्दा अगाडिको मात्र फ्याँक्ने (नयाँ डाटा सेफ राख्ने)
     window.clearMyHistory = function() {
-        if(confirm("के तपाईं आफ्नो मोबाइलमा सेभ भएका पुराना सबै रिजल्टहरू हटाउन चाहनुहुन्छ?")) {
-            localStorage.removeItem('murali_progress');
-            showToast("History Cleared!", "success");
+        if(confirm("के तपाईं १३ अगस्ट २०२६ भन्दा अगाडिका पुराना रेकर्डहरू मात्र हटाउन चाहनुहुन्छ? (तपाईंको नयाँ डाटा सुरक्षित रहनेछ)")) {
+            let history = safeJSON('murali_progress', []);
+            let cutoffDate = new Date(2026, 7, 13); // 7 means August (0-indexed)
+            
+            let newHistory = history.filter(h => {
+                let dObj = getValidDate(h);
+                if(!dObj) return false;
+                return dObj.getTime() >= cutoffDate.getTime();
+            });
+            
+            localStorage.setItem('murali_progress', JSON.stringify(newHistory));
+            showToast("१३ अगस्ट भन्दा अगाडिका पुराना रेकर्डहरू हटाइए!", "success");
             closeSettings();
             renderDashboard();
         }
@@ -546,6 +568,7 @@
         });
     }
 
+    // 🔴 यो फङ्सनले तपाईंको हराएको डाटा गुगल सिटबाट अटोमेटिक तान्छ!
     function syncMyResults() {
         if (!navigator.onLine || !userPhone || userPhone === "N/A") return;
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "fetchMyResults", phone: userPhone }) })
