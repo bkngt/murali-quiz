@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <title>BK Murali Quiz</title>
     
-    <!-- 🔴 ZIP फाइल बनाउनको लागि लाइब्रेरी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -123,10 +122,9 @@
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         
-        /* 🔴 स्पष्ट Settings बटन र Toolbar डिजाइन (४ वटै बटन १ लाइनमा) */
+        /* 🔴 ४ वटै बटन १ लाइनमा राख्ने डिजाइन */
         .btn-settings-clear { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
         .btn-settings-clear:hover { border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.05); }
-        
         .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px;}
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
@@ -147,20 +145,33 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <!-- 🔴 अन्डाकार (Oval) लोगो, सेतो गोलो भित्र सानो पारेर ठिक्क मिलाइएको -->
-                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #ffffff; border: 2px solid #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
+                <!-- 🔴 PERFECT OVAL BACKGROUND (No Extra White Space) -->
+                <div id="pic-preview" style="width: 80px; height: 104px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000000; border: 2px solid #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
                      <div class="baba-logo-container">
-                        <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: auto; height: 85%; display:block; margin:auto;">
-                            <!-- 🔴 रातो किरण र अन्डाकार पृष्ठभूमि (Scale 1.3 ले Oval बनाउँछ) -->
-                            <g transform="translate(50, 65) scale(1, 1.3)" stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
-                                <line x1="0" y1="0" x2="0" y2="-45" /><line x1="0" y1="0" x2="0" y2="45" /><line x1="0" y1="0" x2="-45" y2="0" /><line x1="0" y1="0" x2="45" y2="0" />
-                                <line x1="0" y1="0" x2="32" y2="32" /><line x1="0" y1="0" x2="-32" y2="-32" /><line x1="0" y1="0" x2="-32" y2="32" /><line x1="0" y1="0" x2="32" y2="-32" />
-                                <line x1="0" y1="0" x2="17" y2="41" /><line x1="0" y1="0" x2="-17" y2="-41" /><line x1="0" y1="0" x2="17" y2="-41" /><line x1="0" y1="0" x2="-17" y2="41" />
-                                <line x1="0" y1="0" x2="41" y2="17" /><line x1="0" y1="0" x2="-41" y2="-17" /><line x1="0" y1="0" x2="41" y2="-17" /><line x1="0" y1="0" x2="-41" y2="17" />
+                        <!-- 🔴 16 Rays, Oval Center, Black Star -->
+                        <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
+                            <g stroke="#ff0000" stroke-width="8" stroke-linecap="butt" transform="translate(50,65)">
+                                <line x1="0" y1="0" x2="0" y2="-80" />
+                                <line x1="0" y1="0" x2="31" y2="-74" />
+                                <line x1="0" y1="0" x2="57" y2="-57" />
+                                <line x1="0" y1="0" x2="74" y2="-31" />
+                                <line x1="0" y1="0" x2="80" y2="0" />
+                                <line x1="0" y1="0" x2="74" y2="31" />
+                                <line x1="0" y1="0" x2="57" y2="57" />
+                                <line x1="0" y1="0" x2="31" y2="74" />
+                                <line x1="0" y1="0" x2="0" y2="80" />
+                                <line x1="0" y1="0" x2="-31" y2="74" />
+                                <line x1="0" y1="0" x2="-57" y2="57" />
+                                <line x1="0" y1="0" x2="-74" y2="31" />
+                                <line x1="0" y1="0" x2="-80" y2="0" />
+                                <line x1="0" y1="0" x2="-74" y2="-31" />
+                                <line x1="0" y1="0" x2="-57" y2="-57" />
+                                <line x1="0" y1="0" x2="-31" y2="-74" />
                             </g>
-                            <ellipse cx="50" cy="65" rx="18" ry="26" fill="#ff0000" />
-                            <!-- 🔴 सेतो तारा (White Star) बीचमा -->
-                            <polygon points="50,56 52,63 59,65 52,67 50,74 48,67 41,65 48,63" fill="#ffffff" />
+                            <!-- Inner Red Oval -->
+                            <ellipse cx="50" cy="65" rx="20" ry="28" fill="#ff0000" />
+                            <!-- Center Black Star (Perfect Shape) -->
+                            <polygon points="50,52 52,63 63,65 52,67 50,78 48,67 37,65 48,63" fill="#000000" />
                         </svg>
                      </div>
                 </div>
@@ -213,18 +224,22 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- 🔴 हेडरको सानो लोगो -->
-        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #cbd5e1; background: #ffffff; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-             <div class="baba-logo-container" style="width: 100%; height: 100%;">
-                <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: auto; height: 85%; display:block; margin:auto;">
-                    <g transform="translate(50, 65) scale(1, 1.3)" stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
-                        <line x1="0" y1="0" x2="0" y2="-45" /><line x1="0" y1="0" x2="0" y2="45" /><line x1="0" y1="0" x2="-45" y2="0" /><line x1="0" y1="0" x2="45" y2="0" />
-                        <line x1="0" y1="0" x2="32" y2="32" /><line x1="0" y1="0" x2="-32" y2="-32" /><line x1="0" y1="0" x2="-32" y2="32" /><line x1="0" y1="0" x2="32" y2="-32" />
-                        <line x1="0" y1="0" x2="17" y2="41" /><line x1="0" y1="0" x2="-17" y2="-41" /><line x1="0" y1="0" x2="17" y2="-41" /><line x1="0" y1="0" x2="-17" y2="41" />
-                        <line x1="0" y1="0" x2="41" y2="17" /><line x1="0" y1="0" x2="-41" y2="-17" /><line x1="0" y1="0" x2="41" y2="-17" /><line x1="0" y1="0" x2="-41" y2="17" />
+        <!-- 🔴 हेडरको सानो लोगो (Perfect Oval) -->
+        <div id="header-avatar" style="width: 35px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ef4444; background: #000000; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+             <div class="baba-logo-container">
+                <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
+                    <g stroke="#ff0000" stroke-width="8" stroke-linecap="butt" transform="translate(50,65)">
+                        <line x1="0" y1="0" x2="0" y2="-80" /> <line x1="0" y1="0" x2="31" y2="-74" />
+                        <line x1="0" y1="0" x2="57" y2="-57" /> <line x1="0" y1="0" x2="74" y2="-31" />
+                        <line x1="0" y1="0" x2="80" y2="0" /> <line x1="0" y1="0" x2="74" y2="31" />
+                        <line x1="0" y1="0" x2="57" y2="57" /> <line x1="0" y1="0" x2="31" y2="74" />
+                        <line x1="0" y1="0" x2="0" y2="80" /> <line x1="0" y1="0" x2="-31" y2="74" />
+                        <line x1="0" y1="0" x2="-57" y2="57" /> <line x1="0" y1="0" x2="-74" y2="31" />
+                        <line x1="0" y1="0" x2="-80" y2="0" /> <line x1="0" y1="0" x2="-74" y2="-31" />
+                        <line x1="0" y1="0" x2="-57" y2="-57" /> <line x1="0" y1="0" x2="-31" y2="-74" />
                     </g>
-                    <ellipse cx="50" cy="65" rx="18" ry="26" fill="#ff0000" />
-                    <polygon points="50,56 52,63 59,65 52,67 50,74 48,67 41,65 48,63" fill="#ffffff" />
+                    <ellipse cx="50" cy="65" rx="20" ry="28" fill="#ff0000" />
+                    <polygon points="50,52 52,63 63,65 52,67 50,78 48,67 37,65 48,63" fill="#000000" />
                 </svg>
              </div>
         </div>
@@ -435,13 +450,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 50.4 (Final Stable Version) | Engine: Multi-Sync</div>
+        <div>Version: 50.5 (Perfect Original Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "50.4"; 
+    const APP_VERSION = "50.5"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
