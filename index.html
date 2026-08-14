@@ -282,12 +282,15 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-            <div id="api-config-section">
-                <p style="font-size:0.95rem; color: #94a3b8; margin-bottom: 8px; font-weight:700;">Gemini API Configuration (Manager Only)</p>
-                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
-                    <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
+             <div id="api-config-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
+    </div>
+    <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
+    <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
+        <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
     </div>
 </div>
             
