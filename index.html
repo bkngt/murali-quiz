@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <title>BK Murali Quiz</title>
     
+    <!-- 🔴 ZIP फाइल बनाउनको लागि लाइब्रेरी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -50,8 +51,9 @@
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
-        /* 🔴 एनिमेसन पूर्ण रूपमा हटाइएको स्थिर लोगो कन्टेनर */
-        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 4px; }
+        /* 🔴 घुम्ने एनिमेसन (Original Logo Animation) */
+        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
+        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
@@ -147,33 +149,23 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <!-- 🔴 PERFECT UPRIGHT EGG (माथि फर्केको अण्डाकार) RED & WHITE ONLY -->
-                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #ffffff; border: 2px solid #ff0000; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);">
+                <!-- 🔴 सुरुको ओरिजिनल एनिमेटेड लोगो (Glowing Rays) -->
+                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
                      <div class="baba-logo-container">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
-                            <!-- 16 Red Rays Radiating from Center -->
-                            <g stroke="#ff0000" stroke-width="4.5" stroke-linecap="round">
-                                <line x1="50" y1="50" x2="50" y2="2" />
-                                <line x1="50" y1="50" x2="50" y2="98" />
-                                <line x1="50" y1="50" x2="2" y2="50" />
-                                <line x1="50" y1="50" x2="98" y2="50" />
-                                <line x1="50" y1="50" x2="16" y2="16" />
-                                <line x1="50" y1="50" x2="84" y2="84" />
-                                <line x1="50" y1="50" x2="16" y2="84" />
-                                <line x1="50" y1="50" x2="84" y2="16" />
-                                <line x1="50" y1="50" x2="68" y2="6" />
-                                <line x1="50" y1="50" x2="32" y2="94" />
-                                <line x1="50" y1="50" x2="32" y2="6" />
-                                <line x1="50" y1="50" x2="68" y2="94" />
-                                <line x1="50" y1="50" x2="94" y2="32" />
-                                <line x1="50" y1="50" x2="6" y2="68" />
-                                <line x1="50" y1="50" x2="6" y2="32" />
-                                <line x1="50" y1="50" x2="94" y2="68" />
-                            </g>
-                            <!-- Red Upright Egg Shape (Jyoti) -->
-                            <path d="M 50,15 C 65,15 75,45 75,60 C 75,75 65,85 50,85 C 35,85 25,75 25,60 C 25,45 35,15 50,15 Z" fill="#ff0000" />
-                            <!-- White Star -->
-                            <polygon points="50,45 52,53 60,55 52,57 50,65 48,57 40,55 48,53" fill="#ffffff" />
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            <radialGradient id="auraLock" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+                              <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
+                              <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
+                              <stop offset="100%" stop-color="#f00" stop-opacity="0" />
+                            </radialGradient>
+                          </defs>
+                          <circle cx="100" cy="100" r="95" fill="url(#auraLock)"/>
+                          <g transform="translate(100 100)" stroke="#ff0" stroke-width="2">
+                              <line y1="-85" y2="85"/><line y1="-85" y2="85" transform="rotate(45)"/><line y1="-85" y2="85" transform="rotate(90)"/><line y1="-85" y2="85" transform="rotate(135)"/>
+                          </g>
+                          <circle cx="100" cy="100" r="12" fill="gold"/>
                         </svg>
                      </div>
                 </div>
@@ -226,22 +218,23 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- 🔴 हेडरको सानो लोगो (Perfect Upright Egg) RED & WHITE -->
-        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ff0000; background: #ffffff; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(255,0,0,0.2);">
+        <!-- 🔴 सुरुको ओरिजिनल एनिमेटेड लोगो (Header) -->
+        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white; margin: 0;">
              <div class="baba-logo-container">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 80%; height: 80%; display:block;">
-                    <g stroke="#ff0000" stroke-width="4.5" stroke-linecap="round">
-                        <line x1="50" y1="50" x2="50" y2="2" /><line x1="50" y1="50" x2="50" y2="98" />
-                        <line x1="50" y1="50" x2="2" y2="50" /><line x1="50" y1="50" x2="98" y2="50" />
-                        <line x1="50" y1="50" x2="16" y2="16" /><line x1="50" y1="50" x2="84" y2="84" />
-                        <line x1="50" y1="50" x2="16" y2="84" /><line x1="50" y1="50" x2="84" y2="16" />
-                        <line x1="50" y1="50" x2="68" y2="6" /><line x1="50" y1="50" x2="32" y2="94" />
-                        <line x1="50" y1="50" x2="32" y2="6" /><line x1="50" y1="50" x2="68" y2="94" />
-                        <line x1="50" y1="50" x2="94" y2="32" /><line x1="50" y1="50" x2="6" y2="68" />
-                        <line x1="50" y1="50" x2="6" y2="32" /><line x1="50" y1="50" x2="94" y2="68" />
-                    </g>
-                    <path d="M 50,15 C 65,15 75,45 75,60 C 75,75 65,85 50,85 C 35,85 25,75 25,60 C 25,45 35,15 50,15 Z" fill="#ff0000" />
-                    <polygon points="50,45 52,53 60,55 52,57 50,65 48,57 40,55 48,53" fill="#ffffff" />
+                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="auraHeader" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#fff" stop-opacity="1" />
+                      <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
+                      <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
+                      <stop offset="100%" stop-color="#f00" stop-opacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <circle cx="100" cy="100" r="95" fill="url(#auraHeader)"/>
+                  <g transform="translate(100 100)" stroke="#ff0" stroke-width="3">
+                      <line y1="-85" y2="85"/><line y1="-85" y2="85" transform="rotate(45)"/><line y1="-85" y2="85" transform="rotate(90)"/><line y1="-85" y2="85" transform="rotate(135)"/>
+                  </g>
+                  <circle cx="100" cy="100" r="15" fill="gold"/>
                 </svg>
              </div>
         </div>
@@ -451,13 +444,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 50.5 (Final Perfect Logo) | Engine: Multi-Sync</div>
+        <div>Version: 56.0 (Animated Original Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "50.5"; 
+    const APP_VERSION = "56.0"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -966,7 +959,7 @@
 
     window.exportAllSavedQuizzes = async function() {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
-        if(serverQuizzes.length === 0) return showToast("कुनै भी क्वीज छैन।", "error");
+        if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
         
         if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरू एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
 
