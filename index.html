@@ -50,7 +50,8 @@
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
-        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        /* 🔴 एनिमेसन पूर्ण रूपमा हटाइएको स्थिर लोगो कन्टेनर */
+        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 4px; }
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
@@ -125,6 +126,7 @@
         /* 🔴 ४ वटै बटन १ लाइनमा राख्ने डिजाइन */
         .btn-settings-clear { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
         .btn-settings-clear:hover { border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.05); }
+        
         .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px;}
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
@@ -145,33 +147,33 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <!-- 🔴 PERFECT OVAL BACKGROUND (No Extra White Space) -->
-                <div id="pic-preview" style="width: 80px; height: 104px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000000; border: 2px solid #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);">
+                <!-- 🔴 PERFECT UPRIGHT EGG (माथि फर्केको अण्डाकार) RED & WHITE ONLY -->
+                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #ffffff; border: 2px solid #ff0000; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);">
                      <div class="baba-logo-container">
-                        <!-- 🔴 16 Rays, Oval Center, Black Star -->
-                        <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
-                            <g stroke="#ff0000" stroke-width="8" stroke-linecap="butt" transform="translate(50,65)">
-                                <line x1="0" y1="0" x2="0" y2="-80" />
-                                <line x1="0" y1="0" x2="31" y2="-74" />
-                                <line x1="0" y1="0" x2="57" y2="-57" />
-                                <line x1="0" y1="0" x2="74" y2="-31" />
-                                <line x1="0" y1="0" x2="80" y2="0" />
-                                <line x1="0" y1="0" x2="74" y2="31" />
-                                <line x1="0" y1="0" x2="57" y2="57" />
-                                <line x1="0" y1="0" x2="31" y2="74" />
-                                <line x1="0" y1="0" x2="0" y2="80" />
-                                <line x1="0" y1="0" x2="-31" y2="74" />
-                                <line x1="0" y1="0" x2="-57" y2="57" />
-                                <line x1="0" y1="0" x2="-74" y2="31" />
-                                <line x1="0" y1="0" x2="-80" y2="0" />
-                                <line x1="0" y1="0" x2="-74" y2="-31" />
-                                <line x1="0" y1="0" x2="-57" y2="-57" />
-                                <line x1="0" y1="0" x2="-31" y2="-74" />
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
+                            <!-- 16 Red Rays Radiating from Center -->
+                            <g stroke="#ff0000" stroke-width="4.5" stroke-linecap="round">
+                                <line x1="50" y1="50" x2="50" y2="2" />
+                                <line x1="50" y1="50" x2="50" y2="98" />
+                                <line x1="50" y1="50" x2="2" y2="50" />
+                                <line x1="50" y1="50" x2="98" y2="50" />
+                                <line x1="50" y1="50" x2="16" y2="16" />
+                                <line x1="50" y1="50" x2="84" y2="84" />
+                                <line x1="50" y1="50" x2="16" y2="84" />
+                                <line x1="50" y1="50" x2="84" y2="16" />
+                                <line x1="50" y1="50" x2="68" y2="6" />
+                                <line x1="50" y1="50" x2="32" y2="94" />
+                                <line x1="50" y1="50" x2="32" y2="6" />
+                                <line x1="50" y1="50" x2="68" y2="94" />
+                                <line x1="50" y1="50" x2="94" y2="32" />
+                                <line x1="50" y1="50" x2="6" y2="68" />
+                                <line x1="50" y1="50" x2="6" y2="32" />
+                                <line x1="50" y1="50" x2="94" y2="68" />
                             </g>
-                            <!-- Inner Red Oval -->
-                            <ellipse cx="50" cy="65" rx="20" ry="28" fill="#ff0000" />
-                            <!-- Center Black Star (Perfect Shape) -->
-                            <polygon points="50,52 52,63 63,65 52,67 50,78 48,67 37,65 48,63" fill="#000000" />
+                            <!-- Red Upright Egg Shape (Jyoti) -->
+                            <path d="M 50,15 C 65,15 75,45 75,60 C 75,75 65,85 50,85 C 35,85 25,75 25,60 C 25,45 35,15 50,15 Z" fill="#ff0000" />
+                            <!-- White Star -->
+                            <polygon points="50,45 52,53 60,55 52,57 50,65 48,57 40,55 48,53" fill="#ffffff" />
                         </svg>
                      </div>
                 </div>
@@ -224,22 +226,22 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- 🔴 हेडरको सानो लोगो (Perfect Oval) -->
-        <div id="header-avatar" style="width: 35px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ef4444; background: #000000; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <!-- 🔴 हेडरको सानो लोगो (Perfect Upright Egg) RED & WHITE -->
+        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #ff0000; background: #ffffff; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(255,0,0,0.2);">
              <div class="baba-logo-container">
-                <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%; display:block;">
-                    <g stroke="#ff0000" stroke-width="8" stroke-linecap="butt" transform="translate(50,65)">
-                        <line x1="0" y1="0" x2="0" y2="-80" /> <line x1="0" y1="0" x2="31" y2="-74" />
-                        <line x1="0" y1="0" x2="57" y2="-57" /> <line x1="0" y1="0" x2="74" y2="-31" />
-                        <line x1="0" y1="0" x2="80" y2="0" /> <line x1="0" y1="0" x2="74" y2="31" />
-                        <line x1="0" y1="0" x2="57" y2="57" /> <line x1="0" y1="0" x2="31" y2="74" />
-                        <line x1="0" y1="0" x2="0" y2="80" /> <line x1="0" y1="0" x2="-31" y2="74" />
-                        <line x1="0" y1="0" x2="-57" y2="57" /> <line x1="0" y1="0" x2="-74" y2="31" />
-                        <line x1="0" y1="0" x2="-80" y2="0" /> <line x1="0" y1="0" x2="-74" y2="-31" />
-                        <line x1="0" y1="0" x2="-57" y2="-57" /> <line x1="0" y1="0" x2="-31" y2="-74" />
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 80%; height: 80%; display:block;">
+                    <g stroke="#ff0000" stroke-width="4.5" stroke-linecap="round">
+                        <line x1="50" y1="50" x2="50" y2="2" /><line x1="50" y1="50" x2="50" y2="98" />
+                        <line x1="50" y1="50" x2="2" y2="50" /><line x1="50" y1="50" x2="98" y2="50" />
+                        <line x1="50" y1="50" x2="16" y2="16" /><line x1="50" y1="50" x2="84" y2="84" />
+                        <line x1="50" y1="50" x2="16" y2="84" /><line x1="50" y1="50" x2="84" y2="16" />
+                        <line x1="50" y1="50" x2="68" y2="6" /><line x1="50" y1="50" x2="32" y2="94" />
+                        <line x1="50" y1="50" x2="32" y2="6" /><line x1="50" y1="50" x2="68" y2="94" />
+                        <line x1="50" y1="50" x2="94" y2="32" /><line x1="50" y1="50" x2="6" y2="68" />
+                        <line x1="50" y1="50" x2="6" y2="32" /><line x1="50" y1="50" x2="94" y2="68" />
                     </g>
-                    <ellipse cx="50" cy="65" rx="20" ry="28" fill="#ff0000" />
-                    <polygon points="50,52 52,63 63,65 52,67 50,78 48,67 37,65 48,63" fill="#000000" />
+                    <path d="M 50,15 C 65,15 75,45 75,60 C 75,75 65,85 50,85 C 35,85 25,75 25,60 C 25,45 35,15 50,15 Z" fill="#ff0000" />
+                    <polygon points="50,45 52,53 60,55 52,57 50,65 48,57 40,55 48,53" fill="#ffffff" />
                 </svg>
              </div>
         </div>
@@ -336,7 +338,6 @@
                     <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
                 </div>
                 
-                <!-- 🔴 स्मार्ट क्लियर हिस्ट्री: १३ अगस्टभन्दा अगाडिको मात्र मेटाउने -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
                     <button onclick="clearMyHistory()" style="background: transparent; color: var(--danger-color); border: 1px dashed var(--danger-color); flex: 1; padding: 0.8rem; box-shadow: none; border-radius:12px; font-size:0.9rem;">🗑️ Clear Old Records (Before 13 Aug)</button>
                 </div>
@@ -450,7 +451,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 50.5 (Perfect Original Logo) | Engine: Multi-Sync</div>
+        <div>Version: 50.5 (Final Perfect Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
@@ -965,7 +966,7 @@
 
     window.exportAllSavedQuizzes = async function() {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
-        if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
+        if(serverQuizzes.length === 0) return showToast("कुनै भी क्वीज छैन।", "error");
         
         if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरू एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
 
