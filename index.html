@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <title>BK Murali Quiz</title>
     
+    <!-- 🔴 ZIP फाइल बनाउनको लागि लाइब्रेरी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -49,9 +50,8 @@
         .container { width: 100%; max-width: 760px; background: var(--card-bg); min-height: 100vh; padding: 0.6rem; padding-bottom: 85px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
-
-        /* 🔴 एनिमेसन हटाइयो, साइज मिलाइयो */
-        .baba-logo-container { width: 75%; height: 75%; display: flex; align-items: center; justify-content: center; }
+        
+        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
@@ -147,18 +147,20 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <!-- 🔴 सेतो गोलो (White Circle) भित्र सानो पारिएको स्थिर लोगो -->
+                <!-- 🔴 अन्डाकार (Oval) लोगो, सेतो गोलो भित्र सानो पारेर ठिक्क मिलाइएको -->
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #ffffff; border: 2px solid #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
                      <div class="baba-logo-container">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                            <g stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
-                                <line x1="50" y1="50" x2="50" y2="5" /><line x1="50" y1="50" x2="50" y2="95" /><line x1="50" y1="50" x2="5" y2="50" /><line x1="50" y1="50" x2="95" y2="50" />
-                                <line x1="50" y1="50" x2="18" y2="18" /><line x1="50" y1="50" x2="82" y2="82" /><line x1="50" y1="50" x2="18" y2="82" /><line x1="50" y1="50" x2="82" y2="18" />
-                                <line x1="50" y1="50" x2="67" y2="8" /><line x1="50" y1="50" x2="33" y2="92" /><line x1="50" y1="50" x2="33" y2="8" /><line x1="50" y1="50" x2="67" y2="92" />
-                                <line x1="50" y1="50" x2="92" y2="33" /><line x1="50" y1="50" x2="8" y2="67" /><line x1="50" y1="50" x2="8" y2="33" /><line x1="50" y1="50" x2="92" y2="67" />
+                        <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: auto; height: 85%; display:block; margin:auto;">
+                            <!-- 🔴 रातो किरण र अन्डाकार पृष्ठभूमि (Scale 1.3 ले Oval बनाउँछ) -->
+                            <g transform="translate(50, 65) scale(1, 1.3)" stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
+                                <line x1="0" y1="0" x2="0" y2="-45" /><line x1="0" y1="0" x2="0" y2="45" /><line x1="0" y1="0" x2="-45" y2="0" /><line x1="0" y1="0" x2="45" y2="0" />
+                                <line x1="0" y1="0" x2="32" y2="32" /><line x1="0" y1="0" x2="-32" y2="-32" /><line x1="0" y1="0" x2="-32" y2="32" /><line x1="0" y1="0" x2="32" y2="-32" />
+                                <line x1="0" y1="0" x2="17" y2="41" /><line x1="0" y1="0" x2="-17" y2="-41" /><line x1="0" y1="0" x2="17" y2="-41" /><line x1="0" y1="0" x2="-17" y2="41" />
+                                <line x1="0" y1="0" x2="41" y2="17" /><line x1="0" y1="0" x2="-41" y2="-17" /><line x1="0" y1="0" x2="41" y2="-17" /><line x1="0" y1="0" x2="-41" y2="17" />
                             </g>
-                            <ellipse cx="50" cy="50" rx="20" ry="25" fill="#ff0000" />
-                            <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#000000" />
+                            <ellipse cx="50" cy="65" rx="18" ry="26" fill="#ff0000" />
+                            <!-- 🔴 सेतो तारा (White Star) बीचमा -->
+                            <polygon points="50,56 52,63 59,65 52,67 50,74 48,67 41,65 48,63" fill="#ffffff" />
                         </svg>
                      </div>
                 </div>
@@ -211,18 +213,18 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- 🔴 हेडरको लागि सानो सेतो गोलो भित्रको लोगो -->
+        <!-- 🔴 हेडरको सानो लोगो -->
         <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #cbd5e1; background: #ffffff; margin: 0; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-             <div class="baba-logo-container" style="width: 80%; height: 80%;">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                    <g stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
-                        <line x1="50" y1="50" x2="50" y2="5" /><line x1="50" y1="50" x2="50" y2="95" /><line x1="50" y1="50" x2="5" y2="50" /><line x1="50" y1="50" x2="95" y2="50" />
-                        <line x1="50" y1="50" x2="18" y2="18" /><line x1="50" y1="50" x2="82" y2="82" /><line x1="50" y1="50" x2="18" y2="82" /><line x1="50" y1="50" x2="82" y2="18" />
-                        <line x1="50" y1="50" x2="67" y2="8" /><line x1="50" y1="50" x2="33" y2="92" /><line x1="50" y1="50" x2="33" y2="8" /><line x1="50" y1="50" x2="67" y2="92" />
-                        <line x1="50" y1="50" x2="92" y2="33" /><line x1="50" y1="50" x2="8" y2="67" /><line x1="50" y1="50" x2="8" y2="33" /><line x1="50" y1="50" x2="92" y2="67" />
+             <div class="baba-logo-container" style="width: 100%; height: 100%;">
+                <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" style="width: auto; height: 85%; display:block; margin:auto;">
+                    <g transform="translate(50, 65) scale(1, 1.3)" stroke="#ff0000" stroke-width="6" stroke-linecap="butt">
+                        <line x1="0" y1="0" x2="0" y2="-45" /><line x1="0" y1="0" x2="0" y2="45" /><line x1="0" y1="0" x2="-45" y2="0" /><line x1="0" y1="0" x2="45" y2="0" />
+                        <line x1="0" y1="0" x2="32" y2="32" /><line x1="0" y1="0" x2="-32" y2="-32" /><line x1="0" y1="0" x2="-32" y2="32" /><line x1="0" y1="0" x2="32" y2="-32" />
+                        <line x1="0" y1="0" x2="17" y2="41" /><line x1="0" y1="0" x2="-17" y2="-41" /><line x1="0" y1="0" x2="17" y2="-41" /><line x1="0" y1="0" x2="-17" y2="41" />
+                        <line x1="0" y1="0" x2="41" y2="17" /><line x1="0" y1="0" x2="-41" y2="-17" /><line x1="0" y1="0" x2="41" y2="-17" /><line x1="0" y1="0" x2="-41" y2="17" />
                     </g>
-                    <ellipse cx="50" cy="50" rx="20" ry="25" fill="#ff0000" />
-                    <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#000000" />
+                    <ellipse cx="50" cy="65" rx="18" ry="26" fill="#ff0000" />
+                    <polygon points="50,56 52,63 59,65 52,67 50,74 48,67 41,65 48,63" fill="#ffffff" />
                 </svg>
              </div>
         </div>
@@ -241,7 +243,6 @@
                 <svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
             </a>
             
-            <!-- 🔴 स्पष्ट Settings बटन -->
             <button class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
             </button>
@@ -344,7 +345,6 @@
             </button>
         </div>
 
-        <!-- 🔴 Bulk Export Section -->
         <div id="export-saved-section" style="display:none; margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
                 <span style="display:flex; align-items:center; gap:6px;">
@@ -435,13 +435,13 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 50.3 (Final Setup) | Engine: Multi-Sync</div>
+        <div>Version: 50.4 (Final Stable Version) | Engine: Multi-Sync</div>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "50.3"; 
+    const APP_VERSION = "50.4"; 
 
     let currentQuiz = []; let currentScore = 0; let answeredCount = 0; let currentMurliDate = "";
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; let userCountry = "N/A"; let userRole = "Student";
@@ -512,7 +512,6 @@
         }
     }
     
-    // 🔴 स्मार्ट क्लियर हिस्ट्री
     window.clearMyHistory = function() {
         if(confirm("के तपाईं १३ अगस्ट २०२६ भन्दा अगाडिका पुराना रेकर्डहरू मात्र हटाउन चाहनुहुन्छ? (तपाईंको नयाँ डाटा सुरक्षित रहनेछ)")) {
             let history = safeJSON('murali_progress', []);
