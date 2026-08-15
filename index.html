@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <!-- Admin configuration options (Hidden for students) -->
+    <!-- Admin configuration options -->
     <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
         <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
         <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
@@ -286,7 +286,7 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-             <div id="api-config-section">
+            <div id="api-config-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
@@ -304,7 +304,7 @@
                     <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
-                   <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
                         <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
                         <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
                         <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
@@ -451,7 +451,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 56.0 (Animated Original Logo) | Engine: Multi-Sync</div>
+        <div>Version: 57.0 (Animated Original Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
@@ -460,7 +460,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "56.0"; 
+    const APP_VERSION = "57.0"; 
 
     // DO NOT CHANGE THESE TWO VARIABLE DECLARATIONS (Used for Offline Export String Replacement)
     let currentQuiz = []; 
@@ -1396,7 +1396,7 @@
         const apiKey = localStorage.getItem('murali_gemini_key'); 
         if(!apiKey) { 
             openSettings(); 
-            return showToast("API Key Missing.", "error"); 
+            return showToast("API Key Missing. कृपया सेटिङमा API Key राख्नुहोस्।", "error"); 
         }
         
         const text = document.getElementById('murali-text').value.trim(); 
@@ -1406,16 +1406,15 @@
         let qCount = document.getElementById('q-count').value; 
         if(qCount === "50" || qCount === "100") qCount = "20"; 
         
-        let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash'; 
+        let selectedModel = document.getElementById('ai-model').value || 'gemini-3.7-flash'; 
         let level = document.getElementById('quiz-level').value;
 
         document.getElementById('murali-text').style.display = 'none'; 
         document.getElementById('generator-actions').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
         document.getElementById('loading-box').style.display = 'block'; 
-        document.getElementById('loading-text').innerText = "AI is drafting the quiz... (Manager Only)";
+        document.getElementById('loading-text').innerText = "AI is drafting the quiz... (कृपया पर्खनुहोस्)";
 
-        // 🔴 NEW AI PROMPT LOGIC (Variety & Difficulty Scaling)
         let difficultyInstruction = "";
         if (level === 'expert') {
             difficultyInstruction = "EXPERT LEVEL: Test deep essence. Options must be extremely close and confusing. Distractors must be highly plausible.";
@@ -1425,23 +1424,24 @@
             difficultyInstruction = "STANDARD LEVEL: Test basic factual recall. Distractors should be easily identifiable as incorrect.";
         }
 
-        const promptText = `You are an expert examiner. Generate a valid JSON array containing exactly ${qCount} objects representing a quiz based ONLY on the provided text. Output ONLY the raw JSON array.
+        const promptText = `You are an expert examiner. Generate a valid JSON array containing exactly ${qCount} objects representing a quiz based ONLY on the provided text. 
 
 CRITICAL RULES:
-1. Keep questions SHORT and mobile-friendly.
-2. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार", "आजको मुरलीमा", or "बाबाले भन्नुभएको छ". Ask directly.
-3. The language of the Q&A must strictly match the input text language.
-4. Ensure exactly 4 options per question.
-5. Difficulty: ${difficultyInstruction}
+1. Output ONLY a raw JSON array. Do NOT wrap it in markdown blocks.
+2. Keep questions SHORT and mobile-friendly.
+3. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार", "आजको मुरलीमा", or "बाबाले भन्नुभएको छ". Ask directly.
+4. The language of the Q&A must strictly match the input text language.
+5. Ensure exactly 4 options per question.
+6. Difficulty: ${difficultyInstruction}
 
-QUESTION VARIETY MIX (Scale proportionally if count is not 20):
+QUESTION VARIETY MIX:
 - ~30% Direct Objective (Direct factual questions)
 - ~25% Fill in the Blanks (Use "_____" in the sentence)
 - ~15% Correct/Incorrect Statement (e.g., "Which statement is true/false?" with 4 full statements as options)
 - ~20% Cause & Effect / Reasoning (e.g., "Why did X happen?" or "What is the result of Y?")
 - ~10% Odd One Out / Exception (e.g., "Which of the following is NOT mentioned?")
 
-Structure: {"q": "Question", "options": ["Option1", "Option2", "Option3", "Option4"], "answer": "Exact Match from options", "explanation": "Short reason", "tag": "Keyword", "original": "Quote from text"}
+Structure: [{"q": "Question", "options": ["Option1", "Option2", "Option3", "Option4"], "answer": "Exact Match from options", "explanation": "Short reason", "tag": "Keyword", "original": "Quote from text"}]
 
 Text: ${text}`;
 
@@ -1450,17 +1450,29 @@ Text: ${text}`;
                 method: "POST", 
                 headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify({ 
-                    contents: [{ parts: [{ text: promptText }] }], 
-                    generationConfig: { response_mime_type: "application/json" } 
+                    contents: [{ parts: [{ text: promptText }] }]
                 }) 
             });
             
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error ? errData.error.message : `HTTP Error ${response.status}`);
+            }
+
             const data = await response.json(); 
+            if (!data.candidates || data.candidates.length === 0) {
+                throw new Error("AI did not return any content.");
+            }
+
             let rText = data.candidates[0].content.parts[0].text;
             
             let sIdx = rText.indexOf('['); 
             let eIdx = rText.lastIndexOf(']'); 
-            if (sIdx !== -1 && eIdx !== -1) rText = rText.substring(sIdx, eIdx + 1);
+            if (sIdx !== -1 && eIdx !== -1) {
+                rText = rText.substring(sIdx, eIdx + 1);
+            } else {
+                throw new Error("AI did not return a valid JSON array.");
+            }
             
             currentQuiz = JSON.parse(rText); 
             currentQuiz.forEach(q => shuffleArray(q.options));
@@ -1474,11 +1486,12 @@ Text: ${text}`;
                 document.getElementById('btn-export-top').style.display = 'inline-block'; 
             }
         } catch (error) { 
+            console.error("AI Generation Error:", error);
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('murali-text').style.display = 'block'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
             document.getElementById('export-saved-section').style.display = 'block'; 
-            showToast("AI Request Failed! Check API Key.", "error"); 
+            showToast("AI Error: " + error.message, "error"); 
         }
     }
 
