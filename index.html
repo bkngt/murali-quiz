@@ -80,6 +80,10 @@
         .option-container { border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); overflow: hidden; transition: all 0.25s ease; cursor: pointer; position: relative; padding: 0.5rem 0.6rem;}
         .option-text { display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--opt-text-color) !important; line-height: 1.3;}
         .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3); }
+        
+        /* 🔴 Keyboard Focus Style */
+        .option-container.keyboard-focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3); transform: translateX(4px); background-color: rgba(56, 189, 248, 0.05); }
+        
         .option-container.selected-temp { background-color: rgba(56, 189, 248, 0.15); border-color: var(--primary-color); transform: translateX(4px); }
         .option-container.selected-wrong { background-color: var(--danger-bg); border-color: var(--danger-color); }
         .option-container.selected-wrong .option-letter { background: var(--danger-color); box-shadow: none; }
@@ -259,7 +263,7 @@
         </div>
     </div>
 
-    <!-- Admin configuration options -->
+    <!-- Admin configuration options (Hidden for students) -->
     <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
         <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
         <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
@@ -282,7 +286,7 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-            <div id="api-config-section">
+             <div id="api-config-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
@@ -300,7 +304,7 @@
                     <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
-                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                   <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
                         <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
                         <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
                         <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
@@ -487,6 +491,10 @@
     let lockoutInterval = null; 
     let isRecoveryMode = false; 
     let isDirectLogin = false;
+    
+    // 🔴 NEW: Variables for Resume & Keyboard Navigation
+    let activeQuestionIndex = 0;
+    let focusedOptionIndex = -1;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -1562,7 +1570,7 @@ Text: ${text}`;
     }
 
     // ==========================================
-    // 7. QUIZ EXECUTION & LOGIC
+    // 7. QUIZ EXECUTION & LOGIC (WITH RESUME & KEYBOARD)
     // ==========================================
     window.startSpecificQuiz = function(dateStr) {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); 
@@ -1595,23 +1603,83 @@ Text: ${text}`;
         clearInterval(timerInterval); 
     }
 
+    // 🔴 KEYBOARD NAVIGATION LOGIC
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen').style.display === 'none') {
+            if(reviewSource === 'past') return; // Disable in review mode
+            
+            let optionsCount = 4;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                focusedOptionIndex = (focusedOptionIndex + 1) % optionsCount;
+                updateFocusUI();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                focusedOptionIndex = (focusedOptionIndex - 1 + optionsCount) % optionsCount;
+                updateFocusUI();
+            } else if ((e.key === 'Enter' || e.key === ' ') && focusedOptionIndex !== -1) {
+                e.preventDefault();
+                let optBtn = document.getElementById(`opt-${activeQuestionIndex}-${focusedOptionIndex}`);
+                if(optBtn && !optBtn.classList.contains('disabled')) {
+                    selectOption(activeQuestionIndex, focusedOptionIndex);
+                }
+            }
+        }
+    });
+
+    function updateFocusUI() {
+        for(let i=0; i<4; i++) {
+            let btn = document.getElementById(`opt-${activeQuestionIndex}-${i}`);
+            if(btn) {
+                if(i === focusedOptionIndex) btn.classList.add('keyboard-focus');
+                else btn.classList.remove('keyboard-focus');
+            }
+        }
+    }
+
     function startQuizSession() {
         stopTimer(); 
-        currentScore = 0; 
-        answeredCount = 0; 
-        totalTimeSec = 0; 
-        isTimerStarted = false; 
         document.getElementById('sb-submit-btn').disabled = false;
         
-        currentQuiz.forEach(q => { 
-            delete q.userSelectedIndex; 
-            delete q.userCorrect; 
-        });
+        // 🔴 RESUME LOGIC
+        let savedStateStr = localStorage.getItem('murali_active_quiz_state');
+        let savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
+
+        if (savedState && savedState.date === currentMurliDate && !isOfflineExport) {
+            currentQuiz = savedState.quizData;
+            currentScore = savedState.score;
+            answeredCount = savedState.answeredCount;
+            totalTimeSec = savedState.time;
+            activeQuestionIndex = savedState.qIndex;
+            
+            let cancelBtn = document.getElementById('btn-cancel-top');
+            if(cancelBtn) cancelBtn.style.display = 'none'; // Hide cancel if resuming
+            
+            showToast("तपाईंको रोकिएको परीक्षा पुनः सुरु भयो।", "info");
+        } else {
+            // Fresh Start
+            currentScore = 0; 
+            answeredCount = 0; 
+            totalTimeSec = 0; 
+            activeQuestionIndex = 0;
+            currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+            
+            let cancelBtn = document.getElementById('btn-cancel-top');
+            if(cancelBtn) cancelBtn.style.display = 'inline-block'; // Show initially
+        }
+
+        focusedOptionIndex = -1;
+        isTimerStarted = true; 
+        startTimer();
         
         document.getElementById('result-screen').style.display = 'none'; 
         document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('sticky-scorebar').style.display = 'flex'; 
-        document.getElementById('timer-text').innerText = "00:00";
+        
+        let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); 
+        let s = (totalTimeSec % 60).toString().padStart(2, '0'); 
+        document.getElementById('timer-text').innerText = `${m}:${s}`;
+
         document.getElementById('active-quiz-info').style.display = 'flex'; 
         document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; 
         document.getElementById('online-quiz-actions').style.display = 'flex'; 
@@ -1640,7 +1708,10 @@ Text: ${text}`;
     }
 
     function cancelQuiz() { 
-        if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) resetToGenerator(); 
+        if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) {
+            localStorage.removeItem('murali_active_quiz_state');
+            resetToGenerator(); 
+        }
     }
 
     function resetToGenerator() {
@@ -1691,7 +1762,8 @@ Text: ${text}`;
                 </button>`
             ).join('');
             
-            let displayStyle = qIndex === answeredCount ? 'block' : 'none'; 
+            // 🔴 Only show the active question
+            let displayStyle = qIndex === activeQuestionIndex ? 'block' : 'none'; 
             let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
             
             htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
@@ -1704,18 +1776,20 @@ Text: ${text}`;
     }
 
     function selectOption(qIndex, oIndex) {
-        if (!isTimerStarted) { 
-            startTimer(); 
-            isTimerStarted = true; 
-        } 
-        
         let block = document.getElementById(`qb-${qIndex}`); 
         if(block.classList.contains('answered')) return; 
         block.classList.add('answered'); 
         
+        // 🔴 Hide cancel button on first answer
+        if (qIndex === 0) {
+            let cancelBtn = document.getElementById('btn-cancel-top');
+            if(cancelBtn) cancelBtn.style.display = 'none';
+        }
+        
         for(let i=0; i<4; i++) { 
             let opt = document.getElementById(`opt-${qIndex}-${i}`); 
             opt.classList.add('disabled'); 
+            opt.classList.remove('keyboard-focus'); // Remove focus
             if(i === oIndex) opt.classList.add('selected-temp'); 
         }
         
@@ -1737,8 +1811,22 @@ Text: ${text}`;
         setTimeout(() => {
             if (qIndex < currentQuiz.length - 1) { 
                 document.getElementById(`qb-${qIndex}`).style.display = 'none'; 
-                document.getElementById(`qb-${qIndex+1}`).style.display = 'block'; 
+                activeQuestionIndex++;
+                document.getElementById(`qb-${activeQuestionIndex}`).style.display = 'block'; 
+                focusedOptionIndex = -1; // Reset focus for next question
                 window.scrollTo(0, 0); 
+                
+                // 🔴 SAVE STATE LOCALLY
+                if(!isOfflineExport) {
+                    localStorage.setItem('murali_active_quiz_state', JSON.stringify({
+                        date: currentMurliDate,
+                        qIndex: activeQuestionIndex,
+                        score: currentScore,
+                        time: totalTimeSec,
+                        answeredCount: answeredCount,
+                        quizData: currentQuiz
+                    }));
+                }
             } else { 
                 showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); 
                 submitQuiz(); 
@@ -1755,6 +1843,9 @@ Text: ${text}`;
         
         document.getElementById('sb-submit-btn').disabled = true; 
         stopTimer(); 
+        
+        // 🔴 CLEAR SAVED STATE ON SUBMIT
+        localStorage.removeItem('murali_active_quiz_state');
         
         if(!isOfflineExport) { 
             saveOrReplaceProgress(); 
