@@ -283,16 +283,16 @@
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
              <div id="api-config-section">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
-    </div>
-    <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
-    <div style="display: flex; gap: 8px; margin-top: 10px;">
-        <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
-        <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
-    </div>
-</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
+                </div>
+                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
+                    <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
+                </div>
+            </div>
             
             <div id="exam-config-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <p style="font-size:0.95rem; color: #94a3b8; margin: 0 0 10px 0; font-weight:700;">Exam Configuration (Manager Only)</p>
@@ -301,11 +301,11 @@
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
-    <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
-    <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
-    <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
-    <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash</option>
-</select>
+                        <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
+                        <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
+                        <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
+                        <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash</option>
+                    </select>
                 </div>
             </div>
 
@@ -471,55 +471,144 @@
         en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
     };
 
-    function safeJSON(key, defaultVal) { try { let val = localStorage.getItem(key); return val ? JSON.parse(val) : defaultVal; } catch(e) { return defaultVal; } }
+    function safeJSON(key, defaultVal) { 
+        try { 
+            let val = localStorage.getItem(key); 
+            return val ? JSON.parse(val) : defaultVal; 
+        } catch(e) { 
+            return defaultVal; 
+        } 
+    }
 
     function showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container'); const toast = document.createElement('div');
+        const container = document.getElementById('toast-container'); 
+        const toast = document.createElement('div');
         let iconSvg = type === 'error' ? `<svg class="icon" style="color:var(--danger-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : (type === 'success' ? `<svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : `<svg class="icon" style="color:var(--primary-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`);
-        toast.className = `toast ${type}`; toast.innerHTML = `${iconSvg} <span>${msg}</span>`;
-        container.appendChild(toast); setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; setTimeout(() => toast.remove(), 300); }, 3000);
+        toast.className = `toast ${type}`; 
+        toast.innerHTML = `${iconSvg} <span>${msg}</span>`;
+        container.appendChild(toast); 
+        setTimeout(() => { 
+            toast.style.opacity = '0'; 
+            toast.style.transform = 'translateY(-20px)'; 
+            setTimeout(() => toast.remove(), 300); 
+        }, 3000);
     }
 
     function playSound(type) {
-        if(!soundEnabled) return; if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(!soundEnabled) return; 
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if(audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
-        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-        if(type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3); } 
-        else { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
+        const osc = audioCtx.createOscillator(); 
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode); 
+        gainNode.connect(audioCtx.destination);
+        if(type === 'correct') { 
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            osc.start(); 
+            osc.stop(audioCtx.currentTime + 0.3); 
+        } else { 
+            osc.type = 'sawtooth'; 
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); 
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); 
+            osc.start(); 
+            osc.stop(audioCtx.currentTime + 0.2); 
+        }
     }
 
     function toggleSound() { 
-        soundEnabled = !soundEnabled; localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); 
-        let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+        soundEnabled = !soundEnabled; 
+        localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); 
+        let btn = document.getElementById('modal-sound-btn'); 
+        if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
     }
 
     function toggleDarkMode() { 
         let isLight = document.body.hasAttribute('data-theme'); 
-        let btn = document.getElementById('modal-dark-btn'); let meta = document.getElementById('theme-color-meta');
+        let btn = document.getElementById('modal-dark-btn'); 
+        let meta = document.getElementById('theme-color-meta');
         if(isLight) {
-            document.body.removeAttribute('data-theme'); localStorage.setItem('m_q_theme', 'dark'); 
-            if(meta) meta.content = "#0b0f19"; if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+            document.body.removeAttribute('data-theme'); 
+            localStorage.setItem('m_q_theme', 'dark'); 
+            if(meta) meta.content = "#0b0f19"; 
+            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
         } else {
-            document.body.setAttribute('data-theme', 'light'); localStorage.setItem('m_q_theme', 'light'); 
-            if(meta) meta.content = "#f1f5f9"; if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+            document.body.setAttribute('data-theme', 'light'); 
+            localStorage.setItem('m_q_theme', 'light'); 
+            if(meta) meta.content = "#f1f5f9"; 
+            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
         }
     }
 
-    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
-
-    function fireConfetti() {
-        const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let particles = [];
-        for(let i=0; i<150; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, r: Math.random() * 6 + 2, dx: Math.random() * 4 - 2, dy: Math.random() * 4 + 2, color: ['#0284c7', '#16a34a', '#d97706', '#dc2626', '#eab308', '#8b5cf6'][Math.floor(Math.random()*6)] });
-        function animate() { if(particles.length === 0) return; requestAnimationFrame(animate); ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); p.y += p.dy; p.x += p.dx; }); } animate(); setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
+    function shuffleArray(array) { 
+        for (let i = array.length - 1; i > 0; i--) { 
+            const j = Math.floor(Math.random() * (i + 1)); 
+            [array[i], array[j]] = [array[j], array[i]]; 
+        } 
     }
 
-    function checkOtherCountry() { let sel = document.getElementById('country-select'); let inp = document.getElementById('country-input-other'); if (sel.value === 'Other') { inp.style.display = 'block'; inp.focus(); } else { inp.style.display = 'none'; inp.value = ''; } }
+    function fireConfetti() {
+        const canvas = document.getElementById('confetti-canvas'); 
+        const ctx = canvas.getContext('2d'); 
+        canvas.width = window.innerWidth; 
+        canvas.height = window.innerHeight; 
+        let particles = [];
+        for(let i=0; i<150; i++) {
+            particles.push({ 
+                x: Math.random() * canvas.width, 
+                y: Math.random() * canvas.height - canvas.height, 
+                r: Math.random() * 6 + 2, 
+                dx: Math.random() * 4 - 2, 
+                dy: Math.random() * 4 + 2, 
+                color: ['#0284c7', '#16a34a', '#d97706', '#dc2626', '#eab308', '#8b5cf6'][Math.floor(Math.random()*6)] 
+            });
+        }
+        function animate() { 
+            if(particles.length === 0) return; 
+            requestAnimationFrame(animate); 
+            ctx.clearRect(0,0,canvas.width,canvas.height); 
+            particles.forEach(p => { 
+                ctx.beginPath(); 
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); 
+                ctx.fillStyle = p.color; 
+                ctx.fill(); 
+                p.y += p.dy; 
+                p.x += p.dx; 
+            }); 
+        } 
+        animate(); 
+        setTimeout(() => { 
+            ctx.clearRect(0,0,canvas.width,canvas.height); 
+            particles = []; 
+        }, 4000);
+    }
+
+    function checkOtherCountry() { 
+        let sel = document.getElementById('country-select'); 
+        let inp = document.getElementById('country-input-other'); 
+        if (sel.value === 'Other') { 
+            inp.style.display = 'block'; 
+            inp.focus(); 
+        } else { 
+            inp.style.display = 'none'; 
+            inp.value = ''; 
+        } 
+    }
 
     function clearLocalDataAndReload() {
         if(confirm("तपाईंको ब्राउजरको लगइन डाटा मेटिनेछ। के तपाईं पक्का हुनुहुन्छ?")) {
-            localStorage.removeItem('murali_user_name'); localStorage.removeItem('murali_phone'); localStorage.removeItem('murali_address');
-            localStorage.removeItem('murali_month'); localStorage.removeItem('murali_country'); localStorage.removeItem('murali_pin'); localStorage.removeItem('murali_role');
+            localStorage.removeItem('murali_user_name'); 
+            localStorage.removeItem('murali_phone'); 
+            localStorage.removeItem('murali_address');
+            localStorage.removeItem('murali_month'); 
+            localStorage.removeItem('murali_country'); 
+            localStorage.removeItem('murali_pin'); 
+            localStorage.removeItem('murali_role');
             window.location.reload();
         }
     }
@@ -544,9 +633,21 @@
 
     function syncServerQuizzes(refreshUI = false) {
         if (!navigator.onLine) return;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "fetchQuizzes" }) })
-        .then(res => res.json()).then(data => { if(data.status === "success" && data.quizzes) { localStorage.setItem('murali_server_quizzes', JSON.stringify(data.quizzes)); console.log("☁️ Quizzes updated from server."); populateSavedQuizzes(); if(refreshUI) unlockApp(); }
-        }).catch(e => console.log("Fetch error: ", e));
+        fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify({ action: "fetchQuizzes" }) 
+        })
+        .then(res => res.json())
+        .then(data => { 
+            if(data.status === "success" && data.quizzes) { 
+                localStorage.setItem('murali_server_quizzes', JSON.stringify(data.quizzes)); 
+                console.log("☁️ Quizzes updated from server."); 
+                populateSavedQuizzes(); 
+                if(refreshUI) unlockApp(); 
+            }
+        })
+        .catch(e => console.log("Fetch error: ", e));
     }
 
     function populateSavedQuizzes() {
@@ -568,17 +669,43 @@
 
     function syncMyResults() {
         if (!navigator.onLine || !userPhone || userPhone === "N/A") return;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "fetchMyResults", phone: userPhone }) })
-        .then(res => res.json()).then(data => {
+        fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify({ action: "fetchMyResults", phone: userPhone }) 
+        })
+        .then(res => res.json())
+        .then(data => {
             if(data.status === "success" && data.results) {
-                let localHistory = safeJSON('murali_progress', []); let merged = [...localHistory]; let isUpdated = false;
+                let localHistory = safeJSON('murali_progress', []); 
+                let merged = [...localHistory]; 
+                let isUpdated = false;
                 data.results.forEach(sr => {
                     let exists = merged.find(lh => lh.date === sr.date);
-                    if(!exists) { merged.push({ id: Date.now() + Math.random(), name: userName, phone: userPhone, date: sr.date, score: sr.score, percent: sr.percent, total: sr.total, timeTaken: sr.timeTaken, synced: true, quizData: null }); isUpdated = true; }
+                    if(!exists) { 
+                        merged.push({ 
+                            id: Date.now() + Math.random(), 
+                            name: userName, 
+                            phone: userPhone, 
+                            date: sr.date, 
+                            score: sr.score, 
+                            percent: sr.percent, 
+                            total: sr.total, 
+                            timeTaken: sr.timeTaken, 
+                            synced: true, 
+                            quizData: null 
+                        }); 
+                        isUpdated = true; 
+                    }
                 });
-                if(isUpdated) { merged.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); localStorage.setItem('murali_progress', JSON.stringify(merged)); if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); }
+                if(isUpdated) { 
+                    merged.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
+                    localStorage.setItem('murali_progress', JSON.stringify(merged)); 
+                    if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); 
+                }
             }
-        }).catch(e => console.log("Sync Results Error", e));
+        })
+        .catch(e => console.log("Sync Results Error", e));
     }
 
     function enforceEnglish(input) {
@@ -590,80 +717,135 @@
     }
 
     function init() {
-        if (localStorage.getItem('murali_app_version') !== APP_VERSION) localStorage.setItem('murali_app_version', APP_VERSION);
-        document.getElementById('lock-screen').style.display = 'flex'; document.getElementById('main-app').style.display = 'none';
+        if (localStorage.getItem('murali_app_version') !== APP_VERSION) {
+            localStorage.setItem('murali_app_version', APP_VERSION);
+        }
+        document.getElementById('lock-screen').style.display = 'flex'; 
+        document.getElementById('main-app').style.display = 'none';
         
         let meta = document.getElementById('theme-color-meta');
         if(localStorage.getItem('m_q_theme') === 'light') {
-            document.body.setAttribute('data-theme', 'light'); if(meta) meta.content = "#f1f5f9";
-            let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+            document.body.setAttribute('data-theme', 'light'); 
+            if(meta) meta.content = "#f1f5f9";
+            let btn = document.getElementById('modal-dark-btn'); 
+            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
         } else {
-            document.body.removeAttribute('data-theme'); if(meta) meta.content = "#0b0f19";
-            let btn = document.getElementById('modal-dark-btn'); if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+            document.body.removeAttribute('data-theme'); 
+            if(meta) meta.content = "#0b0f19";
+            let btn = document.getElementById('modal-dark-btn'); 
+            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
         }
 
         const savedSound = localStorage.getItem('m_q_sound'); 
-        if (savedSound === '0') { soundEnabled = false; let btn = document.getElementById('modal-sound-btn'); if(btn) btn.innerHTML = '🔇 Sound: OFF'; }
+        if (savedSound === '0') { 
+            soundEnabled = false; 
+            let btn = document.getElementById('modal-sound-btn'); 
+            if(btn) btn.innerHTML = '🔇 Sound: OFF'; 
+        }
         
         let savedLockout = localStorage.getItem('murali_lockout_time');
-        if(savedLockout && Date.now() < parseInt(savedLockout)) { startLockoutTimer(parseInt(savedLockout)); } else { localStorage.removeItem('murali_lockout_time'); }
+        if(savedLockout && Date.now() < parseInt(savedLockout)) { 
+            startLockoutTimer(parseInt(savedLockout)); 
+        } else { 
+            localStorage.removeItem('murali_lockout_time'); 
+        }
         
         const savedName = localStorage.getItem('murali_user_name');
         if (savedName) {
-            document.getElementById('first-name-input').disabled = true; document.getElementById('last-name-input').disabled = true; 
-            document.getElementById('phone-input').style.display = 'none'; document.getElementById('address-input').style.display = 'none';
-            document.getElementById('country-select').style.display = 'none'; document.getElementById('month-select').style.display = 'none';
-            document.getElementById('warning-msg').style.display = 'none'; if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
+            document.getElementById('first-name-input').disabled = true; 
+            document.getElementById('last-name-input').disabled = true; 
+            document.getElementById('phone-input').style.display = 'none'; 
+            document.getElementById('address-input').style.display = 'none';
+            document.getElementById('country-select').style.display = 'none'; 
+            document.getElementById('month-select').style.display = 'none';
+            document.getElementById('warning-msg').style.display = 'none'; 
+            if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
             document.getElementById('reg-fields').style.display = 'none';
 
-            document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; document.getElementById('forgot-btn').style.display = 'block'; 
-            document.getElementById('cancel-forgot-btn').style.display = 'none'; document.getElementById('direct-login-btn').style.display = 'none';
+            document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; 
+            document.getElementById('forgot-btn').style.display = 'block'; 
+            document.getElementById('cancel-forgot-btn').style.display = 'none'; 
+            document.getElementById('direct-login-btn').style.display = 'none';
         }
         syncServerQuizzes(); 
     }
 
     function startLockoutTimer(unlockTime) {
-        isLockedOut = true; document.getElementById('pin-input').disabled = true; document.getElementById('btn-login-submit').disabled = true; document.getElementById('pin-instruction').style.display = 'block';
+        isLockedOut = true; 
+        document.getElementById('pin-input').disabled = true; 
+        document.getElementById('btn-login-submit').disabled = true; 
+        document.getElementById('pin-instruction').style.display = 'block';
         if (lockoutInterval) clearInterval(lockoutInterval);
         lockoutInterval = setInterval(() => {
             let timeLeft = Math.ceil((unlockTime - Date.now()) / 1000);
             if(timeLeft <= 0) {
-                clearInterval(lockoutInterval); isLockedOut = false; failedAttempts = 0; localStorage.removeItem('murali_lockout_time');
-                document.getElementById('pin-input').disabled = false; document.getElementById('btn-login-submit').disabled = false;
-                document.getElementById('pin-input').value = ""; document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)"; document.getElementById('pin-instruction').style.color = '#64748b';
+                clearInterval(lockoutInterval); 
+                isLockedOut = false; 
+                failedAttempts = 0; 
+                localStorage.removeItem('murali_lockout_time');
+                document.getElementById('pin-input').disabled = false; 
+                document.getElementById('btn-login-submit').disabled = false;
+                document.getElementById('pin-input').value = ""; 
+                document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)"; 
+                document.getElementById('pin-instruction').style.color = '#64748b';
                 if(!isRecoveryMode && !isDirectLogin) document.getElementById('pin-instruction').style.display = 'none';
-            } else { document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeLeft} सेकेन्ड पर्खनुहोस्।`; document.getElementById('pin-instruction').style.color = 'var(--danger-color)'; }
+            } else { 
+                document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeLeft} सेकेन्ड पर्खनुहोस्।`; 
+                document.getElementById('pin-instruction').style.color = 'var(--danger-color)'; 
+            }
         }, 1000);
     }
 
     function toggleDirectLogin() {
-        isDirectLogin = !isDirectLogin; isRecoveryMode = false;
+        isDirectLogin = !isDirectLogin; 
+        isRecoveryMode = false;
         if(isDirectLogin) {
             document.getElementById('pin-msg').innerText = `फोन नम्बर र ४-अंकको पिन हालेर लगइन गर्नुहोस्।`;
-            document.getElementById('reg-fields').style.display = 'none'; document.getElementById('warning-msg').style.display = 'none'; document.getElementById('month-select').style.display = 'none';
-            document.getElementById('phone-input').style.display = 'block'; document.getElementById('pin-input').style.display = 'block'; document.getElementById('pin-instruction').style.display = 'block';
-            document.getElementById('btn-login-submit').innerHTML = `Login`; document.getElementById('direct-login-btn').innerText = `नयाँ दर्ता गर्नुहुन्छ? (Register)`;
-            document.getElementById('forgot-btn').style.display = 'block'; document.getElementById('cancel-forgot-btn').style.display = 'none';
-        } else { window.location.reload(); }
+            document.getElementById('reg-fields').style.display = 'none'; 
+            document.getElementById('warning-msg').style.display = 'none'; 
+            document.getElementById('month-select').style.display = 'none';
+            document.getElementById('phone-input').style.display = 'block'; 
+            document.getElementById('pin-input').style.display = 'block'; 
+            document.getElementById('pin-instruction').style.display = 'block';
+            document.getElementById('btn-login-submit').innerHTML = `Login`; 
+            document.getElementById('direct-login-btn').innerText = `नयाँ दर्ता गर्नुहुन्छ? (Register)`;
+            document.getElementById('forgot-btn').style.display = 'block'; 
+            document.getElementById('cancel-forgot-btn').style.display = 'none';
+        } else { 
+            window.location.reload(); 
+        }
     }
 
     function handleForgotPIN() {
         isRecoveryMode = true;
         document.getElementById('pin-msg').innerText = `कृपया आफ्नो फोन नम्बर र अलौकिक जन्म महिना भर्नुहोस्।`;
-        document.getElementById('reg-fields').style.display = 'none'; document.getElementById('warning-msg').style.display = 'none';
-        document.getElementById('phone-input').style.display = 'block'; document.getElementById('month-select').style.display = 'block'; document.getElementById('month-select').value = "";
-        document.getElementById('pin-input').style.display = 'none'; document.getElementById('pin-instruction').style.display = 'none'; document.getElementById('forgot-btn').style.display = 'none';
-        document.getElementById('direct-login-btn').style.display = 'none'; document.getElementById('cancel-forgot-btn').style.display = 'inline-block'; document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+        document.getElementById('reg-fields').style.display = 'none'; 
+        document.getElementById('warning-msg').style.display = 'none';
+        document.getElementById('phone-input').style.display = 'block'; 
+        document.getElementById('month-select').style.display = 'block'; 
+        document.getElementById('month-select').value = "";
+        document.getElementById('pin-input').style.display = 'none'; 
+        document.getElementById('pin-instruction').style.display = 'none'; 
+        document.getElementById('forgot-btn').style.display = 'none';
+        document.getElementById('direct-login-btn').style.display = 'none'; 
+        document.getElementById('cancel-forgot-btn').style.display = 'inline-block'; 
+        document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
     }
 
-    function cancelForgotPIN() { isRecoveryMode = false; window.location.reload(); }
+    function cancelForgotPIN() { 
+        isRecoveryMode = false; 
+        window.location.reload(); 
+    }
 
     function smartFormatName(fNameRaw, lNameRaw) {
         let fName = fNameRaw.trim();
         let lName = lNameRaw.trim();
 
-        function toTitleCase(str) { return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}); }
-        lName = toTitleCase(lName); fName = fName.replace(/\s+/g, ' '); 
+        function toTitleCase(str) { 
+            return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();}); 
+        }
+        lName = toTitleCase(lName); 
+        fName = fName.replace(/\s+/g, ' '); 
         let isNepali = /[\u0900-\u097F]/.test(fName + lName);
 
         let engPrefixRegex = /^(b\.?\s*k\.?|brahma?a?\s*ku?ma?a?r(i|y)?)\b\s*/i;
@@ -688,24 +870,58 @@
 
     function handlePIN() {
         if(isLockedOut) return;
-        const inputPhone = document.getElementById('phone-input').value.trim(); const inputPIN = document.getElementById('pin-input').value; const month = document.getElementById('month-select').value;
+        const inputPhone = document.getElementById('phone-input').value.trim(); 
+        const inputPIN = document.getElementById('pin-input').value; 
+        const month = document.getElementById('month-select').value;
         
         if (isRecoveryMode) {
             if (!inputPhone || !month) return showToast("कृपया फोन र महिना भर्नुहोस्।", "error");
             document.getElementById('btn-login-submit').innerHTML = `Checking...`;
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
-            }).then(r => r.json()).then(data => { document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
-                if (data.status === "success") { alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); window.location.reload(); } else { showToast(data.message || "विवरण मिलेन!", "error"); }
-            }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Recover PIN`; showToast("सर्भर कनेक्सन फेल भयो!", "error"); }); return;
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
+            })
+            .then(r => r.json())
+            .then(data => { 
+                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+                if (data.status === "success") { 
+                    alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); 
+                    window.location.reload(); 
+                } else { 
+                    showToast(data.message || "विवरण मिलेन!", "error"); 
+                }
+            })
+            .catch(e => { 
+                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`; 
+                showToast("सर्भर कनेक्सन फेल भयो!", "error"); 
+            }); 
+            return;
         }
 
         if (isDirectLogin) {
             if (!inputPhone || inputPIN.length !== 4) return showToast("कृपया सही १० अंकको फोन र ४ अंकको पिन लेख्नुहोस्।", "error");
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
-            }).then(r => r.json()).then(data => { document.getElementById('btn-login-submit').innerHTML = `Login`;
-                if(data.status === "success") { saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); showToast("Server Login Successful!", "success"); } else { handleFailedAttempt(); }
-            }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Login`; showToast("सर्भर कनेक्सन फेल भयो!", "error"); }); return;
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
+            })
+            .then(r => r.json())
+            .then(data => { 
+                document.getElementById('btn-login-submit').innerHTML = `Login`;
+                if(data.status === "success") { 
+                    saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
+                    showToast("Server Login Successful!", "success"); 
+                } else { 
+                    handleFailedAttempt(); 
+                }
+            })
+            .catch(e => { 
+                document.getElementById('btn-login-submit').innerHTML = `Login`; 
+                showToast("सर्भर कनेक्सन फेल भयो!", "error"); 
+            }); 
+            return;
         }
 
         if (document.getElementById('reg-fields').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
@@ -717,7 +933,8 @@
 
             if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पहिलो नाम र थर दुवै अनिवार्य भर्नुहोस्।", "error");
             if(inputPhone.length < 10) return showToast("कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।", "error");
-            let c = address.trim().toUpperCase(); if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
+            let c = address.trim().toUpperCase(); 
+            if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
             if(!countryVal || countryVal === "") return showToast("कृपया देश छान्नुहोस्।", "error"); 
             if(!month || month === "") return showToast("कृपया अलौकिक जन्म महिना छान्नुहोस्।", "error");
             if(inputPIN.length !== 4) return showToast("पिन ठ्याक्कै ४ अंकको हुनुपर्छ।", "error"); 
@@ -727,39 +944,100 @@
 
             if(navigator.onLine) {
                 document.getElementById('btn-login-submit').innerHTML = `Registering...`;
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
-                }).then(r => r.json()).then(data => { if (data.status === "success") { saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); showToast("Registration Successful!", "success"); } else { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast(data.message, "error"); }
-                }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Enter`; showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); });
-            } else { checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); } return;
+                fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                    body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
+                })
+                .then(r => r.json())
+                .then(data => { 
+                    if (data.status === "success") { 
+                        saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); 
+                        showToast("Registration Successful!", "success"); 
+                    } else { 
+                        document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                        showToast(data.message, "error"); 
+                    }
+                })
+                .catch(e => { 
+                    document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                    showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); 
+                    checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); 
+                });
+            } else { 
+                checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); 
+            } 
+            return;
         }
 
         if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
-        let savedPIN = localStorage.getItem('murali_pin'); let savedPhone = localStorage.getItem('murali_phone');
+        let savedPIN = localStorage.getItem('murali_pin'); 
+        let savedPhone = localStorage.getItem('murali_phone');
 
-        if (savedPIN && inputPIN === savedPIN) { unlockApp(); } else if (navigator.onLine && savedPhone) {
+        if (savedPIN && inputPIN === savedPIN) { 
+            unlockApp(); 
+        } else if (navigator.onLine && savedPhone) {
              document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
-             fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN })
-             }).then(r => r.json()).then(data => { document.getElementById('btn-login-submit').innerHTML = `Enter`;
-                if(data.status === "success") { saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); showToast("Server Login Successful!", "success"); } else { handleFailedAttempt(); }
-             }).catch(e => { document.getElementById('btn-login-submit').innerHTML = `Enter`; handleFailedAttempt(); });
-        } else { handleFailedAttempt(); }
+             fetch(API_URL, { 
+                 method: 'POST', 
+                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                 body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN })
+             })
+             .then(r => r.json())
+             .then(data => { 
+                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
+                 if(data.status === "success") { 
+                     saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
+                     showToast("Server Login Successful!", "success"); 
+                 } else { 
+                     handleFailedAttempt(); 
+                 }
+             })
+             .catch(e => { 
+                 document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                 handleFailedAttempt(); 
+             });
+        } else { 
+            handleFailedAttempt(); 
+        }
     }
     
     function handleFailedAttempt() {
         failedAttempts++;
-        if (failedAttempts >= 4) { showToast("४ पटक गलत पिन! १ मिनेट पर्खनुहोस्।", "error"); let unlockTime = Date.now() + (60 * 1000); localStorage.setItem('murali_lockout_time', unlockTime); startLockoutTimer(unlockTime); } 
-        else { showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error"); document.getElementById('pin-input').value = ""; }
+        if (failedAttempts >= 4) { 
+            showToast("४ पटक गलत पिन! १ मिनेट पर्खनुहोस्।", "error"); 
+            let unlockTime = Date.now() + (60 * 1000); 
+            localStorage.setItem('murali_lockout_time', unlockTime); 
+            startLockoutTimer(unlockTime); 
+        } else { 
+            showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error"); 
+            document.getElementById('pin-input').value = ""; 
+        }
     }
 
     function checkLocalPIN(inputPIN, finalFullName, inputPhone, inputAddress, month, countryVal) {
         const savedPIN = localStorage.getItem('murali_pin');
-        if (!savedPIN) { saveLocalDataAndUnlock(finalFullName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student'); showToast("Offline Profile Created!", "success"); } 
-        else { if (inputPIN === savedPIN) { unlockApp(); } else { handleFailedAttempt(); } }
+        if (!savedPIN) { 
+            saveLocalDataAndUnlock(finalFullName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student'); 
+            showToast("Offline Profile Created!", "success"); 
+        } else { 
+            if (inputPIN === savedPIN) { 
+                unlockApp(); 
+            } else { 
+                handleFailedAttempt(); 
+            } 
+        }
     }
 
     function saveLocalDataAndUnlock(name, phone, address, month, country, pin, role) {
-        localStorage.setItem('murali_user_name', name); localStorage.setItem('murali_phone', phone); localStorage.setItem('murali_address', address);
-        localStorage.setItem('murali_month', month); localStorage.setItem('murali_country', country); localStorage.setItem('murali_pin', pin); localStorage.setItem('murali_role', role); unlockApp();
+        localStorage.setItem('murali_user_name', name); 
+        localStorage.setItem('murali_phone', phone); 
+        localStorage.setItem('murali_address', address);
+        localStorage.setItem('murali_month', month); 
+        localStorage.setItem('murali_country', country); 
+        localStorage.setItem('murali_pin', pin); 
+        localStorage.setItem('murali_role', role); 
+        unlockApp();
     }
 
     window.updateLocalProfile = function() {
@@ -767,7 +1045,8 @@
         let lNameRaw = document.getElementById('edit-last-name').value.trim();
         let newPhone = document.getElementById('edit-phone').value.trim();
         let newAddress = document.getElementById('edit-address').value.trim();
-        let oldPhone = localStorage.getItem('murali_phone'); let pin = localStorage.getItem('murali_pin');
+        let oldPhone = localStorage.getItem('murali_phone'); 
+        let pin = localStorage.getItem('murali_pin');
         
         if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पूरा नाम र थर लेख्नुहोस्।", "error");
         if(newPhone.length < 10) return showToast("कृपया सही फोन नम्बर लेख्नुहोस्।", "error");
@@ -776,39 +1055,86 @@
         let finalName = formatted.full;
         
         document.getElementById('btn-save-profile').innerText = "Saving to Cloud...";
-        localStorage.setItem('murali_user_name', finalName); localStorage.setItem('murali_phone', newPhone); localStorage.setItem('murali_address', newAddress);
-        userName = finalName; userPhone = newPhone; userAddress = newAddress;
+        localStorage.setItem('murali_user_name', finalName); 
+        localStorage.setItem('murali_phone', newPhone); 
+        localStorage.setItem('murali_address', newAddress);
+        userName = finalName; 
+        userPhone = newPhone; 
+        userAddress = newAddress;
         
         if(navigator.onLine) {
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "updateProfile", oldPhone: oldPhone, pin: pin, newName: finalName, newPhone: newPhone, newAddress: newAddress })
-            }).then(r => r.json()).then(data => { document.getElementById('btn-save-profile').innerText = "Save Profile";
-                if(data.status === "success") { showToast("Profile Synced to Google Sheet! ☁️", "success"); } else { showToast("Google Sheet Sync Error: " + data.message, "error"); } closeSettings(); unlockApp();
-            }).catch(e => { document.getElementById('btn-save-profile').innerText = "Save Profile"; showToast("Saved Locally. (Server sync failed)", "warning"); closeSettings(); unlockApp(); });
-        } else { document.getElementById('btn-save-profile').innerText = "Save Profile"; showToast("Saved Locally! (You are offline)", "success"); closeSettings(); unlockApp(); }
+            })
+            .then(r => r.json())
+            .then(data => { 
+                document.getElementById('btn-save-profile').innerText = "Save Profile";
+                if(data.status === "success") { 
+                    showToast("Profile Synced to Google Sheet! ☁️", "success"); 
+                } else { 
+                    showToast("Google Sheet Sync Error: " + data.message, "error"); 
+                } 
+                closeSettings(); 
+                unlockApp();
+            })
+            .catch(e => { 
+                document.getElementById('btn-save-profile').innerText = "Save Profile"; 
+                showToast("Saved Locally. (Server sync failed)", "warning"); 
+                closeSettings(); 
+                unlockApp(); 
+            });
+        } else { 
+            document.getElementById('btn-save-profile').innerText = "Save Profile"; 
+            showToast("Saved Locally! (You are offline)", "success"); 
+            closeSettings(); 
+            unlockApp(); 
+        }
     };
 
     function getValidDate(h) {
-        if (!h.date) return h.timestamp ? new Date(h.timestamp) : null; let cleanDateStr = h.date.replace(/\s*\(.*?\)\s*/g, '').trim(); 
+        if (!h.date) return h.timestamp ? new Date(h.timestamp) : null; 
+        let cleanDateStr = h.date.replace(/\s*\(.*?\)\s*/g, '').trim(); 
         let parts = cleanDateStr.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
-        if (parts) { let py = parseInt(parts[3], 10); if (py < 100) py += 2000; return new Date(py, parseInt(parts[2], 10) - 1, parseInt(parts[1], 10)); }
+        if (parts) { 
+            let py = parseInt(parts[3], 10); 
+            if (py < 100) py += 2000; 
+            return new Date(py, parseInt(parts[2], 10) - 1, parseInt(parts[1], 10)); 
+        }
         let strParts = cleanDateStr.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
-        if (strParts) { let mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(strParts[2].toLowerCase()); let py = parseInt(strParts[3], 10); if (py < 100) py += 2000; return new Date(py, mIndex, parseInt(strParts[1], 10)); }
-        let d = new Date(cleanDateStr); if (!isNaN(d.getTime())) return d; return h.timestamp ? new Date(h.timestamp) : null;
+        if (strParts) { 
+            let mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(strParts[2].toLowerCase()); 
+            let py = parseInt(strParts[3], 10); 
+            if (py < 100) py += 2000; 
+            return new Date(py, mIndex, parseInt(strParts[1], 10)); 
+        }
+        let d = new Date(cleanDateStr); 
+        if (!isNaN(d.getTime())) return d; 
+        return h.timestamp ? new Date(h.timestamp) : null;
     }
 
     function unlockApp() { 
         try {
-            userName = localStorage.getItem('murali_user_name') || "Student"; userPhone = localStorage.getItem('murali_phone') || "N/A"; 
-            userAddress = localStorage.getItem('murali_address') || "N/A"; userCountry = localStorage.getItem('murali_country') || "N/A"; userRole = localStorage.getItem('murali_role') || "Student";
+            userName = localStorage.getItem('murali_user_name') || "Student"; 
+            userPhone = localStorage.getItem('murali_phone') || "N/A"; 
+            userAddress = localStorage.getItem('murali_address') || "N/A"; 
+            userCountry = localStorage.getItem('murali_country') || "N/A"; 
+            userRole = localStorage.getItem('murali_role') || "Student";
             
-            document.getElementById('lock-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; 
+            document.getElementById('lock-screen').style.display = 'none'; 
+            document.getElementById('main-app').style.display = 'block'; 
             
-            let nameParts = userName.split(" "); let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; let editFirstName = nameParts.join(" ");
-            document.getElementById('edit-first-name').value = editFirstName; document.getElementById('edit-last-name').value = editLastName;
-            document.getElementById('edit-phone').value = userPhone; document.getElementById('edit-address').value = userAddress;
+            let nameParts = userName.split(" "); 
+            let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; 
+            let editFirstName = nameParts.join(" ");
+            document.getElementById('edit-first-name').value = editFirstName; 
+            document.getElementById('edit-last-name').value = editLastName;
+            document.getElementById('edit-phone').value = userPhone; 
+            document.getElementById('edit-address').value = userAddress;
 
-            syncPendingResults(); syncMyResults();
+            syncPendingResults(); 
+            syncMyResults();
 
             let safeRole = userRole.toString().trim().toLowerCase();
             let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
@@ -816,37 +1142,70 @@
             let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
 
             let displayName = userName;
-            if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") { displayName = editFirstName + " " + editLastName; } 
-            else { displayName = editFirstName.split(" ")[0]; if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) displayName = editFirstName; }
+            if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") { 
+                displayName = editFirstName + " " + editLastName; 
+            } else { 
+                displayName = editFirstName.split(" ")[0]; 
+                if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) displayName = editFirstName; 
+            }
             
             let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
             document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
 
             if (safeRole === 'manager' || safeRole === 'admin') {
-                document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('btn-mega').style.display = 'block'; 
-                document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('exam-config-section').style.display = 'block'; document.getElementById('api-config-section').style.display = 'block';
+                document.getElementById('murali-text').style.display = 'block'; 
+                document.getElementById('generator-actions').style.display = 'flex'; 
+                document.getElementById('btn-mega').style.display = 'block'; 
+                document.getElementById('quiz-config-tools').style.display = 'flex'; 
+                document.getElementById('exam-config-section').style.display = 'block'; 
+                document.getElementById('api-config-section').style.display = 'block';
                 document.getElementById('quiz-area').style.display = 'none';
                 
                 document.getElementById('export-saved-section').style.display = 'block';
                 populateSavedQuizzes();
 
             } else {
-                document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('btn-mega').style.display = 'none';
-                document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('exam-config-section').style.display = 'none'; document.getElementById('api-config-section').style.display = 'none';
+                document.getElementById('murali-text').style.display = 'none'; 
+                document.getElementById('generator-actions').style.display = 'none'; 
+                document.getElementById('btn-mega').style.display = 'none';
+                document.getElementById('quiz-config-tools').style.display = 'none'; 
+                document.getElementById('exam-config-section').style.display = 'none'; 
+                document.getElementById('api-config-section').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'none';
                 loadStudentDashboard();
             }
             switchTab('gen');
-        } catch(e) { showToast("Error loading UI", "error"); }
+        } catch(e) { 
+            showToast("Error loading UI", "error"); 
+        }
     }
 
     function loadStudentDashboard() {
         try {
-            let qArea = document.getElementById('quiz-area'); let serverQuizzes = safeJSON('murali_server_quizzes', []); let history = safeJSON('murali_progress', []);
-            let today = new Date(); let cy = today.getFullYear(); let cm = today.getMonth(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let firstDay = new Date(cy, cm, 1).getDay();
+            let qArea = document.getElementById('quiz-area'); 
+            let serverQuizzes = safeJSON('murali_server_quizzes', []); 
+            let history = safeJSON('murali_progress', []);
+            let today = new Date(); 
+            let cy = today.getFullYear(); 
+            let cm = today.getMonth(); 
+            let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
+            let firstDay = new Date(cy, cm, 1).getDay();
 
-            let quizMap = {}; serverQuizzes.forEach(sq => { let d = getValidDate({date: sq.quizDate}); if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) { quizMap[d.getDate()] = sq; } });
-            let historyMap = {}; history.forEach(h => { let d = getValidDate(h); if(d && d.getMonth() === cm && d.getFullYear() === cy) { historyMap[d.getDate()] = h; } });
+            let quizMap = {}; 
+            serverQuizzes.forEach(sq => { 
+                let d = getValidDate({date: sq.quizDate}); 
+                if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) { 
+                    quizMap[d.getDate()] = sq; 
+                } 
+            });
+            
+            let historyMap = {}; 
+            history.forEach(h => { 
+                let d = getValidDate(h); 
+                if(d && d.getMonth() === cm && d.getFullYear() === cy) { 
+                    historyMap[d.getDate()] = h; 
+                } 
+            });
 
             let html = `<div class="calendar-container">
                 <h3 style="text-align:center; color:var(--primary-color); margin: 0 0 15px 0; font-size:1.3rem;">📅 Exam Calendar <br><span style="font-size:0.9rem; color:#64748b;">${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}</span></h3>
@@ -856,18 +1215,49 @@
 
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
             for (let i = 1; i <= daysInMonth; i++) {
-                let isToday = (i === today.getDate()); let isPast = (i < today.getDate()); let hasQuiz = quizMap[i] ? true : false; let isCompleted = historyMap[i] ? true : false;
+                let isToday = (i === today.getDate()); 
+                let isPast = (i < today.getDate()); 
+                let hasQuiz = quizMap[i] ? true : false; 
+                let isCompleted = historyMap[i] ? true : false;
                 let boxStyle = `padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; border: 2px solid var(--border-color); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50px; transition:all 0.2s; background:var(--card-bg); overflow:hidden; word-break:break-word; line-height: 1.1;`;
-                let statusIcon = ``; let clickAction = ``; let cursor = `cursor:not-allowed; opacity:0.6;`;
+                let statusIcon = ``; 
+                let clickAction = ``; 
+                let cursor = `cursor:not-allowed; opacity:0.6;`;
 
                 if (isToday) {
-                    if (isCompleted) { boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; statusIcon = `✅`; cursor = `cursor:pointer; opacity:1; box-shadow: 0 4px 10px rgba(22,163,74,0.2);`; clickAction = `onclick="showQuizStatus('completed', '${quizMap[i].quizDate}')"`;
-                    } else if (hasQuiz) { boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.4); transform: scale(1.08); z-index:10;`; statusIcon = `▶️ Play`; cursor = `cursor:pointer; opacity:1;`; clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
-                    } else { boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; statusIcon = `⏳ Wait`; cursor = `cursor:not-allowed; opacity:1;`; clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; }
+                    if (isCompleted) { 
+                        boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; 
+                        statusIcon = `✅`; 
+                        cursor = `cursor:pointer; opacity:1; box-shadow: 0 4px 10px rgba(22,163,74,0.2);`; 
+                        clickAction = `onclick="showQuizStatus('completed', '${quizMap[i].quizDate}')"`;
+                    } else if (hasQuiz) { 
+                        boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.4); transform: scale(1.08); z-index:10;`; 
+                        statusIcon = `▶️ Play`; 
+                        cursor = `cursor:pointer; opacity:1;`; 
+                        clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
+                    } else { 
+                        boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; 
+                        statusIcon = `⏳ Wait`; 
+                        cursor = `cursor:not-allowed; opacity:1;`; 
+                        clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; 
+                    }
                 } else if (isPast) {
-                    if (isCompleted) { boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`; statusIcon = `✅`; cursor = `cursor:pointer; opacity:0.8;`; clickAction = `onclick="showQuizStatus('past-completed', '')"`;
-                    } else { boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; statusIcon = `❌ Miss`; clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो!', 'error')"`; cursor = `cursor:pointer;`; }
-                } else { statusIcon = `🔒`; clickAction = `onclick="showToast('भोलिको क्वीज भोलि मात्र खुल्नेछ!', 'info')"`; cursor = `cursor:pointer; opacity:0.5;`; }
+                    if (isCompleted) { 
+                        boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`; 
+                        statusIcon = `✅`; 
+                        cursor = `cursor:pointer; opacity:0.8;`; 
+                        clickAction = `onclick="showQuizStatus('past-completed', '')"`;
+                    } else { 
+                        boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
+                        statusIcon = `❌ Miss`; 
+                        clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो!', 'error')"`; 
+                        cursor = `cursor:pointer;`; 
+                    }
+                } else { 
+                    statusIcon = `🔒`; 
+                    clickAction = `onclick="showToast('भोलिको क्वीज भोलि मात्र खुल्नेछ!', 'info')"`; 
+                    cursor = `cursor:pointer; opacity:0.5;`; 
+                }
 
                 let extraTextSize = isToday && hasQuiz && !isCompleted ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
@@ -879,18 +1269,33 @@
                 html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">`;
                 specialQuizzes.forEach(sq => {
                     let isCompleted = history.some(h => h.date === sq.quizDate);
-                    if (isCompleted) { html += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
-                    } else { html += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; }
-                }); html += `</div></div>`;
+                    if (isCompleted) { 
+                        html += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
+                    } else { 
+                        html += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; 
+                    }
+                }); 
+                html += `</div></div>`;
             }
             html += `<div style="text-align:center; margin-top:20px;"><button class="btn-small" onclick="syncServerQuizzes(true)" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button></div>`;
-            qArea.innerHTML = html; qArea.style.display = 'block';
-        } catch (e) { document.getElementById('quiz-area').innerHTML = `<div style="color:red; text-align:center; padding: 3rem;">डाटा लोड गर्न समस्या भयो! कृपया लगआउट गरेर फेरि लगइन गर्नुहोस्।</div>`; document.getElementById('quiz-area').style.display = 'block'; }
+            qArea.innerHTML = html; 
+            qArea.style.display = 'block';
+        } catch (e) { 
+            document.getElementById('quiz-area').innerHTML = `<div style="color:red; text-align:center; padding: 3rem;">डाटा लोड गर्न समस्या भयो! कृपया लगआउट गरेर फेरि लगइन गर्नुहोस्।</div>`; 
+            document.getElementById('quiz-area').style.display = 'block'; 
+        }
     }
 
     window.startSpecificQuiz = function(dateStr) {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
-        if(targetQuiz && targetQuiz.quizData) { currentQuiz = targetQuiz.quizData; currentMurliDate = targetQuiz.quizDate; startQuizSession(); } else { showToast("क्वीज फेला परेन!", "error"); }
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); 
+        let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
+        if(targetQuiz && targetQuiz.quizData) { 
+            currentQuiz = targetQuiz.quizData; 
+            currentMurliDate = targetQuiz.quizDate; 
+            startQuizSession(); 
+        } else { 
+            showToast("क्वीज फेला परेन!", "error"); 
+        }
     }
 
     window.showQuizStatus = function(status, dateStr) {
@@ -898,66 +1303,153 @@
         else if(status === 'past-completed') showToast(`यो दिनको परीक्षा सम्पन्न भइसकेको छ।`, 'success');
     }
 
-    function extractDate(text) { let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); return m ? m[0] : new Date().toLocaleDateString('en-GB'); }
+    function extractDate(text) { 
+        let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); 
+        return m ? m[0] : new Date().toLocaleDateString('en-GB'); 
+    }
 
     async function generateQuizWithAI() {
-        const apiKey = localStorage.getItem('murali_gemini_key'); if(!apiKey) { openSettings(); return showToast("API Key Missing.", "error"); }
-        const text = document.getElementById('murali-text').value.trim(); if(text.length < 50) return showToast("मुरलीको पाठ धेरै छोटो भयो।", "error");
-        currentMurliDate = extractDate(text); let qCount = document.getElementById('q-count').value; if(qCount === "50" || qCount === "100") qCount = "20"; 
-        let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash'; let level = document.getElementById('quiz-level').value;
+        const apiKey = localStorage.getItem('murali_gemini_key'); 
+        if(!apiKey) { 
+            openSettings(); 
+            return showToast("API Key Missing.", "error"); 
+        }
+        const text = document.getElementById('murali-text').value.trim(); 
+        if(text.length < 50) return showToast("मुरलीको पाठ धेरै छोटो भयो।", "error");
+        
+        currentMurliDate = extractDate(text); 
+        let qCount = document.getElementById('q-count').value; 
+        if(qCount === "50" || qCount === "100") qCount = "20"; 
+        
+        let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash'; 
+        let level = document.getElementById('quiz-level').value;
 
-        document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('murali-text').style.display = 'none'; 
+        document.getElementById('generator-actions').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
-        document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "AI is drafting the quiz... (Manager Only)";
+        document.getElementById('loading-box').style.display = 'block'; 
+        document.getElementById('loading-text').innerText = "AI is drafting the quiz... (Manager Only)";
 
         let dynamicInstruction = level === 'expert' ? "Make questions extremely logical and tricky." : "Make standard comprehension questions.";
         const promptText = `You are an expert examiner. Generate a valid JSON array containing exactly ${qCount} objects representing a quiz based ONLY on the following text. Output ONLY the raw JSON array.\nStructure: {"q": "Question", "options": ["A", "B", "C", "D"], "answer": "Exact Match", "explanation": "Why", "tag": "Keyword", "original": "Quote"}\nInstruction: ${dynamicInstruction}\nText: ${text}`;
 
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { response_mime_type: "application/json" } }) });
-            const data = await response.json(); let rText = data.candidates[0].content.parts[0].text;
-            let sIdx = rText.indexOf('['); let eIdx = rText.lastIndexOf(']'); if (sIdx !== -1 && eIdx !== -1) rText = rText.substring(sIdx, eIdx + 1);
-            currentQuiz = JSON.parse(rText); currentQuiz.forEach(q => shuffleArray(q.options));
-            document.getElementById('loading-box').style.display = 'none'; startQuizSession();
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, { 
+                method: "POST", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { response_mime_type: "application/json" } }) 
+            });
+            const data = await response.json(); 
+            let rText = data.candidates[0].content.parts[0].text;
+            
+            let sIdx = rText.indexOf('['); 
+            let eIdx = rText.lastIndexOf(']'); 
+            if (sIdx !== -1 && eIdx !== -1) rText = rText.substring(sIdx, eIdx + 1);
+            
+            currentQuiz = JSON.parse(rText); 
+            currentQuiz.forEach(q => shuffleArray(q.options));
+            
+            document.getElementById('loading-box').style.display = 'none'; 
+            startQuizSession();
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
-            if(safeRole === 'manager' || safeRole === 'admin') { document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; }
-        } catch (error) { document.getElementById('loading-box').style.display = 'none'; document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; showToast("AI Request Failed! Check API Key.", "error"); }
+            if(safeRole === 'manager' || safeRole === 'admin') { 
+                document.getElementById('btn-save-top').style.display = 'inline-block'; 
+                document.getElementById('btn-export-top').style.display = 'inline-block'; 
+            }
+        } catch (error) { 
+            document.getElementById('loading-box').style.display = 'none'; 
+            document.getElementById('murali-text').style.display = 'block'; 
+            document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('export-saved-section').style.display = 'block'; 
+            showToast("AI Request Failed! Check API Key.", "error"); 
+        }
     }
 
     function createMegaQuiz() {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); if(serverQuizzes.length === 0) return showToast("सर्भरमा कुनै पनि पुरानो प्रश्न छैन!", "error");
-        let allQuestions = []; serverQuizzes.forEach(sq => { if(sq.quizData && Array.isArray(sq.quizData)) allQuestions = allQuestions.concat(sq.quizData); });
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); 
+        if(serverQuizzes.length === 0) return showToast("सर्भरमा कुनै पनि पुरानो प्रश्न छैन!", "error");
+        
+        let allQuestions = []; 
+        serverQuizzes.forEach(sq => { 
+            if(sq.quizData && Array.isArray(sq.quizData)) allQuestions = allQuestions.concat(sq.quizData); 
+        });
+        
         if(allQuestions.length < 5) return showToast("क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
-        let uniqueQ = []; let qTextSet = new Set(); allQuestions.forEach(q => { if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); } });
-        shuffleArray(uniqueQ); let qCount = parseInt(document.getElementById('q-count').value); qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
-        currentQuiz = uniqueQ.slice(0, qCount); currentQuiz.forEach(q => shuffleArray(q.options));
+        
+        let uniqueQ = []; 
+        let qTextSet = new Set(); 
+        allQuestions.forEach(q => { 
+            if(!qTextSet.has(q.q)) { 
+                qTextSet.add(q.q); 
+                uniqueQ.push(q); 
+            } 
+        });
+        
+        shuffleArray(uniqueQ); 
+        let qCount = parseInt(document.getElementById('q-count').value); 
+        qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
+        
+        currentQuiz = uniqueQ.slice(0, qCount); 
+        currentQuiz.forEach(q => shuffleArray(q.options));
         
         let todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
         currentMurliDate = qCount >= 50 ? `🏆 Mega Quiz (${qCount} Qs) [${todayDate}]` : `🔄 Review Quiz (${qCount} Qs) [${todayDate}]`;
         
-        document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; 
-        document.getElementById('export-saved-section').style.display = 'none'; startQuizSession(); 
+        document.getElementById('murali-text').style.display = 'none'; 
+        document.getElementById('generator-actions').style.display = 'none'; 
+        document.getElementById('export-saved-section').style.display = 'none'; 
+        startQuizSession(); 
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
-        if(safeRole === 'manager' || safeRole === 'admin') { document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; }
+        if(safeRole === 'manager' || safeRole === 'admin') { 
+            document.getElementById('btn-save-top').style.display = 'inline-block'; 
+            document.getElementById('btn-export-top').style.display = 'inline-block'; 
+        }
         showToast(`क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
     }
 
     function saveQuizToServer() {
         if (!currentQuiz || currentQuiz.length === 0) return showToast("पहिले क्विज तयार गर्नुहोस्!", "error");
-        document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
-        document.getElementById('generator-actions').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
+        
+        document.getElementById('loading-box').style.display = 'block'; 
+        document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
+        document.getElementById('generator-actions').style.display = 'none'; 
+        document.getElementById('export-saved-section').style.display = 'none'; 
+        document.getElementById('quiz-area').style.display = 'none'; 
+        document.getElementById('sticky-scorebar').style.display = 'none';
+        
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega }) 
-        }).then(res => res.json()).then(data => { 
+        
+        fetch(API_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega }) 
+        })
+        .then(res => res.json())
+        .then(data => { 
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-tabs').style.display = 'flex';
             document.getElementById('toolbar-right-actions').style.display = 'flex';
 
-            document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block';
-            if(data.status === "success") { showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success"); document.getElementById('btn-save-top').style.display = 'none'; syncServerQuizzes(false); }
-        }).catch(err => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; showToast("इन्टरनेट समस्या!", "error"); });
+            document.getElementById('loading-box').style.display = 'none'; 
+            document.getElementById('quiz-area').style.display = 'block'; 
+            document.getElementById('sticky-scorebar').style.display = 'flex'; 
+            document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('export-saved-section').style.display = 'block';
+            
+            if(data.status === "success") { 
+                showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success"); 
+                document.getElementById('btn-save-top').style.display = 'none'; 
+                syncServerQuizzes(false); 
+            }
+        })
+        .catch(err => { 
+            document.getElementById('loading-box').style.display = 'none'; 
+            document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('export-saved-section').style.display = 'block'; 
+            showToast("इन्टरनेट समस्या!", "error"); 
+        });
     }
 
     window.exportAllSavedQuizzes = async function() {
@@ -991,7 +1483,8 @@
         document.getElementById('btn-save-top').style.display = 'none';
         document.getElementById('btn-export-top').style.display = 'none';
 
-        let backupQuiz = currentQuiz; let backupDate = currentMurliDate;
+        let backupQuiz = currentQuiz; 
+        let backupDate = currentMurliDate;
 
         for (let i = 0; i < serverQuizzes.length; i++) {
             let sq = serverQuizzes[i];
@@ -999,7 +1492,8 @@
 
             currentQuiz = sq.quizData;
             currentMurliDate = sq.quizDate;
-            answeredCount = 0; currentScore = 0;
+            answeredCount = 0; 
+            currentScore = 0;
             currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
 
             renderQuizArea();
@@ -1008,7 +1502,7 @@
             document.getElementById('timer-text').innerText = "00:00";
 
             let html = document.documentElement.outerHTML
-                        .replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`)
+                        .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
                         .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
 
             let filename = `OfflineQuiz-${currentMurliDate.replace(/[\/\\]/g,'-')}.html`;
@@ -1027,7 +1521,8 @@
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
 
-        currentQuiz = backupQuiz; currentMurliDate = backupDate;
+        currentQuiz = backupQuiz; 
+        currentMurliDate = backupDate;
         if(currentQuiz && currentQuiz.length > 0) renderQuizArea();
 
         zip.generateAsync({type:"blob"}).then(function(content) {
@@ -1045,14 +1540,17 @@
         let select = document.getElementById('saved-quiz-select');
         let idx = select.value;
         if(idx === "") return showToast("कृपया क्वीज छान्नुहोस्।", "error");
+        
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         let sq = serverQuizzes[idx];
         if(!sq || !sq.quizData) return showToast("Quiz data not found!", "error");
         
         document.getElementById('toast-container').innerHTML = ''; 
         
-        let backupQuiz = currentQuiz; let backupDate = currentMurliDate;
-        currentQuiz = sq.quizData; currentMurliDate = sq.quizDate;
+        let backupQuiz = currentQuiz; 
+        let backupDate = currentMurliDate;
+        currentQuiz = sq.quizData; 
+        currentMurliDate = sq.quizDate;
         
         document.getElementById('murali-text').style.display = 'none';
         document.getElementById('generator-actions').style.display = 'none';
@@ -1062,8 +1560,10 @@
         document.getElementById('toolbar-right-actions').style.display = 'none';
         document.getElementById('loading-box').style.display = 'none';
         
-        answeredCount = 0; currentScore = 0;
+        answeredCount = 0; 
+        currentScore = 0;
         currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+        
         renderQuizArea();
         document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('sticky-scorebar').style.display = 'flex';
@@ -1076,7 +1576,7 @@
         document.getElementById('btn-export-top').style.display = 'none'; 
         
         let html = document.documentElement.outerHTML
-                    .replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`)
+                    .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
                     .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
 
         let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
@@ -1095,7 +1595,8 @@
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
         
-        currentQuiz = backupQuiz; currentMurliDate = backupDate;
+        currentQuiz = backupQuiz; 
+        currentMurliDate = backupDate;
     };
 
     function exportStandaloneHTML() {
@@ -1107,109 +1608,236 @@
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
 
-        let saveBtn = document.getElementById('btn-save-top'); let exportBtn = document.getElementById('btn-export-top');
-        if(saveBtn) saveBtn.style.display = 'none'; if(exportBtn) exportBtn.style.display = 'none';
+        let saveBtn = document.getElementById('btn-save-top'); 
+        let exportBtn = document.getElementById('btn-export-top');
+        if(saveBtn) saveBtn.style.display = 'none'; 
+        if(exportBtn) exportBtn.style.display = 'none';
         
         let html = document.documentElement.outerHTML
-                    .replace("let currentQuiz = []", `let currentQuiz = ${JSON.stringify(currentQuiz)}`)
+                    .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
                     .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
                     
         if(exportBtn) exportBtn.style.display = 'inline-block';
         let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
-        let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; let file = new File([b], filename, { type: "text/html" });
+        let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; 
+        let file = new File([b], filename, { type: "text/html" });
         
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
         document.getElementById('toolbar-right-actions').style.display = 'none';
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'BK Murali Quiz Offline', text: 'Offline Quiz HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
-        } else { triggerDownload(b, filename); }
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+            navigator.share({ files: [file], title: 'BK Murali Quiz Offline', text: 'Offline Quiz HTML File' })
+            .then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success"))
+            .catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
+        } else { 
+            triggerDownload(b, filename); 
+        }
     }
 
-    function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("HTML Downloaded", "success"); }
+    function triggerDownload(blob, filename) { 
+        let a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = filename; 
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a); 
+        showToast("HTML Downloaded", "success"); 
+    }
 
-    function startTimer() { clearInterval(timerInterval); timerInterval = setInterval(() => { totalTimeSec++; let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); let s = (totalTimeSec % 60).toString().padStart(2, '0'); document.getElementById('timer-text').innerText = `${m}:${s}`; }, 1000); }
-    function stopTimer() { clearInterval(timerInterval); }
+    function startTimer() { 
+        clearInterval(timerInterval); 
+        timerInterval = setInterval(() => { 
+            totalTimeSec++; 
+            let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); 
+            let s = (totalTimeSec % 60).toString().padStart(2, '0'); 
+            document.getElementById('timer-text').innerText = `${m}:${s}`; 
+        }, 1000); 
+    }
+    
+    function stopTimer() { 
+        clearInterval(timerInterval); 
+    }
 
     function startQuizSession() {
-        stopTimer(); currentScore = 0; answeredCount = 0; totalTimeSec = 0; isTimerStarted = false; document.getElementById('sb-submit-btn').disabled = false;
-        currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
-        document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
-        document.getElementById('sticky-scorebar').style.display = 'flex'; document.getElementById('timer-text').innerText = "00:00";
-        document.getElementById('active-quiz-info').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; document.getElementById('online-quiz-actions').style.display = 'flex'; 
+        stopTimer(); 
+        currentScore = 0; 
+        answeredCount = 0; 
+        totalTimeSec = 0; 
+        isTimerStarted = false; 
+        document.getElementById('sb-submit-btn').disabled = false;
+        
+        currentQuiz.forEach(q => { 
+            delete q.userSelectedIndex; 
+            delete q.userCorrect; 
+        });
+        
+        document.getElementById('result-screen').style.display = 'none'; 
+        document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('sticky-scorebar').style.display = 'flex'; 
+        document.getElementById('timer-text').innerText = "00:00";
+        document.getElementById('active-quiz-info').style.display = 'flex'; 
+        document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; 
+        document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
         document.getElementById('toolbar-right-actions').style.display = 'none';
 
         let safeRole = (userRole||"").toString().trim().toLowerCase(); 
-        if(safeRole === 'manager' || safeRole === 'admin') { document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'inline-block'; } 
-        else { document.getElementById('quiz-config-tools').style.display = 'none'; document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none'; }
+        if(safeRole === 'manager' || safeRole === 'admin') { 
+            document.getElementById('quiz-config-tools').style.display = 'none'; 
+            document.getElementById('btn-export-top').style.display = 'inline-block'; 
+        } else { 
+            document.getElementById('quiz-config-tools').style.display = 'none'; 
+            document.getElementById('btn-save-top').style.display = 'none'; 
+            document.getElementById('btn-export-top').style.display = 'none'; 
+        }
         
         if(isOfflineExport) {
             let cancelBtn = document.getElementById('btn-cancel-top');
             if(cancelBtn) cancelBtn.style.display = 'none';
         }
         
-        updateStickyBar(); renderQuizArea();
+        updateStickyBar(); 
+        renderQuizArea();
     }
 
-    function cancelQuiz() { if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) resetToGenerator(); }
+    function cancelQuiz() { 
+        if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) resetToGenerator(); 
+    }
 
     function resetToGenerator() {
-        document.getElementById('quiz-area').style.display = 'none'; document.getElementById('result-screen').style.display = 'none';
-        document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none';
-        document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'none'; 
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('sticky-scorebar').style.display = 'none'; 
+        document.getElementById('active-quiz-info').style.display = 'none'; 
+        document.getElementById('online-quiz-actions').style.display = 'none';
+        document.getElementById('btn-save-top').style.display = 'none'; 
+        document.getElementById('btn-export-top').style.display = 'none';
         
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
 
         let safeRole = (userRole||"").toString().trim().toLowerCase();
-        if (safeRole === 'manager' || safeRole === 'admin') { document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block';
-        } else { loadStudentDashboard(); } window.scrollTo(0, 0); stopTimer(); isTimerStarted = false;
+        if (safeRole === 'manager' || safeRole === 'admin') { 
+            document.getElementById('murali-text').style.display = 'block'; 
+            document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('quiz-config-tools').style.display = 'flex'; 
+            document.getElementById('export-saved-section').style.display = 'block';
+        } else { 
+            loadStudentDashboard(); 
+        } 
+        window.scrollTo(0, 0); 
+        stopTimer(); 
+        isTimerStarted = false;
     }
 
-    function updateStickyBar() { document.getElementById('sb-answered').innerText = `${answeredCount}/${currentQuiz.length}`; }
+    function updateStickyBar() { 
+        document.getElementById('sb-answered').innerText = `${answeredCount}/${currentQuiz.length}`; 
+    }
 
     function renderQuizArea() {
-        const area = document.getElementById('quiz-area'); let htmlString = ''; const letters = ['A', 'B', 'C', 'D'];
+        const area = document.getElementById('quiz-area'); 
+        let htmlString = ''; 
+        const letters = ['A', 'B', 'C', 'D'];
+        
         currentQuiz.forEach((item, qIndex) => {
-            let optsHTML = item.options.map((opt, oIndex) => `<button type="button" class="option-container" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex})" style="text-align: left; width: 100%; display: block; font-family: inherit; margin: 0; appearance: none;"><div class="option-text"><span class="option-letter">${letters[oIndex]}</span> <span>${opt}</span></div><div class="feedback-box"><div class="feedback-title" id="fb-title-${qIndex}-${oIndex}"></div><div class="feedback-desc" id="fb-desc-${qIndex}-${oIndex}"></div></div></button>`).join('');
-            let displayStyle = qIndex === answeredCount ? 'block' : 'none'; let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
-            htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};"><div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div><p class="question-text">${item.q}</p><div class="options-group">${optsHTML}</div></div>`;
+            let optsHTML = item.options.map((opt, oIndex) => 
+                `<button type="button" class="option-container" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex})" style="text-align: left; width: 100%; display: block; font-family: inherit; margin: 0; appearance: none;">
+                    <div class="option-text"><span class="option-letter">${letters[oIndex]}</span> <span>${opt}</span></div>
+                    <div class="feedback-box">
+                        <div class="feedback-title" id="fb-title-${qIndex}-${oIndex}"></div>
+                        <div class="feedback-desc" id="fb-desc-${qIndex}-${oIndex}"></div>
+                    </div>
+                </button>`
+            ).join('');
+            
+            let displayStyle = qIndex === answeredCount ? 'block' : 'none'; 
+            let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
+            
+            htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
+                <div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div>
+                <p class="question-text">${item.q}</p>
+                <div class="options-group">${optsHTML}</div>
+            </div>`;
         });
         area.innerHTML = htmlString;
     }
 
     function selectOption(qIndex, oIndex) {
-        if (!isTimerStarted) { startTimer(); isTimerStarted = true; } let block = document.getElementById(`qb-${qIndex}`); if(block.classList.contains('answered')) return; block.classList.add('answered'); 
-        for(let i=0; i<4; i++) { let opt = document.getElementById(`opt-${qIndex}-${i}`); opt.classList.add('disabled'); if(i === oIndex) opt.classList.add('selected-temp'); }
-        let q = currentQuiz[qIndex]; answeredCount++; q.userSelectedIndex = oIndex;
-        if (q.options[oIndex] === q.answer) { currentScore++; q.userCorrect = true; playSound('correct'); } else { q.userCorrect = false; playSound('wrong'); }
+        if (!isTimerStarted) { 
+            startTimer(); 
+            isTimerStarted = true; 
+        } 
+        let block = document.getElementById(`qb-${qIndex}`); 
+        if(block.classList.contains('answered')) return; 
+        block.classList.add('answered'); 
+        
+        for(let i=0; i<4; i++) { 
+            let opt = document.getElementById(`opt-${qIndex}-${i}`); 
+            opt.classList.add('disabled'); 
+            if(i === oIndex) opt.classList.add('selected-temp'); 
+        }
+        
+        let q = currentQuiz[qIndex]; 
+        answeredCount++; 
+        q.userSelectedIndex = oIndex;
+        
+        if (q.options[oIndex] === q.answer) { 
+            currentScore++; 
+            q.userCorrect = true; 
+            playSound('correct'); 
+        } else { 
+            q.userCorrect = false; 
+            playSound('wrong'); 
+        }
+        
         updateStickyBar(); 
+        
         setTimeout(() => {
-            if (qIndex < currentQuiz.length - 1) { document.getElementById(`qb-${qIndex}`).style.display = 'none'; document.getElementById(`qb-${qIndex+1}`).style.display = 'block'; window.scrollTo(0, 0); } 
-            else { showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); submitQuiz(); }
+            if (qIndex < currentQuiz.length - 1) { 
+                document.getElementById(`qb-${qIndex}`).style.display = 'none'; 
+                document.getElementById(`qb-${qIndex+1}`).style.display = 'block'; 
+                window.scrollTo(0, 0); 
+            } else { 
+                showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); 
+                submitQuiz(); 
+            }
         }, 600); 
     }
 
     function submitQuiz() {
-        if (document.getElementById('sb-submit-btn').disabled) return; let untouched = currentQuiz.length - answeredCount;
+        if (document.getElementById('sb-submit-btn').disabled) return; 
+        let untouched = currentQuiz.length - answeredCount;
+        
         if (currentQuiz.length > 0 && answeredCount === 0) return showToast("कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
         if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) return;
-        document.getElementById('sb-submit-btn').disabled = true; stopTimer(); 
         
-        if(!isOfflineExport) { saveOrReplaceProgress(); }
+        document.getElementById('sb-submit-btn').disabled = true; 
+        stopTimer(); 
+        
+        if(!isOfflineExport) { 
+            saveOrReplaceProgress(); 
+        }
         
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
         document.getElementById('toolbar-right-actions').style.display = 'flex';
 
-        document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('result-screen').style.display = 'block'; 
-        let percent = Math.round((currentScore / currentQuiz.length) * 100); document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
+        document.getElementById('quiz-area').style.display = 'none'; 
+        document.getElementById('sticky-scorebar').style.display = 'none'; 
+        document.getElementById('result-screen').style.display = 'block'; 
+        
+        let percent = Math.round((currentScore / currentQuiz.length) * 100); 
+        document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
+        
         let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 50 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!"));
-        if(percent === 100) fireConfetti(); document.getElementById('rs-msg').innerText = msg; window.scrollTo(0, 0); 
+        if(percent === 100) fireConfetti(); 
+        
+        document.getElementById('rs-msg').innerText = msg; 
+        window.scrollTo(0, 0); 
         
         if (isOfflineExport) {
             let exitBtn = document.getElementById('btn-new-quiz');
@@ -1220,146 +1848,379 @@
     }
 
     function saveOrReplaceProgress() {
-        let history = safeJSON('murali_progress', []); let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
-        history.unshift({ id: Date.now(), name: userName, address: userAddress, country: userCountry, phone: userPhone, date: currentMurliDate, score: currentScore, total: currentQuiz.length, percent: Math.round((currentScore / currentQuiz.length) * 100), timeTaken: document.getElementById('timer-text').innerText, time: new Date().toLocaleString('en-GB'), timestamp: Date.now(), weakTags: incorrectTags, quizData: currentQuiz, synced: false });
+        let history = safeJSON('murali_progress', []); 
+        let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
+        
+        history.unshift({ 
+            id: Date.now(), 
+            name: userName, 
+            address: userAddress, 
+            country: userCountry, 
+            phone: userPhone, 
+            date: currentMurliDate, 
+            score: currentScore, 
+            total: currentQuiz.length, 
+            percent: Math.round((currentScore / currentQuiz.length) * 100), 
+            timeTaken: document.getElementById('timer-text').innerText, 
+            time: new Date().toLocaleString('en-GB'), 
+            timestamp: Date.now(), 
+            weakTags: incorrectTags, 
+            quizData: currentQuiz, 
+            synced: false 
+        });
+        
         localStorage.setItem('murali_progress', JSON.stringify(history));
     }
 
     function syncPendingResults() {
         if (!navigator.onLine) return;
-        let history = safeJSON('murali_progress', []); let pendingData = history.filter(item => item.synced !== true); if (pendingData.length === 0) return;
+        let history = safeJSON('murali_progress', []); 
+        let pendingData = history.filter(item => item.synced !== true); 
+        if (pendingData.length === 0) return;
+        
         pendingData.forEach(data => {
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "saveResult", name: data.name, address: data.address, country: data.country, phone: data.phone, date: data.date, score: data.score, total: data.total, percent: data.percent, timeTaken: data.timeTaken, time: data.time, weakTags: data.weakTags }) 
-            }).then(res => res.json()).then(result => { if(result.status === "success") { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); console.log("Result synced!"); } });
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: "saveResult", 
+                    name: data.name, 
+                    address: data.address, 
+                    country: data.country, 
+                    phone: data.phone, 
+                    date: data.date, 
+                    score: data.score, 
+                    total: data.total, 
+                    percent: data.percent, 
+                    timeTaken: data.timeTaken, 
+                    time: data.time, 
+                    weakTags: data.weakTags 
+                }) 
+            })
+            .then(res => res.json())
+            .then(result => { 
+                if(result.status === "success") { 
+                    data.synced = true; 
+                    localStorage.setItem('murali_progress', JSON.stringify(history)); 
+                    console.log("Result synced!"); 
+                } 
+            });
         });
     }
 
     function reviewQuiz() {
-        document.getElementById('result-screen').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block';
+        document.getElementById('result-screen').style.display = 'none'; 
+        document.getElementById('quiz-area').style.display = 'block';
         
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
         document.getElementById('toolbar-right-actions').style.display = 'none';
 
-        let backBtn = document.getElementById('back-to-res'); if (backBtn) backBtn.remove(); backBtn = document.createElement('button'); backBtn.id = 'back-to-res'; 
+        let backBtn = document.getElementById('back-to-res'); 
+        if (backBtn) backBtn.remove(); 
+        
+        backBtn = document.createElement('button'); 
+        backBtn.id = 'back-to-res'; 
         backBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Go Back`;
         backBtn.style.cssText = "margin:0 0 15px 0; background:var(--primary-color); color:white; border-radius:50px; padding:0.6rem 1.4rem; width:auto; font-weight:800; border:none; cursor:pointer;";
+        
         backBtn.onclick = () => { 
             document.getElementById('quiz-area').style.display = 'none'; 
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-tabs').style.display = 'flex';
             document.getElementById('toolbar-right-actions').style.display = 'flex';
-            if (reviewSource === 'past') { reviewSource = 'current'; resetToGenerator(); switchTab('prog'); } 
-            else { document.getElementById('result-screen').style.display = 'block'; } 
-        }; document.getElementById('quiz-area').prepend(backBtn);
+            
+            if (reviewSource === 'past') { 
+                reviewSource = 'current'; 
+                resetToGenerator(); 
+                switchTab('prog'); 
+            } else { 
+                document.getElementById('result-screen').style.display = 'block'; 
+            } 
+        }; 
+        document.getElementById('quiz-area').prepend(backBtn);
         
         currentQuiz.forEach((q, qIndex) => {
-            let qb = document.getElementById(`qb-${qIndex}`); if (qb) qb.style.display = 'block';
+            let qb = document.getElementById(`qb-${qIndex}`); 
+            if (qb) qb.style.display = 'block';
+            
             if (q.userSelectedIndex !== undefined) {
-                let d = dict[lang]; let oIndex = q.userSelectedIndex; let rightIndex = q.options.indexOf(q.answer);
-                let selectedContainer = document.getElementById(`opt-${qIndex}-${oIndex}`); selectedContainer.classList.remove('selected-temp');
-                const sIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`; const eIcon = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
+                let d = dict[lang]; 
+                let oIndex = q.userSelectedIndex; 
+                let rightIndex = q.options.indexOf(q.answer);
+                let selectedContainer = document.getElementById(`opt-${qIndex}-${oIndex}`); 
+                selectedContainer.classList.remove('selected-temp');
+                
+                const sIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`; 
+                const eIcon = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
                 let expHtml = q.explanation ? `<div class="explanation-box">💡 <strong>Reason:</strong> ${q.explanation}</div>` : '';
 
                 if (q.userCorrect) {
-                    selectedContainer.classList.add('selected-right'); document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${sIcon} ${d.feedbackRightTitle}`; document.getElementById(`fb-desc-${qIndex}-${oIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}" ${expHtml}`;
+                    selectedContainer.classList.add('selected-right'); 
+                    document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${sIcon} ${d.feedbackRightTitle}`; 
+                    document.getElementById(`fb-desc-${qIndex}-${oIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}" ${expHtml}`;
                 } else {
-                    selectedContainer.classList.add('selected-wrong'); document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${eIcon} ${d.feedbackWrongTitle}`;
+                    selectedContainer.classList.add('selected-wrong'); 
+                    document.getElementById(`fb-title-${qIndex}-${oIndex}`).innerHTML = `${eIcon} ${d.feedbackWrongTitle}`;
                     let correctLetter = rightIndex !== -1 ? ['A','B','C','D'][rightIndex] : '';
                     document.getElementById(`fb-desc-${qIndex}-${oIndex}`).innerHTML = `<div style="margin-top:4px; padding:8px; background:rgba(22,163,74,0.15); border-left:4px solid var(--success-color); border-radius:6px; color:var(--text-color); font-weight:700;"><strong>${d.feedbackRightTitle}:</strong> (${correctLetter}) ${q.answer}</div><div style="margin-top: 8px;"><strong>Context:</strong> "${q.original}"</div>${expHtml}`;
-                    if (rightIndex !== -1) { let rightContainer = document.getElementById(`opt-${qIndex}-${rightIndex}`); if(rightContainer) rightContainer.classList.add('selected-right'); document.getElementById(`fb-title-${qIndex}-${rightIndex}`).innerHTML = `${sIcon} ${d.feedbackRightTitle}`; document.getElementById(`fb-desc-${qIndex}-${rightIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}"`; }
+                    
+                    if (rightIndex !== -1) { 
+                        let rightContainer = document.getElementById(`opt-${qIndex}-${rightIndex}`); 
+                        if(rightContainer) rightContainer.classList.add('selected-right'); 
+                        document.getElementById(`fb-title-${qIndex}-${rightIndex}`).innerHTML = `${sIcon} ${d.feedbackRightTitle}`; 
+                        document.getElementById(`fb-desc-${qIndex}-${rightIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}"`; 
+                    }
                 }
             }
-        }); window.scrollTo(0, 0);
+        }); 
+        window.scrollTo(0, 0);
     }
 
     window.reviewPastQuiz = function(id) {
-        let history = safeJSON('murali_progress', []); let record = history.find(item => item.id === id);
+        let history = safeJSON('murali_progress', []); 
+        let record = history.find(item => item.id === id);
+        
         if(record && record.quizData) {
-            currentQuiz = record.quizData; currentScore = record.score; currentMurliDate = record.date;
-            document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none';
-            reviewSource = 'past'; document.getElementById('tab-gen').classList.add('active'); document.getElementById('tab-prog').classList.remove('active');
-            document.getElementById('view-generator').style.display = 'block'; document.getElementById('view-progress').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
-            renderQuizArea(); reviewQuiz();
-        } else { showToast("यसको प्रश्नपत्र उपलब्ध छैन। (Synced from another device)", "info"); }
+            currentQuiz = record.quizData; 
+            currentScore = record.score; 
+            currentMurliDate = record.date;
+            
+            document.getElementById('murali-text').style.display = 'none'; 
+            document.getElementById('generator-actions').style.display = 'none';
+            reviewSource = 'past'; 
+            document.getElementById('tab-gen').classList.add('active'); 
+            document.getElementById('tab-prog').classList.remove('active');
+            document.getElementById('view-generator').style.display = 'block'; 
+            document.getElementById('view-progress').style.display = 'none'; 
+            document.getElementById('sticky-scorebar').style.display = 'none';
+            
+            renderQuizArea(); 
+            reviewQuiz();
+        } else { 
+            showToast("यसको प्रश्नपत्र उपलब्ध छैन। (Synced from another device)", "info"); 
+        }
     };
 
     function switchTab(tab) {
-        document.getElementById('tab-gen').classList.toggle('active', tab === 'gen'); document.getElementById('tab-prog').classList.toggle('active', tab === 'prog');
-        document.getElementById('view-generator').style.display = tab === 'gen' ? 'block' : 'none'; document.getElementById('view-progress').style.display = tab === 'prog' ? 'block' : 'none';
-        if (tab === 'prog') { document.getElementById('sticky-scorebar').style.display = 'none'; renderDashboard(); } else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block') document.getElementById('sticky-scorebar').style.display = 'flex'; 
+        document.getElementById('tab-gen').classList.toggle('active', tab === 'gen'); 
+        document.getElementById('tab-prog').classList.toggle('active', tab === 'prog');
+        document.getElementById('view-generator').style.display = tab === 'gen' ? 'block' : 'none'; 
+        document.getElementById('view-progress').style.display = tab === 'prog' ? 'block' : 'none';
+        
+        if (tab === 'prog') { 
+            document.getElementById('sticky-scorebar').style.display = 'none'; 
+            renderDashboard(); 
+        } else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block') {
+            document.getElementById('sticky-scorebar').style.display = 'flex'; 
+        }
     }
     
     function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
     function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
     function closeSettingsOnOverlay(e) { if(e.target.id === 'settings-modal') closeSettings(); }
-    function saveAPIKey() { const key = document.getElementById('api-key-input').value.trim(); if(key) { localStorage.setItem('murali_gemini_key', key); showToast("Key stored!", "success"); closeSettings(); } }
+    
+    function saveAPIKey() { 
+        const key = document.getElementById('api-key-input').value.trim(); 
+        if(key) { 
+            localStorage.setItem('murali_gemini_key', key); 
+            showToast("Key stored!", "success"); 
+            closeSettings(); 
+        } 
+    }
+    
+    function deleteAPIKey() {
+        localStorage.removeItem('murali_gemini_key');
+        document.getElementById('api-key-input').value = '';
+        showToast("Key cleared!", "success");
+    }
 
     function calculateStreak(history) {
         if (!history.length) return 0;
-        let uniqueDays = new Set(); history.forEach(h => { let d = getValidDate(h); if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()); });
-        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); if (sortedDays.length === 0) return 0;
-        let streak = 0; let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); let expectedTime = todayTime;
-        if (sortedDays[0] === todayTime) {} else if (sortedDays[0] === todayTime - 86400000) { expectedTime = todayTime - 86400000; } else { return 0; }
-        for (let time of sortedDays) { if (time === expectedTime) { streak++; expectedTime -= 86400000; } else if (time > expectedTime) { continue; } else { break; } } return streak;
+        let uniqueDays = new Set(); 
+        history.forEach(h => { 
+            let d = getValidDate(h); 
+            if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()); 
+        });
+        
+        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); 
+        if (sortedDays.length === 0) return 0;
+        
+        let streak = 0; 
+        let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); 
+        let expectedTime = todayTime;
+        
+        if (sortedDays[0] === todayTime) {
+        } else if (sortedDays[0] === todayTime - 86400000) { 
+            expectedTime = todayTime - 86400000; 
+        } else { 
+            return 0; 
+        }
+        
+        for (let time of sortedDays) { 
+            if (time === expectedTime) { 
+                streak++; 
+                expectedTime -= 86400000; 
+            } else if (time > expectedTime) { 
+                continue; 
+            } else { 
+                break; 
+            } 
+        } 
+        return streak;
     }
 
-    window.changeCalMonth = function(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderDashboard(); };
-    window.toggleCalendar = function() { let cal = document.getElementById('calendar-wrapper'); let txt = document.getElementById('cal-toggle-text'); if (cal.style.display === 'none') { cal.style.display = 'block'; txt.innerText = 'Hide Calendar'; } else { cal.style.display = 'none'; txt.innerText = 'View Monthly Calendar'; } };
+    window.changeCalMonth = function(dir) { 
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
+        renderDashboard(); 
+    };
+    
+    window.toggleCalendar = function() { 
+        let cal = document.getElementById('calendar-wrapper'); 
+        let txt = document.getElementById('cal-toggle-text'); 
+        if (cal.style.display === 'none') { 
+            cal.style.display = 'block'; 
+            txt.innerText = 'Hide Calendar'; 
+        } else { 
+            cal.style.display = 'none'; 
+            txt.innerText = 'View Monthly Calendar'; 
+        } 
+    };
 
     function renderDashboard() {
-        const d = dict[lang]; let history = safeJSON('murali_progress', []); let streak = calculateStreak(history);
-        let cy = currentCalDate.getFullYear(); let cm = currentCalDate.getMonth();
-        let filteredHistory = history.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; });
-
-        let totalTaken = filteredHistory.length; let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
-        document.getElementById('dash-stats').innerHTML = `<div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div><div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div><div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div><div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>`;
-        document.getElementById('cal-month-year').innerText = `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}`;
-        let firstDay = new Date(cy, cm, 1).getDay(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let today = new Date(); let monthMap = {}; filteredHistory.forEach(h => { let dObj = getValidDate(h); if (dObj) { let day = dObj.getDate(); if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; } });
+        const d = dict[lang]; 
+        let history = safeJSON('murali_progress', []); 
+        let streak = calculateStreak(history);
+        let cy = currentCalDate.getFullYear(); 
+        let cm = currentCalDate.getMonth();
         
-        let calHtml = ''; for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
+        let filteredHistory = history.filter(h => { 
+            let dObj = getValidDate(h); 
+            return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
+        });
+
+        let totalTaken = filteredHistory.length; 
+        let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
+        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
+        
+        document.getElementById('dash-stats').innerHTML = `<div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div><div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div><div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div><div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>`;
+        
+        document.getElementById('cal-month-year').innerText = `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}`;
+        
+        let firstDay = new Date(cy, cm, 1).getDay(); 
+        let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
+        let today = new Date(); 
+        let monthMap = {}; 
+        
+        filteredHistory.forEach(h => { 
+            let dObj = getValidDate(h); 
+            if (dObj) { 
+                let day = dObj.getDate(); 
+                if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
+            } 
+        });
+        
+        let calHtml = ''; 
+        for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
+        
         for (let i = 1; i <= daysInMonth; i++) {
-            let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
-            if (monthMap[i]) { let h = monthMap[i]; let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
-            } else { calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; }
+            let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
+            let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
+            if (monthMap[i]) { 
+                let h = monthMap[i]; 
+                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
+            } else { 
+                calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
+            }
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        let allWeakTags = []; filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
-        if (allWeakTags.length > 0) { let tagCounts = {}; allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]); document.getElementById('weakness-alert').innerHTML = `<div style="margin-top: 15px; padding: 10px; background: rgba(217,119,6,0.1); border-left: 4px solid var(--warning-color); border-radius: 8px; font-size: 0.9rem;">यस महिनाको गल्तीहरूको आधारमा <b>'${sortedTags[0]}'</b> ${sortedTags[1] ? `र <b>'${sortedTags[1]}'</b>` : ''} विषयमा अलि बढी ध्यान दिनुहोला।</div>`;
-        } else { document.getElementById('weakness-alert').innerHTML = ''; }
+        let allWeakTags = []; 
+        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
+        
+        if (allWeakTags.length > 0) { 
+            let tagCounts = {}; 
+            allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
+            let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]); 
+            document.getElementById('weakness-alert').innerHTML = `<div style="margin-top: 15px; padding: 10px; background: rgba(217,119,6,0.1); border-left: 4px solid var(--warning-color); border-radius: 8px; font-size: 0.9rem;">यस महिनाको गल्तीहरूको आधारमा <b>'${sortedTags[0]}'</b> ${sortedTags[1] ? `र <b>'${sortedTags[1]}'</b>` : ''} विषयमा अलि बढी ध्यान दिनुहोला।</div>`;
+        } else { 
+            document.getElementById('weakness-alert').innerHTML = ''; 
+        }
 
         const list = document.getElementById('progress-list'); 
-        if (totalTaken === 0) { list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; return; }
+        if (totalTaken === 0) { 
+            list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; 
+            return; 
+        }
         
         list.innerHTML = filteredHistory.map(h => {
-            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
+            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
             let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
             return `<div class="progress-item"><div style="flex-grow: 1;"><div style="font-weight:800; font-size:1.15rem; color:var(--primary-color);">📅 ${h.date}</div><div class="prog-remark ${rClass}">${rText}</div><div>${reviewBtn}</div></div><div style="text-align: right;"><div class="prog-percent">${h.percent}%</div><div style="font-size:0.95rem; color:var(--text-color); font-weight:800;">${h.score} / ${h.total}</div></div></div>`;
         }).join('');
     }
 
     async function exportBackupData() {
-        let history = safeJSON('murali_progress', []); if (history.length === 0) return showToast("कुनै पनि पुरानो नतिजा छैन।", "error");
-        let jsonString = JSON.stringify({ app_version: APP_VERSION, data: history }, null, 2); let blob = new Blob([jsonString], { type: 'text/plain' }); let filename = `Murali_Quiz_Backup_${userName.replace(/ /g, '_')}.txt`; let file = new File([blob], filename, { type: "text/plain" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], title: 'Quiz Backup' }); showToast("फाइल सेयर मेनुमा पठाइयो!", "success"); return; } catch(e) {} }
-        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Backup exported.", "success");
+        let history = safeJSON('murali_progress', []); 
+        if (history.length === 0) return showToast("कुनै पनि पुरानो नतिजा छैन।", "error");
+        
+        let jsonString = JSON.stringify({ app_version: APP_VERSION, data: history }, null, 2); 
+        let blob = new Blob([jsonString], { type: 'text/plain' }); 
+        let filename = `Murali_Quiz_Backup_${userName.replace(/ /g, '_')}.txt`; 
+        let file = new File([blob], filename, { type: "text/plain" });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+            try { 
+                await navigator.share({ files: [file], title: 'Quiz Backup' }); 
+                showToast("फाइल सेयर मेनुमा पठाइयो!", "success"); 
+                return; 
+            } catch(e) {} 
+        }
+        
+        let a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = filename; 
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a); 
+        showToast("Backup exported.", "success");
     }
 
     function importBackupData(event) {
-        let file = event.target.files[0]; if (!file) return;
-        let reader = new FileReader(); reader.onload = function(e) {
-            try { let importedFile = JSON.parse(e.target.result); let importedData = Array.isArray(importedFile) ? importedFile : (importedFile.data || []); 
-                if (Array.isArray(importedData)) { let localData = safeJSON('murali_progress', []); let merged = [...importedData, ...localData];
-                    let uniqueMap = new Map(); merged.forEach(item => { let uniqueKey = item.id || (item.date + "_" + item.name); if(!uniqueMap.has(uniqueKey)) uniqueMap.set(uniqueKey, item); });
-                    let finalArray = Array.from(uniqueMap.values()); finalArray.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    localStorage.setItem('murali_progress', JSON.stringify(finalArray)); showToast("Backup Restored!", "success"); renderDashboard();
-                } } catch(err) { showToast("Invalid backup file.", "error"); }
-        }; reader.readAsText(file);
+        let file = event.target.files[0]; 
+        if (!file) return;
+        
+        let reader = new FileReader(); 
+        reader.onload = function(e) {
+            try { 
+                let importedFile = JSON.parse(e.target.result); 
+                let importedData = Array.isArray(importedFile) ? importedFile : (importedFile.data || []); 
+                if (Array.isArray(importedData)) { 
+                    let localData = safeJSON('murali_progress', []); 
+                    let merged = [...importedData, ...localData];
+                    let uniqueMap = new Map(); 
+                    merged.forEach(item => { 
+                        let uniqueKey = item.id || (item.date + "_" + item.name); 
+                        if(!uniqueMap.has(uniqueKey)) uniqueMap.set(uniqueKey, item); 
+                    });
+                    let finalArray = Array.from(uniqueMap.values()); 
+                    finalArray.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    localStorage.setItem('murali_progress', JSON.stringify(finalArray)); 
+                    showToast("Backup Restored!", "success"); 
+                    renderDashboard();
+                } 
+            } catch(err) { 
+                showToast("Invalid backup file.", "error"); 
+            }
+        }; 
+        reader.readAsText(file);
     }
 
-    function updateLanguageUI() { lang = document.getElementById('lang-select').value; }
+    function updateLanguageUI() { 
+        lang = document.getElementById('lang-select').value; 
+    }
     
     window.onload = function() {
         if (isOfflineExport) {
