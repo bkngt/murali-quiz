@@ -377,6 +377,21 @@
         </div>
     </div>
 
+    <!-- 🔴 NEW: Honesty Pledge Modal -->
+    <div id="pledge-modal" class="modal-overlay" style="z-index: 2500;">
+        <div class="modal-content" style="text-align: center; max-width: 400px; padding: 2rem 1.5rem;">
+            <div style="font-size: 3.5rem; margin-bottom: 10px; animation: divineSpin 10s linear infinite;">✨</div>
+            <h3 style="color: var(--primary-color); margin-top: 0; font-weight: 800; font-size: 1.5rem;">ईश्वरीय प्रतिज्ञा</h3>
+            <p style="font-size: 1.05rem; font-weight: 700; color: var(--text-color); line-height: 1.6; padding: 15px; background: rgba(167, 139, 250, 0.1); border-radius: 16px; border: 2px dashed #a78bfa; margin-bottom: 20px;">
+                "म शिव बाबाको सच्चा बच्चा हुँ। म यो परीक्षा पूर्ण इमान्दारीका साथ, कसैको सहयोग नलिई र चिटिङ नगरी दिनेछु। बाबाले मलाई हेरिरहनुभएको छ।"
+            </p>
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+                <button onclick="closePledgeModal()" style="background: var(--danger-bg); color: var(--danger-color); border: 1px solid var(--danger-border); flex: 1; box-shadow: none;">रद्द गर्नुहोस्</button>
+                <button onclick="acceptPledgeAndStart()" style="background: var(--success-color); flex: 1; font-size: 1.1rem;">मञ्जुर छ (Start)</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Generator View (Admin) -->
     <div id="view-generator">
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
@@ -487,7 +502,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 60.0 (Dynamic Swaman & Mobile Leaderboard)</div>
+        <div>Version: 62.0 (AI Generated Swaman & Double Shuffle)</div>
     </div>
 </div>
 
@@ -496,9 +511,10 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "60.0"; 
+    const APP_VERSION = "62.0"; 
 
     let currentQuiz = []; 
+    let currentSwaman = ""; // 🔴 NEW: Global variable for AI Swaman
     let currentScore = 0; 
     let answeredCount = 0; 
     let currentMurliDate = "";
@@ -534,29 +550,14 @@
         en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
     };
 
-    // 🔴 NEW: Dynamic Swaman Arrays
-    const swamanList = {
-        excellent: [
-            "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ। तिमी नै साँचो ईश्वरीय विद्यार्थी हौ।",
-            "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीखो छ। यसरी नै मुरलीको मनन-चिन्तन गर्दै अगाडि बढ।",
-            "👑 स्वराज्य अधिकारी भव:! मीठे बच्चे, तिमीले आफ्ना कर्मेन्द्रियहरूलाई जितेका छौ। तिम्रो यो ईश्वरीय नशा सधैं कायम रहोस्।",
-            "💎 अमूल्य रत्न भव:! मीठे बच्चे, तिमी बाबाको घाँटीको हार हौ। तिम्रो यो लगनले अनेकौं आत्माहरूलाई प्रेरणा दिनेछ।"
-        ],
-        good: [
-            "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ, सफलता तिम्रो जन्मसिद्ध अधिकार हो।",
-            "🌸 हर्षितमुख भव:! मीठे बच्चे, तिम्रो प्रयास धेरै राम्रो छ। अझै अलिकति अटेन्सन दियौ भने तिमी नम्बर वान बन्न सक्छौ।",
-            "🛡️ मायाजित भव:! मीठे बच्चे, तिमीले राम्रो पुरुषार्थ गरिरहेका छौ। बाबाको यादलाई अझै निरन्तर बनाऊ।"
-        ],
-        struggling: [
-            "🌱 विघ्न-विनाशक भव:! मीठे बच्चे, मायाको विघ्नले कहिलेकाहीँ रोक्न खोज्छ, तर तिमी महावीर हौ। भोलिदेखि फेरि नयाँ उमंगका साथ मुरलीको अभ्यास सुरु गर।",
-            "🔥 योगयुक्त भव:! मीठे बच्चे, अलिकति अभ्यास कम भएको छ। बिहानको अमृतवेला र मुरलीमा विशेष ध्यान देऊ, सबै ठीक हुनेछ।",
-            "💪 महावीर भव:! मीठे बच्चे, कहिल्यै निराश नहुनु। बाबा सधैं तिम्रो साथमा हुनुहुन्छ। फेरि उठ र पुरुषार्थ गर।"
-        ],
-        newbie: [
-            "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।",
-            "🌺 ईश्वरीय सन्तान भव:! मीठे बच्चे, ज्ञान मार्गमा तिम्रो स्वागत छ। हरेक दिन मुरली पढ्ने र क्वीज खेल्ने नियम बनाऊ।"
-        ]
-    };
+    // 🔴 Fallback Swaman (In case old quizzes don't have AI Swaman)
+    const fallbackSwaman = [
+        "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ।",
+        "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीखो छ। यसरी नै अगाडि बढ।",
+        "👑 स्वराज्य अधिकारी भव:! मीठे बच्चे, तिमीले आफ्ना कर्मेन्द्रियहरूलाई जितेका छौ।",
+        "💎 अमूल्य रत्न भव:! मीठे बच्चे, तिमी बाबाको घाँटीको हार हौ।",
+        "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ।"
+    ];
 
     // ==========================================
     // 2. UTILITY FUNCTIONS
@@ -1520,7 +1521,7 @@
         document.getElementById('generator-actions').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
         document.getElementById('loading-box').style.display = 'block'; 
-        document.getElementById('loading-text').innerText = "AI is drafting the quiz... (कृपया पर्खनुहोस्)";
+        document.getElementById('loading-text').innerText = "AI is drafting the quiz and Swaman... (कृपया पर्खनुहोस्)";
 
         let difficultyInstruction = "";
         if (level === 'expert') {
@@ -1531,24 +1532,37 @@
             difficultyInstruction = "STANDARD LEVEL: Test basic factual recall. Distractors should be easily identifiable as incorrect.";
         }
 
-        const promptText = `You are an expert examiner. Generate a valid JSON array containing exactly ${qCount} objects representing a quiz based ONLY on the provided text. 
+        // 🔴 NEW: Prompt updated to return a JSON Object with "quiz" and "swaman"
+        const promptText = `You are an expert examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text. 
 
-CRITICAL RULES:
-1. Output ONLY a raw JSON array. Do NOT wrap it in markdown blocks.
+CRITICAL RULES FOR JSON:
+1. Output ONLY a raw JSON object. Do NOT wrap it in markdown blocks.
+2. The language must strictly match the input text language.
+
+SWAMAN RULES:
+1. Read the "वरदान" (Blessing) section of the provided Murli.
+2. Create a beautiful, spiritually accurate title ending with "भव:!".
+3. Start with a unique, relevant emoji.
+4. Write 2-3 sentences explaining it based on the Murli.
+5. NEVER use the word "साँचो" (use "सच्चा" instead).
+6. Use standard BK titles (e.g., मास्टर सर्वशक्तिवान्, सच्चा सेवाधारी, कमल पुष्प समान, विघ्न विनाशक). Do not invent awkward titles.
+7. Example format: "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे..."
+
+QUIZ RULES:
+1. "quiz" must be an array of exactly ${qCount} objects.
 2. Keep questions SHORT and mobile-friendly.
-3. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार", "आजको मुरलीमा", or "बाबाले भन्नुभएको छ". Ask directly.
-4. The language of the Q&A must strictly match the input text language.
-5. Ensure exactly 4 options per question.
-6. Difficulty: ${difficultyInstruction}
+3. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार". Ask directly.
+4. Ensure exactly 4 options per question.
+5. Difficulty: ${difficultyInstruction}
+6. Mix: ~30% Direct, ~25% Fill in Blanks, ~15% True/False statements, ~20% Cause & Effect, ~10% Odd One Out.
 
-QUESTION VARIETY MIX:
-- ~30% Direct Objective (Direct factual questions)
-- ~25% Fill in the Blanks (Use "_____" in the sentence)
-- ~15% Correct/Incorrect Statement (e.g., "Which statement is true/false?" with 4 full statements as options)
-- ~20% Cause & Effect / Reasoning (e.g., "Why did X happen?" or "What is the result of Y?")
-- ~10% Odd One Out / Exception (e.g., "Which of the following is NOT mentioned?")
-
-Structure: [{"q": "Question", "options": ["Option1", "Option2", "Option3", "Option4"], "answer": "Exact Match from options", "explanation": "Short reason", "tag": "Keyword", "original": "Quote from text"}]
+Structure: 
+{
+  "swaman": "Emoji Title भव:! Explanation...",
+  "quiz": [
+    {"q": "Question", "options": ["Option1", "Option2", "Option3", "Option4"], "answer": "Exact Match from options", "explanation": "Short reason", "tag": "Keyword", "original": "Quote from text"}
+  ]
+}
 
 Text: ${text}`;
 
@@ -1573,19 +1587,20 @@ Text: ${text}`;
 
             let rText = data.candidates[0].content.parts[0].text;
             
-            let sIdx = rText.indexOf('['); 
-            let eIdx = rText.lastIndexOf(']'); 
+            let sIdx = rText.indexOf('{'); 
+            let eIdx = rText.lastIndexOf('}'); 
             if (sIdx !== -1 && eIdx !== -1) {
                 rText = rText.substring(sIdx, eIdx + 1);
             } else {
-                throw new Error("AI did not return a valid JSON array.");
+                throw new Error("AI did not return a valid JSON object.");
             }
             
-            currentQuiz = JSON.parse(rText); 
-            currentQuiz.forEach(q => shuffleArray(q.options));
+            let parsedData = JSON.parse(rText); 
+            currentQuiz = parsedData.quiz;
+            currentSwaman = parsedData.swaman; // 🔴 NEW: Store AI Swaman
             
             document.getElementById('loading-box').style.display = 'none'; 
-            startQuizSession();
+            document.getElementById('pledge-modal').style.display = 'flex'; // Show pledge
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             if(safeRole === 'manager' || safeRole === 'admin') { 
@@ -1627,7 +1642,7 @@ Text: ${text}`;
         qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
         
         currentQuiz = uniqueQ.slice(0, qCount); 
-        currentQuiz.forEach(q => shuffleArray(q.options));
+        currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
         let todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
         currentMurliDate = qCount >= 50 ? `🏆 Mega Quiz (${qCount} Qs) [${todayDate}]` : `🔄 Review Quiz (${qCount} Qs) [${todayDate}]`;
@@ -1636,7 +1651,7 @@ Text: ${text}`;
         document.getElementById('generator-actions').style.display = 'none'; 
         document.getElementById('export-saved-section').style.display = 'none'; 
         
-        startQuizSession(); 
+        document.getElementById('pledge-modal').style.display = 'flex'; // Show pledge
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
         if(safeRole === 'manager' || safeRole === 'admin') { 
@@ -1658,10 +1673,11 @@ Text: ${text}`;
         
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
         
+        // 🔴 NEW: Send swaman to server
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega }) 
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman }) 
         })
         .then(res => res.json())
         .then(data => { 
@@ -1692,16 +1708,28 @@ Text: ${text}`;
     // ==========================================
     // 7. QUIZ EXECUTION & LOGIC
     // ==========================================
+    
     window.startSpecificQuiz = function(dateStr) {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); 
         let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
         if(targetQuiz && targetQuiz.quizData) { 
-            currentQuiz = targetQuiz.quizData; 
+            currentQuiz = JSON.parse(JSON.stringify(targetQuiz.quizData)); 
             currentMurliDate = targetQuiz.quizDate; 
-            startQuizSession(); 
+            currentSwaman = targetQuiz.swaman || ""; // 🔴 NEW: Load Swaman
+            document.getElementById('pledge-modal').style.display = 'flex';
         } else { 
             showToast("क्वीज फेला परेन!", "error"); 
         }
+    }
+
+    window.closePledgeModal = function() {
+        document.getElementById('pledge-modal').style.display = 'none';
+        resetToGenerator();
+    }
+
+    window.acceptPledgeAndStart = function() {
+        document.getElementById('pledge-modal').style.display = 'none';
+        startQuizSession();
     }
 
     window.showQuizStatus = function(status, dateStr) {
@@ -1779,7 +1807,14 @@ Text: ${text}`;
             answeredCount = 0; 
             totalTimeSec = 0; 
             activeQuestionIndex = 0;
-            currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
+            
+            // 🔴 NEW: Double Shuffle (प्रश्न र उत्तर दुवै सफल गर्ने)
+            shuffleArray(currentQuiz); 
+            currentQuiz.forEach(q => { 
+                delete q.userSelectedIndex; 
+                delete q.userCorrect; 
+                shuffleArray(q.options); 
+            });
             
             let cancelBtn = document.getElementById('btn-cancel-top');
             if(cancelBtn) cancelBtn.style.display = 'inline-block'; 
@@ -2185,18 +2220,6 @@ Text: ${text}`;
         } 
     };
 
-    // 🔴 NEW: Get Dynamic Swaman based on Date Hash
-    function getDynamicSwaman(category) {
-        let list = swamanList[category] || swamanList.good;
-        let todayStr = new Date().toDateString();
-        let hash = 0;
-        for (let i = 0; i < todayStr.length; i++) {
-            hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        let index = Math.abs(hash) % list.length;
-        return list[index];
-    }
-
     function renderDashboard() {
         const d = dict[lang]; 
         let history = safeJSON('murali_progress', []); 
@@ -2220,23 +2243,34 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
-        // 🔴 NEW: Dynamic Baba's Message Logic
+        // 🔴 NEW: Fetch Swaman from Server Quizzes based on latest taken quiz
         let babaMessage = "";
         if (totalTaken === 0) {
-            babaMessage = getDynamicSwaman('newbie');
-        } else if (streak >= 7 && avgPercent >= 80) {
-            babaMessage = getDynamicSwaman('excellent');
-        } else if (streak <= 2 && totalTaken > 2) {
-            babaMessage = getDynamicSwaman('struggling');
+            babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
         } else {
-            babaMessage = getDynamicSwaman('good');
+            // Find the most recent quiz taken in history
+            let latestHistory = history[0]; 
+            let serverQuizzes = safeJSON('murali_server_quizzes', []);
+            let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
+            
+            if (matchedQuiz && matchedQuiz.swaman) {
+                babaMessage = matchedQuiz.swaman;
+            } else {
+                // Fallback if old quiz didn't have AI swaman
+                let hash = 0;
+                let uniqueString = new Date().toDateString() + userName;
+                for (let i = 0; i < uniqueString.length; i++) {
+                    hash = uniqueString.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                babaMessage = fallbackSwaman[Math.abs(hash) % fallbackSwaman.length];
+            }
         }
 
         let swamanHtml = `
         <div style="margin-bottom: 15px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
             <h3 style="margin: 0 0 8px 0; color: #a78bfa; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                 <svg class="icon" viewBox="0 0 24 24" style="color:#a78bfa;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                बाबाको सन्देश र स्वमान
+                आजको वरदान र स्वमान
             </h3>
             <p style="margin: 0; font-size: 0.95rem; color: var(--text-color); font-weight: 600; line-height: 1.5;">
                 ${babaMessage}
