@@ -405,6 +405,7 @@
         </div>
         
         <div class="dashboard-stats" id="dash-stats"></div>
+        <div id="baba-message-container"></div> <!-- 🔴 NEW: Baba's Message Container -->
         
         <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -451,7 +452,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 58.0 (Animated Original Logo) | Engine: Multi-Sync</div>
+        <div>Version: 59.0 (Animated Original Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
@@ -460,7 +461,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "58.0"; 
+    const APP_VERSION = "59.0"; 
 
     let currentQuiz = []; 
     let currentScore = 0; 
@@ -1323,6 +1324,9 @@
             let cm = today.getMonth(); 
             let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
             let firstDay = new Date(cy, cm, 1).getDay();
+            
+            // 🔴 App Launch Date Logic
+            let launchDate = new Date(2026, 7, 13); // August 13, 2026
 
             let quizMap = {}; 
             serverQuizzes.forEach(sq => { 
@@ -1349,6 +1353,9 @@
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
             
             for (let i = 1; i <= daysInMonth; i++) {
+                let renderDate = new Date(cy, cm, i);
+                let isPreLaunch = renderDate.getTime() < launchDate.getTime();
+                
                 let isToday = (i === today.getDate()); 
                 let isPast = (i < today.getDate()); 
                 let hasQuiz = quizMap[i] ? true : false; 
@@ -1359,7 +1366,13 @@
                 let clickAction = ``; 
                 let cursor = `cursor:not-allowed; opacity:0.6;`;
 
-                if (isToday) {
+                if (isPreLaunch) {
+                    // 🔴 Pre-launch dates logic
+                    boxStyle += `background: var(--bg-color); border-color: var(--border-color); color: #64748b; opacity:0.6;`;
+                    statusIcon = `➖`;
+                    clickAction = `onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"`;
+                    cursor = `cursor:pointer;`;
+                } else if (isToday) {
                     if (isCompleted) { 
                         boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; 
                         statusIcon = `✅`; 
@@ -1394,11 +1407,11 @@
                     cursor = `cursor:pointer; opacity:0.5;`; 
                 }
 
-                let extraTextSize = isToday && hasQuiz && !isCompleted ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
+                let extraTextSize = isToday && hasQuiz && !isCompleted && !isPreLaunch ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
             
-            html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#94a3b8; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>🔒 : आगामी दिन (Locked)</div></div></div>`;
+            html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#94a3b8; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>➖ : एप सुरु नभएको</div></div></div>`;
 
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
@@ -2148,6 +2161,30 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
+        // 🔴 NEW: Baba's Message & Swaman Logic
+        let babaMessage = "";
+        if (totalTaken === 0) {
+            babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
+        } else if (streak >= 7 && avgPercent >= 80) {
+            babaMessage = "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ। तिमी नै साँचो ईश्वरीय विद्यार्थी हौ।";
+        } else if (streak <= 2 && totalTaken > 2) {
+            babaMessage = "🌱 विघ्न-विनाशक भव:! मीठे बच्चे, मायाको विघ्नले कहिलेकाहीँ रोक्न खोज्छ, तर तिमी महावीर हौ। भोलिदेखि फेरि नयाँ उमंगका साथ मुरलीको अभ्यास सुरु गर।";
+        } else {
+            babaMessage = "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ, सफलता तिम्रो जन्मसिद्ध अधिकार हो।";
+        }
+
+        let swamanHtml = `
+        <div style="margin-bottom: 15px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="margin: 0 0 8px 0; color: #a78bfa; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24" style="color:#a78bfa;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                बाबाको सन्देश र स्वमान
+            </h3>
+            <p style="margin: 0; font-size: 0.95rem; color: var(--text-color); font-weight: 600; line-height: 1.5;">
+                ${babaMessage}
+            </p>
+        </div>`;
+        document.getElementById('baba-message-container').innerHTML = swamanHtml;
+        
         document.getElementById('cal-month-year').innerText = `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}`;
         
         let firstDay = new Date(cy, cm, 1).getDay(); 
@@ -2155,6 +2192,9 @@ Text: ${text}`;
         let today = new Date(); 
         let monthMap = {}; 
         
+        // 🔴 App Launch Date Logic
+        let launchDate = new Date(2026, 7, 13); // August 13, 2026
+
         filteredHistory.forEach(h => { 
             let dObj = getValidDate(h); 
             if (dObj) { 
@@ -2167,10 +2207,16 @@ Text: ${text}`;
         for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
         
         for (let i = 1; i <= daysInMonth; i++) {
+            let renderDate = new Date(cy, cm, i);
+            let isPreLaunch = renderDate.getTime() < launchDate.getTime();
+            
             let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
             let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
             
-            if (monthMap[i]) { 
+            if (isPreLaunch) {
+                // 🔴 Pre-launch dates logic for Analytics Calendar
+                calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
+            } else if (monthMap[i]) { 
                 let h = monthMap[i]; 
                 let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
                 calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
