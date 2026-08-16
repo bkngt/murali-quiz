@@ -345,6 +345,38 @@
         </div>
     </div>
 
+    <!-- 🔴 NEW: Leaderboard Modal (Admin Only) -->
+    <div id="leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'leaderboard-modal') document.getElementById('leaderboard-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="close-modal" onclick="document.getElementById('leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800; display:flex; align-items:center; gap:8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 15l-8.5-8.5L12 2l8.5 4.5L12 15z"></path><path d="M3.5 11L12 15.5 20.5 11"></path><path d="M3.5 15.5L12 20l8.5-4.5"></path></svg>
+                WhatsApp Leaderboard
+            </h3>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <select id="lb-date-select" class="select-field" style="flex: 2; margin:0; font-size:0.9rem;">
+                    <option value="">Loading dates...</option>
+                </select>
+                <select id="lb-limit-select" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
+                    <option value="all">All</option>
+                    <option value="5">Top 5</option>
+                    <option value="10" selected>Top 10</option>
+                    <option value="20">Top 20</option>
+                </select>
+            </div>
+            
+            <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Report</button>
+            
+            <textarea id="lb-result-text" readonly style="height: 250px; min-height: 200px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
+            
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button onclick="copyLeaderboard()" style="background: var(--success-color); flex: 1;">📋 Copy Text</button>
+                <button onclick="shareLeaderboardWA()" style="background: #25D366; flex: 1;">💬 Share WA</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Generator View (Admin) -->
     <div id="view-generator">
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
@@ -367,7 +399,10 @@
                     <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export Q&A List
                 </span>
-                <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 Download All (ZIP)</button>
+                <span style="display:flex; gap:6px;">
+                    <button onclick="openLeaderboardModal()" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">🏆 Leaderboard</button>
+                    <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 ZIP</button>
+                </span>
             </p>
             <div style="display: flex; gap: 8px;">
                 <select id="saved-quiz-select" class="select-field" style="flex: 1; margin: 0; text-align: left; padding-left: 10px; font-size:0.9rem;">
@@ -452,7 +487,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 59.0 (Animated Original Logo) | Engine: Multi-Sync</div>
+        <div>Version: 60.0 (Dynamic Swaman & Mobile Leaderboard)</div>
     </div>
 </div>
 
@@ -461,7 +496,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "59.0"; 
+    const APP_VERSION = "60.0"; 
 
     let currentQuiz = []; 
     let currentScore = 0; 
@@ -490,7 +525,6 @@
     let isRecoveryMode = false; 
     let isDirectLogin = false;
     
-    // 🔴 Variables for Resume & Keyboard Navigation
     let activeQuestionIndex = 0;
     let focusedOptionIndex = -1;
 
@@ -498,6 +532,30 @@
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
         hi: { placeholder: "आज की मुरली यहाँ पेस्ट करें...", feedbackWrongTitle: "गलत", feedbackRightTitle: "सही जवाब", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
         en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
+    };
+
+    // 🔴 NEW: Dynamic Swaman Arrays
+    const swamanList = {
+        excellent: [
+            "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ। तिमी नै साँचो ईश्वरीय विद्यार्थी हौ।",
+            "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीखो छ। यसरी नै मुरलीको मनन-चिन्तन गर्दै अगाडि बढ।",
+            "👑 स्वराज्य अधिकारी भव:! मीठे बच्चे, तिमीले आफ्ना कर्मेन्द्रियहरूलाई जितेका छौ। तिम्रो यो ईश्वरीय नशा सधैं कायम रहोस्।",
+            "💎 अमूल्य रत्न भव:! मीठे बच्चे, तिमी बाबाको घाँटीको हार हौ। तिम्रो यो लगनले अनेकौं आत्माहरूलाई प्रेरणा दिनेछ।"
+        ],
+        good: [
+            "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ, सफलता तिम्रो जन्मसिद्ध अधिकार हो।",
+            "🌸 हर्षितमुख भव:! मीठे बच्चे, तिम्रो प्रयास धेरै राम्रो छ। अझै अलिकति अटेन्सन दियौ भने तिमी नम्बर वान बन्न सक्छौ।",
+            "🛡️ मायाजित भव:! मीठे बच्चे, तिमीले राम्रो पुरुषार्थ गरिरहेका छौ। बाबाको यादलाई अझै निरन्तर बनाऊ।"
+        ],
+        struggling: [
+            "🌱 विघ्न-विनाशक भव:! मीठे बच्चे, मायाको विघ्नले कहिलेकाहीँ रोक्न खोज्छ, तर तिमी महावीर हौ। भोलिदेखि फेरि नयाँ उमंगका साथ मुरलीको अभ्यास सुरु गर।",
+            "🔥 योगयुक्त भव:! मीठे बच्चे, अलिकति अभ्यास कम भएको छ। बिहानको अमृतवेला र मुरलीमा विशेष ध्यान देऊ, सबै ठीक हुनेछ।",
+            "💪 महावीर भव:! मीठे बच्चे, कहिल्यै निराश नहुनु। बाबा सधैं तिम्रो साथमा हुनुहुन्छ। फेरि उठ र पुरुषार्थ गर।"
+        ],
+        newbie: [
+            "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।",
+            "🌺 ईश्वरीय सन्तान भव:! मीठे बच्चे, ज्ञान मार्गमा तिम्रो स्वागत छ। हरेक दिन मुरली पढ्ने र क्वीज खेल्ने नियम बनाऊ।"
+        ]
     };
 
     // ==========================================
@@ -1103,7 +1161,6 @@
     // 4. DATA SYNCING (SERVER)
     // ==========================================
     
-    // 🔴 NEW: Background Profile Sync
     function backgroundProfileSync() {
         if (!navigator.onLine) return;
         let savedPhone = localStorage.getItem('murali_phone');
@@ -1129,7 +1186,6 @@
                     showToast("Profile auto-updated from server.", "info");
                 }
             } else {
-                // Phone or PIN changed/deleted by admin
                 alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
                 clearLocalDataAndReload(true);
             }
@@ -1284,7 +1340,7 @@
             syncPendingResults(); 
             syncMyResults();
             updateProfileBadgeUI();
-            backgroundProfileSync(); // 🔴 Auto-sync profile on load
+            backgroundProfileSync(); 
 
             let safeRole = userRole.toString().trim().toLowerCase();
             if (safeRole === 'manager' || safeRole === 'admin') {
@@ -1325,8 +1381,7 @@
             let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
             let firstDay = new Date(cy, cm, 1).getDay();
             
-            // 🔴 App Launch Date Logic
-            let launchDate = new Date(2026, 7, 13); // August 13, 2026
+            let launchDate = new Date(2026, 7, 13); 
 
             let quizMap = {}; 
             serverQuizzes.forEach(sq => { 
@@ -1367,7 +1422,6 @@
                 let cursor = `cursor:not-allowed; opacity:0.6;`;
 
                 if (isPreLaunch) {
-                    // 🔴 Pre-launch dates logic
                     boxStyle += `background: var(--bg-color); border-color: var(--border-color); color: #64748b; opacity:0.6;`;
                     statusIcon = `➖`;
                     clickAction = `onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"`;
@@ -1636,7 +1690,7 @@ Text: ${text}`;
     }
 
     // ==========================================
-    // 7. QUIZ EXECUTION & LOGIC (WITH RESUME & KEYBOARD)
+    // 7. QUIZ EXECUTION & LOGIC
     // ==========================================
     window.startSpecificQuiz = function(dateStr) {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); 
@@ -1669,10 +1723,9 @@ Text: ${text}`;
         clearInterval(timerInterval); 
     }
 
-    // 🔴 KEYBOARD NAVIGATION LOGIC
     document.addEventListener('keydown', function(e) {
         if (document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen').style.display === 'none') {
-            if(reviewSource === 'past') return; // Disable in review mode
+            if(reviewSource === 'past') return; 
             
             let optionsCount = 4;
             if (e.key === 'ArrowDown') {
@@ -1707,7 +1760,6 @@ Text: ${text}`;
         stopTimer(); 
         document.getElementById('sb-submit-btn').disabled = false;
         
-        // 🔴 RESUME LOGIC
         let savedStateStr = localStorage.getItem('murali_active_quiz_state');
         let savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
 
@@ -1719,11 +1771,10 @@ Text: ${text}`;
             activeQuestionIndex = savedState.qIndex;
             
             let cancelBtn = document.getElementById('btn-cancel-top');
-            if(cancelBtn) cancelBtn.style.display = 'none'; // Hide cancel if resuming
+            if(cancelBtn) cancelBtn.style.display = 'none'; 
             
             showToast("तपाईंको रोकिएको परीक्षा पुनः सुरु भयो।", "info");
         } else {
-            // Fresh Start
             currentScore = 0; 
             answeredCount = 0; 
             totalTimeSec = 0; 
@@ -1731,7 +1782,7 @@ Text: ${text}`;
             currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
             
             let cancelBtn = document.getElementById('btn-cancel-top');
-            if(cancelBtn) cancelBtn.style.display = 'inline-block'; // Show initially
+            if(cancelBtn) cancelBtn.style.display = 'inline-block'; 
         }
 
         focusedOptionIndex = -1;
@@ -1823,7 +1874,6 @@ Text: ${text}`;
                 </button>`
             ).join('');
             
-            // 🔴 Only show the active question
             let displayStyle = qIndex === activeQuestionIndex ? 'block' : 'none'; 
             let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
             
@@ -1841,7 +1891,6 @@ Text: ${text}`;
         if(block.classList.contains('answered')) return; 
         block.classList.add('answered'); 
         
-        // 🔴 Hide cancel button on first answer
         if (qIndex === 0) {
             let cancelBtn = document.getElementById('btn-cancel-top');
             if(cancelBtn) cancelBtn.style.display = 'none';
@@ -1850,7 +1899,7 @@ Text: ${text}`;
         for(let i=0; i<4; i++) { 
             let opt = document.getElementById(`opt-${qIndex}-${i}`); 
             opt.classList.add('disabled'); 
-            opt.classList.remove('keyboard-focus'); // Remove focus
+            opt.classList.remove('keyboard-focus'); 
             if(i === oIndex) opt.classList.add('selected-temp'); 
         }
         
@@ -1874,10 +1923,9 @@ Text: ${text}`;
                 document.getElementById(`qb-${qIndex}`).style.display = 'none'; 
                 activeQuestionIndex++;
                 document.getElementById(`qb-${activeQuestionIndex}`).style.display = 'block'; 
-                focusedOptionIndex = -1; // Reset focus for next question
+                focusedOptionIndex = -1; 
                 window.scrollTo(0, 0); 
                 
-                // 🔴 SAVE STATE LOCALLY
                 localStorage.setItem('murali_active_quiz_state', JSON.stringify({
                     date: currentMurliDate,
                     qIndex: activeQuestionIndex,
@@ -1904,7 +1952,6 @@ Text: ${text}`;
         document.getElementById('sb-submit-btn').disabled = true; 
         stopTimer(); 
         
-        // 🔴 CLEAR SAVED STATE ON SUBMIT
         localStorage.removeItem('murali_active_quiz_state');
         
         saveOrReplaceProgress(); 
@@ -2138,6 +2185,18 @@ Text: ${text}`;
         } 
     };
 
+    // 🔴 NEW: Get Dynamic Swaman based on Date Hash
+    function getDynamicSwaman(category) {
+        let list = swamanList[category] || swamanList.good;
+        let todayStr = new Date().toDateString();
+        let hash = 0;
+        for (let i = 0; i < todayStr.length; i++) {
+            hash = todayStr.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let index = Math.abs(hash) % list.length;
+        return list[index];
+    }
+
     function renderDashboard() {
         const d = dict[lang]; 
         let history = safeJSON('murali_progress', []); 
@@ -2161,16 +2220,16 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
-        // 🔴 NEW: Baba's Message & Swaman Logic
+        // 🔴 NEW: Dynamic Baba's Message Logic
         let babaMessage = "";
         if (totalTaken === 0) {
-            babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
+            babaMessage = getDynamicSwaman('newbie');
         } else if (streak >= 7 && avgPercent >= 80) {
-            babaMessage = "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ। तिमी नै साँचो ईश्वरीय विद्यार्थी हौ।";
+            babaMessage = getDynamicSwaman('excellent');
         } else if (streak <= 2 && totalTaken > 2) {
-            babaMessage = "🌱 विघ्न-विनाशक भव:! मीठे बच्चे, मायाको विघ्नले कहिलेकाहीँ रोक्न खोज्छ, तर तिमी महावीर हौ। भोलिदेखि फेरि नयाँ उमंगका साथ मुरलीको अभ्यास सुरु गर।";
+            babaMessage = getDynamicSwaman('struggling');
         } else {
-            babaMessage = "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ, सफलता तिम्रो जन्मसिद्ध अधिकार हो।";
+            babaMessage = getDynamicSwaman('good');
         }
 
         let swamanHtml = `
@@ -2192,8 +2251,7 @@ Text: ${text}`;
         let today = new Date(); 
         let monthMap = {}; 
         
-        // 🔴 App Launch Date Logic
-        let launchDate = new Date(2026, 7, 13); // August 13, 2026
+        let launchDate = new Date(2026, 7, 13); 
 
         filteredHistory.forEach(h => { 
             let dObj = getValidDate(h); 
@@ -2214,7 +2272,6 @@ Text: ${text}`;
             let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
             
             if (isPreLaunch) {
-                // 🔴 Pre-launch dates logic for Analytics Calendar
                 calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
             } else if (monthMap[i]) { 
                 let h = monthMap[i]; 
@@ -2268,22 +2325,97 @@ Text: ${text}`;
     // ==========================================
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
+        let lbSelect = document.getElementById('lb-date-select'); // For Leaderboard
+        
         if(!select) return;
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        
         select.innerHTML = '<option value="" disabled selected>कुनै पुरानो क्वीज छान्नुहोस्...</option>';
+        if(lbSelect) lbSelect.innerHTML = '<option value="" disabled selected>Select Date...</option>';
+        
         if(serverQuizzes.length === 0) {
             select.innerHTML = '<option value="" disabled selected>सर्भरमा कुनै क्वीज छैन</option>';
+            if(lbSelect) lbSelect.innerHTML = '<option value="" disabled selected>No Quizzes Found</option>';
             return;
         }
+        
         serverQuizzes.forEach((sq, idx) => {
             let opt = document.createElement('option');
             opt.value = idx;
             opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + sq.quizDate;
             select.appendChild(opt);
+            
+            if(lbSelect) {
+                let lbOpt = document.createElement('option');
+                lbOpt.value = sq.quizDate;
+                lbOpt.text = sq.quizDate;
+                lbSelect.appendChild(lbOpt);
+            }
         });
     }
 
-    // 🔴 NEW: Generate Clean Q&A HTML String
+    // 🔴 NEW: Leaderboard Functions for Mobile Admin
+    window.openLeaderboardModal = function() {
+        document.getElementById('leaderboard-modal').style.display = 'flex';
+        document.getElementById('lb-result-text').value = "Select date and click Generate Report...";
+    }
+
+    window.fetchLeaderboard = function() {
+        let dateVal = document.getElementById('lb-date-select').value;
+        let limitVal = document.getElementById('lb-limit-select').value;
+        
+        if(!dateVal) return showToast("Please select a date first.", "error");
+        if(!navigator.onLine) return showToast("Internet connection required.", "error");
+        
+        let btn = document.getElementById('btn-fetch-lb');
+        let txtArea = document.getElementById('lb-result-text');
+        
+        btn.innerText = "Fetching from Server...";
+        btn.disabled = true;
+        txtArea.value = "Loading data from Google Sheets... Please wait.";
+        
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "getLeaderboard", targetDate: dateVal, limit: limitVal })
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.innerText = "Generate Report";
+            btn.disabled = false;
+            if(data.status === "success") {
+                txtArea.value = data.report;
+                showToast("Report Generated!", "success");
+            } else {
+                txtArea.value = "Error: " + data.message;
+                showToast("Failed to fetch report.", "error");
+            }
+        })
+        .catch(e => {
+            btn.innerText = "Generate Report";
+            btn.disabled = false;
+            txtArea.value = "Network Error. Could not connect to server.";
+            showToast("Network Error.", "error");
+        });
+    }
+
+    window.copyLeaderboard = function() {
+        let txtArea = document.getElementById('lb-result-text');
+        if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to copy.", "error");
+        
+        txtArea.select();
+        document.execCommand("copy");
+        showToast("Copied to Clipboard!", "success");
+    }
+
+    window.shareLeaderboardWA = function() {
+        let txtArea = document.getElementById('lb-result-text');
+        if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to share.", "error");
+        
+        let text = encodeURIComponent(txtArea.value);
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
     function generateQnAHtml(quizData, dateStr) {
         let html = `<!DOCTYPE html>
         <html lang="ne">
