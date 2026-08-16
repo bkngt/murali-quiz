@@ -1136,6 +1136,11 @@
             localStorage.removeItem('murali_country'); 
             localStorage.removeItem('murali_pin'); 
             localStorage.removeItem('murali_role');
+            
+            // 🔴 FIX: लगआउट गर्दा पुरानो परीक्षाको रेकर्ड पनि हटाउने
+            localStorage.removeItem('murali_progress'); 
+            localStorage.removeItem('murali_active_quiz_state'); 
+            
             window.location.reload();
         }
     }
