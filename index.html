@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <!-- Admin configuration options -->
+    <!-- Admin configuration options (Hidden for students) -->
     <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
         <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
         <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
@@ -275,7 +275,7 @@
         <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.95rem; white-space: nowrap;"></span></div>
         <div style="display:flex; gap:8px;">
             <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save</button>
-            <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export</button>
+            <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export Q&A</button>
             <button id="btn-cancel-top" class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.8rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.85rem; font-weight:700;">Cancel</button>
         </div>
     </div>
@@ -286,7 +286,7 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-            <div id="api-config-section">
+             <div id="api-config-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
@@ -304,7 +304,7 @@
                     <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Expert</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
-                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                   <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
                         <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
                         <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
                         <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
@@ -365,7 +365,7 @@
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
                 <span style="display:flex; align-items:center; gap:6px;">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export Saved Quizzes
+                    Export Q&A List
                 </span>
                 <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 Download All (ZIP)</button>
             </p>
@@ -451,7 +451,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 57.0 (Animated Original Logo) | Engine: Multi-Sync</div>
+        <div>Version: 58.0 (Animated Original Logo) | Engine: Multi-Sync</div>
     </div>
 </div>
 
@@ -460,12 +460,9 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "57.0"; 
+    const APP_VERSION = "58.0"; 
 
-    // DO NOT CHANGE THESE TWO VARIABLE DECLARATIONS (Used for Offline Export String Replacement)
     let currentQuiz = []; 
-    let isOfflineExport = false;
-
     let currentScore = 0; 
     let answeredCount = 0; 
     let currentMurliDate = "";
@@ -492,7 +489,7 @@
     let isRecoveryMode = false; 
     let isDirectLogin = false;
     
-    // 🔴 NEW: Variables for Resume & Keyboard Navigation
+    // 🔴 Variables for Resume & Keyboard Navigation
     let activeQuestionIndex = 0;
     let focusedOptionIndex = -1;
 
@@ -1050,28 +1047,28 @@
                 document.getElementById('btn-save-profile').innerText = "Save Profile";
                 if(data.status === "success") { 
                     showToast("Profile Synced to Google Sheet! ☁️", "success"); 
+                    updateProfileBadgeUI();
                 } else { 
                     showToast("Google Sheet Sync Error: " + data.message, "error"); 
                 } 
                 closeSettings(); 
-                unlockApp();
             })
             .catch(e => { 
                 document.getElementById('btn-save-profile').innerText = "Save Profile"; 
                 showToast("Saved Locally. (Server sync failed)", "warning"); 
                 closeSettings(); 
-                unlockApp(); 
+                updateProfileBadgeUI();
             });
         } else { 
             document.getElementById('btn-save-profile').innerText = "Save Profile"; 
             showToast("Saved Locally! (You are offline)", "success"); 
             closeSettings(); 
-            unlockApp(); 
+            updateProfileBadgeUI();
         }
     };
 
-    function clearLocalDataAndReload() {
-        if(confirm("तपाईंको ब्राउजरको लगइन डाटा मेटिनेछ। के तपाईं पक्का हुनुहुन्छ?")) {
+    function clearLocalDataAndReload(force = false) {
+        if(force || confirm("तपाईंको ब्राउजरको लगइन डाटा मेटिनेछ। के तपाईं पक्का हुनुहुन्छ?")) {
             localStorage.removeItem('murali_user_name'); 
             localStorage.removeItem('murali_phone'); 
             localStorage.removeItem('murali_address');
@@ -1104,6 +1101,40 @@
     // ==========================================
     // 4. DATA SYNCING (SERVER)
     // ==========================================
+    
+    // 🔴 NEW: Background Profile Sync
+    function backgroundProfileSync() {
+        if (!navigator.onLine) return;
+        let savedPhone = localStorage.getItem('murali_phone');
+        let savedPin = localStorage.getItem('murali_pin');
+        if (!savedPhone || !savedPin) return;
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === "success") {
+                let updated = false;
+                if (data.name !== userName) { localStorage.setItem('murali_user_name', data.name); userName = data.name; updated = true; }
+                if (data.address !== userAddress) { localStorage.setItem('murali_address', data.address); userAddress = data.address; updated = true; }
+                if (data.role !== userRole) { localStorage.setItem('murali_role', data.role); userRole = data.role; updated = true; }
+                if (data.country !== userCountry) { localStorage.setItem('murali_country', data.country); userCountry = data.country; updated = true; }
+                
+                if (updated) {
+                    updateProfileBadgeUI();
+                    showToast("Profile auto-updated from server.", "info");
+                }
+            } else {
+                // Phone or PIN changed/deleted by admin
+                alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
+                clearLocalDataAndReload(true);
+            }
+        }).catch(e => console.log("Background sync failed", e));
+    }
+
     function syncServerQuizzes(refreshUI = false) {
         if (!navigator.onLine) return;
         fetch(API_URL, { 
@@ -1205,6 +1236,30 @@
     // ==========================================
     // 5. UI INITIALIZATION & DASHBOARD
     // ==========================================
+    function updateProfileBadgeUI() {
+        let safeRole = userRole.toString().trim().toLowerCase();
+        let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
+        let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
+        let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
+
+        let nameParts = userName.split(" "); 
+        let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; 
+        let editFirstName = nameParts.join(" ");
+        
+        let displayName = userName;
+        if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") { 
+            displayName = editFirstName + " " + editLastName; 
+        } else { 
+            displayName = editFirstName.split(" ")[0]; 
+            if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) {
+                displayName = editFirstName; 
+            }
+        }
+        
+        let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
+        document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
+    }
+
     function unlockApp() { 
         try {
             userName = localStorage.getItem('murali_user_name') || "Student"; 
@@ -1227,25 +1282,10 @@
 
             syncPendingResults(); 
             syncMyResults();
+            updateProfileBadgeUI();
+            backgroundProfileSync(); // 🔴 Auto-sync profile on load
 
             let safeRole = userRole.toString().trim().toLowerCase();
-            let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
-            let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
-            let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
-
-            let displayName = userName;
-            if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") { 
-                displayName = editFirstName + " " + editLastName; 
-            } else { 
-                displayName = editFirstName.split(" ")[0]; 
-                if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) {
-                    displayName = editFirstName; 
-                }
-            }
-            
-            let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
-            document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
-
             if (safeRole === 'manager' || safeRole === 'admin') {
                 document.getElementById('murali-text').style.display = 'block'; 
                 document.getElementById('generator-actions').style.display = 'flex'; 
@@ -1658,7 +1698,7 @@ Text: ${text}`;
         let savedStateStr = localStorage.getItem('murali_active_quiz_state');
         let savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
 
-        if (savedState && savedState.date === currentMurliDate && !isOfflineExport) {
+        if (savedState && savedState.date === currentMurliDate) {
             currentQuiz = savedState.quizData;
             currentScore = savedState.score;
             answeredCount = savedState.answeredCount;
@@ -1709,11 +1749,6 @@ Text: ${text}`;
             document.getElementById('quiz-config-tools').style.display = 'none'; 
             document.getElementById('btn-save-top').style.display = 'none'; 
             document.getElementById('btn-export-top').style.display = 'none'; 
-        }
-        
-        if(isOfflineExport) {
-            let cancelBtn = document.getElementById('btn-cancel-top');
-            if(cancelBtn) cancelBtn.style.display = 'none';
         }
         
         updateStickyBar(); 
@@ -1830,16 +1865,15 @@ Text: ${text}`;
                 window.scrollTo(0, 0); 
                 
                 // 🔴 SAVE STATE LOCALLY
-                if(!isOfflineExport) {
-                    localStorage.setItem('murali_active_quiz_state', JSON.stringify({
-                        date: currentMurliDate,
-                        qIndex: activeQuestionIndex,
-                        score: currentScore,
-                        time: totalTimeSec,
-                        answeredCount: answeredCount,
-                        quizData: currentQuiz
-                    }));
-                }
+                localStorage.setItem('murali_active_quiz_state', JSON.stringify({
+                    date: currentMurliDate,
+                    qIndex: activeQuestionIndex,
+                    score: currentScore,
+                    time: totalTimeSec,
+                    answeredCount: answeredCount,
+                    quizData: currentQuiz
+                }));
+                
             } else { 
                 showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); 
                 submitQuiz(); 
@@ -1860,9 +1894,7 @@ Text: ${text}`;
         // 🔴 CLEAR SAVED STATE ON SUBMIT
         localStorage.removeItem('murali_active_quiz_state');
         
-        if(!isOfflineExport) { 
-            saveOrReplaceProgress(); 
-        }
+        saveOrReplaceProgress(); 
         
         document.getElementById('main-header').style.display = 'flex';
         document.getElementById('main-tabs').style.display = 'flex';
@@ -1881,12 +1913,7 @@ Text: ${text}`;
         document.getElementById('rs-msg').innerText = msg; 
         window.scrollTo(0, 0); 
         
-        if (isOfflineExport) {
-            let exitBtn = document.getElementById('btn-new-quiz');
-            if(exitBtn) exitBtn.style.display = 'none';
-        } else {
-            syncPendingResults();
-        }
+        syncPendingResults();
     }
 
     function saveOrReplaceProgress() {
@@ -2191,7 +2218,7 @@ Text: ${text}`;
     }
 
     // ==========================================
-    // 9. EXPORT & IMPORT (OFFLINE / ZIP)
+    // 9. EXPORT & IMPORT (Q&A LIST / ZIP)
     // ==========================================
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
@@ -2210,11 +2237,66 @@ Text: ${text}`;
         });
     }
 
+    // 🔴 NEW: Generate Clean Q&A HTML String
+    function generateQnAHtml(quizData, dateStr) {
+        let html = `<!DOCTYPE html>
+        <html lang="ne">
+        <head>
+            <meta charset="UTF-8">
+            <title>BK Murali Quiz - ${dateStr}</title>
+            <style>
+                body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; background: #f1f5f9; }
+                h1 { color: #0284c7; text-align: center; border-bottom: 2px solid #0284c7; padding-bottom: 10px; }
+                .q-block { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); page-break-inside: avoid; }
+                .q-text { font-weight: bold; font-size: 1.1em; margin-top: 0; color: #0f172a; }
+                .options { list-style-type: none; padding-left: 0; }
+                .options li { margin-bottom: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; }
+                .correct-ans { background: #dcfce7 !important; border-color: #16a34a !important; font-weight: bold; color: #166534; }
+                .explanation { margin-top: 12px; font-size: 0.95em; color: #334155; background: #e0f2fe; padding: 12px; border-left: 4px solid #0284c7; border-radius: 4px; }
+                .tag { display: inline-block; background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; color: #475569; margin-bottom: 10px; font-weight: bold; }
+                @media print { body { background: #fff; padding: 0; } .q-block { box-shadow: none; border: none; border-bottom: 1px dashed #ccc; border-radius: 0; padding: 10px 0; } }
+            </style>
+        </head>
+        <body>
+            <h1>📖 BK Murali Quiz Q&A</h1>
+            <p style="text-align:center; font-weight:bold; font-size: 1.2em; color: #475569;">📅 Date: ${dateStr}</p>
+            <hr style="margin-bottom: 30px; border: 0; border-top: 1px solid #cbd5e1;">`;
+        
+        quizData.forEach((q, i) => {
+            let optsHtml = q.options.map(opt => {
+                let isCorrect = (opt === q.answer) ? 'class="correct-ans"' : '';
+                let checkMark = (opt === q.answer) ? ' ✅ (Correct)' : '';
+                return `<li ${isCorrect}>${opt}${checkMark}</li>`;
+            }).join('');
+            
+            let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em>"${q.original}"</em></div>` : '';
+            let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
+
+            html += `
+            <div class="q-block">
+                ${tagHtml}
+                <p class="q-text">Q${i + 1}. ${q.q}</p>
+                <ul class="options">
+                    ${optsHtml}
+                </ul>
+                ${expHtml}
+            </div>`;
+        });
+
+        html += `
+            <div style="text-align:center; margin-top:40px; font-size:0.9em; color:#64748b; padding-top: 20px; border-top: 1px solid #cbd5e1;">
+                Generated by BK Murali Quiz App
+            </div>
+        </body>
+        </html>`;
+        return html;
+    }
+
     window.exportAllSavedQuizzes = async function() {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
         
-        if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरू एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
+        if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरूको Q&A List एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
 
         if (typeof JSZip === 'undefined') {
             return showToast("इन्टरनेट कनेक्सन छैन। ZIP फाइल बनाउन इन्टरनेट चाहिन्छ।", "error");
@@ -2223,72 +2305,17 @@ Text: ${text}`;
         showToast("ZIP फाइल बन्दैछ, कृपया एकछिन पर्खनुहोस्...", "info");
         let zip = new JSZip();
 
-        await new Promise(r => setTimeout(r, 500));
-        document.getElementById('toast-container').innerHTML = ''; 
-
-        document.getElementById('murali-text').style.display = 'none';
-        document.getElementById('generator-actions').style.display = 'none';
-        document.getElementById('export-saved-section').style.display = 'none';
-        document.getElementById('main-header').style.display = 'none';
-        document.getElementById('main-tabs').style.display = 'none';
-        document.getElementById('toolbar-right-actions').style.display = 'none';
-        document.getElementById('loading-box').style.display = 'none';
-
-        document.getElementById('quiz-area').style.display = 'block';
-        document.getElementById('sticky-scorebar').style.display = 'flex';
-        document.getElementById('active-quiz-info').style.display = 'flex';
-        document.getElementById('online-quiz-actions').style.display = 'flex';
-        document.getElementById('btn-save-top').style.display = 'none';
-        document.getElementById('btn-export-top').style.display = 'none';
-
-        let backupQuiz = currentQuiz; 
-        let backupDate = currentMurliDate;
-
-        for (let i = 0; i < serverQuizzes.length; i++) {
-            let sq = serverQuizzes[i];
-            if (!sq.quizData) continue;
-
-            currentQuiz = sq.quizData;
-            currentMurliDate = sq.quizDate;
-            answeredCount = 0; 
-            currentScore = 0;
-            
-            currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
-
-            renderQuizArea();
-            document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
-            document.getElementById('sb-answered').innerText = `0/${currentQuiz.length}`;
-            document.getElementById('timer-text').innerText = "00:00";
-
-            // CRITICAL: This relies on the exact string declarations at the top of the script
-            let html = document.documentElement.outerHTML
-                        .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
-                        .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
-
-            let filename = `OfflineQuiz-${currentMurliDate.replace(/[\/\\]/g,'-')}.html`;
+        serverQuizzes.forEach(sq => {
+            if (!sq.quizData) return;
+            let html = generateQnAHtml(sq.quizData, sq.quizDate);
+            let filename = `Murali_QnA_${sq.quizDate.replace(/[\/\\]/g,'-')}.html`;
             zip.file(filename, html);
-        }
-
-        document.getElementById('quiz-area').style.display = 'none';
-        document.getElementById('sticky-scorebar').style.display = 'none';
-        document.getElementById('active-quiz-info').style.display = 'none';
-        document.getElementById('online-quiz-actions').style.display = 'none';
-
-        document.getElementById('murali-text').style.display = 'block';
-        document.getElementById('generator-actions').style.display = 'flex';
-        document.getElementById('export-saved-section').style.display = 'block';
-        document.getElementById('main-header').style.display = 'flex';
-        document.getElementById('main-tabs').style.display = 'flex';
-        document.getElementById('toolbar-right-actions').style.display = 'flex';
-
-        currentQuiz = backupQuiz; 
-        currentMurliDate = backupDate;
-        if(currentQuiz && currentQuiz.length > 0) renderQuizArea();
+        });
 
         zip.generateAsync({type:"blob"}).then(function(content) {
             let a = document.createElement('a');
             a.href = URL.createObjectURL(content);
-            a.download = "BK_Murali_Quizzes.zip";
+            a.download = "BK_Murali_QnA_Collection.zip";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2305,92 +2332,22 @@ Text: ${text}`;
         let sq = serverQuizzes[idx];
         if(!sq || !sq.quizData) return showToast("Quiz data not found!", "error");
         
-        document.getElementById('toast-container').innerHTML = ''; 
-        
-        let backupQuiz = currentQuiz; 
-        let backupDate = currentMurliDate;
-        currentQuiz = sq.quizData; 
-        currentMurliDate = sq.quizDate;
-        
-        document.getElementById('murali-text').style.display = 'none';
-        document.getElementById('generator-actions').style.display = 'none';
-        document.getElementById('export-saved-section').style.display = 'none';
-        document.getElementById('main-header').style.display = 'none';
-        document.getElementById('main-tabs').style.display = 'none';
-        document.getElementById('toolbar-right-actions').style.display = 'none';
-        document.getElementById('loading-box').style.display = 'none';
-        
-        answeredCount = 0; 
-        currentScore = 0;
-        currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; });
-        
-        renderQuizArea();
-        document.getElementById('quiz-area').style.display = 'block';
-        document.getElementById('sticky-scorebar').style.display = 'flex';
-        document.getElementById('active-quiz-info').style.display = 'flex'; 
-        document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; 
-        document.getElementById('online-quiz-actions').style.display = 'flex';
-        document.getElementById('sb-answered').innerText = `0/${currentQuiz.length}`;
-        document.getElementById('timer-text').innerText = "00:00";
-        document.getElementById('btn-save-top').style.display = 'none';
-        document.getElementById('btn-export-top').style.display = 'none'; 
-        
-        // CRITICAL: This relies on the exact string declarations at the top of the script
-        let html = document.documentElement.outerHTML
-                    .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
-                    .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
-
-        let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
-        let filename = `OfflineQuiz-${currentMurliDate.replace(/[\/\\]/g,'-')}.html`; 
+        let html = generateQnAHtml(sq.quizData, sq.quizDate);
+        let b = new Blob([html], { type: 'text/html;charset=utf-8' });
+        let filename = `Murali_QnA_${sq.quizDate.replace(/[\/\\]/g,'-')}.html`; 
         triggerDownload(b, filename);
-        
-        document.getElementById('quiz-area').style.display = 'none';
-        document.getElementById('sticky-scorebar').style.display = 'none';
-        document.getElementById('active-quiz-info').style.display = 'none'; 
-        document.getElementById('online-quiz-actions').style.display = 'none';
-        
-        document.getElementById('murali-text').style.display = 'block';
-        document.getElementById('generator-actions').style.display = 'flex';
-        document.getElementById('export-saved-section').style.display = 'block';
-        document.getElementById('main-header').style.display = 'flex';
-        document.getElementById('main-tabs').style.display = 'flex';
-        document.getElementById('toolbar-right-actions').style.display = 'flex';
-        
-        currentQuiz = backupQuiz; 
-        currentMurliDate = backupDate;
     };
 
     function exportStandaloneHTML() {
         if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
         
-        document.getElementById('toast-container').innerHTML = ''; 
-
-        document.getElementById('main-header').style.display = 'flex';
-        document.getElementById('main-tabs').style.display = 'flex';
-        document.getElementById('toolbar-right-actions').style.display = 'flex';
-
-        let saveBtn = document.getElementById('btn-save-top'); 
-        let exportBtn = document.getElementById('btn-export-top');
-        if(saveBtn) saveBtn.style.display = 'none'; 
-        if(exportBtn) exportBtn.style.display = 'none';
-        
-        // CRITICAL: This relies on the exact string declarations at the top of the script
-        let html = document.documentElement.outerHTML
-                    .replace("let currentQuiz = [];", `let currentQuiz = ${JSON.stringify(currentQuiz)};`)
-                    .replace("let isOfflineExport = false;", "let isOfflineExport = true;");
-                    
-        if(exportBtn) exportBtn.style.display = 'inline-block';
-        
-        let b = new Blob(["<!DOCTYPE html>\n" + html], { type: 'text/html;charset=utf-8' });
-        let filename = `OfflineQuiz-${currentMurliDate.replace(/\//g,'-')}.html`; 
+        let html = generateQnAHtml(currentQuiz, currentMurliDate);
+        let b = new Blob([html], { type: 'text/html;charset=utf-8' });
+        let filename = `Murali_QnA_${currentMurliDate.replace(/[\/\\]/g,'-')}.html`; 
         let file = new File([b], filename, { type: "text/html" });
         
-        document.getElementById('main-header').style.display = 'none';
-        document.getElementById('main-tabs').style.display = 'none';
-        document.getElementById('toolbar-right-actions').style.display = 'none';
-
         if (navigator.canShare && navigator.canShare({ files: [file] })) { 
-            navigator.share({ files: [file], title: 'BK Murali Quiz Offline', text: 'Offline Quiz HTML File' })
+            navigator.share({ files: [file], title: 'BK Murali Q&A List', text: 'Q&A List HTML File' })
             .then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success"))
             .catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); });
         } else { 
@@ -2405,7 +2362,7 @@ Text: ${text}`;
         document.body.appendChild(a); 
         a.click(); 
         document.body.removeChild(a); 
-        showToast("HTML Downloaded", "success"); 
+        showToast("Q&A List Downloaded", "success"); 
     }
 
     async function exportBackupData() {
@@ -2476,20 +2433,7 @@ Text: ${text}`;
     // 10. APP STARTUP
     // ==========================================
     window.onload = function() {
-        if (isOfflineExport) {
-            document.getElementById('lock-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            document.getElementById('view-generator').style.display = 'block';
-            document.getElementById('murali-text').style.display = 'none';
-            document.getElementById('generator-actions').style.display = 'none';
-            document.getElementById('export-saved-section').style.display = 'none';
-            document.getElementById('main-header').style.display = 'none';
-            document.getElementById('main-tabs').style.display = 'none';
-            document.getElementById('toolbar-right-actions').style.display = 'none';
-            startQuizSession();
-        } else {
-            init();
-        }
+        init();
     };
     
     setTimeout(syncPendingResults, 3000);
