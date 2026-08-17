@@ -286,12 +286,23 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-             <div id="api-config-section">
+            <!-- 🔴 NEW: Updated API Config Section with Badge and Eye Icon -->
+            <div id="api-config-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700;">API Configuration (Manager Only)</p>
+                    <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700; display: flex; align-items: center; gap: 8px;">
+                        API Configuration 
+                        <span id="api-status-badge" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 50px; font-weight: 800;"></span>
+                    </p>
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(56, 189, 248, 0.1);">🔑 Get Free Key</a>
                 </div>
-                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0;">
+                
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0; padding-right: 45px; width: 100%;">
+                    <button type="button" onclick="toggleApiKeyVisibility()" style="position: absolute; right: 5px; background: transparent; border: none; color: #94a3b8; box-shadow: none; width: auto; padding: 5px; cursor: pointer;">
+                        <svg id="eye-icon-api" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
                     <button onclick="saveAPIKey()" style="background-color: var(--success-color); flex: 1; box-shadow: none;">Save Key</button>
                     <button onclick="deleteAPIKey()" style="background-color: #64748b; flex: 1; box-shadow: none;">Clear Key</button>
@@ -440,7 +451,7 @@
         <div id="result-screen" style="display: none;">
             <div class="result-score-circle" id="rs-score">0/10</div>
             <div class="result-msg" id="rs-msg">अद्भुत!</div>
-            <div class="result-submsg" id="rs-submsg">हजुरको स्मृति धेरै तीखो छ। बाबा धेरै खुसी हुनुहुन्छ!</div>
+            <div class="result-submsg" id="rs-submsg">हजुरको स्मृति धेरै तीक्ष्ण छ। बाबा धेरै खुसी हुनुहुन्छ!</div>
             <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
                 <button onclick="reviewQuiz()" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none; width:auto; border-radius:50px;">Review Answers</button>
                 <button onclick="resetToGenerator()" id="btn-new-quiz" style="background: #475569; color: white; width:auto; border-radius:50px; box-shadow: none;">Exit Quiz</button>
@@ -502,7 +513,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 62.0 (AI Generated Swaman & Double Shuffle)</div>
+        <div>Version: 63.0 (Deep Study AI & Smart API Config)</div>
     </div>
 </div>
 
@@ -511,7 +522,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "62.0"; 
+    const APP_VERSION = "63.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; // 🔴 NEW: Global variable for AI Swaman
@@ -553,10 +564,10 @@
     // 🔴 Fallback Swaman (In case old quizzes don't have AI Swaman)
     const fallbackSwaman = [
         "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ।",
-        "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीखो छ। यसरी नै अगाडि बढ।",
+        "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीक्ष्ण छ। यसरी नै अगाडि बढ।",
         "👑 स्वराज्य अधिकारी भव:! मीठे बच्चे, तिमीले आफ्ना कर्मेन्द्रियहरूलाई जितेका छौ।",
-        "💎 अमूल्य रत्न भव:! मीठे बच्चे, तिमी बाबाको घाँटीको हार हौ।",
-        "🕊️ शान्ति-स्वरूप भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ।"
+        "💎 अमूल्य रत्न भव:! मीठे बच्चे, तिमी बाबाको गलाको हार हौ।",
+        "🕊️ विजयी भव:! मीठे बच्चे, तिम्रो चार्ट राम्रो छ। अझै गहिरो अभ्यास गर्दै जाऊ।"
     ];
 
     // ==========================================
@@ -1528,17 +1539,25 @@
         document.getElementById('loading-box').style.display = 'block'; 
         document.getElementById('loading-text').innerText = "AI is drafting the quiz and Swaman... (कृपया पर्खनुहोस्)";
 
+        // 🔴 NEW: Updated Difficulty Instructions for Deep Study
         let difficultyInstruction = "";
         if (level === 'expert') {
-            difficultyInstruction = "EXPERT LEVEL: Test deep essence. Options must be extremely close and confusing. Distractors must be highly plausible.";
+            difficultyInstruction = `EXPERT LEVEL (Deep Chintan): 
+            - Focus on the deepest, most unique points, specific examples, and subtle nuances of TODAY'S text. 
+            - CRITICAL: The 3 wrong options (distractors) MUST be universally true spiritual statements (valid BK knowledge) but they MUST NOT be mentioned in today's text. This forces the user to know exactly what was spoken TODAY.
+            - Include 2-3 questions of "Except/Not" type (e.g., "Which of the following was NOT mentioned today?").`;
         } else if (level === 'advanced') {
-            difficultyInstruction = "ADVANCED LEVEL: Test conceptual understanding. Distractors should be other valid points from the text to make them think.";
+            difficultyInstruction = `ADVANCED LEVEL (Conceptual Focus): 
+            - Focus on specific examples, analogies, and the main theme of today's text. 
+            - Distractors should be related concepts but slightly altered or applied to the wrong context based on today's text.`;
         } else {
-            difficultyInstruction = "STANDARD LEVEL: Test basic factual recall. Distractors should be easily identifiable as incorrect.";
+            difficultyInstruction = `STANDARD LEVEL (Factual Recall): 
+            - Test basic factual recall of today's main points. 
+            - Distractors should be easily identifiable as incorrect for someone who has read the text.`;
         }
 
-        // 🔴 NEW: Prompt updated to return a JSON Object with "quiz" and "swaman"
-        const promptText = `You are an expert examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text. 
+        // 🔴 NEW: Updated Prompt Text for Deep Study
+        const promptText = `You are an expert spiritual examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text. 
 
 CRITICAL RULES FOR JSON:
 1. Output ONLY a raw JSON object. Do NOT wrap it in markdown blocks.
@@ -1549,17 +1568,23 @@ SWAMAN RULES:
 2. Create a beautiful, spiritually accurate title ending with "भव:!".
 3. Start with a unique, relevant emoji.
 4. Write 2-3 sentences explaining it based on the Murli.
-5. NEVER use the word "साँचो" (use "सच्चा" instead).
-6. Use standard BK titles (e.g., मास्टर सर्वशक्तिवान्, सच्चा सेवाधारी, कमल पुष्प समान, विघ्न विनाशक). Do not invent awkward titles.
+5. NEVER use the word "साँचो", "तीखो" (use "सच्चा", "तीक्ष्ण" instead).
+6. Use standard BK titles (e.g., मास्टर सर्वशक्तिवान्, सच्चा सेवाधारी).
 7. Example format: "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे..."
 
-QUIZ RULES:
+QUIZ RULES (FORCING DEEP STUDY):
 1. "quiz" must be an array of exactly ${qCount} objects.
-2. Keep questions SHORT and mobile-friendly.
-3. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार". Ask directly.
-4. Ensure exactly 4 options per question.
-5. Difficulty: ${difficultyInstruction}
-6. Mix: ~30% Direct, ~25% Fill in Blanks, ~15% True/False statements, ~20% Cause & Effect, ~10% Odd One Out.
+2. NEVER ask generic spiritual questions that can be answered without reading THIS specific text. Every question MUST rely on a specific sentence, unique phrase, or specific context present ONLY in the provided text.
+3. Keep questions SHORT and mobile-friendly.
+4. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार". Ask directly based on the context.
+5. Ensure exactly 4 options per question.
+6. Difficulty: ${difficultyInstruction}
+7. Mix of Question Types: 
+   - ~30% Specific Examples/Analogies used today.
+   - ~25% Cause & Effect (Why did Baba say X?).
+   - ~20% Fill in the exact unique words used today.
+   - ~15% True/False context.
+   - ~10% Odd One Out / "Not mentioned today".
 
 Structure: 
 {
@@ -2154,22 +2179,63 @@ Text: ${text}`;
         }
     }
     
-    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    // 🔴 NEW: API Key UI Functions
+    function openSettings() { 
+        document.getElementById('settings-modal').style.display = 'flex'; 
+        checkApiStatus();
+    }
+    
     function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
     function closeSettingsOnOverlay(e) { if(e.target.id === 'settings-modal') closeSettings(); }
+    
+    window.checkApiStatus = function() {
+        let savedKey = localStorage.getItem('murali_gemini_key');
+        let input = document.getElementById('api-key-input');
+        let badge = document.getElementById('api-status-badge');
+        
+        if (savedKey) {
+            input.value = savedKey;
+            badge.innerHTML = "✅ Saved";
+            badge.style.background = "rgba(22, 163, 74, 0.15)";
+            badge.style.color = "var(--success-color)";
+            badge.style.border = "1px solid var(--success-color)";
+        } else {
+            input.value = "";
+            badge.innerHTML = "❌ Not Saved";
+            badge.style.background = "rgba(220, 38, 38, 0.15)";
+            badge.style.color = "var(--danger-color)";
+            badge.style.border = "1px solid var(--danger-color)";
+        }
+    }
+
+    window.toggleApiKeyVisibility = function() {
+        let input = document.getElementById('api-key-input');
+        let icon = document.getElementById('eye-icon-api');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+        } else {
+            input.type = "password";
+            icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        }
+    }
     
     function saveAPIKey() { 
         const key = document.getElementById('api-key-input').value.trim(); 
         if(key) { 
             localStorage.setItem('murali_gemini_key', key); 
-            showToast("Key stored!", "success"); 
-            closeSettings(); 
-        } 
+            showToast("API Key Stored Securely!", "success"); 
+            checkApiStatus();
+        } else {
+            showToast("Please enter a valid key.", "error");
+        }
     }
+    
     function deleteAPIKey() {
         localStorage.removeItem('murali_gemini_key');
         document.getElementById('api-key-input').value = '';
-        showToast("Key cleared!", "success");
+        showToast("API Key Cleared!", "success");
+        checkApiStatus();
     }
 
     function calculateStreak(history) {
