@@ -51,7 +51,6 @@
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
-        /* 🔴 घुम्ने एनिमेसन (Original Logo Animation) */
         @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
         .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
 
@@ -81,7 +80,6 @@
         .option-text { display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--opt-text-color) !important; line-height: 1.3;}
         .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3); }
         
-        /* 🔴 Keyboard Focus Style */
         .option-container.keyboard-focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3); transform: translateX(4px); background-color: rgba(56, 189, 248, 0.05); }
         
         .option-container.selected-temp { background-color: rgba(56, 189, 248, 0.15); border-color: var(--primary-color); transform: translateX(4px); }
@@ -129,7 +127,6 @@
         .icon { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
         
-        /* 🔴 ४ वटै बटन १ लाइनमा राख्ने डिजाइन */
         .btn-settings-clear { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
         .btn-settings-clear:hover { border-color: #a78bfa; color: #a78bfa; background: rgba(167, 139, 250, 0.05); }
         
@@ -153,7 +150,6 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <!-- 🔴 सुरुको ओरिजिनल एनिमेटेड लोगो (Glowing Rays) -->
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
                      <div class="baba-logo-container">
                         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -222,7 +218,6 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <!-- 🔴 सुरुको ओरिजिनल एनिमेटेड लोगो (Header) -->
         <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white; margin: 0;">
              <div class="baba-logo-container">
                 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -245,7 +240,6 @@
         <div id="profile-badge-container" style="display: flex; align-items: center;"></div>
     </div>
     
-    <!-- 🔴 ४ वटै बटनहरू एउटै लाइनमा (Single Line Toolbar) -->
     <div class="toolbar-one-line" id="top-toolbar">
         <div class="nav-tabs" id="main-tabs" style="display: flex; gap: 2px; background: rgba(0,0,0,0.05); padding: 3px; border-radius: 50px; border: 1px solid var(--border-color); margin: 0;">
             <button id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> <span id="tab-gen-txt">Exam</span></button>
@@ -263,7 +257,6 @@
         </div>
     </div>
 
-    <!-- Admin configuration options (Hidden for students) -->
     <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
         <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
         <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
@@ -286,7 +279,6 @@
             <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
             
-            <!-- 🔴 NEW: Updated API Config Section with Badge and Eye Icon -->
             <div id="api-config-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <p style="font-size:0.95rem; color: #94a3b8; margin: 0; font-weight:700; display: flex; align-items: center; gap: 8px;">
@@ -356,7 +348,7 @@
         </div>
     </div>
 
-    <!-- 🔴 NEW: Leaderboard Modal (Admin Only) -->
+    <!-- Leaderboard Modal (Admin Only) -->
     <div id="leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'leaderboard-modal') document.getElementById('leaderboard-modal').style.display='none';">
         <div class="modal-content" style="max-width: 500px;">
             <button class="close-modal" onclick="document.getElementById('leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -379,16 +371,31 @@
             
             <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Report</button>
             
-            <textarea id="lb-result-text" readonly style="height: 250px; min-height: 200px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
+            <textarea id="lb-result-text" readonly style="height: 150px; min-height: 120px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
             
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <!-- 🔴 NEW: In-App Leaderboard Table -->
+            <div id="lb-table-container" style="display:none; margin-top:15px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead style="background: var(--primary-color); color: white; position: sticky; top: 0;">
+                        <tr>
+                            <th style="padding: 8px;">SN</th>
+                            <th style="padding: 8px;">Name</th>
+                            <th style="padding: 8px;">Sewa Kendra</th>
+                            <th style="padding: 8px;">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lb-table-body"></tbody>
+                </table>
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
                 <button onclick="copyLeaderboard()" style="background: var(--success-color); flex: 1;">📋 Copy Text</button>
                 <button onclick="shareLeaderboardWA()" style="background: #25D366; flex: 1;">💬 Share WA</button>
             </div>
         </div>
     </div>
 
-    <!-- 🔴 NEW: Honesty Pledge Modal -->
+    <!-- Honesty Pledge Modal -->
     <div id="pledge-modal" class="modal-overlay" style="z-index: 2500;">
         <div class="modal-content" style="text-align: center; max-width: 400px; padding: 2rem 1.5rem;">
             <div style="font-size: 3.5rem; margin-bottom: 10px; animation: divineSpin 10s linear infinite;">✨</div>
@@ -466,7 +473,7 @@
         </div>
         
         <div class="dashboard-stats" id="dash-stats"></div>
-        <div id="baba-message-container"></div> <!-- 🔴 NEW: Baba's Message Container -->
+        <div id="baba-message-container"></div>
         
         <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -513,7 +520,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 63.0 (Deep Study AI & Smart API Config)</div>
+        <div>Version: 64.0 (Deep Study AI & 48h Active Window)</div>
     </div>
 </div>
 
@@ -522,10 +529,10 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "63.0"; 
+    const APP_VERSION = "64.0"; 
 
     let currentQuiz = []; 
-    let currentSwaman = ""; // 🔴 NEW: Global variable for AI Swaman
+    let currentSwaman = ""; 
     let currentScore = 0; 
     let answeredCount = 0; 
     let currentMurliDate = "";
@@ -561,7 +568,6 @@
         en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
     };
 
-    // 🔴 Fallback Swaman (In case old quizzes don't have AI Swaman)
     const fallbackSwaman = [
         "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे, तिम्रो निरन्तरको अभ्यास र लगन देखेर बाबा धेरै हर्षित हुनुहुन्छ।",
         "🌟 सफलताको सितारा भव:! मीठे बच्चे, तिम्रो बुद्धि एकदमै स्वच्छ र तीक्ष्ण छ। यसरी नै अगाडि बढ।",
@@ -911,7 +917,6 @@
         const inputPIN = document.getElementById('pin-input').value; 
         const month = document.getElementById('month-select').value;
         
-        // Recovery Mode
         if (isRecoveryMode) {
             if (!inputPhone || !month) return showToast("कृपया फोन र महिना भर्नुहोस्।", "error");
             document.getElementById('btn-login-submit').innerHTML = `Checking...`;
@@ -938,7 +943,6 @@
             return;
         }
 
-        // Direct Login Mode
         if (isDirectLogin) {
             if (!inputPhone || inputPIN.length !== 4) return showToast("कृपया सही १० अंकको फोन र ४ अंकको पिन लेख्नुहोस्।", "error");
             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
@@ -965,7 +969,6 @@
             return;
         }
 
-        // Registration Mode
         if (document.getElementById('reg-fields').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
             let fNameRaw = document.getElementById('first-name-input').value.trim(); 
             let lNameRaw = document.getElementById('last-name-input').value.trim();
@@ -1014,7 +1017,6 @@
             return;
         }
 
-        // Standard Login (Returning User)
         if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
         let savedPIN = localStorage.getItem('murali_pin'); 
         let savedPhone = localStorage.getItem('murali_phone');
@@ -1148,7 +1150,6 @@
             localStorage.removeItem('murali_pin'); 
             localStorage.removeItem('murali_role');
             
-            // 🔴 FIX: लगआउट गर्दा पुरानो परीक्षाको रेकर्ड पनि हटाउने
             localStorage.removeItem('murali_progress'); 
             localStorage.removeItem('murali_active_quiz_state'); 
             
@@ -1424,12 +1425,19 @@
 
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
             
+            // 🔴 NEW: 48-Hour Active Window Logic
+            let todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
             for (let i = 1; i <= daysInMonth; i++) {
                 let renderDate = new Date(cy, cm, i);
                 let isPreLaunch = renderDate.getTime() < launchDate.getTime();
                 
-                let isToday = (i === today.getDate()); 
-                let isPast = (i < today.getDate()); 
+                let diffDays = Math.round((todayDateOnly - renderDate) / (1000 * 60 * 60 * 24));
+                let isToday = (diffDays === 0);
+                let isYesterday = (diffDays === 1);
+                let isPast = (diffDays > 1);
+                let isFuture = (diffDays < 0);
+                
                 let hasQuiz = quizMap[i] ? true : false; 
                 let isCompleted = historyMap[i] ? true : false;
                 
@@ -1443,7 +1451,7 @@
                     statusIcon = `➖`;
                     clickAction = `onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"`;
                     cursor = `cursor:pointer;`;
-                } else if (isToday) {
+                } else if (isToday || isYesterday) {
                     if (isCompleted) { 
                         boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; 
                         statusIcon = `✅`; 
@@ -1455,10 +1463,17 @@
                         cursor = `cursor:pointer; opacity:1;`; 
                         clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
                     } else { 
-                        boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; 
-                        statusIcon = `⏳ Wait`; 
-                        cursor = `cursor:not-allowed; opacity:1;`; 
-                        clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; 
+                        if (isToday) {
+                            boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; 
+                            statusIcon = `⏳ Wait`; 
+                            cursor = `cursor:not-allowed; opacity:1;`; 
+                            clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; 
+                        } else {
+                            boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
+                            statusIcon = `❌ Miss`; 
+                            clickAction = `onclick="showToast('यस दिनको क्वीज उपलब्ध छैन।', 'error')"`; 
+                            cursor = `cursor:pointer;`; 
+                        }
                     }
                 } else if (isPast) {
                     if (isCompleted) { 
@@ -1469,7 +1484,7 @@
                     } else { 
                         boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
                         statusIcon = `❌ Miss`; 
-                        clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो!', 'error')"`; 
+                        clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो! (म्याद सकियो)', 'error')"`; 
                         cursor = `cursor:pointer;`; 
                     }
                 } else { 
@@ -1478,7 +1493,7 @@
                     cursor = `cursor:pointer; opacity:0.5;`; 
                 }
 
-                let extraTextSize = isToday && hasQuiz && !isCompleted && !isPreLaunch ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
+                let extraTextSize = (isToday || isYesterday) && hasQuiz && !isCompleted && !isPreLaunch ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
             
@@ -1539,7 +1554,6 @@
         document.getElementById('loading-box').style.display = 'block'; 
         document.getElementById('loading-text').innerText = "AI is drafting the quiz and Swaman... (कृपया पर्खनुहोस्)";
 
-        // 🔴 NEW: Updated Difficulty Instructions for Deep Study
         let difficultyInstruction = "";
         if (level === 'expert') {
             difficultyInstruction = `EXPERT LEVEL (Deep Chintan): 
@@ -1556,7 +1570,6 @@
             - Distractors should be easily identifiable as incorrect for someone who has read the text.`;
         }
 
-        // 🔴 NEW: Updated Prompt Text for Deep Study
         const promptText = `You are an expert spiritual examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text. 
 
 CRITICAL RULES FOR JSON:
@@ -1627,10 +1640,10 @@ Text: ${text}`;
             
             let parsedData = JSON.parse(rText); 
             currentQuiz = parsedData.quiz;
-            currentSwaman = parsedData.swaman; // 🔴 NEW: Store AI Swaman
+            currentSwaman = parsedData.swaman; 
             
             document.getElementById('loading-box').style.display = 'none'; 
-            document.getElementById('pledge-modal').style.display = 'flex'; // Show pledge
+            document.getElementById('pledge-modal').style.display = 'flex'; 
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             if(safeRole === 'manager' || safeRole === 'admin') { 
@@ -1681,7 +1694,7 @@ Text: ${text}`;
         document.getElementById('generator-actions').style.display = 'none'; 
         document.getElementById('export-saved-section').style.display = 'none'; 
         
-        document.getElementById('pledge-modal').style.display = 'flex'; // Show pledge
+        document.getElementById('pledge-modal').style.display = 'flex'; 
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
         if(safeRole === 'manager' || safeRole === 'admin') { 
@@ -1703,7 +1716,6 @@ Text: ${text}`;
         
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
         
-        // 🔴 NEW: Send swaman to server
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
@@ -1745,7 +1757,7 @@ Text: ${text}`;
         if(targetQuiz && targetQuiz.quizData) { 
             currentQuiz = JSON.parse(JSON.stringify(targetQuiz.quizData)); 
             currentMurliDate = targetQuiz.quizDate; 
-            currentSwaman = targetQuiz.swaman || ""; // 🔴 NEW: Load Swaman
+            currentSwaman = targetQuiz.swaman || ""; 
             document.getElementById('pledge-modal').style.display = 'flex';
         } else { 
             showToast("क्वीज फेला परेन!", "error"); 
@@ -1838,7 +1850,6 @@ Text: ${text}`;
             totalTimeSec = 0; 
             activeQuestionIndex = 0;
             
-            // 🔴 NEW: Double Shuffle (प्रश्न र उत्तर दुवै सफल गर्ने)
             shuffleArray(currentQuiz); 
             currentQuiz.forEach(q => { 
                 delete q.userSelectedIndex; 
@@ -2179,7 +2190,6 @@ Text: ${text}`;
         }
     }
     
-    // 🔴 NEW: API Key UI Functions
     function openSettings() { 
         document.getElementById('settings-modal').style.display = 'flex'; 
         checkApiStatus();
@@ -2254,7 +2264,6 @@ Text: ${text}`;
         let expectedTime = todayTime;
         
         if (sortedDays[0] === todayTime) {
-            // Started today
         } else if (sortedDays[0] === todayTime - 86400000) { 
             expectedTime = todayTime - 86400000; 
         } else { 
@@ -2314,12 +2323,10 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
-        // 🔴 NEW: Fetch Swaman from Server Quizzes based on latest taken quiz
         let babaMessage = "";
         if (totalTaken === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
         } else {
-            // Find the most recent quiz taken in history
             let latestHistory = history[0]; 
             let serverQuizzes = safeJSON('murali_server_quizzes', []);
             let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
@@ -2327,7 +2334,6 @@ Text: ${text}`;
             if (matchedQuiz && matchedQuiz.swaman) {
                 babaMessage = matchedQuiz.swaman;
             } else {
-                // Fallback if old quiz didn't have AI swaman
                 let hash = 0;
                 let uniqueString = new Date().toDateString() + userName;
                 for (let i = 0; i < uniqueString.length; i++) {
@@ -2430,7 +2436,7 @@ Text: ${text}`;
     // ==========================================
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
-        let lbSelect = document.getElementById('lb-date-select'); // For Leaderboard
+        let lbSelect = document.getElementById('lb-date-select'); 
         
         if(!select) return;
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
@@ -2459,12 +2465,14 @@ Text: ${text}`;
         });
     }
 
-    // 🔴 NEW: Leaderboard Functions for Mobile Admin
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
         document.getElementById('lb-result-text').value = "Select date and click Generate Report...";
+        let tableContainer = document.getElementById('lb-table-container');
+        if(tableContainer) tableContainer.style.display = 'none';
     }
 
+    // 🔴 NEW: Updated Leaderboard Fetch with Table Data
     window.fetchLeaderboard = function() {
         let dateVal = document.getElementById('lb-date-select').value;
         let limitVal = document.getElementById('lb-limit-select').value;
@@ -2474,10 +2482,13 @@ Text: ${text}`;
         
         let btn = document.getElementById('btn-fetch-lb');
         let txtArea = document.getElementById('lb-result-text');
+        let tableContainer = document.getElementById('lb-table-container');
+        let tableBody = document.getElementById('lb-table-body');
         
         btn.innerText = "Fetching from Server...";
         btn.disabled = true;
         txtArea.value = "Loading data from Google Sheets... Please wait.";
+        if(tableContainer) tableContainer.style.display = 'none';
         
         fetch(API_URL, {
             method: 'POST',
@@ -2490,6 +2501,21 @@ Text: ${text}`;
             btn.disabled = false;
             if(data.status === "success") {
                 txtArea.value = data.report;
+                
+                if(data.rawData && data.rawData.length > 0 && tableContainer) {
+                    tableBody.innerHTML = data.rawData.map((rec, i) => `
+                        <tr style="border-bottom: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color);">
+                            <td style="padding: 8px;">${i + 1}</td>
+                            <td style="padding: 8px; font-weight: bold;">${rec.name}</td>
+                            <td style="padding: 8px;">${rec.address || '-'}</td>
+                            <td style="padding: 8px; color: var(--primary-color); font-weight: bold;">${rec.score}/${rec.total}</td>
+                        </tr>
+                    `).join('');
+                    tableContainer.style.display = 'block';
+                } else if (tableContainer) {
+                    tableContainer.style.display = 'none';
+                }
+                
                 showToast("Report Generated!", "success");
             } else {
                 txtArea.value = "Error: " + data.message;
