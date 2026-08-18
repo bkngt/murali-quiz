@@ -382,7 +382,7 @@
                             <th style="padding: 8px;">Name</th>
                             <th style="padding: 8px;">Sewa Kendra</th>
                             <th style="padding: 8px;">Score</th>
-                            <th style="padding: 8px;">Time</th> <!-- 🔴 Added Time Column -->
+                            <th style="padding: 8px;">Time</th>
                         </tr>
                     </thead>
                     <tbody id="lb-table-body"></tbody>
@@ -521,7 +521,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 65.0 (Deep Study AI, 48h Window & Full Leaderboard)</div>
+        <div>Version: 65.1 (Deep Study AI, 48h Window & Full Leaderboard)</div>
     </div>
 </div>
 
@@ -530,7 +530,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "65.0"; 
+    const APP_VERSION = "65.1"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -2379,96 +2379,57 @@ Text: ${text}`;
             let renderDate = new Date(cy, cm, i);
             let isPreLaunch = renderDate.getTime() < launchDate.getTime();
             
-            let diffDays = Math.round((new Date(today.getFullYear(), today.getMonth(), today.getDate()) - renderDate) / (1000 * 60 * 60 * 24));
-            let isToday = (diffDays === 0);
-            let isYesterday = (diffDays === 1);
-            let isPast = (diffDays > 1);
-            let isFuture = (diffDays < 0);
+            let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
+            let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
             
-            let hasQuiz = quizMap[i] ? true : false; 
-            let isCompleted = historyMap[i] ? true : false;
-            
-            let boxStyle = `padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; border: 2px solid var(--border-color); display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50px; transition:all 0.2s; background:var(--card-bg); overflow:hidden; word-break:break-word; line-height: 1.1;`;
-            let statusIcon = ``; 
-            let clickAction = ``; 
-            let cursor = `cursor:not-allowed; opacity:0.6;`;
-
             if (isPreLaunch) {
-                boxStyle += `background: var(--bg-color); border-color: var(--border-color); color: #64748b; opacity:0.6;`;
-                statusIcon = `➖`;
-                clickAction = `onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"`;
-                cursor = `cursor:pointer;`;
-            } else if (isToday || isYesterday) {
-                if (isCompleted) { 
-                    boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; 
-                    statusIcon = `✅`; 
-                    cursor = `cursor:pointer; opacity:1; box-shadow: 0 4px 10px rgba(22,163,74,0.2);`; 
-                    clickAction = `onclick="showQuizStatus('completed', '${quizMap[i].quizDate}')"`;
-                } else if (hasQuiz) { 
-                    boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(56, 189, 248, 0.4); transform: scale(1.08); z-index:10;`; 
-                    statusIcon = `▶️ Play`; 
-                    cursor = `cursor:pointer; opacity:1;`; 
-                    clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`;
-                } else { 
-                    if (isToday) {
-                        boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; 
-                        statusIcon = `⏳ Wait`; 
-                        cursor = `cursor:not-allowed; opacity:1;`; 
-                        clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; 
-                    } else {
-                        boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
-                        statusIcon = `❌ Miss`; 
-                        clickAction = `onclick="showToast('यस दिनको क्वीज उपलब्ध छैन।', 'error')"`; 
-                        cursor = `cursor:pointer;`; 
-                    }
-                }
-            } else if (isPast) {
-                if (isCompleted) { 
-                    boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`; 
-                    statusIcon = `✅`; 
-                    cursor = `cursor:pointer; opacity:0.8;`; 
-                    clickAction = `onclick="showQuizStatus('past-completed', '')"`;
-                } else { 
-                    boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
-                    statusIcon = `❌ Miss`; 
-                    clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो! (म्याद सकियो)', 'error')"`; 
-                    cursor = `cursor:pointer;`; 
-                }
+                calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
+            } else if (monthMap[i]) { 
+                let h = monthMap[i]; 
+                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
             } else { 
-                statusIcon = `🔒`; 
-                clickAction = `onclick="showToast('भोलिको क्वीज भोलि मात्र खुल्नेछ!', 'info')"`; 
-                cursor = `cursor:pointer; opacity:0.5;`; 
+                calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
             }
+        }
+        document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-            let extraTextSize = (isToday || isYesterday) && hasQuiz && !isCompleted && !isPreLaunch ? 'font-size:0.75rem;' : 'font-size:0.65rem;';
-            html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
+        let allWeakTags = []; 
+        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
+        
+        if (allWeakTags.length > 0) { 
+            let tagCounts = {}; 
+            allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
+            let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]); 
+            document.getElementById('weakness-alert').innerHTML = `<div style="margin-top: 15px; padding: 10px; background: rgba(217,119,6,0.1); border-left: 4px solid var(--warning-color); border-radius: 8px; font-size: 0.9rem;">यस महिनाको गल्तीहरूको आधारमा <b>'${sortedTags[0]}'</b> ${sortedTags[1] ? `र <b>'${sortedTags[1]}'</b>` : ''} विषयमा अलि बढी ध्यान दिनुहोला।</div>`;
+        } else { 
+            document.getElementById('weakness-alert').innerHTML = ''; 
+        }
+
+        const list = document.getElementById('progress-list'); 
+        if (totalTaken === 0) { 
+            list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; 
+            return; 
         }
         
-        html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#94a3b8; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>➖ : एप सुरु नभएको</div></div></div>`;
-
-        let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
-        if (specialQuizzes.length > 0) {
-            html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">`;
-            specialQuizzes.forEach(sq => {
-                let isCompleted = history.some(h => h.date === sq.quizDate);
-                if (isCompleted) { 
-                    html += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
-                } else { 
-                    html += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; 
-                }
-            }); 
-            html += `</div></div>`;
-        }
-        
-        html += `<div style="text-align:center; margin-top:20px;"><button class="btn-small" onclick="syncServerQuizzes(true)" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button></div>`;
-        qArea.innerHTML = html; 
-        qArea.style.display = 'block';
-        
-    } catch (e) { 
-        document.getElementById('quiz-area').innerHTML = `<div style="color:red; text-align:center; padding: 3rem;">डाटा लोड गर्न समस्या भयो! कृपया लगआउट गरेर फेरि लगइन गर्नुहोस्।</div>`; 
-        document.getElementById('quiz-area').style.display = 'block'; 
+        list.innerHTML = filteredHistory.map(h => {
+            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
+            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+            let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
+            
+            return `<div class="progress-item">
+                <div style="flex-grow: 1;">
+                    <div style="font-weight:800; font-size:1.15rem; color:var(--primary-color);">📅 ${h.date}</div>
+                    <div class="prog-remark ${rClass}">${rText}</div>
+                    <div>${reviewBtn}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="prog-percent">${h.percent}%</div>
+                    <div style="font-size:0.95rem; color:var(--text-color); font-weight:800;">${h.score} / ${h.total}</div>
+                </div>
+            </div>`;
+        }).join('');
     }
-}
 
     // ==========================================
     // 9. EXPORT & IMPORT (Q&A LIST / ZIP)
