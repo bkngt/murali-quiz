@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <title>BK Murali Quiz</title>
     
-    <!-- 🔴 ZIP फाइल बनाउनको लागि लाइब्रेरी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
@@ -17,7 +16,6 @@
 
         *, *::before, *::after { box-sizing: border-box; }
         
-        /* 🔴 Default Dark Mode Theme */
         :root {
             --bg-color: #0b0f19; --card-bg: #1e293b; --text-color: #f8fafc; 
             --primary-color: #38bdf8; --primary-hover: #7dd3fc;
@@ -81,7 +79,6 @@
         .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3); }
         
         .option-container.keyboard-focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3); transform: translateX(4px); background-color: rgba(56, 189, 248, 0.05); }
-        
         .option-container.selected-temp { background-color: rgba(56, 189, 248, 0.15); border-color: var(--primary-color); transform: translateX(4px); }
         .option-container.selected-wrong { background-color: var(--danger-bg); border-color: var(--danger-color); }
         .option-container.selected-wrong .option-letter { background: var(--danger-color); box-shadow: none; }
@@ -133,6 +130,11 @@
         .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px;}
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+
+        /* Leaderboard Tabs CSS */
+        .lb-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .lb-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
+        .lb-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3); }
     </style>
 </head>
 <body>
@@ -348,16 +350,16 @@
         </div>
     </div>
 
-    <!-- Leaderboard Modal (Admin Only) -->
+    <!-- Leaderboard Modal (Admin Only) - REDESIGNED WITH TABS -->
     <div id="leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'leaderboard-modal') document.getElementById('leaderboard-modal').style.display='none';">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 550px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
-            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800; display:flex; align-items:center; gap:8px;">
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; display:flex; align-items:center; gap:8px; margin-bottom: 15px;">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M12 15l-8.5-8.5L12 2l8.5 4.5L12 15z"></path><path d="M3.5 11L12 15.5 20.5 11"></path><path d="M3.5 15.5L12 20l8.5-4.5"></path></svg>
-                WhatsApp Leaderboard
+                Admin Dashboard
             </h3>
             
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
                 <select id="lb-date-select" class="select-field" style="flex: 2; margin:0; font-size:0.9rem;">
                     <option value="">Loading dates...</option>
                 </select>
@@ -369,30 +371,43 @@
                 </select>
             </div>
             
-            <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Report</button>
+            <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Data</button>
             
-            <textarea id="lb-result-text" readonly style="height: 150px; min-height: 120px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
-            
-            <!-- 🔴 NEW: In-App Leaderboard Table (With Time Column) -->
-            <div id="lb-table-container" style="display:none; margin-top:15px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-                    <thead style="background: var(--primary-color); color: white; position: sticky; top: 0;">
-                        <tr>
-                            <th style="padding: 8px;">SN</th>
-                            <th style="padding: 8px;">Name</th>
-                            <th style="padding: 8px;">Sewa Kendra</th>
-                            <th style="padding: 8px;">Score</th>
-                            <th style="padding: 8px;">Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lb-table-body"></tbody>
-                </table>
+            <!-- Tabs for Leaderboard -->
+            <div class="lb-tabs">
+                <button id="tab-wa" class="active" onclick="switchLbTab('wa')">📊 WhatsApp Report</button>
+                <button id="tab-table" onclick="switchLbTab('table')">👥 Daily Attendance</button>
             </div>
-            
-            <div style="display: flex; gap: 8px; margin-top: 15px;">
-                <button onclick="copyLeaderboard()" style="background: var(--success-color); flex: 1;">📋 Copy Text</button>
-                <button onclick="shareLeaderboardWA()" style="background: #25D366; flex: 1;">💬 Share WA</button>
+
+            <!-- Tab 1: WhatsApp Report -->
+            <div id="lb-wa-section">
+                <textarea id="lb-result-text" readonly style="height: 180px; min-height: 150px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button onclick="copyLeaderboard()" style="background: var(--success-color); flex: 1;">📋 Copy Text</button>
+                    <button onclick="shareLeaderboardWA()" style="background: #25D366; flex: 1;">💬 Share WA</button>
+                </div>
             </div>
+
+            <!-- Tab 2: Daily Attendance Table -->
+            <div id="lb-table-section" style="display:none;">
+                <div id="lb-table-container" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                        <thead style="background: var(--primary-color); color: white; position: sticky; top: 0;">
+                            <tr>
+                                <th style="padding: 8px;">SN</th>
+                                <th style="padding: 8px;">Name</th>
+                                <th style="padding: 8px;">Sewa Kendra</th>
+                                <th style="padding: 8px;">Score</th>
+                                <th style="padding: 8px;">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-table-body">
+                            <tr><td colspan="5" style="text-align:center; padding: 15px; color: #64748b;">No data generated yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -434,7 +449,7 @@
                     Export Q&A List
                 </span>
                 <span style="display:flex; gap:6px;">
-                    <button onclick="openLeaderboardModal()" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">🏆 Leaderboard</button>
+                    <button onclick="openLeaderboardModal()" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">🏆 Dashboard</button>
                     <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 ZIP</button>
                 </span>
             </p>
@@ -2467,9 +2482,16 @@ Text: ${text}`;
 
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
-        document.getElementById('lb-result-text').value = "Select date and click Generate Report...";
-        let tableContainer = document.getElementById('lb-table-container');
-        if(tableContainer) tableContainer.style.display = 'none';
+        document.getElementById('lb-result-text').value = "Select date and click Generate Data...";
+        switchLbTab('wa'); // Default to WA tab
+    }
+
+    // NEW: Function to switch tabs inside Leaderboard Modal
+    window.switchLbTab = function(tab) {
+        document.getElementById('tab-wa').classList.toggle('active', tab === 'wa');
+        document.getElementById('tab-table').classList.toggle('active', tab === 'table');
+        document.getElementById('lb-wa-section').style.display = tab === 'wa' ? 'block' : 'none';
+        document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none';
     }
 
     window.fetchLeaderboard = function() {
@@ -2481,13 +2503,12 @@ Text: ${text}`;
         
         let btn = document.getElementById('btn-fetch-lb');
         let txtArea = document.getElementById('lb-result-text');
-        let tableContainer = document.getElementById('lb-table-container');
         let tableBody = document.getElementById('lb-table-body');
         
         btn.innerText = "Fetching from Server...";
         btn.disabled = true;
         txtArea.value = "Loading data from Google Sheets... Please wait.";
-        if(tableContainer) tableContainer.style.display = 'none';
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #64748b;">⏳ Loading data...</td></tr>`;
         
         fetch(API_URL, {
             method: 'POST',
@@ -2496,12 +2517,14 @@ Text: ${text}`;
         })
         .then(r => r.json())
         .then(data => {
-            btn.innerText = "Generate Report";
+            btn.innerText = "Generate Data";
             btn.disabled = false;
             if(data.status === "success") {
+                // Populate Textarea (WhatsApp)
                 txtArea.value = data.report;
                 
-                if(data.rawData && data.rawData.length > 0 && tableContainer) {
+                // Populate Table (Attendance)
+                if(data.rawData && data.rawData.length > 0) {
                     tableBody.innerHTML = data.rawData.map((rec, i) => `
                         <tr style="border-bottom: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color);">
                             <td style="padding: 8px;">${i + 1}</td>
@@ -2511,21 +2534,22 @@ Text: ${text}`;
                             <td style="padding: 8px;">${rec.timeText} मि.</td>
                         </tr>
                     `).join('');
-                    tableContainer.style.display = 'block';
-                } else if (tableContainer) {
-                    tableContainer.style.display = 'none';
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #dc2626; font-weight:bold;">यस मितिमा कसैले पनि परीक्षा दिएको छैन।</td></tr>`;
                 }
                 
-                showToast("Report Generated!", "success");
+                showToast("Data Generated Successfully!", "success");
             } else {
                 txtArea.value = "Error: " + data.message;
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #dc2626;">Error loading data.</td></tr>`;
                 showToast("Failed to fetch report.", "error");
             }
         })
         .catch(e => {
-            btn.innerText = "Generate Report";
+            btn.innerText = "Generate Data";
             btn.disabled = false;
             txtArea.value = "Network Error. Could not connect to server.";
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #dc2626;">Network Error.</td></tr>`;
             showToast("Network Error.", "error");
         });
     }
