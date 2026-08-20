@@ -135,6 +135,11 @@
         .lb-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
         .lb-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
         .lb-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3); }
+        
+        /* Radio Button Styling */
+        .radio-group { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .radio-label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--text-color); }
+        .radio-label input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -350,7 +355,7 @@
         </div>
     </div>
 
-    <!-- Leaderboard Modal (Admin Only) - REDESIGNED WITH TABS -->
+    <!-- Leaderboard Modal (Admin Only) - UPDATED WITH CALENDAR & AVERAGE -->
     <div id="leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'leaderboard-modal') document.getElementById('leaderboard-modal').style.display='none';">
         <div class="modal-content" style="max-width: 550px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -359,16 +364,45 @@
                 Admin Dashboard
             </h3>
             
-            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <select id="lb-date-select" class="select-field" style="flex: 2; margin:0; font-size:0.9rem;">
-                    <option value="">Loading dates...</option>
-                </select>
-                <select id="lb-limit-select" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
+            <!-- Report Type Selection -->
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="lb-report-type" value="daily" checked onchange="toggleLbDateInputs()"> 📅 दैनिक नतिजा (Daily)
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="lb-report-type" value="range" onchange="toggleLbDateInputs()"> 📊 औसत नतिजा (Average)
+                </label>
+            </div>
+
+            <!-- Daily Input Group -->
+            <div id="lb-daily-input-group" style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <input type="date" id="lb-daily-date" class="input-field" style="flex: 2; margin:0; font-size:0.9rem; cursor:pointer;">
+                <select id="lb-limit-select-daily" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
                     <option value="all">All</option>
                     <option value="5">Top 5</option>
                     <option value="10" selected>Top 10</option>
                     <option value="20">Top 20</option>
                 </select>
+            </div>
+
+            <!-- Range (Average) Input Group -->
+            <div id="lb-range-input-group" style="display: none; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 120px;">
+                    <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color);">सुरु मिति (Start Date)</label>
+                    <input type="date" id="lb-start-date" class="input-field" style="width:100%; margin:0; font-size:0.9rem; cursor:pointer;">
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                    <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color);">अन्तिम मिति (End Date)</label>
+                    <input type="date" id="lb-end-date" class="input-field" style="width:100%; margin:0; font-size:0.9rem; cursor:pointer;">
+                </div>
+                <div style="width: 100%;">
+                    <select id="lb-limit-select-range" class="select-field" style="width:100%; margin:0; font-size:0.9rem;">
+                        <option value="all">All</option>
+                        <option value="5">Top 5</option>
+                        <option value="10" selected>Top 10</option>
+                        <option value="20">Top 20</option>
+                    </select>
+                </div>
             </div>
             
             <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Data</button>
@@ -376,7 +410,7 @@
             <!-- Tabs for Leaderboard -->
             <div class="lb-tabs">
                 <button id="tab-wa" class="active" onclick="switchLbTab('wa')">📊 WhatsApp Report</button>
-                <button id="tab-table" onclick="switchLbTab('table')">👥 Daily Attendance</button>
+                <button id="tab-table" onclick="switchLbTab('table')">👥 Table View</button>
             </div>
 
             <!-- Tab 1: WhatsApp Report -->
@@ -388,11 +422,11 @@
                 </div>
             </div>
 
-            <!-- Tab 2: Daily Attendance Table -->
+            <!-- Tab 2: Table View -->
             <div id="lb-table-section" style="display:none;">
                 <div id="lb-table-container" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-                        <thead style="background: var(--primary-color); color: white; position: sticky; top: 0;">
+                        <thead id="lb-table-head" style="background: var(--primary-color); color: white; position: sticky; top: 0;">
                             <tr>
                                 <th style="padding: 8px;">SN</th>
                                 <th style="padding: 8px;">Name</th>
@@ -536,7 +570,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 65.1 (Deep Study AI, 48h Window & Full Leaderboard)</div>
+        <div>Version: 66.0 (Deep Study AI, Average Leaderboard & Calendar)</div>
     </div>
 </div>
 
@@ -545,7 +579,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "65.1"; 
+    const APP_VERSION = "66.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -2451,17 +2485,12 @@ Text: ${text}`;
     // ==========================================
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
-        let lbSelect = document.getElementById('lb-date-select'); 
-        
         if(!select) return;
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         
         select.innerHTML = '<option value="" disabled selected>कुनै पुरानो क्वीज छान्नुहोस्...</option>';
-        if(lbSelect) lbSelect.innerHTML = '<option value="" disabled selected>Select Date...</option>';
-        
         if(serverQuizzes.length === 0) {
             select.innerHTML = '<option value="" disabled selected>सर्भरमा कुनै क्वीज छैन</option>';
-            if(lbSelect) lbSelect.innerHTML = '<option value="" disabled selected>No Quizzes Found</option>';
             return;
         }
         
@@ -2470,23 +2499,36 @@ Text: ${text}`;
             opt.value = idx;
             opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + sq.quizDate;
             select.appendChild(opt);
-            
-            if(lbSelect) {
-                let lbOpt = document.createElement('option');
-                lbOpt.value = sq.quizDate;
-                lbOpt.text = sq.quizDate;
-                lbSelect.appendChild(lbOpt);
-            }
         });
     }
 
+    // ==========================================
+    // 🏆 LEADERBOARD LOGIC (NEW CALENDAR SYSTEM)
+    // ==========================================
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
         document.getElementById('lb-result-text').value = "Select date and click Generate Data...";
-        switchLbTab('wa'); // Default to WA tab
+        switchLbTab('wa'); 
+        
+        // Set default dates to today and last week
+        let today = new Date();
+        let todayStr = today.toISOString().split('T')[0];
+        
+        let lastWeek = new Date();
+        lastWeek.setDate(today.getDate() - 7);
+        let lastWeekStr = lastWeek.toISOString().split('T')[0];
+        
+        document.getElementById('lb-daily-date').value = todayStr;
+        document.getElementById('lb-start-date').value = lastWeekStr;
+        document.getElementById('lb-end-date').value = todayStr;
     }
 
-    // NEW: Function to switch tabs inside Leaderboard Modal
+    window.toggleLbDateInputs = function() {
+        let type = document.querySelector('input[name="lb-report-type"]:checked').value;
+        document.getElementById('lb-daily-input-group').style.display = type === 'daily' ? 'flex' : 'none';
+        document.getElementById('lb-range-input-group').style.display = type === 'range' ? 'flex' : 'none';
+    }
+
     window.switchLbTab = function(tab) {
         document.getElementById('tab-wa').classList.toggle('active', tab === 'wa');
         document.getElementById('tab-table').classList.toggle('active', tab === 'table');
@@ -2494,16 +2536,52 @@ Text: ${text}`;
         document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none';
     }
 
-    window.fetchLeaderboard = function() {
-        let dateVal = document.getElementById('lb-date-select').value;
-        let limitVal = document.getElementById('lb-limit-select').value;
+    // Helper to map YYYY-MM-DD to exact sheet string (e.g., DD/MM/YYYY)
+    function mapDateToSheetString(yyyy_mm_dd) {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        let targetDateObj = new Date(yyyy_mm_dd);
         
-        if(!dateVal) return showToast("Please select a date first.", "error");
+        for (let sq of serverQuizzes) {
+            let dObj = getValidDate({date: sq.quizDate});
+            if (dObj) {
+                if (dObj.getFullYear() === targetDateObj.getFullYear() &&
+                    dObj.getMonth() === targetDateObj.getMonth() &&
+                    dObj.getDate() === targetDateObj.getDate()) {
+                    return sq.quizDate; 
+                }
+            }
+        }
+        // Fallback format DD/MM/YYYY
+        let parts = yyyy_mm_dd.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    window.fetchLeaderboard = function() {
+        let type = document.querySelector('input[name="lb-report-type"]:checked').value;
+        let payload = { action: "getLeaderboard", reportType: type };
+
+        if (type === 'daily') {
+            let rawDate = document.getElementById('lb-daily-date').value; 
+            if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
+            payload.targetDate = mapDateToSheetString(rawDate);
+            payload.limit = document.getElementById('lb-limit-select-daily').value;
+        } else {
+            let sDate = document.getElementById('lb-start-date').value;
+            let eDate = document.getElementById('lb-end-date').value;
+            if(!sDate || !eDate) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
+            if(new Date(sDate) > new Date(eDate)) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
+            
+            payload.startDate = sDate;
+            payload.endDate = eDate;
+            payload.limit = document.getElementById('lb-limit-select-range').value;
+        }
+        
         if(!navigator.onLine) return showToast("Internet connection required.", "error");
         
         let btn = document.getElementById('btn-fetch-lb');
         let txtArea = document.getElementById('lb-result-text');
         let tableBody = document.getElementById('lb-table-body');
+        let tableHead = document.getElementById('lb-table-head');
         
         btn.innerText = "Fetching from Server...";
         btn.disabled = true;
@@ -2513,27 +2591,41 @@ Text: ${text}`;
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "getLeaderboard", targetDate: dateVal, limit: limitVal })
+            body: JSON.stringify(payload)
         })
         .then(r => r.json())
         .then(data => {
             btn.innerText = "Generate Data";
             btn.disabled = false;
             if(data.status === "success") {
-                // Populate Textarea (WhatsApp)
                 txtArea.value = data.report;
                 
-                // Populate Table (Attendance)
+                if (type === 'daily') {
+                    tableHead.innerHTML = `<tr><th style="padding:8px;">SN</th><th style="padding:8px;">Name</th><th style="padding:8px;">Sewa Kendra</th><th style="padding:8px;">Score</th><th style="padding:8px;">Time</th></tr>`;
+                } else {
+                    tableHead.innerHTML = `<tr><th style="padding:8px;">SN</th><th style="padding:8px;">Name</th><th style="padding:8px;">Sewa Kendra</th><th style="padding:8px;">Avg % (Exams)</th><th style="padding:8px;">Avg Time</th></tr>`;
+                }
+
                 if(data.rawData && data.rawData.length > 0) {
-                    tableBody.innerHTML = data.rawData.map((rec, i) => `
-                        <tr style="border-bottom: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color);">
-                            <td style="padding: 8px;">${i + 1}</td>
-                            <td style="padding: 8px; font-weight: bold;">${rec.name}</td>
-                            <td style="padding: 8px;">${rec.address || '-'}</td>
-                            <td style="padding: 8px; color: var(--primary-color); font-weight: bold;">${rec.score}/${rec.total}</td>
-                            <td style="padding: 8px;">${rec.timeText} मि.</td>
-                        </tr>
-                    `).join('');
+                    tableBody.innerHTML = data.rawData.map((rec, i) => {
+                        if (type === 'daily') {
+                            return `<tr style="border-bottom: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color);">
+                                <td style="padding: 8px;">${i + 1}</td>
+                                <td style="padding: 8px; font-weight: bold;">${rec.name}</td>
+                                <td style="padding: 8px;">${rec.address || '-'}</td>
+                                <td style="padding: 8px; color: var(--primary-color); font-weight: bold;">${rec.score}/${rec.total}</td>
+                                <td style="padding: 8px;">${rec.timeText} मि.</td>
+                            </tr>`;
+                        } else {
+                            return `<tr style="border-bottom: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color);">
+                                <td style="padding: 8px;">${i + 1}</td>
+                                <td style="padding: 8px; font-weight: bold;">${rec.name}</td>
+                                <td style="padding: 8px;">${rec.address || '-'}</td>
+                                <td style="padding: 8px; color: var(--primary-color); font-weight: bold;">${rec.avgPercent}% (${rec.quizzesTaken})</td>
+                                <td style="padding: 8px;">${rec.timeText} मि.</td>
+                            </tr>`;
+                        }
+                    }).join('');
                 } else {
                     tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #dc2626; font-weight:bold;">यस मितिमा कसैले पनि परीक्षा दिएको छैन।</td></tr>`;
                 }
