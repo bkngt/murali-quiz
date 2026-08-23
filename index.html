@@ -327,7 +327,6 @@
                 <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">App Preferences</p>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
-                    <button onclick="toggleSound()" id="modal-sound-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🔊 Sound: ON</button>
                 </div>
             </div>
 
@@ -570,7 +569,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 71.0 (Creative Variety & Self-Validation)</div>
+        <div>Version: 72.0 (Anti-Cheat, Dynamic AI & Strict Murli Trap)</div>
     </div>
 </div>
 
@@ -579,7 +578,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "71.0"; 
+    const APP_VERSION = "72.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -598,8 +597,6 @@
     let totalTimeSec = 0; 
     let isTimerStarted = false;
     
-    let audioCtx; 
-    let soundEnabled = true;
     let currentCalDate = new Date(); 
     let reviewSource = 'current';
     
@@ -611,6 +608,10 @@
     
     let activeQuestionIndex = 0;
     let focusedOptionIndex = -1;
+
+    // Anti-Cheat Variables
+    let isQuizActive = false;
+    let tabSwitchCount = 0;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -652,42 +653,6 @@
             toast.style.transform = 'translateY(-20px)'; 
             setTimeout(() => toast.remove(), 300); 
         }, duration);
-    }
-
-    function playSound(type) {
-        if(!soundEnabled) return; 
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        
-        const osc = audioCtx.createOscillator(); 
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode); 
-        gainNode.connect(audioCtx.destination);
-        
-        if(type === 'correct') { 
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-            osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.start(); 
-            osc.stop(audioCtx.currentTime + 0.3); 
-        } else { 
-            osc.type = 'sawtooth'; 
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); 
-            osc.start(); 
-            osc.stop(audioCtx.currentTime + 0.2); 
-        }
-    }
-
-    function toggleSound() { 
-        soundEnabled = !soundEnabled; 
-        localStorage.setItem('m_q_sound', soundEnabled ? '1' : '0'); 
-        let btn = document.getElementById('modal-sound-btn'); 
-        if(btn) btn.innerHTML = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
     }
 
     function toggleDarkMode() { 
@@ -817,13 +782,6 @@
             if(meta) meta.content = "#0b0f19";
             let btn = document.getElementById('modal-dark-btn'); 
             if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
-        }
-
-        const savedSound = localStorage.getItem('m_q_sound'); 
-        if (savedSound === '0') { 
-            soundEnabled = false; 
-            let btn = document.getElementById('modal-sound-btn'); 
-            if(btn) btn.innerHTML = '🔇 Sound: OFF'; 
         }
         
         let savedLockout = localStorage.getItem('murali_lockout_time');
@@ -1607,8 +1565,8 @@
         if (level === 'expert') {
             difficultyInstruction = `EXPERT LEVEL (Deep Chintan & Plausible Distractors):
             - The correct answer MUST be exactly what is stated in today's text.
-            - CRITICAL FOR DISTRACTORS (Wrong Options): They MUST logically and grammatically fit the question. If the question asks "How are sins erased?", the wrong options MUST be actions (e.g., "By doing charity", "By reading scriptures"), NOT random unrelated sentences like "You are a peaceful soul".
-            - The distractors should be genuine Brahma Kumaris concepts that sound correct but are NOT the specific answer given in today's text for that specific point. This forces the user to remember exactly what Baba said TODAY.`;
+            - CRITICAL FOR DISTRACTORS (Wrong Options): They MUST logically and grammatically fit the question. 
+            - THE MURLI TRAP: Wrong options MUST be genuine Brahma Kumaris concepts from past Murlis. They must sound 100% correct spiritually, but be factually incorrect for TODAY'S Murli. If a user guesses without reading today's text, they should fail.`;
         } else if (level === 'advanced') {
             difficultyInstruction = `ADVANCED LEVEL (Past vs Present Knowledge):
             - The correct answer must be from today's text.
@@ -1640,8 +1598,9 @@ QUIZ RULES (FORCING DEEP STUDY & VARIETY):
 2. VARIETY IS MANDATORY: You MUST include different types of questions to make it engaging and creative. Ensure a mix of:
    - Fill in the blanks (खाली ठाउँ भर्ने): e.g., "बाबाले भन्नुभयो: 'तिमी _____ हौ।'" (Use '_____' for the blank).
    - True/False or Statement Identification (सत्य/असत्य): e.g., "आजको मुरली अनुसार तलका मध्ये कुन भनाइ सत्य हो?"
+   - Odd One Out (नमिल्ने छान्ने): e.g., "आजको मुरलीमा बाबाले तलका मध्ये कुन कुरा उल्लेख गर्नुभएको छैन?"
    - Cause & Effect (कारण र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
-   - Direct specific questions.
+   - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा दिनुभएको हो?"
 3. Difficulty: ${difficultyInstruction}
 4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. If it's a fill-in-the-blank, all 4 options must be plausible words/phrases for that blank. NEVER use silly or obvious wrong answers.
 5. The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words in the "answer" field.
@@ -1652,7 +1611,7 @@ SELF-VALIDATION BEFORE OUTPUT (CRITICAL):
 - Check: Are there exactly 4 options for every question?
 - Check: Is the correct answer exactly matching one of the options?
 - Check: Are the distractors logical but incorrect based *only* on today's text?
-- Check: Is there a good mix of Fill-in-the-blanks, True/False, and Direct questions?
+- Check: Is there a good mix of Fill-in-the-blanks, True/False, Odd One Out, and Direct questions?
 - Check: Is the core meaning (moulikta) of the Murli preserved?
 
 Structure: 
@@ -1670,8 +1629,16 @@ Text: ${text}`;
             let retries = 5; 
             let delay = 4000; 
             let currentModel = selectedModel; 
-            // Updated Hierarchy: 3.6 -> 3.5 -> 3.7 -> 2.5
-            const modelHierarchy = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'];
+            
+            // Dynamic Hierarchy based on selection
+            let modelHierarchy = [];
+            if (selectedModel === 'gemini-3.7-flash') {
+                modelHierarchy = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+            } else if (selectedModel === 'gemini-3.6-flash') {
+                modelHierarchy = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'];
+            } else {
+                modelHierarchy = [selectedModel, 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+            }
 
             for (let i = 0; i < retries; i++) {
                 if (i > 0) {
@@ -1684,7 +1651,7 @@ Text: ${text}`;
                     body: JSON.stringify({ 
                         contents: [{ parts: [{ text: promptText }] }],
                         generationConfig: {
-                            temperature: 0.3, // Slightly increased for creativity
+                            temperature: 0.3, 
                         }
                     }) 
                 });
@@ -1693,7 +1660,7 @@ Text: ${text}`;
                     await new Promise(r => setTimeout(r, delay));
                     delay += 3000; 
                     
-                    if (i >= 1) { // Shift model faster if failing
+                    if (i >= 1) { 
                         let currentIndex = modelHierarchy.indexOf(currentModel);
                         if (currentIndex !== -1 && currentIndex < modelHierarchy.length - 1) {
                             currentModel = modelHierarchy[currentIndex + 1];
@@ -1877,6 +1844,19 @@ Text: ${text}`;
         clearInterval(timerInterval); 
     }
 
+    // Tab-Switch Detection (Anti-Cheat)
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden && isQuizActive && document.getElementById('quiz-area').style.display === 'block') {
+            tabSwitchCount++;
+            if (tabSwitchCount === 1) {
+                alert("⚠️ चेतावनी: परीक्षाको बीचमा अर्को ट्याब वा एप खोल्न सख्त मनाही छ! अर्को पटक यसो गरेमा परीक्षा आफैं Submit हुनेछ।");
+            } else if (tabSwitchCount >= 2) {
+                alert("🚫 तपाईंले नियम उल्लङ्घन गर्नुभयो। परीक्षा अटोमेटिक Submit हुँदैछ।");
+                submitQuiz();
+            }
+        }
+    });
+
     document.addEventListener('keydown', function(e) {
         if (document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen').style.display === 'none') {
             if(reviewSource === 'past') return; 
@@ -1947,6 +1927,8 @@ Text: ${text}`;
 
         focusedOptionIndex = -1;
         isTimerStarted = true; 
+        isQuizActive = true;
+        tabSwitchCount = 0;
         startTimer();
         
         document.getElementById('result-screen').style.display = 'none'; 
@@ -1987,6 +1969,7 @@ Text: ${text}`;
     }
 
     function resetToGenerator() {
+        isQuizActive = false;
         document.getElementById('quiz-area').style.display = 'none'; 
         document.getElementById('result-screen').style.display = 'none';
         document.getElementById('sticky-scorebar').style.display = 'none'; 
@@ -2060,21 +2043,12 @@ Text: ${text}`;
             let opt = document.getElementById(`opt-${qIndex}-${i}`); 
             opt.classList.add('disabled'); 
             opt.classList.remove('keyboard-focus'); 
-            if(i === oIndex) opt.classList.add('selected-temp'); 
+            if(i === oIndex) opt.classList.add('selected-temp'); // Neutral Selection (Blue)
         }
         
         let q = currentQuiz[qIndex]; 
-        answeredCount++; 
+        if (q.userSelectedIndex === undefined) answeredCount++; 
         q.userSelectedIndex = oIndex;
-        
-        if (String(q.options[oIndex]).trim() === String(q.answer).trim()) { 
-            currentScore++; 
-            q.userCorrect = true; 
-            playSound('correct'); 
-        } else { 
-            q.userCorrect = false; 
-            playSound('wrong'); 
-        }
         
         updateStickyBar(); 
         
@@ -2111,6 +2085,24 @@ Text: ${text}`;
         
         document.getElementById('sb-submit-btn').disabled = true; 
         stopTimer(); 
+        isQuizActive = false;
+        
+        // Calculate Score Here (Anti-Cheat)
+        currentScore = 0;
+        currentQuiz.forEach(q => {
+            if (q.userSelectedIndex !== undefined) {
+                let selectedText = String(q.options[q.userSelectedIndex]).trim();
+                let answerText = String(q.answer).trim();
+                if (selectedText === answerText) {
+                    currentScore++;
+                    q.userCorrect = true;
+                } else {
+                    q.userCorrect = false;
+                }
+            } else {
+                q.userCorrect = false;
+            }
+        });
         
         localStorage.removeItem('murali_active_quiz_state');
         
