@@ -569,7 +569,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 72.0 (Anti-Cheat, Dynamic AI & Strict Murli Trap)</div>
+        <div>Version: 73.0 (Expert Micro-Context & Compound Options)</div>
     </div>
 </div>
 
@@ -578,7 +578,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "72.0"; 
+    const APP_VERSION = "73.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1563,10 +1563,12 @@
 
         let difficultyInstruction = "";
         if (level === 'expert') {
-            difficultyInstruction = `EXPERT LEVEL (Deep Chintan & Plausible Distractors):
-            - The correct answer MUST be exactly what is stated in today's text.
-            - CRITICAL FOR DISTRACTORS (Wrong Options): They MUST logically and grammatically fit the question. 
-            - THE MURLI TRAP: Wrong options MUST be genuine Brahma Kumaris concepts from past Murlis. They must sound 100% correct spiritually, but be factually incorrect for TODAY'S Murli. If a user guesses without reading today's text, they should fail.`;
+            difficultyInstruction = `EXPERT LEVEL (Extreme Difficulty & Micro-Context):
+            - CRITICAL: NEVER use obvious, generic, or "nursery-level" distractors (e.g., if the answer is 'Baba', do NOT use 'Family' or 'Friends' as wrong options. Use 'Brahma', 'Seniors', 'Divine Family').
+            - Do NOT invent fake Murli phrases (e.g., if the text says 'Gyan Chita', do not invent 'Tapasya Chita' or 'Sewa Chita' because they don't exist in BK terminology).
+            - Use "Compound Options" to increase difficulty (e.g., A. Gyan and Yog, B. Yog and Dharna, C. Gyan and Yaad).
+            - All 4 options MUST be exact phrases used in BK knowledge, making it impossible to guess without reading TODAY'S specific text.
+            - The questions should test deep nuances, not just basic BK facts.`;
         } else if (level === 'advanced') {
             difficultyInstruction = `ADVANCED LEVEL (Past vs Present Knowledge):
             - The correct answer must be from today's text.
@@ -1602,7 +1604,7 @@ QUIZ RULES (FORCING DEEP STUDY & VARIETY):
    - Cause & Effect (कारण र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
    - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा दिनुभएको हो?"
 3. Difficulty: ${difficultyInstruction}
-4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. If it's a fill-in-the-blank, all 4 options must be plausible words/phrases for that blank. NEVER use silly or obvious wrong answers.
+4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. NEVER use generic words like 'Family', 'Money', 'World' as distractors unless specifically contrasting them from the text. Make the user sweat to find the difference between the 4 options.
 5. The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words in the "answer" field.
 6. STRICT RULE: NEVER use words like "वरदान अनुसार", "आजको मुरलीमा", "बाबाका अनुसार". Ask directly.
 7. Use the "tag" field to indicate the source/context (e.g., "वरदान", "स्लोगन", "धारणा", "ज्ञान", "मुख्य सार"). Do not put these words in the question text itself.
