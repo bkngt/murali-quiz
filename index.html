@@ -1719,6 +1719,9 @@ Text: ${text}`;
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('pledge-modal').style.display = 'flex'; 
             
+            // यो नयाँ लाइन थप्नुहोस्
+            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success"); 
+            
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             if(safeRole === 'manager' || safeRole === 'admin') { 
                 document.getElementById('btn-save-top').style.display = 'inline-block'; 
