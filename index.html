@@ -570,7 +570,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 68.0 (Smart Auto-Shift, Short Qs & Strict Validation)</div>
+        <div>Version: 69.0 (Smart Auto-Shift, Short Qs & Strict Validation)</div>
     </div>
 </div>
 
@@ -579,7 +579,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "68.0"; 
+    const APP_VERSION = "69.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1605,18 +1605,20 @@
 
         let difficultyInstruction = "";
         if (level === 'expert') {
-            difficultyInstruction = `EXPERT LEVEL (100% Today's Text): 
-            - Focus on the deepest, most unique points, specific examples, and subtle nuances of TODAY'S text. 
-            - CRITICAL: The 3 wrong options (distractors) MUST ALSO be extracted directly from TODAY'S text (e.g., taking a phrase from another paragraph). Do NOT use any outside spiritual knowledge. Everything must be 100% from the provided text.
-            - Include 2-3 questions of "Except/Not" type (e.g., "Which of the following was NOT mentioned today?").`;
+            difficultyInstruction = `EXPERT LEVEL (Context Swapping - 100% Today's Text):
+            - CRITICAL: ALL 4 options (1 correct, 3 wrong) MUST be exact phrases copied directly from TODAY'S text.
+            - DO NOT invent any words. DO NOT use generic BK terms if they are not in today's text.
+            - TRICK THE USER: Take a phrase from the 'Slogan' and use it as a wrong option for a question about the 'Vardan'. Take a phrase from 'Dharna' and use it as a wrong option for 'Gyan'.
+            - The user must have read carefully to know WHICH phrase belongs to WHICH context today.`;
         } else if (level === 'advanced') {
-            difficultyInstruction = `ADVANCED LEVEL (Deep Chintan): 
-            - Focus on specific examples, analogies, and the main theme of today's text. 
-            - CRITICAL: The 3 wrong options (distractors) MUST be universally true spiritual statements (valid BK knowledge) but they MUST NOT be mentioned in today's text. This forces the user to know exactly what was spoken TODAY.`;
+            difficultyInstruction = `ADVANCED LEVEL (Past vs Present Knowledge):
+            - The correct answer must be from today's text.
+            - The 3 wrong options MUST be genuine, deep Brahma Kumaris concepts (from past Murlis) that sound highly plausible but were NOT spoken today.
+            - Do not use silly or obvious wrong answers. Make them sound like real Baba's versions.`;
         } else {
-            difficultyInstruction = `STANDARD LEVEL (Conceptual Focus): 
-            - Test basic factual recall of today's main points. 
-            - Distractors should be related concepts but slightly altered or applied to the wrong context based on today's text.`;
+            difficultyInstruction = `STANDARD LEVEL (Core Understanding):
+            - Test the main teachings of today.
+            - Wrong options should be common misunderstandings or opposite traits. They must still sound formal and serious, not childish.`;
         }
 
         const promptText = `You are an expert spiritual examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text. 
@@ -1649,6 +1651,7 @@ QUIZ RULES (FORCING DEEP STUDY):
 7. CRITICAL: The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words, brackets, or English translations in the "answer" field that are not in the options.
 8. CRITICAL: DO NOT use phrases like "आजको मुरलीमा", "बाबाका अनुसार", "भनिएको छ", "मुरली अनुसार" in the questions. Ask the question directly and keep it very short.
 9. Use the "tag" field to indicate the source/context of the question (e.g., "वरदान", "स्लोगन", "धारणा", "ज्ञान", "मुख्य सार", "शब्द स्पष्टीकरण"). Do not put these words in the question text itself.
+10. STRICT RULE FOR OPTIONS: NEVER create silly, obvious, or fake distractors (e.g., do not invent terms like "दादाको भण्डारा"). All options must sound like serious, authentic spiritual text.
 
 Structure: 
 {
@@ -1662,8 +1665,8 @@ Text: ${text}`;
 
         try {
             let response;
-            let retries = 6; 
-            let delay = 2000; 
+            let retries = 5; 
+            let delay = 3000; // Start with 3 seconds
             let currentModel = selectedModel; 
             const modelHierarchy = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 
@@ -1685,9 +1688,9 @@ Text: ${text}`;
                 
                 if (response.status === 503 || response.status === 429) {
                     await new Promise(r => setTimeout(r, delay));
-                    delay = Math.min(delay * 1.5, 5000); 
+                    delay = Math.min(delay * 2, 10000); // 3s, 6s, 10s, 10s...
                     
-                    if (i >= 2) {
+                    if (i >= 2) { // Shift after 3 failed attempts
                         let currentIndex = modelHierarchy.indexOf(currentModel);
                         if (currentIndex !== -1 && currentIndex < modelHierarchy.length - 1) {
                             currentModel = modelHierarchy[currentIndex + 1];
