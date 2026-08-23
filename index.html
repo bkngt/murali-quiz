@@ -317,6 +317,8 @@
                    <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
                         <option value="gemini-3.7-flash" selected>🚀 Gemini 3.7 Flash</option>
                         <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
+                        <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
+                        <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash</option>
                     </select>
                 </div>
             </div>
@@ -353,7 +355,7 @@
         </div>
     </div>
 
-    <!-- Leaderboard Modal (Admin Only) - UPDATED WITH CALENDAR & AVERAGE -->
+    <!-- Leaderboard Modal (Admin Only) -->
     <div id="leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'leaderboard-modal') document.getElementById('leaderboard-modal').style.display='none';">
         <div class="modal-content" style="max-width: 550px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -568,7 +570,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 67.0 (Deep Study AI, Smart Retry & Strict Validation)</div>
+        <div>Version: 68.0 (Smart Auto-Shift, Short Qs & Strict Validation)</div>
     </div>
 </div>
 
@@ -577,7 +579,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "67.0"; 
+    const APP_VERSION = "68.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1599,7 +1601,7 @@
         document.getElementById('generator-actions').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
         document.getElementById('loading-box').style.display = 'block'; 
-        document.getElementById('loading-text').innerText = "AI is drafting the quiz and Swaman... (कृपया पर्खनुहोस्)";
+        document.getElementById('loading-text').innerText = `AI is drafting the quiz using ${selectedModel}... (कृपया पर्खनुहोस्)`;
 
         let difficultyInstruction = "";
         if (level === 'expert') {
@@ -1636,16 +1638,17 @@ QUIZ RULES (FORCING DEEP STUDY):
 1. "quiz" must be an array of exactly ${qCount} objects.
 2. NEVER ask generic spiritual questions that can be answered without reading THIS specific text. Every question MUST rely on a specific sentence, unique phrase, or specific context present ONLY in the provided text.
 3. Keep questions SHORT and mobile-friendly.
-4. NEVER use repetitive phrases like "मुरली अनुसार", "बाबाको अनुसार". Ask directly based on the context.
-5. Ensure exactly 4 options per question.
-6. Difficulty: ${difficultyInstruction}
-7. Mix of Question Types: 
+4. Ensure exactly 4 options per question.
+5. Difficulty: ${difficultyInstruction}
+6. Mix of Question Types: 
    - ~30% Specific Examples/Analogies used today.
    - ~25% Cause & Effect (Why did Baba say X?).
    - ~20% Fill in the exact unique words used today.
    - ~15% True/False context.
    - ~10% Odd One Out / "Not mentioned today".
-8. CRITICAL: The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words, brackets, or English translations in the "answer" field that are not in the options.
+7. CRITICAL: The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words, brackets, or English translations in the "answer" field that are not in the options.
+8. CRITICAL: DO NOT use phrases like "आजको मुरलीमा", "बाबाका अनुसार", "भनिएको छ", "मुरली अनुसार" in the questions. Ask the question directly and keep it very short.
+9. Use the "tag" field to indicate the source/context of the question (e.g., "वरदान", "स्लोगन", "धारणा", "ज्ञान", "मुख्य सार", "शब्द स्पष्टीकरण"). Do not put these words in the question text itself.
 
 Structure: 
 {
@@ -1659,13 +1662,14 @@ Text: ${text}`;
 
         try {
             let response;
-            let retries = 4; 
+            let retries = 6; 
             let delay = 2000; 
             let currentModel = selectedModel; 
+            const modelHierarchy = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 
             for (let i = 0; i < retries; i++) {
                 if (i > 0) {
-                    document.getElementById('loading-text').innerText = `Server is busy. Retrying... Attempt ${i + 1}/${retries}`;
+                    document.getElementById('loading-text').innerText = `Server busy. Retrying with ${currentModel}... Attempt ${i + 1}/${retries}`;
                 }
                 
                 response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`, { 
@@ -1681,11 +1685,14 @@ Text: ${text}`;
                 
                 if (response.status === 503 || response.status === 429) {
                     await new Promise(r => setTimeout(r, delay));
-                    delay *= 2; 
+                    delay = Math.min(delay * 1.5, 5000); 
                     
-                    if (i === 1 && currentModel.includes('3.7')) {
-                        currentModel = 'gemini-3.6-flash'; 
-                        document.getElementById('loading-text').innerText = `Heavy traffic on 3.7. Switching to 3.6 Flash...`;
+                    if (i >= 2) {
+                        let currentIndex = modelHierarchy.indexOf(currentModel);
+                        if (currentIndex !== -1 && currentIndex < modelHierarchy.length - 1) {
+                            currentModel = modelHierarchy[currentIndex + 1];
+                            document.getElementById('loading-text').innerText = `Heavy traffic. Auto-shifting to ${currentModel}...`;
+                        }
                     }
                     continue;
                 }
@@ -1719,8 +1726,7 @@ Text: ${text}`;
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('pledge-modal').style.display = 'flex'; 
             
-            // यो नयाँ लाइन थप्नुहोस्
-            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success"); 
+            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success");
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             if(safeRole === 'manager' || safeRole === 'admin') { 
