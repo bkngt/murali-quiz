@@ -570,7 +570,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 69.0 (Smart Auto-Shift, Short Qs & Strict Validation)</div>
+        <div>Version: 70.0 (Smart Auto-Shift, Short Qs & Strict Validation)</div>
     </div>
 </div>
 
@@ -579,7 +579,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "69.0"; 
+    const APP_VERSION = "70.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -638,7 +638,7 @@
         } 
     }
 
-    function showToast(msg, type = 'info') {
+    function showToast(msg, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container'); 
         const toast = document.createElement('div');
         let iconSvg = type === 'error' ? `<svg class="icon" style="color:var(--danger-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : (type === 'success' ? `<svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : `<svg class="icon" style="color:var(--primary-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`);
@@ -651,7 +651,7 @@
             toast.style.opacity = '0'; 
             toast.style.transform = 'translateY(-20px)'; 
             setTimeout(() => toast.remove(), 300); 
-        }, 3000);
+        }, duration);
     }
 
     function playSound(type) {
@@ -1605,11 +1605,10 @@
 
         let difficultyInstruction = "";
         if (level === 'expert') {
-            difficultyInstruction = `EXPERT LEVEL (Context Swapping - 100% Today's Text):
-            - CRITICAL: ALL 4 options (1 correct, 3 wrong) MUST be exact phrases copied directly from TODAY'S text.
-            - DO NOT invent any words. DO NOT use generic BK terms if they are not in today's text.
-            - TRICK THE USER: Take a phrase from the 'Slogan' and use it as a wrong option for a question about the 'Vardan'. Take a phrase from 'Dharna' and use it as a wrong option for 'Gyan'.
-            - The user must have read carefully to know WHICH phrase belongs to WHICH context today.`;
+            difficultyInstruction = `EXPERT LEVEL (Deep Chintan & Plausible Distractors):
+            - The correct answer MUST be exactly what is stated in today's text.
+            - CRITICAL FOR DISTRACTORS (Wrong Options): They MUST logically and grammatically fit the question. If the question asks "How are sins erased?", the wrong options MUST be actions (e.g., "By doing charity", "By reading scriptures"), NOT random unrelated sentences like "You are a peaceful soul".
+            - The distractors should be genuine Brahma Kumaris concepts that sound correct but are NOT the specific answer given in today's text for that specific point. This forces the user to remember exactly what Baba said TODAY.`;
         } else if (level === 'advanced') {
             difficultyInstruction = `ADVANCED LEVEL (Past vs Present Knowledge):
             - The correct answer must be from today's text.
@@ -1649,9 +1648,9 @@ QUIZ RULES (FORCING DEEP STUDY):
    - ~15% True/False context.
    - ~10% Odd One Out / "Not mentioned today".
 7. CRITICAL: The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words, brackets, or English translations in the "answer" field that are not in the options.
-8. CRITICAL: DO NOT use phrases like "आजको मुरलीमा", "बाबाका अनुसार", "भनिएको छ", "मुरली अनुसार" in the questions. Ask the question directly and keep it very short.
+8. STRICT RULE: NEVER use words like "वरदान अनुसार", "आजको मुरलीमा", "बाबाका अनुसार", "भनिएको छ", "मुरली अनुसार". Ask directly. Example: Instead of "वरदान अनुसार हामी के हौं?", ask "हामी के हौं?".
 9. Use the "tag" field to indicate the source/context of the question (e.g., "वरदान", "स्लोगन", "धारणा", "ज्ञान", "मुख्य सार", "शब्द स्पष्टीकरण"). Do not put these words in the question text itself.
-10. STRICT RULE FOR OPTIONS: NEVER create silly, obvious, or fake distractors (e.g., do not invent terms like "दादाको भण्डारा"). All options must sound like serious, authentic spiritual text.
+10. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category. Do not mix a sentence about 'Yoga' with an option about 'Food' unless the question specifically connects them. NEVER create silly, obvious, or fake distractors (e.g., do not invent terms like "दादाको भण्डारा"). All options must sound like serious, authentic spiritual text.
 
 Structure: 
 {
@@ -1666,7 +1665,7 @@ Text: ${text}`;
         try {
             let response;
             let retries = 5; 
-            let delay = 3000; // Start with 3 seconds
+            let delay = 4000; // Start with 4 seconds
             let currentModel = selectedModel; 
             const modelHierarchy = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
 
@@ -1688,7 +1687,7 @@ Text: ${text}`;
                 
                 if (response.status === 503 || response.status === 429) {
                     await new Promise(r => setTimeout(r, delay));
-                    delay = Math.min(delay * 2, 10000); // 3s, 6s, 10s, 10s...
+                    delay += 3000; // 4s, 7s, 10s...
                     
                     if (i >= 2) { // Shift after 3 failed attempts
                         let currentIndex = modelHierarchy.indexOf(currentModel);
@@ -1729,7 +1728,7 @@ Text: ${text}`;
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('pledge-modal').style.display = 'flex'; 
             
-            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success");
+            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success", 8000); // 8 seconds duration
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             if(safeRole === 'manager' || safeRole === 'admin') { 
