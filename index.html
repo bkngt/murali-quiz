@@ -627,9 +627,14 @@
         });
     }
 
+    // EMERGENCY FIX: अटोमेटिक बिग्रिएको फाइल डिलिट गर्ने
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Reg Failed:', err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister().then(function(isUnregistered) {
+                    if(isUnregistered) { window.location.reload(true); }
+                });
+            }
         });
     }
 
