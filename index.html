@@ -595,7 +595,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 78.0 (Smart Install Detector)</div>
+        <div>Version: 79.0 (Smart Cloud Resume System)</div>
     </div>
 </div>
 
@@ -609,7 +609,6 @@
         deferredPrompt = e;
     });
 
-    // Button is always visible now. Handle click manually.
     const installBtn = document.getElementById('install-pwa-btn');
     if(installBtn) {
         installBtn.addEventListener('click', async () => {
@@ -618,7 +617,6 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
             } else {
-                // Smart Fallback for iOS and Android
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 if (isIOS) {
                     alert("🍎 Apple को नियम अनुसार:\nकृपया तल रहेको 'Share' (शेयर) बटन थिच्नुहोस् र अलि तल सारेर 'Add to Home Screen' छान्नुहोस्।");
@@ -638,8 +636,8 @@
     // ==========================================
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "78.0"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
+    const APP_VERSION = "79.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -731,13 +729,12 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
-            // Sweet "Water Drop / Pop" Sound
             osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Start high
-            osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1); // Drop fast
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1); 
             
-            gain.gain.setValueAtTime(0.8, audioCtx.currentTime); // Louder volume
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); // Fade out fast
+            gain.gain.setValueAtTime(0.8, audioCtx.currentTime); 
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); 
             
             osc.start(audioCtx.currentTime);
             osc.stop(audioCtx.currentTime + 0.1);
@@ -750,7 +747,7 @@
         let meta = document.getElementById('theme-color-meta');
         
         if(isDark) {
-            document.body.removeAttribute('data-theme'); // Default is Light now
+            document.body.removeAttribute('data-theme'); 
             localStorage.setItem('m_q_theme', 'light'); 
             if(meta) meta.content = "#f8fafc"; 
             if(btn) btn.innerHTML = '🌙 Dark Mode: OFF';
@@ -861,7 +858,6 @@
         document.getElementById('main-app').style.display = 'none';
         
         let meta = document.getElementById('theme-color-meta');
-        // Default is Light now. Check if user explicitly wants Dark.
         if(localStorage.getItem('m_q_theme') === 'dark') {
             document.body.setAttribute('data-theme', 'dark'); 
             if(meta) meta.content = "#0b0f19";
@@ -1239,7 +1235,7 @@
     };
 
     function clearLocalDataAndReload(force = false) {
-        if(force || confirm("तपाईंको ब्राउजरको लगइन डाटा मेटिनेछ। के तपाईं पक्का हुनुहुन्छ?")) {
+        if(force || confirm("तपाईंको लगइन विवरण मात्र हट्नेछ (तपाईंको परीक्षा रेकर्ड सुरक्षित रहनेछ)। के तपाईं पक्का हुनुहुन्छ?")) {
             localStorage.removeItem('murali_user_name'); 
             localStorage.removeItem('murali_phone'); 
             localStorage.removeItem('murali_address');
@@ -1248,7 +1244,6 @@
             localStorage.removeItem('murali_pin'); 
             localStorage.removeItem('murali_role');
             
-            localStorage.removeItem('murali_progress'); 
             localStorage.removeItem('murali_active_quiz_state'); 
             
             window.location.reload();
@@ -1715,7 +1710,7 @@ QUIZ RULES (FORCING DEEP STUDY & VARIETY):
    - True/False or Statement Identification (सत्य/असत्य): e.g., "आजको मुरली अनुसार तलका मध्ये कुन भनाइ सत्य हो?"
    - Odd One Out (नमिल्ने छान्ने): e.g., "आजको मुरलीमा बाबाले तलका मध्ये कुन कुरा उल्लेख गर्नुभएको छैन?"
    - Cause & Effect (कारण र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
-   - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा दिनुभएको हो?"
+   - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा উন্নয়ন गर्नुभएको हो?"
 3. Difficulty: ${difficultyInstruction}
 4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. NEVER use generic words like 'Family', 'Money', 'World' as distractors unless specifically contrasting them from the text. Make the user sweat to find the difference between the 4 options.
 5. The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words in the "answer" field.
@@ -1921,20 +1916,61 @@ Text: ${text}`;
     }
 
     // ==========================================
-    // 7. QUIZ EXECUTION & LOGIC
+    // 7. QUIZ EXECUTION & LOGIC (WITH CLOUD RESUME)
     // ==========================================
     
-    window.startSpecificQuiz = function(dateStr) {
+    // NEW: Save state to cloud asynchronously
+    function saveStateToCloud(stateObj) {
+        if(!navigator.onLine) return;
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                action: "saveActiveState",
+                phone: userPhone,
+                date: stateObj.date,
+                stateData: stateObj
+            })
+        }).catch(e => console.log("Background state save failed"));
+    }
+
+    window.startSpecificQuiz = async function(dateStr) {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); 
         let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
-        if(targetQuiz && targetQuiz.quizData) { 
-            currentQuiz = JSON.parse(JSON.stringify(targetQuiz.quizData)); 
-            currentMurliDate = targetQuiz.quizDate; 
-            currentSwaman = targetQuiz.swaman || ""; 
-            document.getElementById('pledge-modal').style.display = 'flex';
-        } else { 
-            showToast("क्वीज फेला परेन!", "error"); 
+        
+        if(!targetQuiz || !targetQuiz.quizData) {
+            return showToast("क्वीज फेला परेन!", "error"); 
         }
+
+        // Show loading while checking cloud state
+        document.getElementById('loading-box').style.display = 'block';
+        document.getElementById('loading-text').innerText = "Checking previous progress...";
+        document.getElementById('quiz-area').style.display = 'none';
+        
+        let cloudState = null;
+        if(navigator.onLine) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "fetchActiveState", phone: userPhone, date: dateStr })
+                });
+                let data = await res.json();
+                if(data.status === "success" && data.stateData) {
+                    cloudState = data.stateData;
+                }
+            } catch(e) {
+                console.log("Could not fetch cloud state, falling back to local.");
+            }
+        }
+
+        document.getElementById('loading-box').style.display = 'none';
+        
+        // Store temporarily to use after pledge
+        window.tempCloudState = cloudState;
+        window.tempTargetQuiz = targetQuiz;
+        
+        document.getElementById('pledge-modal').style.display = 'flex';
     }
 
     window.closePledgeModal = function() {
@@ -1944,7 +1980,14 @@ Text: ${text}`;
 
     window.acceptPledgeAndStart = function() {
         document.getElementById('pledge-modal').style.display = 'none';
-        startQuizSession();
+        
+        let targetQuiz = window.tempTargetQuiz;
+        let cloudState = window.tempCloudState;
+        
+        currentMurliDate = targetQuiz.quizDate; 
+        currentSwaman = targetQuiz.swaman || ""; 
+        
+        startQuizSession(cloudState, targetQuiz.quizData);
     }
 
     function startTimer() { 
@@ -2048,19 +2091,27 @@ Text: ${text}`;
         }, 1000);
     }
 
-    function startQuizSession() {
+    function startQuizSession(cloudState, originalQuizData) {
         stopTimer(); 
         document.getElementById('sb-submit-btn').disabled = false;
         
-        let savedStateStr = localStorage.getItem('murali_active_quiz_state');
-        let savedState = savedStateStr ? JSON.parse(savedStateStr) : null;
+        let localStateStr = localStorage.getItem('murali_active_quiz_state');
+        let localState = localStateStr ? JSON.parse(localStateStr) : null;
 
-        if (savedState && savedState.date === currentMurliDate) {
-            currentQuiz = savedState.quizData;
-            currentScore = savedState.score;
-            answeredCount = savedState.answeredCount;
-            totalTimeSec = savedState.time;
-            activeQuestionIndex = savedState.qIndex;
+        // Determine which state to use (Cloud > Local > Fresh)
+        let stateToUse = null;
+        if (cloudState && cloudState.date === currentMurliDate) {
+            stateToUse = cloudState;
+        } else if (localState && localState.date === currentMurliDate) {
+            stateToUse = localState;
+        }
+
+        if (stateToUse) {
+            currentQuiz = stateToUse.quizData;
+            currentScore = stateToUse.score;
+            answeredCount = stateToUse.answeredCount;
+            totalTimeSec = stateToUse.time;
+            activeQuestionIndex = stateToUse.qIndex;
             
             let cancelBtn = document.getElementById('btn-cancel-top');
             if(cancelBtn) cancelBtn.style.display = 'none'; 
@@ -2072,6 +2123,7 @@ Text: ${text}`;
             totalTimeSec = 0; 
             activeQuestionIndex = 0;
             
+            currentQuiz = JSON.parse(JSON.stringify(originalQuizData));
             shuffleArray(currentQuiz); 
             currentQuiz.forEach(q => { 
                 delete q.userSelectedIndex; 
@@ -2220,6 +2272,12 @@ Text: ${text}`;
         if (q.userSelectedIndex === undefined) answeredCount++; 
         q.userSelectedIndex = oIndex;
         
+        // Calculate temporary score for cloud save
+        let tempScore = currentScore;
+        let selectedText = String(q.options[oIndex]).trim();
+        let answerText = String(q.answer).trim();
+        if (selectedText === answerText) tempScore++;
+        
         updateStickyBar(); 
         
         setTimeout(() => {
@@ -2230,14 +2288,17 @@ Text: ${text}`;
                 focusedOptionIndex = -1; 
                 window.scrollTo(0, 0); 
                 
-                localStorage.setItem('murali_active_quiz_state', JSON.stringify({
+                let stateObj = {
                     date: currentMurliDate,
                     qIndex: activeQuestionIndex,
-                    score: currentScore,
+                    score: tempScore,
                     time: totalTimeSec,
                     answeredCount: answeredCount,
                     quizData: currentQuiz
-                }));
+                };
+                
+                localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj));
+                saveStateToCloud(stateObj); // Save to cloud
                 
                 startQuestionLock(activeQuestionIndex);
                 
