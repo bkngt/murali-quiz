@@ -160,6 +160,9 @@
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .radio-label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--text-color); }
         .radio-label input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); }
+        
+        /* PWA Install Button - ALWAYS VISIBLE IN SETTINGS */
+        #install-pwa-btn { display: block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
     </style>
 </head>
 <body>
@@ -312,8 +315,8 @@
                     <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: OFF</button>
                     <button onclick="toggleAdminStudentView()" id="btn-toggle-view" style="display:none; flex:1; background: var(--bg-color); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">👁️ Student View</button>
                 </div>
-                <!-- PWA Install Button Moved Here -->
-                <button id="install-pwa-btn" style="display:none; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">📱 Install App to Home Screen</button>
+                <!-- PWA Install Button ALWAYS VISIBLE HERE -->
+                <button id="install-pwa-btn" style="display:block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">📱 Install App to Home Screen</button>
             </div>
 
             <div id="api-config-section">
@@ -592,7 +595,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 76.0 (Settings Install & Daily Sync)</div>
+        <div>Version: 77.0 (Always Visible Install Button)</div>
     </div>
 </div>
 
@@ -604,17 +607,22 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        const installBtn = document.getElementById('install-pwa-btn');
-        if(installBtn) {
-            installBtn.style.display = 'block'; // Show in settings
-            installBtn.addEventListener('click', async () => {
-                installBtn.style.display = 'none';
+    });
+
+    // Button is always visible now. Handle click manually.
+    const installBtn = document.getElementById('install-pwa-btn');
+    if(installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
-            });
-        }
-    });
+            } else {
+                // Fallback for iOS or if already installed
+                showToast("कृपया ब्राउजरको मेनु (⋮) वा Share बटन थिचेर 'Add to Home Screen' छान्नुहोस्।", "info", 5000);
+            }
+        });
+    }
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -626,7 +634,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "76.0"; 
+    const APP_VERSION = "77.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
