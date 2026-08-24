@@ -595,7 +595,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 79.3 (Smart Cloud Resume System)</div>
+        <div>Version: 80.0 (Fair Play & Cloud Resume)</div>
     </div>
 </div>
 
@@ -637,7 +637,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "79.3"; 
+    const APP_VERSION = "80.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -669,9 +669,7 @@
     let activeQuestionIndex = 0;
     let focusedOptionIndex = -1;
 
-    // Anti-Cheat Variables
     let isQuizActive = false;
-    let tabSwitchCount = 0;
     let canAnswerQuestion = false;
     let qLockInterval = null;
     let audioCtx = null;
@@ -729,7 +727,6 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
-            // Sweet "Water Drop / Pop" Sound
             osc.type = 'sine'; 
             osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
             osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1); 
@@ -1851,7 +1848,6 @@ Text: ${text}`;
         shuffleArray(uniqueQ); 
         let qCount = parseInt(document.getElementById('q-count').value); 
         
-        // MEGA QUIZ CONFIRMATION ADDED HERE
         if (qCount >= 50) {
             if(!confirm(`तपाईं ${qCount} प्रश्नको मेगा क्वीज सुरु गर्दै हुनुहुन्छ। यसले केही समय लिन सक्छ। के तपाईं साँच्चै सुरु गर्ने हो?`)) return;
         }
@@ -1926,7 +1922,6 @@ Text: ${text}`;
     // 7. QUIZ EXECUTION & LOGIC (WITH CLOUD RESUME)
     // ==========================================
     
-    // NEW: Save state to cloud asynchronously
     function saveStateToCloud(stateObj) {
         if(!navigator.onLine) return;
         fetch(API_URL, {
@@ -1949,7 +1944,6 @@ Text: ${text}`;
             return showToast("क्वीज फेला परेन!", "error"); 
         }
 
-        // Show loading while checking cloud state
         document.getElementById('loading-box').style.display = 'block';
         document.getElementById('loading-text').innerText = "Checking previous progress...";
         document.getElementById('quiz-area').style.display = 'none';
@@ -1973,7 +1967,6 @@ Text: ${text}`;
 
         document.getElementById('loading-box').style.display = 'none';
         
-        // Store temporarily to use after pledge
         window.tempCloudState = cloudState;
         window.tempTargetQuiz = targetQuiz;
         
@@ -2010,19 +2003,6 @@ Text: ${text}`;
     function stopTimer() { 
         clearInterval(timerInterval); 
     }
-
-    // Tab-Switch Detection (Anti-Cheat)
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden && isQuizActive && document.getElementById('quiz-area').style.display === 'block') {
-            tabSwitchCount++;
-            if (tabSwitchCount === 1) {
-                alert("⚠️ चेतावनी: परीक्षाको बीचमा अर्को ट्याब वा एप खोल्न सख्त मनाही छ! अर्को पटक यसो गरेमा परीक्षा आफैं Submit हुनेछ।");
-            } else if (tabSwitchCount >= 2) {
-                alert("🚫 तपाईंले नियम उल्लङ्घन गर्नुभयो। परीक्षा अटोमेटिक Submit हुँदैछ।");
-                submitQuiz();
-            }
-        }
-    });
 
     document.addEventListener('keydown', function(e) {
         if (document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen').style.display === 'none') {
@@ -2105,7 +2085,6 @@ Text: ${text}`;
         let localStateStr = localStorage.getItem('murali_active_quiz_state');
         let localState = localStateStr ? JSON.parse(localStateStr) : null;
 
-        // Determine which state to use (Cloud > Local > Fresh)
         let stateToUse = null;
         if (cloudState && cloudState.date === currentMurliDate) {
             stateToUse = cloudState;
@@ -2145,7 +2124,6 @@ Text: ${text}`;
         focusedOptionIndex = -1;
         isTimerStarted = true; 
         isQuizActive = true;
-        tabSwitchCount = 0;
         startTimer();
         
         document.getElementById('result-screen').style.display = 'none'; 
@@ -2272,14 +2250,13 @@ Text: ${text}`;
             let opt = document.getElementById(`opt-${qIndex}-${i}`); 
             opt.classList.add('disabled'); 
             opt.classList.remove('keyboard-focus'); 
-            if(i === oIndex) opt.classList.add('selected-temp'); // Neutral Selection (Blue)
+            if(i === oIndex) opt.classList.add('selected-temp'); 
         }
         
         let q = currentQuiz[qIndex]; 
         if (q.userSelectedIndex === undefined) answeredCount++; 
         q.userSelectedIndex = oIndex;
         
-        // Calculate temporary score for cloud save
         let tempScore = currentScore;
         let selectedText = String(q.options[oIndex]).trim();
         let answerText = String(q.answer).trim();
@@ -2305,7 +2282,7 @@ Text: ${text}`;
                 };
                 
                 localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj));
-                saveStateToCloud(stateObj); // Save to cloud
+                saveStateToCloud(stateObj); 
                 
                 startQuestionLock(activeQuestionIndex);
                 
@@ -2328,7 +2305,6 @@ Text: ${text}`;
         clearInterval(qLockInterval);
         isQuizActive = false;
         
-        // Calculate Score Here (Anti-Cheat)
         currentScore = 0;
         currentQuiz.forEach(q => {
             if (q.userSelectedIndex !== undefined) {
@@ -2781,7 +2757,6 @@ Text: ${text}`;
         document.getElementById('lb-result-text').value = "Select date and click Generate Data...";
         switchLbTab('wa'); 
         
-        // Set default dates to today and last week
         let today = new Date();
         let todayStr = today.toISOString().split('T')[0];
         
@@ -2807,7 +2782,6 @@ Text: ${text}`;
         document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none';
     }
 
-    // Helper to map YYYY-MM-DD to exact sheet string (e.g., DD/MM/YYYY)
     function mapDateToSheetString(yyyy_mm_dd) {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         let targetDateObj = new Date(yyyy_mm_dd);
@@ -2822,7 +2796,6 @@ Text: ${text}`;
                 }
             }
         }
-        // Fallback format DD/MM/YYYY
         let parts = yyyy_mm_dd.split('-');
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
@@ -2934,7 +2907,6 @@ Text: ${text}`;
         window.open(`https://wa.me/?text=${text}`, '_blank');
     }
 
-    // IMPROVED HTML EXPORT DESIGN
     function generateQnAHtml(quizData, dateStr) {
         let html = `<!DOCTYPE html>
         <html lang="ne">
@@ -2992,7 +2964,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 79.3)
+                Generated by BK Murali Quiz App (Version 80.0)
             </div>
         </body>
         </html>`;
