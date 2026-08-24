@@ -1,0 +1,17 @@
+{
+  "name": "BK Murali Quiz",
+  "short_name": "Murali Quiz",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "description": "Daily Brahma Kumaris Murali Quiz App",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3176/3176298.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
