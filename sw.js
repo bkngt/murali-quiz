@@ -1,4 +1,4 @@
-const CACHE_NAME = 'murali-quiz-v79';
+const CACHE_NAME = 'murali-quiz-v79-fixed';
 const URLS_TO_CACHE = [
   './',
   './index.html',
@@ -28,19 +28,21 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// NETWORK FIRST STRATEGY (सधैं नयाँ भर्सन तान्ने नियम)
 self.addEventListener('fetch', event => {
+  // गुगल सिटमा जाने डाटा (POST requests) लाई सेभ नगर्ने (यसैले पिन गलत भनेको थियो)
+  if (event.request.method !== 'GET' || event.request.url.includes('script.google.com')) {
+    return; 
+  }
+
   event.respondWith(
     fetch(event.request)
       .then(networkResponse => {
-        // इन्टरनेट छ भने नयाँ भर्सन ल्याउने र सेभ गर्ने
         return caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, networkResponse.clone());
           return networkResponse;
         });
       })
       .catch(() => {
-        // इन्टरनेट छैन भने मात्र पुरानो सेभ भएको भर्सन देखाउने
         return caches.match(event.request);
       })
   );
