@@ -73,6 +73,10 @@
         .question-meta { font-size: 0.75rem; color: #a78bfa; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
         .q-tag { background: rgba(167, 139, 250, 0.15); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.3);}
         .question-text { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.8rem 0; color: var(--q-text-color) !important; line-height: 1.4; }
+        
+        /* Timer Lock UI */
+        .lock-timer-msg { font-size: 0.9rem; font-weight: 800; text-align: center; padding: 8px; margin-bottom: 10px; border-radius: 8px; background: var(--bg-color); border: 1px dashed var(--border-color); transition: all 0.3s; }
+        
         .options-group { display: flex; flex-direction: column; gap: 10px; }
         .option-container { border-radius: 12px; border: 2px solid var(--border-color); background: var(--card-bg); overflow: hidden; transition: all 0.25s ease; cursor: pointer; position: relative; padding: 0.5rem 0.6rem;}
         .option-text { display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--opt-text-color) !important; line-height: 1.3;}
@@ -85,6 +89,8 @@
         .option-container.selected-right { background-color: var(--success-bg); border-color: var(--success-color); }
         .option-container.selected-right .option-letter { background: var(--success-color); box-shadow: none; }
         .option-container.disabled { cursor: default; pointer-events: none; opacity: 0.8; }
+        .option-container.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        
         .feedback-box { display: none; padding-top: 0.8rem; margin-top: 0.5rem; font-size: 0.9rem; border-top: 1px dashed var(--border-color); }
         .selected-wrong .feedback-box, .selected-right .feedback-box { display: block; }
         .explanation-box { margin-top: 10px; padding: 10px; background: rgba(167, 139, 250, 0.1); border-left: 4px solid #a78bfa; border-radius: 8px; font-weight: 600; color: var(--text-color);}
@@ -327,6 +333,7 @@
                 <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">App Preferences</p>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
+                    <button onclick="toggleAdminStudentView()" id="btn-toggle-view" style="display:none; flex:1; background: var(--bg-color); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">👁️ Student View</button>
                 </div>
             </div>
 
@@ -569,16 +576,53 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 73.0 (Expert Micro-Context & Compound Options)</div>
+        <div>Version: 74.0 (Anti-Rushing & PWA Support)</div>
     </div>
 </div>
 
 <script>
     // ==========================================
+    // 0. PWA (OFFLINE APP) INJECTION
+    // ==========================================
+    (function initPWA() {
+        try {
+            const manifestJSON = {
+                "name": "BK Murali Quiz",
+                "short_name": "Murali Quiz",
+                "start_url": window.location.href.split('?')[0],
+                "display": "standalone",
+                "background_color": "#0b0f19",
+                "theme_color": "#38bdf8",
+                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3176/3176298.png", "sizes": "512x512", "type": "image/png"}]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
+
+            const swCode = `
+                const CACHE_NAME = 'murali-quiz-v74';
+                self.addEventListener('install', e => {
+                    self.skipWaiting();
+                    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll([location.href.split('?')[0]])));
+                });
+                self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+                self.addEventListener('fetch', e => {
+                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(swUrl).catch(err => console.log("SW Reg Error:", err));
+            }
+        } catch(e) { console.log("PWA Init Error", e); }
+    })();
+
+    // ==========================================
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "73.0"; 
+    const APP_VERSION = "74.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -592,6 +636,7 @@
     let userAddress = "N/A"; 
     let userCountry = "N/A"; 
     let userRole = "Student";
+    let isAdminViewActive = true; // For Admin/Manager to switch to Student View
     
     let timerInterval = null; 
     let totalTimeSec = 0; 
@@ -612,6 +657,9 @@
     // Anti-Cheat Variables
     let isQuizActive = false;
     let tabSwitchCount = 0;
+    let canAnswerQuestion = false;
+    let qLockInterval = null;
+    let audioCtx = null;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -642,7 +690,7 @@
     function showToast(msg, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container'); 
         const toast = document.createElement('div');
-        let iconSvg = type === 'error' ? `<svg class="icon" style="color:var(--danger-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : (type === 'success' ? `<svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : `<svg class="icon" style="color:var(--primary-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`);
+        let iconSvg = type === 'error' ? `<svg class="icon" style="color:var(--danger-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>` : (type === 'success' ? `<svg class="icon" style="color:var(--success-color);" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>` : (type === 'warning' ? `<svg class="icon" style="color:var(--warning-color);" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>` : `<svg class="icon" style="color:var(--primary-color);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`));
         
         toast.className = `toast ${type}`; 
         toast.innerHTML = `${iconSvg} <span>${msg}</span>`;
@@ -653,6 +701,28 @@
             toast.style.transform = 'translateY(-20px)'; 
             setTimeout(() => toast.remove(), 300); 
         }, duration);
+    }
+
+    function playClickSound() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); 
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.1);
+        } catch (e) { console.log("Audio not supported"); }
     }
 
     function toggleDarkMode() { 
@@ -1343,6 +1413,20 @@
         document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
     }
 
+    window.toggleAdminStudentView = function() {
+        isAdminViewActive = !isAdminViewActive;
+        let btn = document.getElementById('btn-toggle-view');
+        if(isAdminViewActive) {
+            btn.innerHTML = '👁️ Student View';
+            showToast("Switched to Admin View", "info");
+        } else {
+            btn.innerHTML = '👑 Admin View';
+            showToast("Switched to Student View", "info");
+        }
+        closeSettings();
+        unlockApp();
+    }
+
     function unlockApp() { 
         try {
             userName = localStorage.getItem('murali_user_name') || "Student"; 
@@ -1369,7 +1453,16 @@
             backgroundProfileSync(); 
 
             let safeRole = userRole.toString().trim().toLowerCase();
-            if (safeRole === 'manager' || safeRole === 'admin') {
+            let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+            
+            if (isPrivileged) {
+                document.getElementById('btn-toggle-view').style.display = 'block';
+            } else {
+                document.getElementById('btn-toggle-view').style.display = 'none';
+                isAdminViewActive = false;
+            }
+
+            if (isPrivileged && isAdminViewActive) {
                 document.getElementById('murali-text').style.display = 'block'; 
                 document.getElementById('generator-actions').style.display = 'flex'; 
                 document.getElementById('btn-mega').style.display = 'block'; 
@@ -1704,7 +1797,8 @@ Text: ${text}`;
             showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success", 8000); 
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
-            if(safeRole === 'manager' || safeRole === 'admin') { 
+            let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+            if(isPrivileged && isAdminViewActive) { 
                 document.getElementById('btn-save-top').style.display = 'inline-block'; 
                 document.getElementById('btn-export-top').style.display = 'inline-block'; 
             }
@@ -1755,7 +1849,8 @@ Text: ${text}`;
         document.getElementById('pledge-modal').style.display = 'flex'; 
         
         let safeRole = (userRole||"").toString().trim().toLowerCase();
-        if(safeRole === 'manager' || safeRole === 'admin') { 
+        let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+        if(isPrivileged && isAdminViewActive) { 
             document.getElementById('btn-save-top').style.display = 'inline-block'; 
             document.getElementById('btn-export-top').style.display = 'inline-block'; 
         }
@@ -1875,7 +1970,7 @@ Text: ${text}`;
             } else if ((e.key === 'Enter' || e.key === ' ') && focusedOptionIndex !== -1) {
                 e.preventDefault();
                 let optBtn = document.getElementById(`opt-${activeQuestionIndex}-${focusedOptionIndex}`);
-                if(optBtn && !optBtn.classList.contains('disabled')) {
+                if(optBtn && !optBtn.classList.contains('disabled') && !optBtn.classList.contains('locked')) {
                     selectOption(activeQuestionIndex, focusedOptionIndex);
                 }
             }
@@ -1890,6 +1985,48 @@ Text: ${text}`;
                 else btn.classList.remove('keyboard-focus');
             }
         }
+    }
+
+    function startQuestionLock(qIndex) {
+        if(reviewSource === 'past') {
+            canAnswerQuestion = true;
+            return;
+        }
+        
+        canAnswerQuestion = false;
+        clearInterval(qLockInterval);
+        let timeLeft = 10;
+        let timerEl = document.getElementById(`lock-timer-${qIndex}`);
+        
+        if(timerEl) {
+            timerEl.innerHTML = `⏳ कृपया प्रश्न र विकल्पहरू पढ्नुहोस्... (${timeLeft}s)`;
+            timerEl.style.color = 'var(--warning-color)';
+        }
+
+        for(let i=0; i<4; i++) {
+            let opt = document.getElementById(`opt-${qIndex}-${i}`);
+            if(opt) opt.classList.add('locked');
+        }
+
+        qLockInterval = setInterval(() => {
+            timeLeft--;
+            if(timerEl) timerEl.innerHTML = `⏳ कृपया प्रश्न र विकल्पहरू पढ्नुहोस्... (${timeLeft}s)`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(qLockInterval);
+                canAnswerQuestion = true;
+                playClickSound(); // Soft pop when ready
+                
+                if(timerEl) {
+                    timerEl.innerHTML = `✨ अब उत्तर दिनुहोस्`;
+                    timerEl.style.color = 'var(--success-color)';
+                }
+                for(let i=0; i<4; i++) {
+                    let opt = document.getElementById(`opt-${qIndex}-${i}`);
+                    if(opt) opt.classList.remove('locked');
+                }
+            }
+        }, 1000);
     }
 
     function startQuizSession() {
@@ -1950,7 +2087,8 @@ Text: ${text}`;
         document.getElementById('toolbar-right-actions').style.display = 'none';
 
         let safeRole = (userRole||"").toString().trim().toLowerCase(); 
-        if(safeRole === 'manager' || safeRole === 'admin') { 
+        let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+        if(isPrivileged && isAdminViewActive) { 
             document.getElementById('quiz-config-tools').style.display = 'none'; 
             document.getElementById('btn-export-top').style.display = 'inline-block'; 
         } else { 
@@ -1961,11 +2099,13 @@ Text: ${text}`;
         
         updateStickyBar(); 
         renderQuizArea();
+        startQuestionLock(activeQuestionIndex);
     }
 
     function cancelQuiz() { 
         if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) {
             localStorage.removeItem('murali_active_quiz_state');
+            clearInterval(qLockInterval);
             resetToGenerator(); 
         }
     }
@@ -1985,7 +2125,8 @@ Text: ${text}`;
         document.getElementById('toolbar-right-actions').style.display = 'flex';
 
         let safeRole = (userRole||"").toString().trim().toLowerCase();
-        if (safeRole === 'manager' || safeRole === 'admin') { 
+        let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+        if (isPrivileged && isAdminViewActive) { 
             document.getElementById('murali-text').style.display = 'block'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
             document.getElementById('quiz-config-tools').style.display = 'flex'; 
@@ -2025,6 +2166,7 @@ Text: ${text}`;
             htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
                 <div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div>
                 <p class="question-text">${item.q}</p>
+                <div id="lock-timer-${qIndex}" class="lock-timer-msg" style="display: ${reviewSource === 'past' ? 'none' : 'block'};"></div>
                 <div class="options-group">${optsHTML}</div>
             </div>`;
         });
@@ -2032,6 +2174,13 @@ Text: ${text}`;
     }
 
     function selectOption(qIndex, oIndex) {
+        if (!canAnswerQuestion) {
+            showToast("कृपया प्रश्न र विकल्पहरू राम्रोसँग पढ्नुहोस्।", "warning", 1500);
+            return; 
+        }
+
+        playClickSound();
+
         let block = document.getElementById(`qb-${qIndex}`); 
         if(block.classList.contains('answered')) return; 
         block.classList.add('answered'); 
@@ -2071,6 +2220,8 @@ Text: ${text}`;
                     quizData: currentQuiz
                 }));
                 
+                startQuestionLock(activeQuestionIndex);
+                
             } else { 
                 showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); 
                 submitQuiz(); 
@@ -2087,6 +2238,7 @@ Text: ${text}`;
         
         document.getElementById('sb-submit-btn').disabled = true; 
         stopTimer(); 
+        clearInterval(qLockInterval);
         isQuizActive = false;
         
         // Calculate Score Here (Anti-Cheat)
@@ -2191,6 +2343,9 @@ Text: ${text}`;
         currentQuiz.forEach((q, qIndex) => {
             let qb = document.getElementById(`qb-${qIndex}`); 
             if (qb) qb.style.display = 'block';
+            
+            let timerEl = document.getElementById(`lock-timer-${qIndex}`);
+            if(timerEl) timerEl.style.display = 'none';
             
             if (q.userSelectedIndex !== undefined) {
                 let d = dict[lang]; 
