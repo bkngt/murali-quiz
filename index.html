@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" id="theme-color-meta" content="#0b0f19">
+    <meta name="theme-color" id="theme-color-meta" content="#f8fafc">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <title>BK Murali Quiz</title>
+    
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -16,24 +19,13 @@
 
         *, *::before, *::after { box-sizing: border-box; }
         
+        /* DEFAULT LIGHT THEME */
         :root {
-            --bg-color: #0b0f19; --card-bg: #1e293b; --text-color: #f8fafc; 
-            --primary-color: #38bdf8; --primary-hover: #7dd3fc;
-            --primary-gradient: linear-gradient(135deg, #38bdf8, #a78bfa);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --success-bg: rgba(22, 163, 74, 0.15); --success-border: rgba(22, 163, 74, 0.4);
-            --danger-bg: rgba(220, 38, 38, 0.15); --danger-border: rgba(220, 38, 38, 0.4);
-            --warning-bg: rgba(217, 119, 6, 0.15); --warning-color: #fbbf24;
-            --q-text-color: #fbbf24; --opt-text-color: #7dd3fc; 
-            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.5); --glass-bg: rgba(15, 23, 42, 0.85);
-            --font-size: 18px; 
-            --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
-            --success-color: #16a34a; --danger-color: #dc2626;
-        }
-        
-        [data-theme="light"] {
-            --bg-color: #f1f5f9; --card-bg: #ffffff; --text-color: #1e293b; 
-            --primary-color: #0284c7; --primary-hover: #0369a1; 
+            --bg-color: linear-gradient(135deg, #f1f5f9, #e2e8f0); 
+            --card-bg: #ffffff; 
+            --text-color: #1e293b; 
+            --primary-color: #0284c7; 
+            --primary-hover: #0369a1; 
             --primary-gradient: linear-gradient(135deg, #0284c7, #8b5cf6);
             --border-color: #cbd5e1;
             --success-bg: #f0fdf4; --success-border: #bbf7d0;
@@ -42,11 +34,31 @@
             --q-text-color: #0c4a6e; --opt-text-color: #0f766e; 
             --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
             --glass-bg: rgba(255, 255, 255, 0.85);
+            --font-size: 18px; 
+            --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
+            --success-color: #16a34a; --danger-color: #dc2626;
+        }
+        
+        /* DARK THEME */
+        [data-theme="dark"] {
+            --bg-color: #0b0f19; 
+            --card-bg: #1e293b; 
+            --text-color: #f8fafc; 
+            --primary-color: #38bdf8; 
+            --primary-hover: #7dd3fc;
+            --primary-gradient: linear-gradient(135deg, #38bdf8, #a78bfa);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-bg: rgba(22, 163, 74, 0.15); --success-border: rgba(22, 163, 74, 0.4);
+            --danger-bg: rgba(220, 38, 38, 0.15); --danger-border: rgba(220, 38, 38, 0.4);
+            --warning-bg: rgba(217, 119, 6, 0.15); --warning-color: #fbbf24;
+            --q-text-color: #fbbf24; --opt-text-color: #7dd3fc; 
+            --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.5); 
+            --glass-bg: rgba(15, 23, 42, 0.85);
         }
 
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: var(--font-size); line-height: 1.5; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; display: flex; justify-content: center; }
+        body { background: var(--bg-color); color: var(--text-color); font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: var(--font-size); line-height: 1.5; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; display: flex; justify-content: center; min-height: 100vh;}
         .container { width: 100%; max-width: 760px; background: var(--card-bg); min-height: 100vh; padding: 0.6rem; padding-bottom: 85px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
-        @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 10px; margin-bottom: 10px; min-height: auto; border: 1px solid var(--border-color);} }
+        @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 15px; margin-bottom: 15px; min-height: auto; border: 1px solid var(--border-color); box-shadow: var(--box-shadow-main);} }
         @media (max-width: 600px) { .container { padding-bottom: 240px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
         
         @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
@@ -54,7 +66,7 @@
 
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
         .pin-box { background: var(--card-bg); padding: 2rem 1.8rem; border-radius: 24px; box-shadow: var(--box-shadow-main); text-align: center; width: 100%; max-width: 380px; border: 1px solid var(--border-color); max-height: 90vh; overflow-y: auto;}
-        .input-field, .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s; outline: none;}
+        .input-field, .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s; outline: none;}
         .input-field:focus, .select-field:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15); }
         .input-field:disabled { opacity: 0.5; background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
 
@@ -66,7 +78,7 @@
         .nav-tabs button { background: transparent; color: var(--text-color); border: none; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; width: auto; font-size: 0.9rem; opacity: 0.85; transition: all 0.2s; box-shadow: none;}
         .nav-tabs button.active { background: var(--primary-gradient); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); }
         
-        textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-color); color: var(--text-color); font-family: inherit; font-size: 0.95rem; height: 45vh; min-height: 280px; resize: vertical; outline: none; transition: all 0.2s;}
+        textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-color); font-family: inherit; font-size: 0.95rem; height: 45vh; min-height: 280px; resize: vertical; outline: none; transition: all 0.2s;}
         textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
         
         .question-block { margin-bottom: 0.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--box-shadow-main); padding: 1rem; position: relative; scroll-margin-top: 10px;}
@@ -89,7 +101,9 @@
         .option-container.selected-right { background-color: var(--success-bg); border-color: var(--success-color); }
         .option-container.selected-right .option-letter { background: var(--success-color); box-shadow: none; }
         .option-container.disabled { cursor: default; pointer-events: none; opacity: 0.8; }
-        .option-container.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        
+        /* Locked state: Clear text, but unclickable */
+        .option-container.locked { cursor: not-allowed; pointer-events: none; }
         
         .feedback-box { display: none; padding-top: 0.8rem; margin-top: 0.5rem; font-size: 0.9rem; border-top: 1px dashed var(--border-color); }
         .selected-wrong .feedback-box, .selected-right .feedback-box { display: block; }
@@ -146,6 +160,10 @@
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .radio-label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--text-color); }
         .radio-label input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); }
+        
+        /* PWA Install Button */
+        #install-pwa-btn { display: none; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -260,6 +278,7 @@
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions">
+            <button id="install-pwa-btn">📱 Install App</button>
             <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="btn-icon" style="width: 30px; height: 30px; border-color: var(--primary-color); color: var(--primary-color); background: rgba(56, 189, 248, 0.1); text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
             </a>
@@ -332,7 +351,7 @@
             <div id="preferences-section" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <p style="font-size:1rem; color: var(--primary-color); margin: 0 0 12px 0; font-weight:800;">App Preferences</p>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: ON</button>
+                    <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: OFF</button>
                     <button onclick="toggleAdminStudentView()" id="btn-toggle-view" style="display:none; flex:1; background: var(--bg-color); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">👁️ Student View</button>
                 </div>
             </div>
@@ -576,53 +595,41 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 74.0 (Anti-Rushing & PWA Support)</div>
+        <div>Version: 75.0 (Light Theme, Clear Lock & Sweet Sound)</div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // 0. PWA (OFFLINE APP) INJECTION
+    // 0. PWA INSTALLATION LOGIC
     // ==========================================
-    (function initPWA() {
-        try {
-            const manifestJSON = {
-                "name": "BK Murali Quiz",
-                "short_name": "Murali Quiz",
-                "start_url": window.location.href.split('?')[0],
-                "display": "standalone",
-                "background_color": "#0b0f19",
-                "theme_color": "#38bdf8",
-                "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/3176/3176298.png", "sizes": "512x512", "type": "image/png"}]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(manifestBlob);
-            document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('install-pwa-btn');
+        if(installBtn) {
+            installBtn.style.display = 'inline-block';
+            installBtn.addEventListener('click', async () => {
+                installBtn.style.display = 'none';
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            });
+        }
+    });
 
-            const swCode = `
-                const CACHE_NAME = 'murali-quiz-v74';
-                self.addEventListener('install', e => {
-                    self.skipWaiting();
-                    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll([location.href.split('?')[0]])));
-                });
-                self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-                });
-            `;
-            const swBlob = new Blob([swCode], {type: 'application/javascript'});
-            const swUrl = URL.createObjectURL(swBlob);
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(swUrl).catch(err => console.log("SW Reg Error:", err));
-            }
-        } catch(e) { console.log("PWA Init Error", e); }
-    })();
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Reg Failed:', err));
+        });
+    }
 
     // ==========================================
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "74.0"; 
+    const APP_VERSION = "75.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -636,7 +643,7 @@
     let userAddress = "N/A"; 
     let userCountry = "N/A"; 
     let userRole = "Student";
-    let isAdminViewActive = true; // For Admin/Manager to switch to Student View
+    let isAdminViewActive = true; 
     
     let timerInterval = null; 
     let totalTimeSec = 0; 
@@ -714,11 +721,13 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
+            // Sweet "Water Drop / Pop" Sound
             osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Start high
+            osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1); // Drop fast
             
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); 
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.8, audioCtx.currentTime); // Louder volume
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); // Fade out fast
             
             osc.start(audioCtx.currentTime);
             osc.stop(audioCtx.currentTime + 0.1);
@@ -726,20 +735,20 @@
     }
 
     function toggleDarkMode() { 
-        let isLight = document.body.hasAttribute('data-theme'); 
+        let isDark = document.body.hasAttribute('data-theme'); 
         let btn = document.getElementById('modal-dark-btn'); 
         let meta = document.getElementById('theme-color-meta');
         
-        if(isLight) {
-            document.body.removeAttribute('data-theme'); 
+        if(isDark) {
+            document.body.removeAttribute('data-theme'); // Default is Light now
+            localStorage.setItem('m_q_theme', 'light'); 
+            if(meta) meta.content = "#f8fafc"; 
+            if(btn) btn.innerHTML = '🌙 Dark Mode: OFF';
+        } else {
+            document.body.setAttribute('data-theme', 'dark'); 
             localStorage.setItem('m_q_theme', 'dark'); 
             if(meta) meta.content = "#0b0f19"; 
-            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
-        } else {
-            document.body.setAttribute('data-theme', 'light'); 
-            localStorage.setItem('m_q_theme', 'light'); 
-            if(meta) meta.content = "#f1f5f9"; 
-            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
+            if(btn) btn.innerHTML = '☀️ Dark Mode: ON';
         }
     }
 
@@ -842,16 +851,17 @@
         document.getElementById('main-app').style.display = 'none';
         
         let meta = document.getElementById('theme-color-meta');
-        if(localStorage.getItem('m_q_theme') === 'light') {
-            document.body.setAttribute('data-theme', 'light'); 
-            if(meta) meta.content = "#f1f5f9";
-            let btn = document.getElementById('modal-dark-btn'); 
-            if(btn) btn.innerHTML = '☀️ Dark Mode: OFF';
-        } else {
-            document.body.removeAttribute('data-theme'); 
+        // Default is Light now. Check if user explicitly wants Dark.
+        if(localStorage.getItem('m_q_theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark'); 
             if(meta) meta.content = "#0b0f19";
             let btn = document.getElementById('modal-dark-btn'); 
-            if(btn) btn.innerHTML = '🌙 Dark Mode: ON';
+            if(btn) btn.innerHTML = '☀️ Dark Mode: ON';
+        } else {
+            document.body.removeAttribute('data-theme'); 
+            if(meta) meta.content = "#f8fafc";
+            let btn = document.getElementById('modal-dark-btn'); 
+            if(btn) btn.innerHTML = '🌙 Dark Mode: OFF';
         }
         
         let savedLockout = localStorage.getItem('murali_lockout_time');
@@ -2015,7 +2025,6 @@ Text: ${text}`;
             if(timeLeft <= 0) {
                 clearInterval(qLockInterval);
                 canAnswerQuestion = true;
-                playClickSound(); // Soft pop when ready
                 
                 if(timerEl) {
                     timerEl.innerHTML = `✨ अब उत्तर दिनुहोस्`;
