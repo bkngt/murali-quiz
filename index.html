@@ -729,6 +729,7 @@
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
+            // Sweet "Water Drop / Pop" Sound
             osc.type = 'sine'; 
             osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
             osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.1); 
@@ -1710,7 +1711,7 @@ QUIZ RULES (FORCING DEEP STUDY & VARIETY):
    - True/False or Statement Identification (सत्य/असत्य): e.g., "आजको मुरली अनुसार तलका मध्ये कुन भनाइ सत्य हो?"
    - Odd One Out (नमिल्ने छान्ने): e.g., "आजको मुरलीमा बाबाले तलका मध्ये कुन कुरा उल्लेख गर्नुभएको छैन?"
    - Cause & Effect (कारण र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
-   - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा উন্নয়ন गर्नुभएको हो?"
+   - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा दिनुभएको हो?"
 3. Difficulty: ${difficultyInstruction}
 4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. NEVER use generic words like 'Family', 'Money', 'World' as distractors unless specifically contrasting them from the text. Make the user sweat to find the difference between the 4 options.
 5. The value of "answer" MUST match EXACTLY, character-by-character, with one of the items in the "options" array. Do not add extra words in the "answer" field.
