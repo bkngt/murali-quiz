@@ -595,7 +595,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 77.0 (Always Visible Install Button)</div>
+        <div>Version: 78.0 (Smart Install Detector)</div>
     </div>
 </div>
 
@@ -618,8 +618,13 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 deferredPrompt = null;
             } else {
-                // Fallback for iOS or if already installed
-                showToast("कृपया ब्राउजरको मेनु (⋮) वा Share बटन थिचेर 'Add to Home Screen' छान्नुहोस्।", "info", 5000);
+                // Smart Fallback for iOS and Android
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isIOS) {
+                    alert("🍎 Apple को नियम अनुसार:\nकृपया तल रहेको 'Share' (शेयर) बटन थिच्नुहोस् र अलि तल सारेर 'Add to Home Screen' छान्नुहोस्।");
+                } else {
+                    alert("⚙️ जानकारी:\nतपाईंको मोबाइलमा यो एप पहिले नै इन्स्टल भइसकेको हुन सक्छ, वा ब्राउजरले सपोर्ट गरेन।\nकृपया माथि दायाँपट्टि रहेको तीनवटा थोप्ला (⋮) थिचेर 'Add to Home Screen' छान्नुहोस्।");
+                }
             }
         });
     }
@@ -634,7 +639,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbzq7dBj-xaDIBefimX3q4aZjvWgtoeRax0S9ggSDqbl13bLEtopBcONvpdFxnICkoVZ/exec";
-    const APP_VERSION = "77.0"; 
+    const APP_VERSION = "78.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
