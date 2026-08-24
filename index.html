@@ -474,6 +474,27 @@
         </div>
     </div>
 
+    <!-- Mega Quiz Date Selection Modal -->
+    <div id="mega-quiz-modal" class="modal-overlay" onclick="if(event.target.id === 'mega-quiz-modal') document.getElementById('mega-quiz-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 400px; padding: 1.5rem;">
+            <button class="close-modal" onclick="document.getElementById('mega-quiz-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800;">🏆 Mega Quiz Setup</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">कुन मितिदेखि कुन मितिसम्मको प्रश्नहरू समावेश गर्ने?</p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--primary-color);">सुरु मिति (Start Date)</label>
+                    <input type="date" id="mq-start-date" class="input-field" style="margin:0; font-size:0.9rem; cursor:pointer;">
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--primary-color);">अन्तिम मिति (End Date)</label>
+                    <input type="date" id="mq-end-date" class="input-field" style="margin:0; font-size:0.9rem; cursor:pointer;">
+                </div>
+            </div>
+            <button onclick="executeMegaQuiz()" style="padding: 0.8rem; font-size: 1.05rem;">Generate Mega Quiz</button>
+        </div>
+    </div>
+
     <!-- Honesty Pledge Modal -->
     <div id="pledge-modal" class="modal-overlay" style="z-index: 2500;">
         <div class="modal-content" style="text-align: center; max-width: 400px; padding: 2rem 1.5rem;">
@@ -494,7 +515,7 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <button onclick="createMegaQuiz()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
+            <button onclick="openMegaQuizModal()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
                 🏆 Mega Quiz
             </button>
             <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);">
@@ -599,7 +620,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 80.1 (Fair Play & Cloud Resume)</div>
+        <div>Version: 80.2 (Mega Quiz Date Selection)</div>
     </div>
 </div>
 
@@ -641,7 +662,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "80.1"; 
+    const APP_VERSION = "80.2"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1809,7 +1830,6 @@ Text: ${text}`;
             
             document.getElementById('loading-box').style.display = 'none'; 
             
-            // FIX: Show quiz area for admin review instead of pledge modal
             document.getElementById('quiz-area').style.display = 'block';
             document.getElementById('online-quiz-actions').style.display = 'flex';
             document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
@@ -1835,16 +1855,45 @@ Text: ${text}`;
         }
     }
 
-    function createMegaQuiz() {
+    function openMegaQuizModal() {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); 
         if(serverQuizzes.length === 0) return showToast("सर्भरमा कुनै पनि पुरानो प्रश्न छैन!", "error");
+
+        let today = new Date();
+        let lastWeek = new Date();
+        lastWeek.setDate(today.getDate() - 7);
         
+        document.getElementById('mq-end-date').value = today.toISOString().split('T')[0];
+        document.getElementById('mq-start-date').value = lastWeek.toISOString().split('T')[0];
+
+        document.getElementById('mega-quiz-modal').style.display = 'flex';
+    }
+
+    function executeMegaQuiz() {
+        let sDateStr = document.getElementById('mq-start-date').value;
+        let eDateStr = document.getElementById('mq-end-date').value;
+
+        if(!sDateStr || !eDateStr) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
+
+        let sDate = new Date(sDateStr);
+        let eDate = new Date(eDateStr);
+        eDate.setHours(23, 59, 59, 999);
+
+        if(sDate > eDate) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
+
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); 
         let allQuestions = []; 
+
         serverQuizzes.forEach(sq => { 
-            if(sq.quizData && Array.isArray(sq.quizData)) allQuestions = allQuestions.concat(sq.quizData); 
+            if(sq.quizData && Array.isArray(sq.quizData) && !sq.isMegaQuiz) { 
+                let qDateObj = parseDateString(sq.quizDate);
+                if(qDateObj && qDateObj >= sDate && qDateObj <= eDate) {
+                    allQuestions = allQuestions.concat(sq.quizData); 
+                }
+            } 
         });
         
-        if(allQuestions.length < 5) return showToast("क्विज बनाउन पर्याप्त प्रश्नहरू छैनन्!", "error");
+        if(allQuestions.length < 5) return showToast("यो मिति भित्र पर्याप्त प्रश्नहरू छैनन्!", "error");
         
         let uniqueQ = []; 
         let qTextSet = new Set(); 
@@ -1867,14 +1916,16 @@ Text: ${text}`;
         currentQuiz = uniqueQ.slice(0, qCount); 
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
-        let todayDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-        currentMurliDate = qCount >= 50 ? `🏆 Mega Quiz (${qCount} Qs) [${todayDate}]` : `🔄 Review Quiz (${qCount} Qs) [${todayDate}]`;
+        let displayStart = sDateStr.split('-').reverse().join('-');
+        let displayEnd = eDateStr.split('-').reverse().join('-');
         
+        currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`;
+        
+        document.getElementById('mega-quiz-modal').style.display = 'none';
         document.getElementById('murali-text').style.display = 'none'; 
         document.getElementById('generator-actions').style.display = 'none'; 
         document.getElementById('export-saved-section').style.display = 'none'; 
         
-        // FIX: Show quiz area for admin review instead of pledge modal
         document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('online-quiz-actions').style.display = 'flex';
         document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
@@ -2980,7 +3031,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 80.1)
+                Generated by BK Murali Quiz App (Version 80.2)
             </div>
         </body>
         </html>`;
