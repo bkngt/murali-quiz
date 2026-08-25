@@ -218,13 +218,17 @@
                 <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next" oninput="enforceEnglish(this)">
             </div>
 
-            <!-- FIX: Auto convert Nepali numbers to English numbers -->
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
             
+            <!-- PIN INPUT WITH EYE ICON -->
             <div style="margin: 0.4rem 0;">
                 <p id="pin-instruction" style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
-                <!-- FIX: Auto convert Nepali numbers to English numbers -->
-                <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; text-align: center; letter-spacing: 4px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; text-align: center; letter-spacing: 4px; padding-right: 45px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
+                    <button type="button" onclick="togglePinVisibility()" style="position: absolute; right: 8px; background: transparent; border: none; color: var(--primary-color); box-shadow: none; width: auto; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <svg id="eye-icon-pin" class="icon" viewBox="0 0 24 24" style="width: 22px; height: 22px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
             </div>
             
             <select id="month-select" class="select-field">
@@ -622,7 +626,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 80.4 (True Sync Fix)</div>
+        <div>Version: 80.6 (Final Fix)</div>
     </div>
 </div>
 
@@ -664,7 +668,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "80.4"; 
+    const APP_VERSION = "80.6"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -876,6 +880,18 @@
         return h.timestamp ? new Date(h.timestamp) : null;
     }
 
+    window.togglePinVisibility = function() {
+        let input = document.getElementById('pin-input');
+        let icon = document.getElementById('eye-icon-pin');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+        } else {
+            input.type = "password";
+            icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        }
+    }
+
     // ==========================================
     // 3. AUTHENTICATION & PROFILE
     // ==========================================
@@ -1040,10 +1056,11 @@
         const inputPhone = document.getElementById('phone-input').value.trim(); 
         const inputPIN = document.getElementById('pin-input').value; 
         const month = document.getElementById('month-select').value;
+        let submitBtn = document.getElementById('btn-login-submit');
         
         if (isRecoveryMode) {
             if (!inputPhone || !month) return showToast("कृपया फोन र महिना भर्नुहोस्।", "error");
-            document.getElementById('btn-login-submit').innerHTML = `Checking...`;
+            submitBtn.innerHTML = `Checking...`;
             
             fetch(API_URL, { 
                 method: 'POST', 
@@ -1052,7 +1069,7 @@
             })
             .then(r => r.json())
             .then(data => { 
-                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
+                submitBtn.innerHTML = `Recover PIN`;
                 if (data.status === "success") { 
                     alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); 
                     window.location.reload(); 
@@ -1061,7 +1078,7 @@
                 }
             })
             .catch(e => { 
-                document.getElementById('btn-login-submit').innerHTML = `Recover PIN`; 
+                submitBtn.innerHTML = `Recover PIN`; 
                 showToast("सर्भर कनेक्सन फेल भयो!", "error"); 
             }); 
             return;
@@ -1069,7 +1086,7 @@
 
         if (isDirectLogin) {
             if (!inputPhone || inputPIN.length !== 4) return showToast("कृपया सही १० अंकको फोन र ४ अंकको पिन लेख्नुहोस्।", "error");
-            document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
+            submitBtn.innerHTML = `Verifying...`;
             
             fetch(API_URL, { 
                 method: 'POST', 
@@ -1078,7 +1095,7 @@
             })
             .then(r => r.json())
             .then(data => { 
-                document.getElementById('btn-login-submit').innerHTML = `Login`;
+                submitBtn.innerHTML = `Login`;
                 if(data.status === "success") { 
                     saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
                     showToast("Server Login Successful!", "success"); 
@@ -1087,7 +1104,7 @@
                 }
             })
             .catch(e => { 
-                document.getElementById('btn-login-submit').innerHTML = `Login`; 
+                submitBtn.innerHTML = `Login`; 
                 showToast("सर्भर कनेक्सन फेल भयो!", "error"); 
             }); 
             return;
@@ -1114,7 +1131,7 @@
             let finalFullName = formattedName.full;
 
             if(navigator.onLine) {
-                document.getElementById('btn-login-submit').innerHTML = `Registering...`;
+                submitBtn.innerHTML = `Registering...`;
                 fetch(API_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
@@ -1126,12 +1143,12 @@
                         saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); 
                         showToast("Registration Successful!", "success"); 
                     } else { 
-                        document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                        submitBtn.innerHTML = `Enter`; 
                         showToast(data.message, "error"); 
                     }
                 })
                 .catch(e => { 
-                    document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                    submitBtn.innerHTML = `Enter`; 
                     showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); 
                     checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); 
                 });
@@ -1148,7 +1165,7 @@
         if (savedPIN && inputPIN === savedPIN) { 
             unlockApp(); 
         } else if (navigator.onLine && savedPhone) {
-             document.getElementById('btn-login-submit').innerHTML = `Verifying...`;
+             submitBtn.innerHTML = `Verifying...`;
              fetch(API_URL, { 
                  method: 'POST', 
                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
@@ -1156,7 +1173,7 @@
              })
              .then(r => r.json())
              .then(data => { 
-                 document.getElementById('btn-login-submit').innerHTML = `Enter`;
+                 submitBtn.innerHTML = `Enter`;
                  if(data.status === "success") { 
                      saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
                      showToast("Server Login Successful!", "success"); 
@@ -1165,7 +1182,7 @@
                  }
              })
              .catch(e => { 
-                 document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+                 submitBtn.innerHTML = `Enter`; 
                  handleFailedAttempt(); 
              });
         } else { 
@@ -1275,6 +1292,7 @@
             localStorage.removeItem('murali_role');
             
             localStorage.removeItem('murali_active_quiz_state'); 
+            localStorage.removeItem('murali_lockout_time'); 
             
             window.location.reload();
         }
@@ -1352,7 +1370,6 @@
         .catch(e => console.log("Fetch error: ", e));
     }
 
-    // NEW FIX: True Sync - Overwrite local history with server history to allow deletions
     function syncMyResults() {
         if (!navigator.onLine || !userPhone || userPhone === "N/A") return;
         fetch(API_URL, { 
@@ -1366,7 +1383,6 @@
                 let localHistory = safeJSON('murali_progress', []); 
                 let serverDates = data.results.map(sr => sr.date);
                 
-                // Keep local items ONLY IF they are unsynced OR they still exist on the server
                 let validLocalHistory = localHistory.filter(h => {
                     if (h.synced === false) return true;
                     return serverDates.includes(h.date);
@@ -1374,7 +1390,6 @@
                 
                 let isUpdated = false;
                 
-                // Add any new records from server that aren't in local history
                 data.results.forEach(sr => {
                     let exists = validLocalHistory.find(lh => lh.date === sr.date);
                     if(!exists) { 
@@ -1394,7 +1409,6 @@
                     }
                 });
                 
-                // If length changed (deleted or added), update local storage
                 if(validLocalHistory.length !== localHistory.length || isUpdated) { 
                     validLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
                     localStorage.setItem('murali_progress', JSON.stringify(validLocalHistory)); 
@@ -1749,7 +1763,7 @@ QUIZ RULES (FORCING DEEP STUDY & VARIETY):
    - Fill in the blanks (खाली ठाउँ भर्ने): e.g., "बाबाले भन्नुभयो: 'तिमी _____ हौ।'" (Use '_____' for the blank).
    - True/False or Statement Identification (सत्य/असत्य): e.g., "आजको मुरली अनुसार तलका मध्ये कुन भनाइ सत्य हो?"
    - Odd One Out (नमिल्ने छान्ने): e.g., "आजको मुरलीमा बाबाले तलका मध्ये कुन कुरा उल्लेख गर्नुभएको छैन?"
-   - Cause & Effect (कारण र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
+   - Cause & Effect (कारण গঠন र प्रभाव): e.g., "किन बाबाले यसो भन्नुभयो?"
    - Contextual (सन्दर्भ): e.g., "यो दृष्टान्त बाबाले कुन सन्दर्भमा दिनुभएको हो?"
 3. Difficulty: ${difficultyInstruction}
 4. STRICT RULE FOR OPTIONS: All 4 options MUST belong to the same category and grammatically fit the question. NEVER use generic words like 'Family', 'Money', 'World' as distractors unless specifically contrasting them from the text. Make the user sweat to find the difference between the 4 options.
@@ -3048,7 +3062,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 80.4)
+                Generated by BK Murali Quiz App (Version 80.6)
             </div>
         </body>
         </html>`;
