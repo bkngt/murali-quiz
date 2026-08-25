@@ -1,4 +1,4 @@
-const CACHE_NAME = 'murali-quiz-v80';
+const CACHE_NAME = 'murali-quiz-v80-6';
 const URLS_TO_CACHE = [
   './',
   './index.html',
