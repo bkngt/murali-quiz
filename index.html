@@ -626,7 +626,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 80.7 (AI Variety Update)</div>
+        <div>Version: 80.8 (Concise Variety Update)</div>
     </div>
 </div>
 
@@ -668,7 +668,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "80.7"; 
+    const APP_VERSION = "80.8"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -788,7 +788,6 @@
         }
     }
 
-    // NOTE: Fisher-Yates Shuffle array is working properly here.
     function shuffleArray(array) { 
         for (let i = array.length - 1; i > 0; i--) { 
             const j = Math.floor(Math.random() * (i + 1)); 
@@ -1730,69 +1729,72 @@
 
         let difficultyInstruction = "";
         if (level === 'expert') {
-            difficultyInstruction = `EXPORT/EXPERT LEVEL (Extreme Difficulty & Micro-Context):
+            difficultyInstruction = `EXPORT/EXPERT LEVEL:
             - CRITICAL: NEVER use obvious, generic, or "nursery-level" distractors.
             - Do NOT invent fake Murli phrases.
             - All 4 options MUST be exact phrases used in BK knowledge, making it impossible to guess without reading TODAY'S specific text.`;
         } else if (level === 'advanced') {
-            difficultyInstruction = `ADVANCED LEVEL (Past vs Present Knowledge):
+            difficultyInstruction = `ADVANCED LEVEL:
             - The 3 wrong options MUST be genuine Brahma Kumaris concepts that sound highly plausible but were NOT spoken today.`;
         } else {
-            difficultyInstruction = `STANDARD LEVEL (Core Understanding):
+            difficultyInstruction = `STANDARD LEVEL:
             - Test the main teachings of today. Wrong options should be common misunderstandings.`;
         }
 
         const promptText = `You are an expert Brahma Kumaris spiritual examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text.
 
-CRITICAL LANGUAGE RULE:
-The output language MUST BE strictly ${langName}. Do NOT mix languages. All questions, options, and explanations must be in ${langName}.
+CRITICAL LANGUAGE & TONE RULE:
+Output strictly in natural ${langName}. Use authentic Brahma Kumaris vocabulary (e.g., 'ज्ञान', 'योग', 'धारणा', 'सेवा', 'बाबा', 'मुरली', 'विनाश'). Keep sentences highly readable. NO robotic translations.
+
+CONCISENESS RULE (CRITICAL):
+- Questions MUST be short and direct (maximum 12-15 words).
+- Options MUST be extremely concise (1 to 8 words max). Do not write full sentences for options unless absolutely necessary. Summarize the concept into a short phrase.
 
 SWAMAN RULES:
-1. Read the "वरदान" (Blessing) section of the provided Murli.
-2. Create a beautiful, spiritually accurate title ending with "भव:!".
-3. Start with a unique, relevant emoji.
-4. Write 2-3 sentences explaining it based on the Murli.
-5. Example format: "✨ मास्टर सर्वशक्तिवान् भव:! मीठे बच्चे..."
+1. Read the "वरदान" (Blessing) section.
+2. Create a short title ending with "भव:!". Start with an emoji.
+3. Write exactly 2 short sentences explaining it.
 
-QUIZ RULES (FORCING DEEP STUDY & 20 VARIETIES):
-1. "quiz" must be an array of exactly ${qCount} objects.
-2. VARIETY IS MANDATORY (100% OBJECTIVE): Use the following 20 question models to ensure maximum variety. Do NOT ask subjective questions like 'What is the title/essence?'.
-   - Model 1 (सटीक अर्थ): Exact meaning of a specific word used in Murli.
-   - Model 2 (बाबाको उपमा - Metaphor): What Baba compared a concept to (e.g., Island, Sweet).
-   - Model 3 (आज उल्लेख नभएको - Except/Not Mentioned): 3 correct facts + 1 fact NOT in today's Murli.
-   - Model 4 (लौकिक भ्रम - Myth vs Fact): Ignorant beliefs vs Baba's truth mentioned today.
-   - Model 5 (मुख्य कारण - Root Cause): The exact reason for an event or state.
-   - Model 6 (परिणाम - Effect): What happens if we do/don't follow a specific Shrimat.
-   - Model 7 (असत्य कथन - False Statement): 3 exact statements + 1 slightly altered false statement.
-   - Model 8 (सङ्ख्या वा समय - Numbers/Time): Specific years, hours, or counts mentioned.
-   - Model 9 (स्थान वा व्यक्ति - Places/History): Kings, cities, rivers, or historical figures mentioned.
-   - Model 10 (परिस्थितिमा धारणा - Situation): What Baba instructed to do in a specific situation.
-   - Model 11 (वरदान - Vardan): Specific condition or result from today's Vardan.
-   - Model 12 (स्लोगन - Slogan): Main takeaway or word from the Slogan.
-   - Model 13 (अव्यक्त इसारा - Avyakt Ishara): Deep checking point mentioned.
-   - Model 14 (खाली ठाउँ भर्ने - Fill in blanks): Exact missing word from a quote.
-   - Model 15 (सूक्ष्म भिन्नता - Subtle Difference): Differentiating two similar concepts mentioned today.
-   - Model 16 (विशेष उपाधि - Special Title): Specific title Baba gave to children today.
-   - Model 17 (दृष्टान्त - Analogy/Example): Worldly example Baba used (e.g., Doctor, Laundry).
-   - Model 18 (विपरीत अवस्था - Antonyms): Opposite states discussed.
-   - Model 19 (जोडा नमिल्ने - Incorrect Pair): Match concepts, with one wrong pair.
-   - Model 20 (सीधा प्रश्न - Direct Fact): Straightforward 'Who', 'What', 'Where' from the text.
-3. Difficulty: ${difficultyInstruction}
-4. Distractors (Wrong Options) must be plausible BK terms, but factually wrong based on TODAY's text.
-5. "answer" MUST perfectly match one of the "options".
-6. "explanation" MUST contain the short reason, and "original" must quote the exact sentence from the text.
-7. Use the "tag" field to indicate the context (e.g., "वरदान", "स्लोगन", "ज्ञान").
+QUIZ RULES (FORCING 20 DISTINCT VARIETIES):
+You MUST generate exactly ${qCount} questions. 
+To ensure 100% variety, you MUST map each question sequentially to the following 20 specific models. For example, Q1 must be Model 1, Q2 must be Model 2, etc. (If qCount is > 20, loop back to Model 1).
+
+THE 20 MODELS:
+M1 (सटीक अर्थ): Meaning of a specific spiritual word used today.
+M2 (बाबाको उपमा): What Baba compared a concept to (e.g., Island, Sweet).
+M3 (आज उल्लेख नभएको): 3 correct facts + 1 fact NOT in today's Murli.
+M4 (लौकिक भ्रम): Ignorant worldly beliefs vs Baba's truth.
+M5 (मुख्य कारण): The direct root cause for a specific state/event.
+M6 (परिणाम): The exact effect/result of following a specific Shrimat.
+M7 (असत्य कथन): 3 exact statements + 1 slightly altered false statement.
+M8 (सङ्ख्या वा समय): Specific years, hours, numbers, or counts.
+M9 (स्थान वा व्यक्ति): Kings, cities, rivers, or historical figures.
+M10 (परिस्थितिमा धारणा): What Baba instructed to do in a specific situation.
+M11 (वरदान): Specific condition or exact result from today's Vardan.
+M12 (स्लोगन): Main takeaway or exact word from the Slogan.
+M13 (अव्यक्त इसारा): Deep checking point or practice mentioned.
+M14 (खाली ठाउँ भर्ने): Exact missing word from a famous quote. (Use _____).
+M15 (सूक्ष्म भिन्नता): Differentiating two similar concepts (e.g., Hatha Yoga vs Raj Yoga).
+M16 (विशेष उपाधि): Specific title Baba gave to children or Himself today.
+M17 (दृष्टान्त): Worldly example Baba used (e.g., Doctor, Laundry).
+M18 (विपरीत अवस्था): Opposite states discussed (e.g., Dehi-abhimani vs Deh-abhimani).
+M19 (जोडा नमिल्ने): Match concepts, with one wrong pair.
+M20 (सीधा प्रश्न): Straightforward 'Who', 'What', 'Where' from the core essence.
+
+Difficulty: ${difficultyInstruction}
+- "answer" MUST perfectly match one of the "options".
+- "explanation" MUST be 1 short sentence, and "original" must quote the exact short sentence from the text.
+- "tag" field should be the topic keyword (max 2 words).
 
 SELF-VALIDATION BEFORE OUTPUT (CRITICAL):
-- Check: Are there exactly 4 options for every question?
-- Check: Is the correct answer exactly matching one of the options?
-- Check: Are you outputting in ${langName}?
+- Check: Are options short (max 8 words)?
+- Check: Did you cycle through all 20 models sequentially?
 
 Structure: 
 {
   "swaman": "Emoji Title भव:! Explanation...",
   "quiz": [
-    {"q": "Question", "options": ["Option1", "Option2", "Option3", "Option4"], "answer": "Exact Match from options", "explanation": "Short reason", "tag": "Keyword", "original": "Exact quote from text"}
+    {"q": "Short Question?", "options": ["Opt1", "Opt2", "Opt3", "Opt4"], "answer": "Exact Match", "explanation": "Short reason.", "tag": "Keyword", "original": "Exact quote."}
   ]
 }
 
@@ -3072,7 +3074,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 80.7)
+                Generated by BK Murali Quiz App (Version 80.8)
             </div>
         </body>
         </html>`;
