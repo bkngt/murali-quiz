@@ -564,8 +564,13 @@
         <div id="result-screen" style="display: none;">
             <div class="result-score-circle" id="rs-score">0/10</div>
             <div class="result-msg" id="rs-msg">अद्भुत!</div>
-            <div class="result-submsg" id="rs-submsg">हजुरको स्मृति धेरै तीक्ष्ण छ। बाबा धेरै खुसी हुनुहुन्छ!</div>
-            <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+            <div class="result-submsg" id="rs-submsg" style="margin-bottom: 20px;"></div>
+            
+            <button onclick="shareMyResult()" style="background: #25D366; color: white; width:auto; border-radius:50px; box-shadow: none; margin-bottom: 20px; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer;">
+                <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share Result
+            </button>
+            
+            <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button onclick="reviewQuiz()" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none; width:auto; border-radius:50px;">Review Answers</button>
                 <button onclick="resetToGenerator()" id="btn-new-quiz" style="background: #475569; color: white; width:auto; border-radius:50px; box-shadow: none;">Exit Quiz</button>
             </div>
@@ -626,7 +631,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 80.8 (Concise Variety Update)</div>
+        <div>Version: 81.0 (Motivation & Share Update)</div>
     </div>
 </div>
 
@@ -668,7 +673,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "80.8"; 
+    const APP_VERSION = "81.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -2446,13 +2451,103 @@ Text: ${text}`;
         let percent = Math.round((currentScore / currentQuiz.length) * 100); 
         document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
         
-        let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 50 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!"));
+        // --- 81.0 Version Motivational Messages ---
+        let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 60 ? "राम्रो!" : (percent >= 40 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!")));
         if(percent === 100) fireConfetti(); 
         
+        const excMsgs = [
+            "हजुरको ज्ञानको मनन-चिन्तन निकै गहिरो छ। यसलाई निरन्तरता दिनुहोला। 🌟",
+            "मुरलीप्रतिको हजुरको एकाग्रता र लगन प्रशंसनीय छ। यसरी नै अगाडि बढ्नुहोस्! ✨",
+            "हजुरको बुद्धि निकै स्वच्छ र तीक्ष्ण छ। बाबाको ज्ञानलाई यसरी नै जीवनमा उतार्दै जानुहोला। 🏆",
+            "ज्ञानका बुँदाहरूलाई हजुरले राम्रोसँग धारण गर्नुभएको छ। यो अभ्यास दैनिक जारी रहोस्। 💎",
+            "हजुरको अध्ययनको स्तर उत्कृष्ट छ। यसले हजुरको आध्यात्मिक उन्नतिमा ठूलो मद्दत गर्नेछ। 🌺",
+            "गहिरो अध्ययन र स्पष्ट धारणा नै हजुरको सफलताको रहस्य हो। धेरै-धेरै बधाई! 🕊️",
+            "मुरलीको प्रत्येक शब्दलाई हजुरले गम्भीरतापूर्वक लिनुभएको छ। नतिजा यसकै प्रमाण हो! 🌈"
+        ];
+        
+        const goodMsgs = [
+            "धेरै राम्रो प्रयास! मुरलीको गहिराइमा अझै ध्यान दिँदा हजुर पूर्ण सफल हुनुहुनेछ। 🌸",
+            "हजुरको नियमित अध्ययनको अभ्यास राम्रो छ। ज्ञानलाई अझै स्पष्ट पार्दै जानुहोस्! 🕊️",
+            "सुन्दर! दैनिक अभ्यास र एकाग्रताले हजुरको नतिजा अझ उत्कृष्ट हुनेछ। 🌟",
+            "धेरै राम्रो प्रयास! नमिलेका प्रश्नहरूलाई फेरि पढेर आफ्नो धारणालाई अझै स्पष्ट र बलियो बनाउनुहोला। 📚",
+            "हजुर सही बाटोमा हुनुहुन्छ। अलिकति थप मेहनतले हजुरलाई १००% सम्म पुर्‍याउनेछ। 🎯",
+            "ज्ञानलाई सम्झिने क्षमता राम्रो छ, यसलाई जीवनमा उतार्ने अभ्यास अझै बढाउनुहोला। 🌻",
+            "राम्रो नतिजा! मुरलीका मुख्य बुँदाहरूलाई नोट गर्ने बानी बसाल्नुभयो भने अझ सहज हुनेछ। 📝"
+        ];
+        
+        const passMsgs = [
+            "राम्रो प्रयास! मुरली सुन्दा र पढ्दा अझै बढी एकाग्र हुने अभ्यास गर्नुहोला। 💪",
+            "ज्ञानको धारणा बढाउन नियमित मनन-चिन्तनको आवश्यकता छ। मिहिनेत जारी राख्नुहोस्! 📚",
+            "सन्तोषजनक! बिहानको मुरलीलाई दिनभरि रिभाइज गर्ने बानी बसाल्नुहोस्, नतिजा पक्कै सुध्रिनेछ। ✨",
+            "पास हुनुभएको छ, तर लक्ष्य अझै माथि राख्नुहोला। भोलिको लागि अझै राम्रो तयारी गर्नुहोस्। 🎯",
+            "मुरलीका केही बुँदाहरू छुटेका हुन सक्छन्। दोहोर्‍याएर पढ्ने बानीले धेरै फाइदा गर्नेछ। 🔍",
+            "अभ्यास गर्दै जाँदा पक्कै सुधार आउनेछ। भोलिको मुरलीमा अझ बढी ध्यान दिनुहोला। 🌱",
+            "सकारात्मक प्रयास! ज्ञानको मनन-चिन्तनले हजुरको स्मृति शक्ति अझै बढ्नेछ। ☀️"
+        ];
+        
+        const failMsgs = [
+            "निराश नहुनुहोस्! मुरलीको नियमित अध्ययन र बाबाको यादले हजुरको नतिजा पक्कै राम्रो हुनेछ। 🌱",
+            "गल्तीबाटै सिकिन्छ। भोलिको मुरली अझै ध्यान दिएर पढ्ने र मनन गर्ने प्रयास गर्नुहोला। 💖",
+            "ज्ञान मार्गमा निरन्तर अभ्यासको ठूलो महत्त्व छ। भोलि नयाँ उत्साहका साथ प्रयास गर्नुहोला! 🕊️",
+            "नतिजा कम आए पनि सिकाइ निरन्तर छ। मुरलीलाई दुई-तीन पटक पढ्ने अभ्यास गर्नुहोस्। 📖",
+            "आज नमिलेका प्रश्नहरू हजुरको लागि नयाँ सिकाइ हुन्। अभ्यासलाई निरन्तरता दिनुहोस्। 🌈",
+            "ध्यानपूर्वक मुरली सुन्ने र पढ्ने बानीले हजुरको नतिजा पक्कै सुधार्नेछ। हिम्मत नहार्नुहोस्! 💪",
+            "यो सुरुवात मात्र हो। बिस्तारै ज्ञानका कुराहरू स्पष्ट हुँदै जानेछन्। लगनशील रहनुहोस्। 🌺"
+        ];
+
+        let subMsgArray = percent >= 80 ? excMsgs : (percent >= 60 ? goodMsgs : (percent >= 40 ? passMsgs : failMsgs));
+        let randomSubMsg = subMsgArray[Math.floor(Math.random() * subMsgArray.length)];
+
+        let shareLinkHtml = `
+        <div style="margin-top: 20px; padding: 12px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; border: 1px dashed var(--primary-color);">
+            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-color); margin-bottom: 5px;">
+                🔗 भोलिको क्वीज खेल्न यो लिंक सेभ वा सेयर गर्नुहोस्:
+            </div>
+            <a href="https://bkngt.github.io/murali-quiz/" target="_blank" style="color: var(--primary-color); font-weight: 800; text-decoration: none; word-break: break-all; font-size: 1.05rem;">
+                https://bkngt.github.io/murali-quiz/
+            </a>
+        </div>`;
+
         document.getElementById('rs-msg').innerText = msg; 
+        document.getElementById('rs-submsg').innerHTML = randomSubMsg + shareLinkHtml;
         window.scrollTo(0, 0); 
         
         syncPendingResults();
+    }
+    
+    // --- NEW: Share Result Function ---
+    window.shareMyResult = function() {
+        let percent = Math.round((currentScore / currentQuiz.length) * 100);
+        let textToShare = `✨ *मेरो आजको अभ्यास!* ✨\nमैले आजको BK Murali Quiz मा *[${currentScore}/${currentQuiz.length}] (${percent}%)* ल्याएँ! 🎉\n\nहजुर पनि आजको मुरलीको मनन-चिन्तन र आफ्नो ज्ञानको परीक्षण गर्न तलको लिंकमा गएर क्वीज खेल्नुहोस्:\n🔗 https://bkngt.github.io/murali-quiz/`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'BK Murali Quiz Result',
+                text: textToShare
+            }).then(() => {
+                showToast("नतिजा सफलतापूर्वक सेयर भयो!", "success");
+            }).catch(err => {
+                // Fallback to clipboard if user cancels or if it fails
+                copyToClipboardFallback(textToShare);
+            });
+        } else {
+            // Fallback for Desktop/Unsupported Browsers
+            copyToClipboardFallback(textToShare);
+        }
+    };
+
+    function copyToClipboardFallback(text) {
+        let tempTextArea = document.createElement("textarea");
+        tempTextArea.value = text;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        try {
+            document.execCommand("copy");
+            showToast("क्लिपबोर्डमा कपी भयो! अब कतै पनि पेस्ट गर्न सक्नुहुन्छ।", "success");
+        } catch (err) {
+            showToast("कपी गर्न सकिएन!", "error");
+        }
+        document.body.removeChild(tempTextArea);
     }
 
     function saveOrReplaceProgress() {
@@ -3074,7 +3169,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 80.8)
+                Generated by BK Murali Quiz App (Version 81.0)
             </div>
         </body>
         </html>`;
