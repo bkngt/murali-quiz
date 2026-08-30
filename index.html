@@ -353,13 +353,12 @@
                     <select id="quiz-level" style="flex: 1; padding: 0.8rem; border-color: #a78bfa; border-radius: 10px; font-size: 1rem; color: #a78bfa; font-weight: 700;">
                         <option value="expert" selected>🧠 Export (Expert)</option><option value="advanced">🔥 Advanced</option><option value="standard">🌱 Standard</option>
                     </select>
-                  <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
-    <option value="gemini-3.7-flash">🚀 Gemini 3.7 Flash</option>
-    <option value="gemini-3.6-flash" selected>⚡ Gemini 3.6 Flash</option>
-    <option value="gemini-3.1-pro-preview">🧠 Gemini 3.1 Pro</option>
-    <option value="gemini-2.5-pro">💎 Gemini 2.5 Pro</option>
-    <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
-</select>
+                   <select id="ai-model" style="flex: 1; padding: 0.8rem; border-color: var(--primary-color); border-radius: 10px; font-size: 1rem;">
+                        <option value="gemini-3.6-flash" selected>⚡ Gemini 3.6 Flash</option>
+                        <option value="gemini-3.7-flash">🚀 Gemini 3.7 Flash</option>
+                        <option value="gemini-3.5-flash">🌟 Gemini 3.5 Flash</option>
+                        <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash</option>
+                    </select>
                 </div>
             </div>
 
@@ -632,7 +631,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 81.0 (Motivation & Share Update)</div>
+        <div>Version: 82.0 (Retry Logic & App Stability)</div>
     </div>
 </div>
 
@@ -674,7 +673,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "81.0"; 
+    const APP_VERSION = "82.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1808,29 +1807,15 @@ Text: ${text}`;
 
         try {
             let response;
-            let retries = 5; 
-            let delay = 4000; 
-            let currentModel = selectedModel; 
+            let retries = 4; // 4 attempts total (1 initial + 3 retries)
+            let delay = 4000; // Start with 4 seconds delay
             
-            let modelHierarchy = [];
-if (selectedModel === 'gemini-3.1-pro-preview') {
-    modelHierarchy = ['gemini-3.1-pro-preview', 'gemini-2.5-pro', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash'];
-} else if (selectedModel === 'gemini-2.5-pro') {
-    modelHierarchy = ['gemini-2.5-pro', 'gemini-3.1-pro-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
-} else if (selectedModel === 'gemini-3.7-flash') {
-    modelHierarchy = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-pro'];
-} else if (selectedModel === 'gemini-3.6-flash') {
-    modelHierarchy = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-2.5-pro'];
-} else {
-    modelHierarchy = [selectedModel, 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash'];
-}
-
             for (let i = 0; i < retries; i++) {
                 if (i > 0) {
-                    document.getElementById('loading-text').innerText = `Server busy. Retrying with ${currentModel}... Attempt ${i + 1}/${retries}`;
+                    document.getElementById('loading-text').innerText = `Server busy. Retrying... Attempt ${i + 1}/${retries}`;
                 }
                 
-                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`, { 
+                response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, { 
                     method: "POST", 
                     headers: { "Content-Type": "application/json" }, 
                     body: JSON.stringify({ 
@@ -1842,15 +1827,9 @@ if (selectedModel === 'gemini-3.1-pro-preview') {
                 });
                 
                 if (response.status === 503 || response.status === 429) {
-                    await new Promise(r => setTimeout(r, delay));
-                    delay += 3000; 
-                    
-                    if (i >= 1) { 
-                        let currentIndex = modelHierarchy.indexOf(currentModel);
-                        if (currentIndex !== -1 && currentIndex < modelHierarchy.length - 1) {
-                            currentModel = modelHierarchy[currentIndex + 1];
-                            document.getElementById('loading-text').innerText = `Heavy traffic. Auto-shifting to ${currentModel}...`;
-                        }
+                    if (i < retries - 1) {
+                        await new Promise(r => setTimeout(r, delay));
+                        delay += 3000; // Progressive delay: 4s, 7s, 10s
                     }
                     continue;
                 }
@@ -1889,7 +1868,7 @@ if (selectedModel === 'gemini-3.1-pro-preview') {
             
             renderQuizArea();
             
-            showToast(`क्विज तयार भयो! (Model: ${currentModel})`, "success", 8000); 
+            showToast(`क्विज तयार भयो! (Model: ${selectedModel})`, "success", 8000); 
             
             let safeRole = (userRole||"").toString().trim().toLowerCase();
             let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
@@ -2465,7 +2444,7 @@ if (selectedModel === 'gemini-3.1-pro-preview') {
             "मुरलीप्रतिको हजुरको एकाग्रता र लगन प्रशंसनीय छ। यसरी नै अगाडि बढ्नुहोस्! ✨",
             "हजुरको बुद्धि निकै स्वच्छ र तीक्ष्ण छ। बाबाको ज्ञानलाई यसरी नै जीवनमा उतार्दै जानुहोला। 🏆",
             "ज्ञानका बुँदाहरूलाई हजुरले राम्रोसँग धारण गर्नुभएको छ। यो अभ्यास दैनिक जारी रहोस्। 💎",
-            "हजुरको अध्ययनको स्तर उत्कृष्ट छ। यसले हजुरको आध्यात्मिक उन्नतिमा ठूलो मद्दत गर्नेछ। 🌺",
+            "हजुरको अध्ययनको स्तर उत्कृष्ट छ। यसले हजुरको आध्यात्मिक उन्नतिमा ठूलो मद्दतিত্তमा ठूलो मद्दत गर्नेछ। 🌺",
             "गहिरो अध्ययन र स्पष्ट धारणा नै हजुरको सफलताको रहस्य हो। धेरै-धेरै बधाई! 🕊️",
             "मुरलीको प्रत्येक शब्दलाई हजुरले गम्भीरतापूर्वक लिनुभएको छ। नतिजा यसकै प्रमाण हो! 🌈"
         ];
@@ -3174,7 +3153,7 @@ if (selectedModel === 'gemini-3.1-pro-preview') {
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 81.0)
+                Generated by BK Murali Quiz App (Version 82.0)
             </div>
         </body>
         </html>`;
