@@ -528,7 +528,7 @@
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
             </button>
             <button onclick="document.getElementById('murali-text').value=''" title="Clear Text" style="flex:0 0 auto; width: auto; background: var(--danger-color); color: white; border-radius: 50px; padding: 1rem 1.4rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">
-                <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path></svg>
             </button>
         </div>
 
@@ -645,7 +645,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 83.1 (Calendar Date & Alignment Fix)</div>
+        <div>Version: 84.0 (Date Sync & Export Fix)</div>
     </div>
 </div>
 
@@ -687,7 +687,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "83.1"; 
+    const APP_VERSION = "84.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -899,6 +899,12 @@
         let d = new Date(cleanDateStr); 
         if (!isNaN(d.getTime())) return d; 
         return h.timestamp ? new Date(h.timestamp) : null;
+    }
+
+    // --- NEW: Safe Filename Generator ---
+    function getSafeFilename(dateStr) {
+        let safe = String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim();
+        return `Murali_QnA_${safe}.html`;
     }
 
     window.togglePinVisibility = function() {
@@ -1729,6 +1735,7 @@
         return m ? m[0] : new Date().toLocaleDateString('en-GB'); 
     }
 
+    // --- FIX: Custom Quiz Date Format ---
     window.saveCustomQuiz = function() {
         let jsonText = document.getElementById('custom-json-input').value.trim();
         let rawDate = document.getElementById('custom-quiz-date').value;
@@ -1736,7 +1743,7 @@
         if(!jsonText) return showToast("कृपया JSON कोड पेस्ट गर्नुहोस्।", "error");
         if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
 
-        // Convert YYYY-MM-DD to DD-MM-YYYY format to match Google Sheet consistency
+        // Convert YYYY-MM-DD to DD-MM-YYYY format strictly as a string
         let parts = rawDate.split('-');
         let dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
@@ -1752,7 +1759,7 @@
 
             currentQuiz = parsedData.quiz;
             currentSwaman = parsedData.swaman || "";
-            currentMurliDate = dateStr;
+            currentMurliDate = dateStr; // Strictly string
 
             document.getElementById('custom-json-input').value = '';
             document.getElementById('custom-quiz-date').value = '';
@@ -1831,7 +1838,7 @@ M4 (लौकिक भ्रम): Ignorant worldly beliefs vs Baba's truth.
 M5 (मुख्य कारण): The direct root cause for a specific state/event.
 M6 (परिणाम): The exact effect/result of following a specific Shrimat.
 M7 (असत्य कथन): 3 exact statements + 1 slightly altered false statement.
-M8 (सङ्ख्या वा समय): Specific years, hours, numbers, or counts.
+M8 (सङ्ख्या वा समय): Specific years, hours, numbers, or historical figures.
 M9 (स्थान वा व्यक्ति): Kings, cities, rivers, or historical figures.
 M10 (परिस्थितिमा धारणा): What Baba instructed to do in a specific situation.
 M11 (वरदान): Specific condition or exact result from today's Vardan.
@@ -2018,7 +2025,7 @@ Text: ${text}`;
         let qCount = parseInt(document.getElementById('q-count').value); 
         
         if (qCount >= 50) {
-            if(!confirm(`तपाईं ${qCount} प्रश्नको मेगा क्वीज सुरु गर्दै हुनुहुन्छ। यसले केही समय लिन सक्छ। के तपाईं साँच्चै सुरु गर्ने পুরো गर्ने हो?`)) return;
+            if(!confirm(`तपाईं ${qCount} प्रश्नको मेगा क्वीज सुरु गर्दै हुनुहुन्छ। यसले केही समय लिन सक्छ। के तपाईं साँच्चै सुरु गर्ने हो?`)) return;
         }
 
         qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
@@ -3016,7 +3023,9 @@ Text: ${text}`;
         serverQuizzes.forEach((sq, idx) => {
             let opt = document.createElement('option');
             opt.value = idx;
-            opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + sq.quizDate;
+            // FIX: Clean up display date if it has T...Z format from old bugs
+            let displayDate = String(sq.quizDate).replace(/T.*/, '');
+            opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
             select.appendChild(opt);
         });
     }
@@ -3180,12 +3189,15 @@ Text: ${text}`;
     }
 
     function generateQnAHtml(quizData, dateStr) {
+        // FIX: Clean up date string for display
+        let cleanDate = String(dateStr).replace(/T.*/, '');
+        
         let html = `<!DOCTYPE html>
         <html lang="ne">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>BK Murali Quiz - ${dateStr}</title>
+            <title>BK Murali Quiz - ${cleanDate}</title>
             <style>
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1e293b; max-width: 850px; margin: 0 auto; padding: 20px; background: #f8fafc; }
                 .header { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid #0284c7; }
@@ -3209,7 +3221,7 @@ Text: ${text}`;
         <body>
             <div class="header">
                 <h1>📖 BK Murali Quiz Q&A</h1>
-                <div class="date-badge">📅 Date: ${dateStr}</div>
+                <div class="date-badge">📅 Date: ${cleanDate}</div>
             </div>`;
         
         quizData.forEach((q, i) => {
@@ -3236,7 +3248,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 83.1)
+                Generated by BK Murali Quiz App (Version 84.0)
             </div>
         </body>
         </html>`;
@@ -3259,7 +3271,7 @@ Text: ${text}`;
         serverQuizzes.forEach(sq => {
             if (!sq.quizData) return;
             let html = generateQnAHtml(sq.quizData, sq.quizDate);
-            let filename = `Murali_QnA_${sq.quizDate.replace(/[\/\\]/g,'-')}.html`;
+            let filename = getSafeFilename(sq.quizDate);
             zip.file(filename, html);
         });
 
@@ -3285,7 +3297,7 @@ Text: ${text}`;
         
         let html = generateQnAHtml(sq.quizData, sq.quizDate);
         let b = new Blob([html], { type: 'text/html;charset=utf-8' });
-        let filename = `Murali_QnA_${sq.quizDate.replace(/[\/\\]/g,'-')}.html`; 
+        let filename = getSafeFilename(sq.quizDate); 
         triggerDownload(b, filename);
     };
 
@@ -3294,7 +3306,7 @@ Text: ${text}`;
         
         let html = generateQnAHtml(currentQuiz, currentMurliDate);
         let b = new Blob([html], { type: 'text/html;charset=utf-8' });
-        let filename = `Murali_QnA_${currentMurliDate.replace(/[\/\\]/g,'-')}.html`; 
+        let filename = getSafeFilename(currentMurliDate); 
         let file = new File([b], filename, { type: "text/html" });
         
         if (navigator.canShare && navigator.canShare({ files: [file] })) { 
