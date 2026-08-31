@@ -12,7 +12,11 @@
     <!-- PWA Manifest Link -->
     <link rel="manifest" href="manifest.json">
     
+    <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- Chart.js for Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -86,7 +90,6 @@
         .q-tag { background: rgba(167, 139, 250, 0.15); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.3);}
         .question-text { font-weight: 800; font-size: 1.05rem; margin: 0 0 0.8rem 0; color: var(--q-text-color) !important; line-height: 1.4; }
         
-        /* Timer Lock UI */
         .lock-timer-msg { font-size: 0.9rem; font-weight: 800; text-align: center; padding: 8px; margin-bottom: 10px; border-radius: 8px; background: var(--bg-color); border: 1px dashed var(--border-color); transition: all 0.3s; }
         
         .options-group { display: flex; flex-direction: column; gap: 10px; }
@@ -101,8 +104,6 @@
         .option-container.selected-right { background-color: var(--success-bg); border-color: var(--success-color); }
         .option-container.selected-right .option-letter { background: var(--success-color); box-shadow: none; }
         .option-container.disabled { cursor: default; pointer-events: none; opacity: 0.8; }
-        
-        /* Locked state: Clear text, but unclickable */
         .option-container.locked { cursor: not-allowed; pointer-events: none; }
         
         .feedback-box { display: none; padding-top: 0.8rem; margin-top: 0.5rem; font-size: 0.9rem; border-top: 1px dashed var(--border-color); }
@@ -151,18 +152,18 @@
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 
-        /* Leaderboard Tabs CSS */
         .lb-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
         .lb-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
         .lb-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3); }
         
-        /* Radio Button Styling */
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .radio-label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--text-color); }
         .radio-label input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); }
         
-        /* PWA Install Button - ALWAYS VISIBLE IN SETTINGS */
         #install-pwa-btn { display: block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
+
+        /* Chart Container Styles */
+        .chart-container { position: relative; width: 100%; height: 250px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -220,7 +221,6 @@
 
             <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
             
-            <!-- PIN INPUT WITH EYE ICON -->
             <div style="margin: 0.4rem 0;">
                 <p id="pin-instruction" style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
                 <div style="position: relative; display: flex; align-items: center;">
@@ -321,7 +321,6 @@
                     <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: OFF</button>
                     <button onclick="toggleAdminStudentView()" id="btn-toggle-view" style="display:none; flex:1; background: var(--bg-color); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">👁️ Student View</button>
                 </div>
-                <!-- PWA Install Button ALWAYS VISIBLE HERE -->
                 <button id="install-pwa-btn" style="display:block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">📱 Install App to Home Screen</button>
             </div>
 
@@ -395,7 +394,6 @@
                 Admin Dashboard
             </h3>
             
-            <!-- Report Type Selection -->
             <div class="radio-group">
                 <label class="radio-label">
                     <input type="radio" name="lb-report-type" value="daily" checked onchange="toggleLbDateInputs()"> 📅 दैनिक नतिजा (Daily)
@@ -405,7 +403,6 @@
                 </label>
             </div>
 
-            <!-- Daily Input Group -->
             <div id="lb-daily-input-group" style="display: flex; gap: 8px; margin-bottom: 15px;">
                 <input type="date" id="lb-daily-date" class="input-field" style="flex: 2; margin:0; font-size:0.9rem; cursor:pointer;">
                 <select id="lb-limit-select-daily" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
@@ -418,7 +415,6 @@
                 </select>
             </div>
 
-            <!-- Range (Average) Input Group -->
             <div id="lb-range-input-group" style="display: none; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 120px;">
                     <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color);">सुरु मिति (Start Date)</label>
@@ -442,13 +438,11 @@
             
             <button onclick="fetchLeaderboard()" id="btn-fetch-lb" style="margin-bottom: 15px; padding: 0.8rem;">Generate Data</button>
             
-            <!-- Tabs for Leaderboard -->
             <div class="lb-tabs">
                 <button id="tab-wa" class="active" onclick="switchLbTab('wa')">📊 WhatsApp Report</button>
                 <button id="tab-table" onclick="switchLbTab('table')">👥 Table View</button>
             </div>
 
-            <!-- Tab 1: WhatsApp Report -->
             <div id="lb-wa-section">
                 <textarea id="lb-result-text" readonly style="height: 180px; min-height: 150px; font-family: monospace; font-size: 0.85rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);"></textarea>
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -457,7 +451,6 @@
                 </div>
             </div>
 
-            <!-- Tab 2: Table View -->
             <div id="lb-table-section" style="display:none;">
                 <div id="lb-table-container" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
@@ -532,7 +525,6 @@
             </button>
         </div>
 
-        <!-- NEW SECTION: CUSTOM AI STUDIO IMPORT -->
         <div id="custom-import-section" style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color); display: none;">
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -598,6 +590,15 @@
         </div>
         
         <div class="dashboard-stats" id="dash-stats"></div>
+        
+        <!-- NEW: Chart.js Containers -->
+        <div class="chart-container">
+            <canvas id="progressLineChart"></canvas>
+        </div>
+        <div class="chart-container" style="height: 220px;">
+            <canvas id="weaknessDoughnutChart"></canvas>
+        </div>
+
         <div id="baba-message-container"></div>
         
         <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -607,10 +608,10 @@
         
         <div id="calendar-wrapper" style="display: none;">
             <div class="calendar-container">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <button class="btn-icon" onclick="changeCalMonth(-1)"><svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-                    <h3 id="cal-month-year" style="margin:0; font-size:1.2rem; color:var(--primary-color); font-weight:800;">...</h3>
-                    <button class="btn-icon" onclick="changeCalMonth(1)"><svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                <!-- NEW: Smart Calendar Picker -->
+                <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1rem; gap: 10px;">
+                    <select id="cal-month-select" class="select-field" style="width: auto; padding: 0.4rem; margin: 0; font-size: 1rem;" onchange="jumpToDate()"></select>
+                    <select id="cal-year-select" class="select-field" style="width: auto; padding: 0.4rem; margin: 0; font-size: 1rem;" onchange="jumpToDate()"></select>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; font-size:0.75rem; font-weight:800; color:#94a3b8; margin-bottom:6px;">
                     <div style="color:var(--danger-color);">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div style="color:var(--primary-color);">Sat</div>
@@ -645,7 +646,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 84.0 (Date Sync & Export Fix)</div>
+        <div>Version: 85.0 (Charts & Archive Update)</div>
     </div>
 </div>
 
@@ -687,7 +688,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "84.0"; 
+    const APP_VERSION = "85.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -725,6 +726,10 @@
     let audioCtx = null;
     
     let abortController = null;
+    
+    // Chart.js Instances
+    let progressChartInstance = null;
+    let tagsChartInstance = null;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -806,6 +811,10 @@
             localStorage.setItem('m_q_theme', 'dark'); 
             if(meta) meta.content = "#0b0f19"; 
             if(btn) btn.innerHTML = '☀️ Dark Mode: ON';
+        }
+        // Redraw charts to match theme
+        if(document.getElementById('view-progress').style.display === 'block') {
+            renderDashboard();
         }
     }
 
@@ -901,7 +910,6 @@
         return h.timestamp ? new Date(h.timestamp) : null;
     }
 
-    // --- NEW: Safe Filename Generator ---
     function getSafeFilename(dateStr) {
         let safe = String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim();
         return `Murali_QnA_${safe}.html`;
@@ -950,13 +958,10 @@
         const savedName = localStorage.getItem('murali_user_name');
         const savedPIN = localStorage.getItem('murali_pin');
 
-        // === नयाँ AUTO-LOGIN लजिक ===
         if (savedName && savedPIN && !isLockedOut) {
-            // यदि पहिले नै लगइन छ भने सिधै एप खोल्ने (पिन नमाग्ने)
             document.getElementById('lock-screen').style.display = 'none';
             unlockApp();
         } else {
-            // नयाँ प्रयोगकर्ता वा लगआउट भएको अवस्थामा मात्र लक स्क्रिन देखाउने
             document.getElementById('lock-screen').style.display = 'flex'; 
             document.getElementById('main-app').style.display = 'none';
             
@@ -1745,7 +1750,6 @@
         return m ? m[0] : new Date().toLocaleDateString('en-GB'); 
     }
 
-    // --- FIX: Custom Quiz Date Format ---
     window.saveCustomQuiz = function() {
         let jsonText = document.getElementById('custom-json-input').value.trim();
         let rawDate = document.getElementById('custom-quiz-date').value;
@@ -1753,7 +1757,6 @@
         if(!jsonText) return showToast("कृपया JSON कोड पेस्ट गर्नुहोस्।", "error");
         if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
 
-        // Convert YYYY-MM-DD to DD-MM-YYYY format strictly as a string
         let parts = rawDate.split('-');
         let dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
@@ -1769,7 +1772,7 @@
 
             currentQuiz = parsedData.quiz;
             currentSwaman = parsedData.swaman || "";
-            currentMurliDate = dateStr; // Strictly string
+            currentMurliDate = dateStr; 
 
             document.getElementById('custom-json-input').value = '';
             document.getElementById('custom-quiz-date').value = '';
@@ -1797,7 +1800,6 @@
         let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash'; 
         let level = document.getElementById('quiz-level').value;
 
-        // Dynamic Language Selection Based on UI Dropdown
         let uiLang = document.getElementById('lang-select').value;
         let langName = uiLang === "en" ? "English" : (uiLang === "hi" ? "Hindi" : "Nepali");
 
@@ -2535,7 +2537,6 @@ Text: ${text}`;
         let percent = Math.round((currentScore / currentQuiz.length) * 100); 
         document.getElementById('rs-score').innerText = `${currentScore}/${currentQuiz.length}`;
         
-        // --- 81.0 Version Motivational Messages ---
         let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 60 ? "राम्रो!" : (percent >= 40 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!")));
         if(percent === 100) fireConfetti(); 
         
@@ -2599,7 +2600,6 @@ Text: ${text}`;
         syncPendingResults();
     }
     
-    // --- NEW: Share Result Function ---
     window.shareMyResult = function() {
         let percent = Math.round((currentScore / currentQuiz.length) * 100);
         let textToShare = `✨ *मेरो आजको अभ्यास!* ✨\nमैले आजको BK Murali Quiz मा *[${currentScore}/${currentQuiz.length}] (${percent}%)* ल्याएँ! 🎉\n\nहजुर पनि आजको मुरलीको मनन-चिन्तन र आफ्नो ज्ञानको परीक्षण गर्न तलको लिंकमा गएर क्वीज खेल्नुहोस्:\n🔗 https://bkngt.github.io/murali-quiz/`;
@@ -2611,11 +2611,9 @@ Text: ${text}`;
             }).then(() => {
                 showToast("नतिजा सफलतापूर्वक सेयर भयो!", "success");
             }).catch(err => {
-                // Fallback to clipboard if user cancels or if it fails
                 copyToClipboardFallback(textToShare);
             });
         } else {
-            // Fallback for Desktop/Unsupported Browsers
             copyToClipboardFallback(textToShare);
         }
     };
@@ -2662,7 +2660,6 @@ Text: ${text}`;
     function reviewQuiz() {
         document.getElementById('result-screen').style.display = 'none'; 
         
-        // नयाँ लजिक: Quiz Area लाई Flexbox बनाएर अर्डर मिलाउने
         let quizArea = document.getElementById('quiz-area');
         quizArea.style.display = 'flex';
         quizArea.style.flexDirection = 'column';
@@ -2678,11 +2675,11 @@ Text: ${text}`;
         backBtn.id = 'back-to-res'; 
         backBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Go Back`;
         backBtn.style.cssText = "margin:0 0 15px 0; background:var(--primary-color); color:white; border-radius:50px; padding:0.6rem 1.4rem; width:auto; font-weight:800; border:none; cursor:pointer;";
-        backBtn.style.order = "0"; // 'Go Back' बटन सधैं सबैभन्दा माथि राख्न
+        backBtn.style.order = "0"; 
         
         backBtn.onclick = () => { 
             quizArea.style.display = 'none'; 
-            quizArea.style.flexDirection = 'initial'; // पुरानै अवस्थामा फर्काउन
+            quizArea.style.flexDirection = 'initial'; 
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-tabs').style.display = 'flex';
             document.getElementById('toolbar-right-actions').style.display = 'flex';
@@ -2702,8 +2699,6 @@ Text: ${text}`;
             let qb = document.getElementById(`qb-${qIndex}`); 
             if (qb) {
                 qb.style.display = 'block';
-                
-                // नयाँ लजिक: गलत उत्तरलाई माथि (order: 1) र सहीलाई तल (order: 2) राख्ने
                 if (q.userCorrect === false) {
                     qb.style.order = "1";
                 } else {
@@ -2774,7 +2769,7 @@ Text: ${text}`;
     };
 
     // ==========================================
-    // 8. DASHBOARD & CALENDAR
+    // 8. DASHBOARD, CHARTS & CALENDAR
     // ==========================================
     function switchTab(tab) {
         document.getElementById('tab-gen').classList.toggle('active', tab === 'gen'); 
@@ -2883,11 +2878,6 @@ Text: ${text}`;
         return streak;
     }
 
-    window.changeCalMonth = function(dir) { 
-        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        renderDashboard(); 
-    };
-    
     window.toggleCalendar = function() { 
         let cal = document.getElementById('calendar-wrapper'); 
         let txt = document.getElementById('cal-toggle-text'); 
@@ -2900,6 +2890,133 @@ Text: ${text}`;
         } 
     };
 
+    // --- NEW: Smart Calendar Picker Logic ---
+    function populateCalendarPickers(cy, cm) {
+        let monthSelect = document.getElementById('cal-month-select');
+        let yearSelect = document.getElementById('cal-year-select');
+        
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        if(monthSelect.options.length === 0) {
+            months.forEach((m, i) => {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.text = m;
+                monthSelect.appendChild(opt);
+            });
+        }
+        monthSelect.value = cm;
+
+        if(yearSelect.options.length === 0) {
+            let currentYear = new Date().getFullYear();
+            for(let y = 2024; y <= currentYear + 1; y++) {
+                let opt = document.createElement('option');
+                opt.value = y;
+                opt.text = y;
+                yearSelect.appendChild(opt);
+            }
+        }
+        yearSelect.value = cy;
+    }
+
+    window.jumpToDate = function() {
+        let m = parseInt(document.getElementById('cal-month-select').value);
+        let y = parseInt(document.getElementById('cal-year-select').value);
+        currentCalDate = new Date(y, m, 1);
+        renderDashboard();
+    }
+
+    // --- NEW: Chart.js Rendering Logic ---
+    function drawCharts(filteredHistory) {
+        let isDark = document.body.hasAttribute('data-theme');
+        let textColor = isDark ? '#f8fafc' : '#1e293b';
+        let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+        // 1. Progress Line Chart
+        let ctxLine = document.getElementById('progressLineChart').getContext('2d');
+        if(progressChartInstance) progressChartInstance.destroy();
+
+        let sortedHistory = [...filteredHistory].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime());
+        let labels = sortedHistory.map(h => {
+            let d = getValidDate(h);
+            return d ? d.getDate() : '';
+        });
+        let dataPoints = sortedHistory.map(h => h.percent);
+
+        progressChartInstance = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Score (%)',
+                    data: dataPoints,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#16a34a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Daily Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } },
+                    x: { ticks: { color: textColor }, grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Weakness Doughnut Chart
+        let ctxDoughnut = document.getElementById('weaknessDoughnutChart').getContext('2d');
+        if(tagsChartInstance) tagsChartInstance.destroy();
+
+        let allWeakTags = []; 
+        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
+        
+        if(allWeakTags.length === 0) {
+            // Show empty state chart
+            tagsChartInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: { labels: ['No Mistakes'], datasets: [{ data: [1], backgroundColor: ['#16a34a'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Weak Areas', color: textColor } } }
+            });
+            return;
+        }
+
+        let tagCounts = {}; 
+        allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
+        
+        let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]).slice(0, 5); // Top 5
+        let tagData = sortedTags.map(t => tagCounts[t]);
+
+        tagsChartInstance = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: sortedTags,
+                datasets: [{
+                    data: tagData,
+                    backgroundColor: ['#dc2626', '#f59e0b', '#0284c7', '#8b5cf6', '#14b8a6'],
+                    borderWidth: 1,
+                    borderColor: isDark ? '#1e293b' : '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { color: textColor, font: {size: 11} } },
+                    title: { display: true, text: 'Top Weak Areas', color: textColor, font: {size: 14, family: 'Poppins'} }
+                }
+            }
+        });
+    }
+
     function renderDashboard() {
         const d = dict[lang]; 
         let history = safeJSON('murali_progress', []); 
@@ -2907,6 +3024,8 @@ Text: ${text}`;
         let cy = currentCalDate.getFullYear(); 
         let cm = currentCalDate.getMonth();
         
+        populateCalendarPickers(cy, cm);
+
         let filteredHistory = history.filter(h => { 
             let dObj = getValidDate(h); 
             return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
@@ -2923,6 +3042,9 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
+        // Draw Charts
+        drawCharts(filteredHistory);
+
         let babaMessage = "";
         if (totalTaken === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
@@ -2954,8 +3076,6 @@ Text: ${text}`;
             </p>
         </div>`;
         document.getElementById('baba-message-container').innerHTML = swamanHtml;
-        
-        document.getElementById('cal-month-year').innerText = `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][cm]} ${cy}`;
         
         let firstDay = new Date(cy, cm, 1).getDay(); 
         let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
@@ -3034,6 +3154,8 @@ Text: ${text}`;
     // ==========================================
     // 9. EXPORT & IMPORT (Q&A LIST / ZIP)
     // ==========================================
+    
+    // --- NEW: Grouped Dropdown Logic ---
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
         if(!select) return;
@@ -3045,18 +3167,32 @@ Text: ${text}`;
             return;
         }
         
+        let groupedQuizzes = {};
         serverQuizzes.forEach((sq, idx) => {
-            let opt = document.createElement('option');
-            opt.value = idx;
-            // FIX: Clean up display date if it has T...Z format from old bugs
-            let displayDate = String(sq.quizDate).replace(/T.*/, '');
-            opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
-            select.appendChild(opt);
+            let dObj = getValidDate({date: sq.quizDate});
+            let monthYear = dObj ? dObj.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : "Special/Mega Quizzes";
+            
+            if(!groupedQuizzes[monthYear]) groupedQuizzes[monthYear] = [];
+            groupedQuizzes[monthYear].push({ data: sq, index: idx });
         });
+
+        for (let group in groupedQuizzes) {
+            let optGroup = document.createElement('optgroup');
+            optGroup.label = group; 
+            
+            groupedQuizzes[group].forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.index;
+                let displayDate = String(item.data.quizDate).replace(/T.*/, '');
+                opt.text = (item.data.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
+                optGroup.appendChild(opt);
+            });
+            select.appendChild(optGroup);
+        }
     }
 
     // ==========================================
-    // 🏆 LEADERBOARD LOGIC (NEW CALENDAR SYSTEM)
+    // 🏆 LEADERBOARD LOGIC
     // ==========================================
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
@@ -3078,7 +3214,7 @@ Text: ${text}`;
     window.toggleLbDateInputs = function() {
         let type = document.querySelector('input[name="lb-report-type"]:checked').value;
         document.getElementById('lb-daily-input-group').style.display = type === 'daily' ? 'flex' : 'none';
-        document.getElementById('lb-range-input-group').style.display = type === 'range' ? 'flex' : 'none';
+     document.getElementById('lb-range-input-group').style.display = type === 'range' ? 'flex' : 'none';
     }
 
     window.switchLbTab = function(tab) {
@@ -3214,7 +3350,6 @@ Text: ${text}`;
     }
 
     function generateQnAHtml(quizData, dateStr) {
-        // FIX: Clean up date string for display
         let cleanDate = String(dateStr).replace(/T.*/, '');
         
         let html = `<!DOCTYPE html>
@@ -3273,7 +3408,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 84.0)
+                Generated by BK Murali Quiz App (Version 85.0)
             </div>
         </body>
         </html>`;
