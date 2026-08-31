@@ -2661,7 +2661,11 @@ Text: ${text}`;
 
     function reviewQuiz() {
         document.getElementById('result-screen').style.display = 'none'; 
-        document.getElementById('quiz-area').style.display = 'block';
+        
+        // नयाँ लजिक: Quiz Area लाई Flexbox बनाएर अर्डर मिलाउने
+        let quizArea = document.getElementById('quiz-area');
+        quizArea.style.display = 'flex';
+        quizArea.style.flexDirection = 'column';
         
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('main-tabs').style.display = 'none';
@@ -2674,9 +2678,11 @@ Text: ${text}`;
         backBtn.id = 'back-to-res'; 
         backBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Go Back`;
         backBtn.style.cssText = "margin:0 0 15px 0; background:var(--primary-color); color:white; border-radius:50px; padding:0.6rem 1.4rem; width:auto; font-weight:800; border:none; cursor:pointer;";
+        backBtn.style.order = "0"; // 'Go Back' बटन सधैं सबैभन्दा माथि राख्न
         
         backBtn.onclick = () => { 
-            document.getElementById('quiz-area').style.display = 'none'; 
+            quizArea.style.display = 'none'; 
+            quizArea.style.flexDirection = 'initial'; // पुरानै अवस्थामा फर्काउन
             document.getElementById('main-header').style.display = 'flex';
             document.getElementById('main-tabs').style.display = 'flex';
             document.getElementById('toolbar-right-actions').style.display = 'flex';
@@ -2690,11 +2696,20 @@ Text: ${text}`;
             } 
         }; 
         
-        document.getElementById('quiz-area').prepend(backBtn);
+        quizArea.prepend(backBtn);
         
         currentQuiz.forEach((q, qIndex) => {
             let qb = document.getElementById(`qb-${qIndex}`); 
-            if (qb) qb.style.display = 'block';
+            if (qb) {
+                qb.style.display = 'block';
+                
+                // नयाँ लजिक: गलत उत्तरलाई माथि (order: 1) र सहीलाई तल (order: 2) राख्ने
+                if (q.userCorrect === false) {
+                    qb.style.order = "1";
+                } else {
+                    qb.style.order = "2";
+                }
+            }
             
             let timerEl = document.getElementById(`lock-timer-${qIndex}`);
             if(timerEl) timerEl.style.display = 'none';
