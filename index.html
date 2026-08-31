@@ -927,9 +927,6 @@
             localStorage.setItem('murali_app_version', APP_VERSION);
         }
         
-        document.getElementById('lock-screen').style.display = 'flex'; 
-        document.getElementById('main-app').style.display = 'none';
-        
         let meta = document.getElementById('theme-color-meta');
         if(localStorage.getItem('m_q_theme') === 'dark') {
             document.body.setAttribute('data-theme', 'dark'); 
@@ -951,21 +948,34 @@
         }
         
         const savedName = localStorage.getItem('murali_user_name');
-        if (savedName) {
-            document.getElementById('first-name-input').disabled = true; 
-            document.getElementById('last-name-input').disabled = true; 
-            document.getElementById('phone-input').style.display = 'none'; 
-            document.getElementById('address-input').style.display = 'none';
-            document.getElementById('country-select').style.display = 'none'; 
-            document.getElementById('month-select').style.display = 'none';
-            document.getElementById('warning-msg').style.display = 'none'; 
-            if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
-            document.getElementById('reg-fields').style.display = 'none';
+        const savedPIN = localStorage.getItem('murali_pin');
 
-            document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; 
-            document.getElementById('forgot-btn').style.display = 'block'; 
-            document.getElementById('cancel-forgot-btn').style.display = 'none'; 
-            document.getElementById('direct-login-btn').style.display = 'none';
+        // === नयाँ AUTO-LOGIN लजिक ===
+        if (savedName && savedPIN && !isLockedOut) {
+            // यदि पहिले नै लगइन छ भने सिधै एप खोल्ने (पिन नमाग्ने)
+            document.getElementById('lock-screen').style.display = 'none';
+            unlockApp();
+        } else {
+            // नयाँ प्रयोगकर्ता वा लगआउट भएको अवस्थामा मात्र लक स्क्रिन देखाउने
+            document.getElementById('lock-screen').style.display = 'flex'; 
+            document.getElementById('main-app').style.display = 'none';
+            
+            if (savedName) {
+                document.getElementById('first-name-input').disabled = true; 
+                document.getElementById('last-name-input').disabled = true; 
+                document.getElementById('phone-input').style.display = 'none'; 
+                document.getElementById('address-input').style.display = 'none';
+                document.getElementById('country-select').style.display = 'none'; 
+                document.getElementById('month-select').style.display = 'none';
+                document.getElementById('warning-msg').style.display = 'none'; 
+                if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
+                document.getElementById('reg-fields').style.display = 'none';
+
+                document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; 
+                document.getElementById('forgot-btn').style.display = 'block'; 
+                document.getElementById('cancel-forgot-btn').style.display = 'none'; 
+                document.getElementById('direct-login-btn').style.display = 'none';
+            }
         }
         syncServerQuizzes(); 
     }
