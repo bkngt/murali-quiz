@@ -532,6 +532,19 @@
             </button>
         </div>
 
+        <!-- NEW SECTION: CUSTOM AI STUDIO IMPORT -->
+        <div id="custom-import-section" style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color); display: none;">
+            <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Import Custom Quiz (AI Studio)
+            </p>
+            <textarea id="custom-json-input" placeholder="AI Studio बाट प्राप्त JSON कोड यहाँ पेस्ट गर्नुहोस्..." style="height: 120px; min-height: 100px; font-family: monospace; font-size: 13px;"></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <input type="text" id="custom-quiz-date" class="input-field" placeholder="मिति (उदा: 31 August 2026)" style="margin: 0; flex: 1; font-size: 0.9rem;">
+                <button onclick="saveCustomQuiz()" style="background: var(--success-color); flex: 1; padding: 0.6rem;">☁️ Save to Server</button>
+            </div>
+        </div>
+
         <div id="export-saved-section" style="display:none; margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
                 <span style="display:flex; align-items:center; gap:6px;">
@@ -632,7 +645,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 82.1 (Cancel Update)</div>
+        <div>Version: 83.0 (AI Studio Import Update)</div>
     </div>
 </div>
 
@@ -674,7 +687,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "82.1"; 
+    const APP_VERSION = "83.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -711,7 +724,7 @@
     let qLockInterval = null;
     let audioCtx = null;
     
-    let abortController = null; // Added for Request Cancellation
+    let abortController = null;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -1542,6 +1555,7 @@
             if (isPrivileged && isAdminViewActive) {
                 document.getElementById('murali-text').style.display = 'block'; 
                 document.getElementById('generator-actions').style.display = 'flex'; 
+                document.getElementById('custom-import-section').style.display = 'block';
                 document.getElementById('btn-mega').style.display = 'block'; 
                 document.getElementById('quiz-config-tools').style.display = 'flex'; 
                 document.getElementById('exam-config-section').style.display = 'block'; 
@@ -1552,6 +1566,7 @@
             } else {
                 document.getElementById('murali-text').style.display = 'none'; 
                 document.getElementById('generator-actions').style.display = 'none'; 
+                document.getElementById('custom-import-section').style.display = 'none';
                 document.getElementById('btn-mega').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none'; 
                 document.getElementById('exam-config-section').style.display = 'none'; 
@@ -1701,7 +1716,7 @@
     }
 
     // ==========================================
-    // 6. QUIZ GENERATION (AI & MEGA)
+    // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
     window.cancelGeneration = function() {
         if (abortController) {
@@ -1713,6 +1728,36 @@
         let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); 
         return m ? m[0] : new Date().toLocaleDateString('en-GB'); 
     }
+
+    window.saveCustomQuiz = function() {
+        let jsonText = document.getElementById('custom-json-input').value.trim();
+        let dateStr = document.getElementById('custom-quiz-date').value.trim();
+
+        if(!jsonText) return showToast("कृपया JSON कोड पेस्ट गर्नुहोस्।", "error");
+        if(!dateStr) return showToast("कृपया मिति भर्नुहोस्।", "error");
+
+        try {
+            let sIdx = jsonText.indexOf('{');
+            let eIdx = jsonText.lastIndexOf('}');
+            if (sIdx !== -1 && eIdx !== -1) {
+                jsonText = jsonText.substring(sIdx, eIdx + 1);
+            }
+
+            let parsedData = JSON.parse(jsonText);
+            if(!parsedData.quiz || !Array.isArray(parsedData.quiz)) throw new Error("Invalid JSON: 'quiz' array missing");
+
+            currentQuiz = parsedData.quiz;
+            currentSwaman = parsedData.swaman || "";
+            currentMurliDate = dateStr;
+
+            document.getElementById('custom-json-input').value = '';
+            document.getElementById('custom-quiz-date').value = '';
+
+            saveQuizToServer();
+        } catch(e) {
+            showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error");
+        }
+    };
 
     async function generateQuizWithAI() {
         const apiKey = localStorage.getItem('murali_gemini_key'); 
@@ -1737,6 +1782,7 @@
 
         document.getElementById('murali-text').style.display = 'none'; 
         document.getElementById('generator-actions').style.display = 'none';
+        document.getElementById('custom-import-section').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none';
         document.getElementById('loading-box').style.display = 'block'; 
         document.getElementById('loading-text').innerText = `AI is drafting the quiz using ${selectedModel}... (कृपया पर्खनुहोस्)`;
@@ -1901,6 +1947,7 @@ Text: ${text}`;
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('murali-text').style.display = 'block'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('custom-import-section').style.display = 'block';
             document.getElementById('export-saved-section').style.display = 'block'; 
 
             if (error.name === 'AbortError') {
@@ -1983,6 +2030,7 @@ Text: ${text}`;
         document.getElementById('mega-quiz-modal').style.display = 'none';
         document.getElementById('murali-text').style.display = 'none'; 
         document.getElementById('generator-actions').style.display = 'none'; 
+        document.getElementById('custom-import-section').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none'; 
         
         document.getElementById('quiz-area').style.display = 'block';
@@ -2007,6 +2055,7 @@ Text: ${text}`;
         document.getElementById('loading-box').style.display = 'block'; 
         document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
         document.getElementById('generator-actions').style.display = 'none'; 
+        document.getElementById('custom-import-section').style.display = 'none';
         document.getElementById('export-saved-section').style.display = 'none'; 
         document.getElementById('quiz-area').style.display = 'none'; 
         document.getElementById('sticky-scorebar').style.display = 'none';
@@ -2028,6 +2077,7 @@ Text: ${text}`;
             document.getElementById('quiz-area').style.display = 'block'; 
             document.getElementById('sticky-scorebar').style.display = 'flex'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('custom-import-section').style.display = 'block';
             document.getElementById('export-saved-section').style.display = 'block';
             
             if(data.status === "success") { 
@@ -2039,6 +2089,7 @@ Text: ${text}`;
         .catch(err => { 
             document.getElementById('loading-box').style.display = 'none'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('custom-import-section').style.display = 'block';
             document.getElementById('export-saved-section').style.display = 'block'; 
             showToast("इन्टरनेट समस्या!", "error"); 
         });
@@ -2311,6 +2362,7 @@ Text: ${text}`;
         if (isPrivileged && isAdminViewActive) { 
             document.getElementById('murali-text').style.display = 'block'; 
             document.getElementById('generator-actions').style.display = 'flex'; 
+            document.getElementById('custom-import-section').style.display = 'block';
             document.getElementById('quiz-config-tools').style.display = 'flex'; 
             document.getElementById('export-saved-section').style.display = 'block';
         } else { 
@@ -3180,7 +3232,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 82.1)
+                Generated by BK Murali Quiz App (Version 83.0)
             </div>
         </body>
         </html>`;
