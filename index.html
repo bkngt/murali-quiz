@@ -120,13 +120,14 @@
         .stat-card p { margin: 0.4rem 0 0; font-size: 0.8rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;}
         
         .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem 0.5rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .cal-day { padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 50px; position: relative; overflow:hidden; word-break: break-word; line-height: 1.1; }
+        .cal-day { padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 55px; position: relative; overflow:hidden; word-break: break-word; line-height: 1.1; }
         .cal-day.empty { background: transparent; border: none; }
-        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid var(--border-color); }
         .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .cal-day.excellent { background: var(--success-bg); color: var(--success-color); border-color: var(--success-border); }
         .cal-day.good { background: var(--warning-bg); color: var(--warning-color); border-color: var(--warning-color); }
         .cal-day.poor { background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); }
+        .cal-score-badge { font-size: 0.65rem; background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 6px; margin-top: 3px; font-weight: 700; letter-spacing: 0.5px; }
         
         .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
         .prog-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; color: var(--primary-color);}
@@ -171,14 +172,14 @@
 <canvas id="confetti-canvas"></canvas>
 <div id="toast-container"></div>
 
-<!-- Lock / Registration / Recovery Screen -->
+<!-- Lock / Registration Screen (NO PIN) -->
 <div id="lock-screen">
     <div class="pin-box">
-        <form id="login-form" onsubmit="event.preventDefault(); handlePIN();" style="width: 100%; margin: 0; padding: 0;">
+        <form id="login-form" onsubmit="event.preventDefault(); handleAuth();" style="width: 100%; margin: 0; padding: 0;">
             <h2 id="pin-title" style="margin-top: 0; color: var(--primary-color); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> BK Murali Quiz
             </h2>
-            <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
+            <p id="auth-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
@@ -219,22 +220,7 @@
                 <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next" oninput="enforceEnglish(this)">
             </div>
 
-            <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
-            
-            <div style="margin: 0.4rem 0;">
-                <p id="pin-instruction" style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
-                <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="pin-input" class="input-field pin-input" style="margin: 0; width: 100%; text-align: center; letter-spacing: 4px; padding-right: 45px;" maxlength="4" placeholder="पिन (उदा: 1234)" autocomplete="off" inputmode="numeric" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
-                    <button type="button" onclick="togglePinVisibility()" style="position: absolute; right: 8px; background: transparent; border: none; color: var(--primary-color); box-shadow: none; width: auto; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        <svg id="eye-icon-pin" class="icon" viewBox="0 0 24 24" style="width: 22px; height: 22px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                </div>
-            </div>
-            
-            <select id="month-select" class="select-field">
-                <option value="" disabled selected>अलौकिक जन्म महिना छान्नुहोस्</option>
-                <option value="बैशाख">बैशाख</option><option value="जेठ">जेठ</option><option value="असार">असार</option><option value="साउन">साउन</option><option value="भदौ">भदौ</option><option value="असोज">असोज</option><option value="कार्तिक">कार्तिक</option><option value="मंसिर">मंसिर</option><option value="पुष">पुष</option><option value="माघ">माघ</option><option value="फागुन">फागुन</option><option value="चैत">चैत</option>
-            </select>
+            <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="done" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
             
             <button type="submit" id="btn-login-submit" style="padding: 1rem; font-size: 1.2rem; margin-top: 20px; border-radius: 14px;">
                 Enter <svg class="icon" viewBox="0 0 24 24"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
@@ -242,10 +228,7 @@
         </form>
         
         <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px; align-items: center;">
-            <a href="#" onclick="toggleDirectLogin()" id="direct-login-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none;">पहिले नै खाता छ? (Direct Login)</a>
-            <a href="#" onclick="handleForgotPIN()" id="forgot-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">पिन बिर्सनुभयो? (Forgot PIN)</a>
-            <a href="#" onclick="cancelForgotPIN()" id="cancel-forgot-btn" style="color: var(--danger-color); font-size: 0.95rem; font-weight: 700; text-decoration: none; display: none;">Cancel Recovery</a>
-            <a href="#" onclick="clearLocalDataAndReload()" id="clear-data-btn" style="color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-decoration: underline; margin-top: 5px;">Switch User / Clear Data</a>
+            <a href="#" onclick="toggleDirectLogin()" id="direct-login-btn" style="color: var(--primary-color); font-size: 0.95rem; font-weight: 700; text-decoration: none;">पहिले नै दर्ता हुनुहुन्छ? (Phone Login)</a>
         </div>
     </div>
 </div>
@@ -375,7 +358,7 @@
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button onclick="updateLocalProfile()" id="btn-save-profile" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
-                    <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
+                    <button onclick="signOut()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Sign Out</button>
                 </div>
                 
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
@@ -591,9 +574,9 @@
         
         <div class="dashboard-stats" id="dash-stats"></div>
         
-        <!-- NEW: Chart.js Containers -->
+        <!-- Chart.js Containers -->
         <div class="chart-container">
-            <canvas id="progressLineChart"></canvas>
+            <canvas id="weeklyBarChart"></canvas>
         </div>
         <div class="chart-container" style="height: 220px;">
             <canvas id="weaknessDoughnutChart"></canvas>
@@ -608,7 +591,6 @@
         
         <div id="calendar-wrapper" style="display: none;">
             <div class="calendar-container">
-                <!-- NEW: Smart Calendar Picker -->
                 <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1rem; gap: 10px;">
                     <select id="cal-month-select" class="select-field" style="width: auto; padding: 0.4rem; margin: 0; font-size: 1rem;" onchange="jumpToDate()"></select>
                     <select id="cal-year-select" class="select-field" style="width: auto; padding: 0.4rem; margin: 0; font-size: 1rem;" onchange="jumpToDate()"></select>
@@ -646,7 +628,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 85.4 (Mega Quiz & Archive Fix)</div>
+        <div>Version: 86.0 (No PIN Edition)</div>
     </div>
 </div>
 
@@ -688,7 +670,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "85.4"; 
+    const APP_VERSION = "86.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -711,11 +693,7 @@
     let currentCalDate = new Date(); 
     let reviewSource = 'current';
     
-    let failedAttempts = 0; 
-    let isLockedOut = false; 
-    let lockoutInterval = null; 
-    let isRecoveryMode = false; 
-    let isDirectLogin = false;
+    let isDirectPhoneLogin = false;
     
     let activeQuestionIndex = 0;
     let focusedOptionIndex = -1;
@@ -728,7 +706,7 @@
     let abortController = null;
     
     // Chart.js Instances
-    let progressChartInstance = null;
+    let weeklyChartInstance = null;
     let tagsChartInstance = null;
 
     const dict = {
@@ -812,7 +790,6 @@
             if(meta) meta.content = "#0b0f19"; 
             if(btn) btn.innerHTML = '☀️ Dark Mode: ON';
         }
-        // Redraw charts to match theme
         if(document.getElementById('view-progress').style.display === 'block') {
             renderDashboard();
         }
@@ -889,16 +866,13 @@
         return str.replace(/[०-९]/g, match => nepaliNumbers.indexOf(match));
     }
 
-    // FIX: Stronger Date Parser for Frontend
     function parseDateString(dateStr) {
       if(!dateStr) return new Date();
       var s = String(dateStr).replace(/['"]/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
       
-      // YYYY-MM-DD
       var ymd = s.match(/^(\d{4})[\/\.\-](\d{1,2})[\/\.\-](\d{1,2})/);
       if (ymd) return new Date(parseInt(ymd[1]), parseInt(ymd[2])-1, parseInt(ymd[3]));
       
-      // DD-MM-YYYY
       var dmy = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
       if (dmy) {
         var y = parseInt(dmy[3]);
@@ -906,7 +880,6 @@
         return new Date(y, parseInt(dmy[2])-1, parseInt(dmy[1]));
       }
       
-      // DD MMM YYYY
       var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
       if (dMy) {
         var y = parseInt(dMy[3]);
@@ -930,20 +903,8 @@
         return `Murali_QnA_${safe}.html`;
     }
 
-    window.togglePinVisibility = function() {
-        let input = document.getElementById('pin-input');
-        let icon = document.getElementById('eye-icon-pin');
-        if (input.type === "password") {
-            input.type = "text";
-            icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
-        } else {
-            input.type = "password";
-            icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
-        }
-    }
-
     // ==========================================
-    // 3. AUTHENTICATION & PROFILE
+    // 3. AUTHENTICATION & PROFILE (NO PIN)
     // ==========================================
     function init() {
         if (localStorage.getItem('murali_app_version') !== APP_VERSION) {
@@ -963,115 +924,35 @@
             if(btn) btn.innerHTML = '🌙 Dark Mode: OFF';
         }
         
-        let savedLockout = localStorage.getItem('murali_lockout_time');
-        if(savedLockout && Date.now() < parseInt(savedLockout)) { 
-            startLockoutTimer(parseInt(savedLockout)); 
-        } else { 
-            localStorage.removeItem('murali_lockout_time'); 
-        }
-        
+        const savedPhone = localStorage.getItem('murali_phone');
         const savedName = localStorage.getItem('murali_user_name');
-        const savedPIN = localStorage.getItem('murali_pin');
 
-        if (savedName && savedPIN && !isLockedOut) {
+        if (savedPhone && savedName) {
             document.getElementById('lock-screen').style.display = 'none';
             unlockApp();
         } else {
             document.getElementById('lock-screen').style.display = 'flex'; 
             document.getElementById('main-app').style.display = 'none';
-            
-            if (savedName) {
-                document.getElementById('first-name-input').disabled = true; 
-                document.getElementById('last-name-input').disabled = true; 
-                document.getElementById('phone-input').style.display = 'none'; 
-                document.getElementById('address-input').style.display = 'none';
-                document.getElementById('country-select').style.display = 'none'; 
-                document.getElementById('month-select').style.display = 'none';
-                document.getElementById('warning-msg').style.display = 'none'; 
-                if(!isLockedOut) document.getElementById('pin-instruction').style.display = 'none';
-                document.getElementById('reg-fields').style.display = 'none';
-
-                document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; 
-                document.getElementById('forgot-btn').style.display = 'block'; 
-                document.getElementById('cancel-forgot-btn').style.display = 'none'; 
-                document.getElementById('direct-login-btn').style.display = 'none';
-            }
         }
         syncServerQuizzes(); 
     }
 
-    function startLockoutTimer(unlockTime) {
-        isLockedOut = true; 
-        document.getElementById('pin-input').disabled = true; 
-        document.getElementById('btn-login-submit').disabled = true; 
-        document.getElementById('pin-instruction').style.display = 'block';
+    window.toggleDirectLogin = function() {
+        isDirectPhoneLogin = !isDirectPhoneLogin; 
         
-        if (lockoutInterval) clearInterval(lockoutInterval);
-        
-        lockoutInterval = setInterval(() => {
-            let timeLeft = Math.ceil((unlockTime - Date.now()) / 1000);
-            if(timeLeft <= 0) {
-                clearInterval(lockoutInterval); 
-                isLockedOut = false; 
-                failedAttempts = 0; 
-                localStorage.removeItem('murali_lockout_time');
-                
-                document.getElementById('pin-input').disabled = false; 
-                document.getElementById('btn-login-submit').disabled = false;
-                document.getElementById('pin-input').value = ""; 
-                document.getElementById('pin-instruction').innerText = "(सम्झनैपर्ने ४ अंक)"; 
-                document.getElementById('pin-instruction').style.color = '#64748b';
-                
-                if(!isRecoveryMode && !isDirectLogin) {
-                    document.getElementById('pin-instruction').style.display = 'none';
-                }
-            } else { 
-                document.getElementById('pin-instruction').innerText = `🔒 कृपया ${timeLeft} सेकेन्ड पर्खनुहोस्।`; 
-                document.getElementById('pin-instruction').style.color = 'var(--danger-color)'; 
-            }
-        }, 1000);
-    }
-
-    function toggleDirectLogin() {
-        isDirectLogin = !isDirectLogin; 
-        isRecoveryMode = false;
-        
-        if(isDirectLogin) {
-            document.getElementById('pin-msg').innerText = `फोन नम्बर र ४-अंकको पिन हालेर लगइन गर्नुहोस्।`;
+        if(isDirectPhoneLogin) {
+            document.getElementById('auth-msg').innerText = `आफ्नो फोन नम्बर हालेर लगइन गर्नुहोस्।`;
             document.getElementById('reg-fields').style.display = 'none'; 
             document.getElementById('warning-msg').style.display = 'none'; 
-            document.getElementById('month-select').style.display = 'none';
-            document.getElementById('phone-input').style.display = 'block'; 
-            document.getElementById('pin-input').style.display = 'block'; 
-            document.getElementById('pin-instruction').style.display = 'block';
             document.getElementById('btn-login-submit').innerHTML = `Login`; 
             document.getElementById('direct-login-btn').innerText = `नयाँ दर्ता गर्नुहुन्छ? (Register)`;
-            document.getElementById('forgot-btn').style.display = 'block'; 
-            document.getElementById('cancel-forgot-btn').style.display = 'none';
         } else { 
-            window.location.reload(); 
+            document.getElementById('auth-msg').innerText = `कृपया आफ्नो विवरण भर्नुहोस्`;
+            document.getElementById('reg-fields').style.display = 'block'; 
+            document.getElementById('warning-msg').style.display = 'block'; 
+            document.getElementById('btn-login-submit').innerHTML = `Enter`; 
+            document.getElementById('direct-login-btn').innerText = `पहिले नै दर्ता हुनुहुन्छ? (Phone Login)`;
         }
-    }
-
-    function handleForgotPIN() {
-        isRecoveryMode = true;
-        document.getElementById('pin-msg').innerText = `कृपया आफ्नो फोन नम्बर र अलौकिक जन्म महिना भर्नुहोस्।`;
-        document.getElementById('reg-fields').style.display = 'none'; 
-        document.getElementById('warning-msg').style.display = 'none';
-        document.getElementById('phone-input').style.display = 'block'; 
-        document.getElementById('month-select').style.display = 'block'; 
-        document.getElementById('month-select').value = "";
-        document.getElementById('pin-input').style.display = 'none'; 
-        document.getElementById('pin-instruction').style.display = 'none'; 
-        document.getElementById('forgot-btn').style.display = 'none';
-        document.getElementById('direct-login-btn').style.display = 'none'; 
-        document.getElementById('cancel-forgot-btn').style.display = 'inline-block'; 
-        document.getElementById('btn-login-submit').innerHTML = `Recover PIN`;
-    }
-
-    function cancelForgotPIN() { 
-        isRecoveryMode = false; 
-        window.location.reload(); 
     }
 
     function smartFormatName(fNameRaw, lNameRaw) {
@@ -1107,57 +988,27 @@
         return { first: fName, last: lName, full: full };
     }
 
-    function handlePIN() {
-        if(isLockedOut) return;
-        
+    window.handleAuth = function() {
         const inputPhone = document.getElementById('phone-input').value.trim(); 
-        const inputPIN = document.getElementById('pin-input').value; 
-        const month = document.getElementById('month-select').value;
         let submitBtn = document.getElementById('btn-login-submit');
         
-        if (isRecoveryMode) {
-            if (!inputPhone || !month) return showToast("कृपया फोन र महिना भर्नुहोस्।", "error");
-            submitBtn.innerHTML = `Checking...`;
-            
-            fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
-            })
-            .then(r => r.json())
-            .then(data => { 
-                submitBtn.innerHTML = `Recover PIN`;
-                if (data.status === "success") { 
-                    alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); 
-                    window.location.reload(); 
-                } else { 
-                    showToast(data.message || "विवरण मिलेन!", "error"); 
-                }
-            })
-            .catch(e => { 
-                submitBtn.innerHTML = `Recover PIN`; 
-                showToast("सर्भर कनेक्सन फेल भयो!", "error"); 
-            }); 
-            return;
-        }
+        if(inputPhone.length < 10) return showToast("कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।", "error");
 
-        if (isDirectLogin) {
-            if (!inputPhone || inputPIN.length !== 4) return showToast("कृपया सही १० अंकको फोन र ४ अंकको पिन लेख्नुहोस्।", "error");
+        if (isDirectPhoneLogin) {
             submitBtn.innerHTML = `Verifying...`;
-            
             fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
+                body: JSON.stringify({ action: "directPhoneLogin", phone: inputPhone })
             })
             .then(r => r.json())
             .then(data => { 
                 submitBtn.innerHTML = `Login`;
                 if(data.status === "success") { 
-                    saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
-                    showToast("Server Login Successful!", "success"); 
+                    saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.country || "N/A", data.role || "Student"); 
+                    showToast("Login Successful!", "success"); 
                 } else { 
-                    handleFailedAttempt(); 
+                    showToast(data.message, "error"); 
                 }
             })
             .catch(e => { 
@@ -1167,120 +1018,54 @@
             return;
         }
 
-        if (document.getElementById('reg-fields').style.display !== 'none' && document.getElementById('first-name-input').disabled !== true) {
-            let fNameRaw = document.getElementById('first-name-input').value.trim(); 
-            let lNameRaw = document.getElementById('last-name-input').value.trim();
-            let address = document.getElementById('address-input').value.trim(); 
-            let countryVal = document.getElementById('country-select').value;
-            if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
+        // Registration Flow
+        let fNameRaw = document.getElementById('first-name-input').value.trim(); 
+        let lNameRaw = document.getElementById('last-name-input').value.trim();
+        let address = document.getElementById('address-input').value.trim(); 
+        let countryVal = document.getElementById('country-select').value;
+        if(countryVal === 'Other') countryVal = document.getElementById('country-input-other').value.trim();
 
-            if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पहिलो नाम र थर दुवै अनिवार्य भर्नुहोस्।", "error");
-            if(inputPhone.length < 10) return showToast("कृपया सही १०-अंकको फोन नम्बर लेख्नुहोस्।", "error");
-            
-            let c = address.trim().toUpperCase(); 
-            if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
-            
-            if(!countryVal || countryVal === "") return showToast("कृपया देश छान्नुहोस्।", "error"); 
-            if(!month || month === "") return showToast("कृपया अलौकिक जन्म महिना छान्नुहोस्।", "error");
-            if(inputPIN.length !== 4) return showToast("पिन ठ्याक्कै ४ अंकको हुनुपर्छ।", "error"); 
+        if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पहिलो नाम र थर दुवै अनिवार्य भर्नुहोस्।", "error");
+        
+        let c = address.trim().toUpperCase(); 
+        if(c.length < 4 || c === "N/A" || c === "KTM" || c === "NONE") return showToast("कृपया सेवा केन्द्रको पूरा नाम लेख्नुहोस् (सर्टकट मान्य छैन)।", "error");
+        if(!countryVal || countryVal === "") return showToast("कृपया देश छान्नुहोस्।", "error"); 
 
-            let formattedName = smartFormatName(fNameRaw, lNameRaw);
-            let finalFullName = formattedName.full;
+        let formattedName = smartFormatName(fNameRaw, lNameRaw);
+        let finalFullName = formattedName.full;
 
-            if(navigator.onLine) {
-                submitBtn.innerHTML = `Registering...`;
-                fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
-                })
-                .then(r => r.json())
-                .then(data => { 
-                    if (data.status === "success") { 
-                        saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); 
-                        showToast("Registration Successful!", "success"); 
-                    } else { 
-                        submitBtn.innerHTML = `Enter`; 
-                        showToast(data.message, "error"); 
-                    }
-                })
-                .catch(e => { 
+        if(navigator.onLine) {
+            submitBtn.innerHTML = `Registering...`;
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: "registerOrLogin", name: finalFullName, phone: inputPhone, address: address, country: countryVal })
+            })
+            .then(r => r.json())
+            .then(data => { 
+                if (data.status === "success") { 
+                    saveLocalDataAndUnlock(finalFullName, inputPhone, address, countryVal, data.role || "Student"); 
+                    showToast("Registration Successful!", "success"); 
+                } else { 
                     submitBtn.innerHTML = `Enter`; 
-                    showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); 
-                    checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); 
-                });
-            } else { 
-                checkLocalPIN(inputPIN, finalFullName, inputPhone, address, month, countryVal); 
-            } 
-            return;
-        }
-
-        if (inputPIN.length !== 4) return showToast("पिन ४ अंकको हुनुपर्छ।", "error");
-        let savedPIN = localStorage.getItem('murali_pin'); 
-        let savedPhone = localStorage.getItem('murali_phone');
-
-        if (savedPIN && inputPIN === savedPIN) { 
-            unlockApp(); 
-        } else if (navigator.onLine && savedPhone) {
-             submitBtn.innerHTML = `Verifying...`;
-             fetch(API_URL, { 
-                 method: 'POST', 
-                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                 body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN })
-             })
-             .then(r => r.json())
-             .then(data => { 
-                 submitBtn.innerHTML = `Enter`;
-                 if(data.status === "success") { 
-                     saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
-                     showToast("Server Login Successful!", "success"); 
-                 } else { 
-                     handleFailedAttempt(); 
-                 }
-             })
-             .catch(e => { 
-                 submitBtn.innerHTML = `Enter`; 
-                 handleFailedAttempt(); 
-             });
+                    showToast(data.message, "error"); 
+                }
+            })
+            .catch(e => { 
+                submitBtn.innerHTML = `Enter`; 
+                showToast("सर्भर कनेक्सन फेल! (Offline Mode)", "error"); 
+                saveLocalDataAndUnlock(finalFullName, inputPhone, address, countryVal, "Student"); 
+            });
         } else { 
-            handleFailedAttempt(); 
-        }
-    }
-    
-    function handleFailedAttempt() {
-        failedAttempts++;
-        if (failedAttempts >= 4) { 
-            showToast("४ पटक गलत पिन! १ मिनेट पर्खनुहोस्।", "error"); 
-            let unlockTime = Date.now() + (60 * 1000); 
-            localStorage.setItem('murali_lockout_time', unlockTime); 
-            startLockoutTimer(unlockTime); 
-        } else { 
-            showToast(`गलत पिन! बाँकी प्रयास: ${4 - failedAttempts}`, "error"); 
-            document.getElementById('pin-input').value = ""; 
-        }
+            saveLocalDataAndUnlock(finalFullName, inputPhone, address, countryVal, "Student"); 
+        } 
     }
 
-    function checkLocalPIN(inputPIN, finalFullName, inputPhone, inputAddress, month, countryVal) {
-        const savedPIN = localStorage.getItem('murali_pin');
-        if (!savedPIN) { 
-            saveLocalDataAndUnlock(finalFullName, inputPhone, inputAddress, month, countryVal, inputPIN, 'Student'); 
-            showToast("Offline Profile Created!", "success"); 
-        } else { 
-            if (inputPIN === savedPIN) { 
-                unlockApp(); 
-            } else { 
-                handleFailedAttempt(); 
-            } 
-        }
-    }
-
-    function saveLocalDataAndUnlock(name, phone, address, month, country, pin, role) {
+    function saveLocalDataAndUnlock(name, phone, address, country, role) {
         localStorage.setItem('murali_user_name', name); 
         localStorage.setItem('murali_phone', phone); 
         localStorage.setItem('murali_address', address);
-        localStorage.setItem('murali_month', month); 
         localStorage.setItem('murali_country', country); 
-        localStorage.setItem('murali_pin', pin); 
         localStorage.setItem('murali_role', role); 
         unlockApp();
     }
@@ -1291,7 +1076,6 @@
         let newPhone = document.getElementById('edit-phone').value.trim();
         let newAddress = document.getElementById('edit-address').value.trim();
         let oldPhone = localStorage.getItem('murali_phone'); 
-        let pin = localStorage.getItem('murali_pin');
         
         if(fNameRaw.length < 2 || lNameRaw.length < 2) return showToast("कृपया पूरा नाम र थर लेख्नुहोस्।", "error");
         if(newPhone.length < 10) return showToast("कृपया सही फोन नम्बर लेख्नुहोस्।", "error");
@@ -1311,7 +1095,7 @@
             fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "updateProfile", oldPhone: oldPhone, pin: pin, newName: finalName, newPhone: newPhone, newAddress: newAddress })
+                body: JSON.stringify({ action: "updateProfile", oldPhone: oldPhone, newName: finalName, newPhone: newPhone, newAddress: newAddress })
             })
             .then(r => r.json())
             .then(data => { 
@@ -1338,19 +1122,14 @@
         }
     };
 
-    function clearLocalDataAndReload(force = false) {
-        if(force || confirm("तपाईंको लगइन विवरण मात्र हट्नेछ (तपाईंको परीक्षा रेकर्ड सुरक्षित रहनेछ)। के तपाईं पक्का हुनुहुन्छ?")) {
+    window.signOut = function() {
+        if(confirm("के तपाईं साइन आउट गर्न चाहनुहुन्छ? (तपाईंको सबै नतिजा सुरक्षित रहनेछ)")) {
             localStorage.removeItem('murali_user_name'); 
             localStorage.removeItem('murali_phone'); 
             localStorage.removeItem('murali_address');
-            localStorage.removeItem('murali_month'); 
             localStorage.removeItem('murali_country'); 
-            localStorage.removeItem('murali_pin'); 
             localStorage.removeItem('murali_role');
-            
             localStorage.removeItem('murali_active_quiz_state'); 
-            localStorage.removeItem('murali_lockout_time'); 
-            
             window.location.reload();
         }
     }
@@ -1380,13 +1159,12 @@
     function backgroundProfileSync() {
         if (!navigator.onLine) return;
         let savedPhone = localStorage.getItem('murali_phone');
-        let savedPin = localStorage.getItem('murali_pin');
-        if (!savedPhone || !savedPin) return;
+        if (!savedPhone) return;
 
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin })
+            body: JSON.stringify({ action: "directPhoneLogin", phone: savedPhone })
         })
         .then(r => r.json())
         .then(data => {
@@ -1403,7 +1181,7 @@
                 }
             } else {
                 alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
-                clearLocalDataAndReload(true);
+                signOut();
             }
         }).catch(e => console.log("Background sync failed", e));
     }
@@ -2013,7 +1791,6 @@ Text: ${text}`;
         document.getElementById('mega-quiz-modal').style.display = 'flex';
     }
 
-    // FIX: Mega Quiz Date Parsing
     function executeMegaQuiz() {
         let sDateStr = document.getElementById('mq-start-date').value;
         let eDateStr = document.getElementById('mq-end-date').value;
@@ -2860,40 +2637,6 @@ Text: ${text}`;
         checkApiStatus();
     }
 
-    function calculateStreak(history) {
-        if (!history.length) return 0;
-        let uniqueDays = new Set(); 
-        history.forEach(h => { 
-            let d = getValidDate(h); 
-            if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()); 
-        });
-        
-        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); 
-        if (sortedDays.length === 0) return 0;
-    let streak = 0; 
-        let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); 
-        let expectedTime = todayTime;
-        
-        if (sortedDays[0] === todayTime) {
-        } else if (sortedDays[0] === todayTime - 86400000) { 
-            expectedTime = todayTime - 86400000; 
-        } else { 
-            return 0; 
-        }
-        
-        for (let time of sortedDays) { 
-            if (time === expectedTime) { 
-                streak++; 
-                expectedTime -= 86400000; 
-            } else if (time > expectedTime) { 
-                continue; 
-            } else { 
-                break; 
-            } 
-        } 
-        return streak;
-    }
-
     window.toggleCalendar = function() { 
         let cal = document.getElementById('calendar-wrapper'); 
         let txt = document.getElementById('cal-toggle-text'); 
@@ -2906,7 +2649,6 @@ Text: ${text}`;
         } 
     };
 
-    // --- NEW: Smart Calendar Picker Logic ---
     function populateCalendarPickers(cy, cm) {
         let monthSelect = document.getElementById('cal-month-select');
         let yearSelect = document.getElementById('cal-year-select');
@@ -2942,36 +2684,31 @@ Text: ${text}`;
         renderDashboard();
     }
 
-    // --- NEW: Chart.js Rendering Logic ---
-    function drawCharts(filteredHistory) {
+    function drawCharts(history) {
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-        // 1. Progress Line Chart
-        let ctxLine = document.getElementById('progressLineChart').getContext('2d');
-        if(progressChartInstance) progressChartInstance.destroy();
+        // 1. Weekly Bar Chart (Last 7 Exams)
+        let ctxBar = document.getElementById('weeklyBarChart').getContext('2d');
+        if(weeklyChartInstance) weeklyChartInstance.destroy();
 
-        let sortedHistory = [...filteredHistory].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime());
-        let labels = sortedHistory.map(h => {
+        let recent7 = [...history].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime()).slice(-7);
+        let labels = recent7.map(h => {
             let d = getValidDate(h);
             return d ? d.getDate() : '';
         });
-        let dataPoints = sortedHistory.map(h => h.percent);
+        let dataPoints = recent7.map(h => parseInt(h.percent) || 0);
 
-        progressChartInstance = new Chart(ctxLine, {
-            type: 'line',
+        weeklyChartInstance = new Chart(ctxBar, {
+            type: 'bar',
             data: {
-                labels: labels,
+                labels: labels.length ? labels : ['-','-','-','-','-','-','-'],
                 datasets: [{
                     label: 'Score (%)',
-                    data: dataPoints,
-                    borderColor: '#0284c7',
-                    backgroundColor: 'rgba(2, 132, 199, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3,
-                    pointBackgroundColor: '#16a34a'
+                    data: dataPoints.length ? dataPoints : [0,0,0,0,0,0,0],
+                    backgroundColor: '#0284c7',
+                    borderRadius: 6
                 }]
             },
             options: {
@@ -2979,7 +2716,7 @@ Text: ${text}`;
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    title: { display: true, text: 'Daily Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
+                    title: { display: true, text: 'पछिल्लो ७ दिनको नतिजा (Weekly Score %)', color: textColor, font: {size: 14, family: 'Poppins'} }
                 },
                 scales: {
                     y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } },
@@ -2993,10 +2730,9 @@ Text: ${text}`;
         if(tagsChartInstance) tagsChartInstance.destroy();
 
         let allWeakTags = []; 
-        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
+        history.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
         
         if(allWeakTags.length === 0) {
-            // Show empty state chart
             tagsChartInstance = new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: { labels: ['No Mistakes'], datasets: [{ data: [1], backgroundColor: ['#16a34a'] }] },
@@ -3008,7 +2744,7 @@ Text: ${text}`;
         let tagCounts = {}; 
         allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
         
-        let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]).slice(0, 5); // Top 5
+        let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]).slice(0, 5);
         let tagData = sortedTags.map(t => tagCounts[t]);
 
         tagsChartInstance = new Chart(ctxDoughnut, {
@@ -3036,7 +2772,6 @@ Text: ${text}`;
     function renderDashboard() {
         const d = dict[lang]; 
         let history = safeJSON('murali_progress', []); 
-        let streak = calculateStreak(history);
         let cy = currentCalDate.getFullYear(); 
         let cm = currentCalDate.getMonth();
         
@@ -3048,18 +2783,18 @@ Text: ${text}`;
         });
 
         let totalTaken = filteredHistory.length; 
-        let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
-        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
+        let sumPercent = filteredHistory.reduce((sum, h) => sum + (parseInt(h.percent) || 0), 0);
+        let avgPercent = totalTaken ? Math.round(sumPercent / totalTaken) : 0; 
+        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => parseInt(h.percent) >= 80).length / totalTaken) * 100) : 0;
         
         document.getElementById('dash-stats').innerHTML = `
             <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
             <div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div>
             <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
-            <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
+            <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${totalTaken > 0 ? '7 Days' : '0'}</h3><p style="color: #38bdf8;">Weekly Track</p></div>
         `;
         
-        // Draw Charts
-        drawCharts(filteredHistory);
+        drawCharts(history); // Pass full history for weekly chart
 
         let babaMessage = "";
         if (totalTaken === 0) {
@@ -3104,7 +2839,7 @@ Text: ${text}`;
             let dObj = getValidDate(h); 
             if (dObj) { 
                 let day = dObj.getDate(); 
-                if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
+                if (!monthMap[day] || parseInt(h.percent) > parseInt(monthMap[day].percent)) monthMap[day] = h; 
             } 
         });
         
@@ -3122,8 +2857,11 @@ Text: ${text}`;
                 calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
             } else if (monthMap[i]) { 
                 let h = monthMap[i]; 
-                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
-                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
+                let cClass = parseInt(h.percent) >= 80 ? 'excellent' : (parseInt(h.percent) >= 50 ? 'good' : 'poor'); 
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">
+                                <span>${i}</span>
+                                <span class="cal-score-badge">${h.score}/${h.total}</span>
+                            </div>`;
             } else { 
                 calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
             }
@@ -3149,8 +2887,9 @@ Text: ${text}`;
         }
         
         list.innerHTML = filteredHistory.map(h => {
-            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
-            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+            let p = parseInt(h.percent) || 0;
+            let rText = p >= 80 ? d.remarkExc : (p >= 50 ? d.remarkGood : d.remarkPoor); 
+            let rClass = p >= 80 ? 'remark-excellent' : (p >= 50 ? 'remark-good' : 'remark-poor');
             let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
             
             return `<div class="progress-item">
@@ -3160,7 +2899,7 @@ Text: ${text}`;
                     <div>${reviewBtn}</div>
                 </div>
                 <div style="text-align: right;">
-                    <div class="prog-percent">${h.percent}%</div>
+                    <div class="prog-percent">${p}%</div>
                     <div style="font-size:0.95rem; color:var(--text-color); font-weight:800;">${h.score} / ${h.total}</div>
                 </div>
             </div>`;
@@ -3171,7 +2910,6 @@ Text: ${text}`;
     // 9. EXPORT & IMPORT (Q&A LIST / ZIP)
     // ==========================================
     
-    // --- NEW: Grouped Dropdown Logic ---
     function populateSavedQuizzes() {
         let select = document.getElementById('saved-quiz-select');
         if(!select) return;
@@ -3424,7 +3162,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 85.4)
+                Generated by BK Murali Quiz App (Version 86.0)
             </div>
         </body>
         </html>`;
@@ -3578,5 +3316,4 @@ Text: ${text}`;
     setTimeout(syncPendingResults, 3000);
 </script>
 </body>
-</html>    
-        
+</html>
