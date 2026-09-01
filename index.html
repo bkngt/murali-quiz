@@ -299,9 +299,12 @@
         </select>
     </div>
 
-    <div id="online-quiz-actions" style="display: none; width: 100%; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center;"><span id="quiz-date-text" style="font-size: 0.95rem; white-space: nowrap;"></span></div>
-        <div style="display:flex; gap:8px;">
+    <!-- FIXED: Top Action Bar (Save/Export/Cancel) is now responsive -->
+    <div id="online-quiz-actions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+        <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center; flex: 1; min-width: 150px;">
+            <span id="quiz-date-text" style="font-size: 0.85rem; word-break: break-word; line-height: 1.2;"></span>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap: wrap; justify-content: flex-end;">
             <button id="btn-save-top" class="btn-small" style="display:none; border-color: #16a34a; color: #16a34a; font-weight: 800; background: rgba(22, 163, 74, 0.1);" onclick="saveQuizToServer()">☁️ Save</button>
             <button id="btn-export-top" class="btn-small" style="display:none; border-color: #0284c7; color: #0284c7; font-weight: 800; background: rgba(2, 132, 199, 0.1);" onclick="exportStandaloneHTML()">Export Q&A</button>
             <button id="btn-cancel-top" class="btn-small" onclick="cancelQuiz()" style="padding: 0.3rem 0.8rem; background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); margin:0; font-size: 0.85rem; font-weight:700;">Cancel</button>
@@ -512,18 +515,19 @@
     <div id="view-generator">
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
-        <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <button onclick="executeMonthlyMegaQuiz()" id="btn-monthly-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.05rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
-                🏆 मासिक मेगा क्वीज
+        <!-- FIXED: Generator Buttons are now responsive and fit well on mobile -->
+        <div style="display:flex; gap:8px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
+            <button onclick="executeMonthlyMegaQuiz()" id="btn-monthly-mega" style="display:none; flex: 1 1 45%; padding: 0.8rem 0.5rem; font-size: 0.9rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
+                🏆 मासिक मेगा
             </button>
-            <button onclick="openMegaQuizModal()" id="btn-custom-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.05rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #7c3aed); box-shadow: 0 6px 15px rgba(168, 85, 247, 0.3);">
-                🗓️ कस्टम मेगा क्वीज
+            <button onclick="openMegaQuizModal()" id="btn-custom-mega" style="display:none; flex: 1 1 45%; padding: 0.8rem 0.5rem; font-size: 0.9rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #7c3aed); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.3);">
+                🗓️ कस्टम मेगा
             </button>
-            <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);">
+            <button onclick="generateQuizWithAI()" id="btn-generate" style="flex: 1 1 60%; padding: 0.8rem; font-size: 1rem; border-radius: 12px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3);">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
             </button>
-            <button onclick="document.getElementById('murali-text').value=''" title="Clear Text" style="flex:0 0 auto; width: auto; background: var(--danger-color); color: white; border-radius: 50px; padding: 1rem 1.4rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">
-                <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path></svg>
+            <button onclick="document.getElementById('murali-text').value=''" title="Clear Text" style="flex: 1 1 20%; background: var(--danger-color); color: white; border-radius: 12px; padding: 0.8rem; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2); display: flex; justify-content: center; align-items: center;">
+                <svg class="icon" viewBox="0 0 24 24" style="margin:0;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"></path></svg>
             </button>
         </div>
 
@@ -616,6 +620,9 @@
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;" id="cal-grid-days"></div>
             </div>
         </div>
+
+        <!-- FIXED: Mega Quiz Results Container -->
+        <div id="mega-quiz-results-container"></div>
     </div>
 
     <!-- Detailed Progress Modal -->
@@ -659,7 +666,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 87.0 (Detailed Stats & Auto-Mega)</div>
+        <div>Version: 87.1 (Mobile UI & Mega Stats Fix)</div>
     </div>
 </div>
 
@@ -701,7 +708,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "87.0"; 
+    const APP_VERSION = "87.1"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -3039,7 +3046,11 @@ Text: ${text}`;
         
         populateCalendarPickers(cy, cm);
 
-        let filteredHistory = history.filter(h => { 
+        // Filter out Mega Quizzes for standard stats
+        let standardHistory = history.filter(h => !h.date.includes("Mega"));
+        let megaHistory = history.filter(h => h.date.includes("Mega"));
+
+        let filteredHistory = standardHistory.filter(h => { 
             let dObj = getValidDate(h); 
             return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
         });
@@ -3061,7 +3072,7 @@ Text: ${text}`;
         if (totalTaken === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
         } else {
-            let latestHistory = history[0]; 
+            let latestHistory = standardHistory[0]; 
             let serverQuizzes = safeJSON('murali_server_quizzes', []);
             let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
             
@@ -3125,6 +3136,32 @@ Text: ${text}`;
             }
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
+
+        // Mega Quiz Results Section
+        if (megaHistory.length > 0) {
+            let megaHtml = `<div style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
+                <h3 style="margin: 0 0 15px 0; color: var(--primary-color); font-size: 1.2rem; font-weight: 800;">🏆 विशेष परीक्षाहरूको नतिजा</h3>`;
+
+            megaHtml += megaHistory.map(h => {
+                let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor);
+                let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+                return `<div class="progress-item">
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight:800; font-size:1rem; color:var(--primary-color); line-height:1.2; margin-bottom:4px;">${h.date}</div>
+                        <div class="prog-remark ${rClass}" style="margin-top:0;">${rText}</div>
+                        <button class="btn-small" style="margin-top: 8px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="prog-percent">${h.percent}%</div>
+                        <div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            megaHtml += `</div>`;
+            document.getElementById('mega-quiz-results-container').innerHTML = megaHtml;
+        } else {
+            document.getElementById('mega-quiz-results-container').innerHTML = '';
+        }
     }
 
     function openDetailedProgress() {
@@ -3144,6 +3181,7 @@ Text: ${text}`;
 
     function renderDetailedProgressCharts() {
         let history = safeJSON('murali_progress', []);
+        let standardHistory = history.filter(h => !h.date.includes("Mega"));
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
@@ -3155,7 +3193,7 @@ Text: ${text}`;
         last7Days.setDate(today.getDate() - 6);
         last7Days.setHours(0,0,0,0);
 
-        let weeklyHistory = history.filter(h => {
+        let weeklyHistory = standardHistory.filter(h => {
             let dObj = getValidDate(h);
             return dObj && dObj.getTime() >= last7Days.getTime();
         }).slice(0, 7).reverse();
@@ -3184,9 +3222,9 @@ Text: ${text}`;
         });
 
         // 2. Monthly Chart & List
-        let currentMonthHistory = history.filter(h => {
+        let currentMonthHistory = standardHistory.filter(h => {
             let dObj = getValidDate(h);
-            return dObj && dObj.getMonth() === new Date().getMonth() && dObj.getFullYear() === new Date().getFullYear();
+            return dObj && dObj.getMonth() === currentCalDate.getMonth() && dObj.getFullYear() === currentCalDate.getFullYear();
         }).reverse();
 
         let monthlyLabels = currentMonthHistory.map(h => {
@@ -3218,7 +3256,7 @@ Text: ${text}`;
         // 3. Yearly Chart
         let yearlyData = {};
         let currentYear = new Date().getFullYear();
-        history.forEach(h => {
+        standardHistory.forEach(h => {
             let dObj = getValidDate(h);
             if (dObj && dObj.getFullYear() === currentYear) {
                 let month = dObj.getMonth();
@@ -3466,7 +3504,8 @@ Text: ${text}`;
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1e293b; max-width: 850px; margin: 0 auto; padding: 20px; background: #f8fafc; }
                 .header { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid #0284c7; }
                 h1 { color: #0284c7; margin-bottom: 5px; font-size: 28px;}
-                .date-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; }
+                .date-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 5px 15px; border-radius: 
+font-weight: bold; font-size: 14px; }
                 .q-block { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); page-break-inside: avoid; }
                 .q-text { font-weight: 700; font-size: 1.15em; margin-top: 0; color: #0f172a; margin-bottom: 15px; }
                 .options { list-style-type: none; padding-left: 0; margin: 0; }
@@ -3501,7 +3540,7 @@ Text: ${text}`;
 
             html += `
             <div class="q-block">
-${tagHtml}
+                ${tagHtml}
                 <p class="q-text">Q${i + 1}. ${q.q}</p>
                 <ul class="options">
                     ${optsHtml}
@@ -3512,7 +3551,7 @@ ${tagHtml}
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 87.0)
+                Generated by BK Murali Quiz App (Version 87.1)
             </div>
         </body>
         </html>`;
