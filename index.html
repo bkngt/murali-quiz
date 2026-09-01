@@ -706,7 +706,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 88.4 (Leaderboard Dropdown & Formatting Fixes)</div>
+        <div>Version: 88.5 (Dynamic AI Prompts & Leaderboard Fix)</div>
     </div>
 </div>
 
@@ -748,7 +748,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.4"; 
+    const APP_VERSION = "88.5"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1857,7 +1857,6 @@
             showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error");
         }
     };
-
     async function generateQuizWithAI() {
         const apiKey = localStorage.getItem('murali_gemini_key'); 
         if(!apiKey) { 
@@ -1899,54 +1898,197 @@
             - Test the main teachings of today. Wrong options should be common misunderstandings.`;
         }
 
-        const promptText = `You are an expert Brahma Kumaris spiritual examiner. Generate a valid JSON OBJECT containing exactly two keys: "quiz" and "swaman" based ONLY on the provided text.
+        // ---------------------------------------------------------
+        // DAY DETECTION & DYNAMIC MODELS LOGIC
+        // ---------------------------------------------------------
+        let parsedDateForDay = parseDateString(currentMurliDate);
+        let dayOfWeek = parsedDateForDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+        let currentDayName = dayNames[dayOfWeek];
 
-CRITICAL LANGUAGE & TONE RULE:
-Output strictly in natural ${langName}. Use authentic Brahma Kumaris vocabulary (e.g., 'ज्ञान', 'योग', 'धारणा', 'सेवा', 'बाबा', 'मुरली', 'विनाश'). Keep sentences highly readable. NO robotic translations.
-
-CONCISENESS RULE (CRITICAL):
-- Questions MUST be short and direct (maximum 12-15 words).
-- Options MUST be extremely concise (1 to 8 words max). Do not write full sentences for options unless absolutely necessary. Summarize the concept into a short phrase.
-
-SWAMAN RULES:
-1. Read the "वरदान" (Blessing) section.
-2. Create a short title ending with "भव:!". Start with an emoji.
-3. Write exactly 2 short sentences explaining it.
-
-QUIZ RULES (FORCING 20 DISTINCT VARIETIES):
-You MUST generate exactly ${qCount} questions. 
-To ensure 100% variety, you MUST map each question sequentially to the following 20 specific models. For example, Q1 must be Model 1, Q2 must be Model 2, etc. (If qCount is > 20, loop back to Model 1).
-
-THE 20 MODELS:
-M1 (सटीक अर्थ): Meaning of a specific spiritual word used today.
-M2 (बाबाको उपमा): What Baba compared a concept to (e.g., Island, Sweet).
-M3 (आज उल्लेख नभएको): 3 correct facts + 1 fact NOT in today's Murli.
-M4 (लौकिक भ्रम): Ignorant worldly beliefs vs Baba's truth.
-M5 (मुख्य कारण): The direct root cause for a specific state/event.
-M6 (परिणाम): The exact effect/result of following a specific Shrimat.
-M7 (असत्य कथन): 3 exact statements + 1 slightly altered false statement.
-M8 (सङ्ख्या वा समय): Specific years, hours, numbers, or historical figures.
-M9 (स्थान वा व्यक्ति): Kings, cities, rivers, or historical figures.
-M10 (परिस्थितिमा धारणा): What Baba instructed to do in a specific situation.
-M11 (वरदान): Specific condition or exact result from today's Vardan.
-M12 (स्लोगन): Main takeaway or exact word from the Slogan.
-M13 (अव्यक्त इसारा): Deep checking point or practice mentioned.
-M14 (खाली ठाउँ भर्ने): Exact missing word from a famous quote. (Use _____).
-M15 (सूक्ष्म भिन्नता): Differentiating two similar concepts (e.g., Hatha Yoga vs Raj Yoga).
-M16 (विशेष उपाधि): Specific title Baba gave to children or Himself today.
-M17 (दृष्टान्त): Worldly example Baba used (e.g., Doctor, Laundry).
-M18 (विपरीत अवस्था): Opposite states discussed (e.g., Dehi-abhimani vs Deh-abhimani).
+        let daySpecificModels = "";
+        
+        if (dayOfWeek === 0) { // SUNDAY
+            daySpecificModels = `--- [SUNDAY MODELS: Avyakt & Deep States Focus] ---
+M1 (मुख्य हेडिङ): The core essence of today's main heading.
+M2 (अव्यक्त स्थिति): What specific practice was given to become Avyakt?
+M3 (विशेष उपाधि): A specific title Baba gave to the children today.
+M4 (सूक्ष्म भिन्नता): Difference between two subtle concepts (e.g., Peace vs Silence).
+M5 (मुख्य कमजोरी): The main subtle weakness Baba pointed out today.
+M6 (वरदानको सर्त): The exact condition required to achieve today's Vardan.
+M7 (स्लोगन): The main takeaway from today's Slogan.
+M8 (अव्यक्त इसारा): The specific checking point from the Avyakt Signal.
+M9 (बाबाको आशा): What is Baba's specific hope from the children today?
+M10 (ब्राह्मण जीवनको लक्ष्य): The ultimate spiritual stage mentioned today.
+M11 (समयको पुकार): What did Baba say about the current time?
+M12 (सच्चा सेवा): Definition of true subtle service today.
+M13 (खुसीको आधार): The exact basis of happiness mentioned today.
+M14 (मायाको सूक्ष्म रूप): How Maya attacks subtly according to today.
+M15 (दृष्टान्त): A specific example Baba used to explain a deep point.
+M16 (पहिलो कदम): The very first step for a specific spiritual achievement.
+M17 (असत्य कथन): 3 exact statements + 1 slightly altered statement from today.
+M18 (खाली ठाउँ): Fill in the blank for a powerful Avyakt sentence.
 M19 (जोडा नमिल्ने): Match concepts, with one wrong pair.
-M20 (सीधा प्रश्न): Straightforward 'Who', 'What', 'Where' from the core essence.
+M20 (सारको सार): The ultimate bottom line of today's entire Murli.`;
+        } else if (dayOfWeek === 1) { // MONDAY
+            daySpecificModels = `--- [MONDAY MODELS: Essence & QnA Focus] ---
+M1 (मीठे बच्चे): The core instruction given in the "Sweet children" line.
+M2 (प्रश्नको आधार): The main premise of today's Question.
+M3 (उत्तरको सार): The root cause/solution given in today's Answer.
+M4 (ज्ञानको परिभाषा): How Baba defined a specific spiritual term today.
+M5 (मुख्य धारणा): Point 1 from the Essence for Dharna.
+M6 (दोस्रो धारणा): Point 2 from the Essence for Dharna.
+M7 (वरदानको फल): The exact result promised in today's Vardan.
+M8 (स्लोगनको शब्द): A specific keyword used in today's Slogan.
+M9 (अव्यक्त इसारा): The specific practice mentioned in the Avyakt Signal.
+M10 (बाबाको ग्यारेन्टी): What specific guarantee did Baba give today?
+M11 (आत्माको स्वधर्म): A point related to the soul's original nature.
+M12 (लौकिक भ्रम): A worldly belief contrasted with Baba's truth today.
+M13 (मुख्य कारण): The root cause of sorrow/degradation mentioned today.
+M14 (परिणाम): The exact effect of following today's specific Shrimat.
+M15 (सङ्ख्या): A specific number, time, or count mentioned today.
+M16 (स्थान): A specific place or realm mentioned today.
+M17 (विपरीत अवस्था): Two opposite states discussed today.
+M18 (आज उल्लेख नभएको): 3 facts from today + 1 genuine BK fact NOT mentioned today.
+M19 (खाली ठाउँ): Fill in the blank from the Q&A section.
+M20 (सीधा प्रश्न): A straightforward question from the core essence.`;
+        } else if (dayOfWeek === 2) { // TUESDAY
+            daySpecificModels = `--- [TUESDAY MODELS: Examples & Illusions Focus] ---
+M1 (बाबाको उपमा): What Baba compared a concept to (e.g., Ocean, Sweet).
+M2 (लौकिक दृष्टान्त): A worldly example used today (e.g., Doctor, Laundry).
+M3 (अज्ञानता): A specific ignorant belief of the world mentioned today.
+M4 (सत्यता): Baba's truth countering the ignorant belief.
+M5 (मायाको जाल): How Maya deceives people according to today's text.
+M6 (भक्ति vs ज्ञान): A specific difference between Bhakti and Gyan mentioned today.
+M7 (वरदानको टाइटल): The specific title given in today's Vardan.
+M8 (स्लोगनको सार): The deep meaning of today's Slogan.
+M9 (अव्यक्त इसारा): The specific action required in the Avyakt Signal.
+M10 (धारणाको मुख्य बुँदा): The most emphasized point for Dharna today.
+M11 (कसले कसलाई): Who is explaining to whom in a specific context today?
+M12 (मुख्य विघ्न): The biggest obstacle in Purusharth mentioned today.
+M13 (सच्चा ब्राह्मण): The sign of a true Brahmin mentioned today.
+M14 (पवित्रताको स्तर): A specific instruction regarding purity today.
+M15 (कर्मको गति): A point about the philosophy of Karma mentioned today.
+M16 (असत्य कथन): 3 exact statements + 1 altered statement.
+M17 (जोडा नमिल्ने): Match examples to their meanings, with one wrong pair.
+M18 (खाली ठाउँ): Fill in the blank from a key example used today.
+M19 (आज उल्लेख नभएको): 3 examples from today + 1 BK example NOT used today.
+M20 (सार): The main takeaway from all the examples used today.`;
+        } else if (dayOfWeek === 3) { // WEDNESDAY
+            daySpecificModels = `--- [WEDNESDAY MODELS: Karma, Dharna & Shrimat Focus] ---
+M1 (मुख्य आज्ञा): The most important Shrimat given today.
+M2 (धारणा १): The first main point of Dharna.
+M3 (धारणा २): The second main point of Dharna.
+M4 (कर्मको परिणाम): The consequence of a specific action mentioned today.
+M5 (विकर्म विनाश): The specific method mentioned today to destroy sins.
+M6 (सच्चा तपस्या): Baba's definition of penance/Tapasya today.
+M7 (वरदानको अभ्यास): The specific practice required for today's Vardan.
+M8 (स्लोगनको सन्देश): The direct instruction in today's Slogan.
+M9 (अव्यक्त इसारा): The subtle checking point from the Avyakt Signal.
+M10 (मीठे बच्चे): The core message of the opening line.
+M11 (प्रश्नको सार): The main doubt addressed in the Q&A.
+M12 (उत्तरको विधि): The method provided in the Answer.
+M13 (सच्चा सेवा): The definition of true service mentioned today.
+M14 (खुसीको खजाना): How to maintain happiness according to today's Murli.
+M15 (मायाको वार): How to stay safe from Maya's specific attack today.
+M16 (विपरीत अवस्था): Contrasting a divine virtue with a specific vice today.
+M17 (खाली ठाउँ): Fill in the blank from the Dharna section.
+M18 (असत्य कथन): 3 true Shrimats from today + 1 Shrimat NOT from today.
+M19 (आज उल्लेख नभएको): 3 virtues from today + 1 virtue NOT mentioned today.
+M20 (सार): The ultimate goal of today's Dharna.`;
+        } else if (dayOfWeek === 4) { // THURSDAY
+            daySpecificModels = `--- [THURSDAY MODELS: History, Numbers & Titles Focus] ---
+M1 (सङ्ख्या): A specific number (years, births, etc.) mentioned today.
+M2 (समय/युग): A specific point about the cycle or Sangamyug today.
+M3 (बाबाको उपाधि): A specific title of Shiv Baba mentioned today.
+M4 (बच्चाहरूको उपाधि): A specific title given to the children today.
+M5 (इतिहास): A reference to the beginning or end of the cycle.
+M6 (देवताहरूको विशेषता): A specific quality of deities mentioned today.
+M7 (वरदानको प्राप्ति): The specific attainment mentioned in today's Vardan.
+M8 (स्लोगनको रहस्य): The hidden meaning in today's Slogan.
+M9 (अव्यक्त इसारा): The specific stage mentioned in the Avyakt Signal.
+M10 (मीठे बच्चे): The opening instruction.
+M11 (प्रश्नको सार): The core of the Q&A.
+M12 (लौकिक भ्रम): A worldly historical/scriptural mistake mentioned today.
+M13 (सत्य इतिहास): Baba's correction of the worldly mistake.
+M14 (मुख्य कारण): The reason for the soul's downfall mentioned today.
+M15 (परिणाम): The result of knowing the Creator and creation.
+M16 (स्थान): A specific realm (Paramdham, Sukshmavatan) mentioned today.
+M17 (खाली ठाउँ): Fill in the blank regarding a specific title or number.
+M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair.
+M19 (आज उल्लेख नभएको): 3 titles from today + 1 BK title NOT used today.
+M20 (सार): The main essence of today's historical/cycle knowledge.`;
+        } else if (dayOfWeek === 5) { // FRIDAY
+            daySpecificModels = `--- [FRIDAY MODELS: End Sections & Special Focus] ---
+M1 (वरदानको टाइटल): The exact title ending with "भव:" in today's Vardan.
+M2 (वरदानको सर्त): The condition to achieve today's Vardan.
+M3 (वरदानको परिणाम): The result of practicing today's Vardan.
+M4 (स्लोगनको मुख्य शब्द): The most important keyword in today's Slogan.
+M5 (स्लोगनको सन्देश): The practical application of today's Slogan.
+M6 (अव्यक्त इसारा १): The first main point of the Avyakt Signal.
+M7 (अव्यक्त इसारा २): The deep checking point in the Avyakt Signal.
+M8 (रात्रि क्लास/मातेश्वरी): A point from the Night Class or Mateshwari's quotes (If none, use Dharna point 1).
+M9 (रात्रि क्लास/मातेश्वरी २): Another point from the Night Class/Mateshwari (If none, use Dharna point 2).
+M10 (मीठे बच्चे): The opening line's essence.
+M11 (प्रश्नको सार): The core of the Q&A.
+M12 (उत्तरको सार): The core of the Answer.
+M13 (मुख्य आज्ञा): The most emphasized Shrimat in the main text.
+M14 (लौकिक भ्रम): A worldly illusion mentioned today.
+M15 (बाबाको उपमा): An analogy used by Baba today.
+M16 (खाली ठाउँ): Fill in the blank from the Vardan.
+M17 (खाली ठाउँ २): Fill in the blank from the Slogan.
+M18 (असत्य कथन): 3 true points from the end sections + 1 false point.
+M19 (आज उल्लेख नभएको): 3 points from today's Vardan/Slogan + 1 from a past Murli.
+M20 (सार): The combined essence of the Vardan, Slogan, and Signal.`;
+        } else { // SATURDAY
+            daySpecificModels = `--- [SATURDAY MODELS: Mega Revision & Tricky Formats] ---
+M1 (आज उल्लेख नभएको): 3 correct facts from today + 1 genuine BK fact NOT in today's Murli.
+M2 (असत्य कथन): 3 exact statements from today + 1 slightly altered false statement.
+M3 (जोडा नमिल्ने): Match 3 correct concepts from today, with 1 wrong pair.
+M4 (खाली ठाउँ): Fill in the blank for a crucial sentence from the essence.
+M5 (सूक्ष्म भिन्नता): Differentiating two similar concepts mentioned today.
+M6 (मुख्य कारण): The direct root cause for a specific state/event today.
+M7 (परिणाम): The exact effect/result of following a specific Shrimat today.
+M8 (सटीक अर्थ): Meaning of a specific spiritual word used today.
+M9 (बाबाको उपमा): What Baba compared a concept to today.
+M10 (लौकिक भ्रम): Ignorant worldly beliefs vs Baba's truth today.
+M11 (सङ्ख्या वा समय): Specific years, hours, numbers, or counts today.
+M12 (स्थान वा व्यक्ति): Realms, cities, or historical figures mentioned today.
+M13 (परिस्थितिमा धारणा): What Baba instructed to do in a specific situation today.
+M14 (वरदान): Specific condition or exact result from today's Vardan.
+M15 (स्लोगन): Main takeaway or exact word from the Slogan.
+M16 (अव्यक्त इसारा): Deep checking point or practice mentioned today.
+M17 (विशेष उपाधि): Specific title Baba gave to children or Himself today.
+M18 (दृष्टान्त): Worldly example Baba used today.
+M19 (विपरीत अवस्था): Opposite states discussed today.
+M20 (सीधा प्रश्न): Straightforward 'Who', 'What', 'Where' from the core essence.`;
+        }
+
+        const promptText = `You are an expert Brahma Kumaris spiritual examiner. Generate a highly engaging, tough, ${qCount}-question quiz based ONLY on the provided daily Murli text.
+
+### STEP 1: DATE & DAY DETECTION
+The Murli date is ${currentMurliDate} (${currentDayName}).
+
+### STEP 2: THE GOLDEN RULES (CRITICAL)
+1. THE DISTRACTOR RULE (NO EASY GUESSES - CRITICAL): This is an advanced quiz. Do NOT use obvious, "nursery-level" wrong options (e.g., Do not use "Worldly Gurus", "Humans", or "Scientists" as distractors). The 3 wrong options MUST be deep, genuine Brahma Kumaris concepts (e.g., "Purity", "Remembrance", "Divine Virtues", "Service") that sound 100% spiritually correct, but are NOT the specific answer for TODAY'S context. A student must be forced to remember today's exact Murli to choose the right one among 4 good BK concepts.
+2. DIRECT QUESTIONING (PREFIX LIMIT): NEVER start questions with phrases like "वरदान अनुसार...", "बाबाले आज...", or "अव्यक्त इसारामा...". You may use "आजको मुरली अनुसार..." ONLY IF absolutely necessary to avoid ambiguity, but strictly limit it to a MAXIMUM of 1 or 2 times in the entire quiz. Ask questions directly as universal spiritual truths.
+3. EXACT STRING MATCHING (BUG FIX): The string in the "answer" field MUST be an EXACT, character-by-character copy of one of the strings in the "options" array. Do not add extra spaces or punctuation.
+4. CONCISENESS & TAGS: Questions max 12-15 words. Options max 1-8 words. The "tag" field must contain a highly relevant 1-2 word hint directly related to the core concept of the question and answer (e.g., "पवित्रता", "कर्मगति", "निश्चय").
+5. LANGUAGE: Output strictly in natural ${langName}. Use authentic Brahma Kumaris vocabulary.
+
+### STEP 3: DYNAMIC MODEL SELECTION
+Based on today being ${currentDayName}, use ONLY the following 20 models sequentially (Q1=M1, Q2=M2... Q20=M20). If qCount is > 20, loop back to M1.
+
+${daySpecificModels}
 
 Difficulty: ${difficultyInstruction}
 - "answer" MUST perfectly match one of the "options".
 - "explanation" MUST be 1 short sentence, and "original" must quote the exact short sentence from the text.
-- "tag" field should be the topic keyword (max 2 words).
 
-SELF-VALIDATION BEFORE OUTPUT (CRITICAL):
-- Check: Are options short (max 8 words)?
-- Check: Did you cycle through all 20 models sequentially?
+### STEP 4: SWAMAN GENERATION
+1. Read the "वरदान" (Blessing) section.
+2. Create a short title ending with "भव:!". Start with an emoji.
+3. Write exactly 2 short sentences explaining it.
 
 Structure: 
 {
@@ -2028,7 +2170,7 @@ Text: ${text}`;
             
             document.getElementById('quiz-area').style.display = 'block';
             document.getElementById('online-quiz-actions').style.display = 'flex';
-            document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
+            document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate} (${currentDayName})`;
             
             renderQuizArea();
             
@@ -3267,11 +3409,10 @@ Text: ${text}`;
 
         document.getElementById('progress-month-year').innerText = progressModalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-        // FIX: Weekly chart now shows the last 7 days of the SELECTED month
         let now = new Date();
-        let targetDate = new Date(progressModalDate.getFullYear(), progressModalDate.getMonth() + 1, 0); // Last day of selected month
+        let targetDate = new Date(progressModalDate.getFullYear(), progressModalDate.getMonth() + 1, 0); 
         if (progressModalDate.getMonth() === now.getMonth() && progressModalDate.getFullYear() === now.getFullYear()) {
-            targetDate = now; // If it's the current month, use today's date
+            targetDate = now; 
         }
         
         let last7Days = new Date(targetDate);
@@ -3415,13 +3556,23 @@ Text: ${text}`;
             return;
         }
         
+        // ---------------------------------------------------------
+        // SORTING LOGIC: Latest Date First
+        // ---------------------------------------------------------
+        let sortedQuizzes = serverQuizzes.map((sq, idx) => ({ data: sq, originalIndex: idx }))
+            .sort((a, b) => {
+                let dA = getValidDate({date: a.data.quizDate}).getTime();
+                let dB = getValidDate({date: b.data.quizDate}).getTime();
+                return dB - dA; // Descending order
+            });
+        
         let groupedQuizzes = {};
-        serverQuizzes.forEach((sq, idx) => {
-            let dObj = getValidDate({date: sq.quizDate});
+        sortedQuizzes.forEach(item => {
+            let dObj = getValidDate({date: item.data.quizDate});
             let monthYear = dObj ? dObj.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : "Special/Mega Quizzes";
             
             if(!groupedQuizzes[monthYear]) groupedQuizzes[monthYear] = [];
-            groupedQuizzes[monthYear].push({ data: sq, index: idx });
+            groupedQuizzes[monthYear].push(item);
         });
 
         for (let group in groupedQuizzes) {
@@ -3430,7 +3581,7 @@ Text: ${text}`;
             
             groupedQuizzes[group].forEach(item => {
                 let opt = document.createElement('option');
-                opt.value = item.index;
+                opt.value = item.originalIndex;
                 let displayDate = String(item.data.quizDate).replace(/T.*/, '');
                 opt.text = (item.data.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
                 optGroup.appendChild(opt);
@@ -3447,15 +3598,23 @@ Text: ${text}`;
         document.getElementById('lb-result-text').value = "Select quiz and click Generate Data...";
         switchLbTab('wa'); 
         
-        // Populate the dropdown with all available quizzes (including Mega Quizzes)
         let select = document.getElementById('lb-daily-date');
         select.innerHTML = '';
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         
         if(serverQuizzes.length > 0) {
-            serverQuizzes.forEach(sq => {
+            // ---------------------------------------------------------
+            // SORTING LOGIC: Latest Date First for Leaderboard Dropdown
+            // ---------------------------------------------------------
+            let sortedQuizzes = [...serverQuizzes].sort((a, b) => {
+                let dA = getValidDate({date: a.quizDate}).getTime();
+                let dB = getValidDate({date: b.quizDate}).getTime();
+                return dB - dA; // Descending order
+            });
+
+            sortedQuizzes.forEach(sq => {
                 let opt = document.createElement('option');
-                opt.value = sq.quizDate; // Exact string from sheet
+                opt.value = sq.quizDate; 
                 let displayDate = String(sq.quizDate).replace(/T.*/, '');
                 opt.text = (sq.isMegaQuiz ? "🏆 " : "📅 ") + displayDate;
                 select.appendChild(opt);
@@ -3511,7 +3670,6 @@ Text: ${text}`;
             let selectedQuizDate = document.getElementById('lb-daily-date').value; 
             if(!selectedQuizDate) return showToast("कृपया क्वीज छान्नुहोस्।", "error");
             
-            // Directly use the selected string (works for both normal and Mega quizzes)
             payload.targetDate = selectedQuizDate;
             payload.limit = document.getElementById('lb-limit-select-daily').value;
         } else {
@@ -3671,7 +3829,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.4)
+                Generated by BK Murali Quiz App (Version 88.5)
             </div>
         </body>
         </html>`;
