@@ -152,9 +152,9 @@
         .toolbar-one-line::-webkit-scrollbar { display: none; }
         .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 
-        .lb-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
-        .lb-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
-        .lb-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3); }
+        .lb-tabs, .progress-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .lb-tabs button, .progress-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
+        .lb-tabs button.active, .progress-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3); }
         
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; background: var(--bg-color); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); }
         .radio-label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; color: var(--text-color); }
@@ -162,7 +162,6 @@
         
         #install-pwa-btn { display: block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
 
-        /* Chart Container Styles */
         .chart-container { position: relative; width: 100%; height: 250px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -477,7 +476,7 @@
     <div id="mega-quiz-modal" class="modal-overlay" onclick="if(event.target.id === 'mega-quiz-modal') document.getElementById('mega-quiz-modal').style.display='none';">
         <div class="modal-content" style="max-width: 400px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('mega-quiz-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
-            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800;">🏆 Mega Quiz Setup</h3>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800;">🗓️ Custom Mega Quiz</h3>
             <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">कुन मितिदेखि कुन मितिसम्मको प्रश्नहरू समावेश गर्ने?</p>
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
@@ -490,7 +489,7 @@
                     <input type="date" id="mq-end-date" class="input-field" style="margin:0; font-size:0.9rem; cursor:pointer;">
                 </div>
             </div>
-            <button onclick="executeMegaQuiz()" style="padding: 0.8rem; font-size: 1.05rem;">Generate Mega Quiz</button>
+            <button onclick="executeMegaQuiz()" style="padding: 0.8rem; font-size: 1.05rem;">Generate Custom Quiz</button>
         </div>
     </div>
 
@@ -514,8 +513,11 @@
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
         <div style="display:flex; gap:12px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <button onclick="openMegaQuizModal()" id="btn-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
-                🏆 Mega Quiz
+            <button onclick="executeMonthlyMegaQuiz()" id="btn-monthly-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.05rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3);">
+                🏆 मासिक मेगा क्वीज
+            </button>
+            <button onclick="openMegaQuizModal()" id="btn-custom-mega" style="display:none; flex:1; padding: 1rem; font-size: 1.05rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #7c3aed); box-shadow: 0 6px 15px rgba(168, 85, 247, 0.3);">
+                🗓️ कस्टम मेगा क्वीज
             </button>
             <button onclick="generateQuizWithAI()" id="btn-generate" style="flex:1; padding: 1rem; font-size: 1.15rem; border-radius: 50px; font-weight: 800; background: var(--primary-gradient); box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AI Quiz
@@ -585,24 +587,22 @@
 
     <!-- Progress View -->
     <div id="view-progress" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.4rem;">
-            <h2 id="dash-title" style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.5rem;">Analytics Dashboard</h2>
-        </div>
-        
-        <div class="dashboard-stats" id="dash-stats"></div>
-        
-        <!-- NEW: Vardan Container Moved to Top -->
         <div id="baba-message-container"></div>
-        
-        <!-- NEW: Line Chart Only -->
+        <div class="dashboard-stats" id="dash-stats"></div>
         <div class="chart-container">
             <canvas id="progressLineChart"></canvas>
         </div>
 
-        <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span id="cal-toggle-text">📅 मासिक क्यालेन्डर हेर्नुहोस्</span>
-        </button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <button onclick="toggleCalendar()" class="btn-small" style="width:100%; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span id="cal-toggle-text">क्यालेन्डर</span>
+            </button>
+            <button onclick="openDetailedProgress()" class="btn-small" style="width:100%; background: rgba(168, 85, 247, 0.08); color: #a855f7; border-color: #a855f7; padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8.11 3.99"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                <span>मेरो प्रगति</span>
+            </button>
+        </div>
         
         <div id="calendar-wrapper" style="display: none;">
             <div class="calendar-container">
@@ -616,16 +616,33 @@
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;" id="cal-grid-days"></div>
             </div>
         </div>
+    </div>
 
-        <div style="margin-bottom:0.8rem; font-weight:800; font-size:1.1rem; display:flex; align-items:center; gap:6px;">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> पछिल्लो ७ दिनको नतिजा (Recent 7 Days)
-        </div>
-        <div id="progress-list"></div>
-        
-        <div id="backup-actions" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem;">
-            <button onclick="exportBackupData()" class="btn-small" style="background: rgba(56,189,248,0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size:1rem;">Export Backup</button>
-            <button onclick="document.getElementById('import-file').click()" class="btn-small" style="background: rgba(22,163,74,0.08); color: var(--success-color); border-color: var(--success-color); padding: 0.8rem; font-size:1rem;">Import Backup</button>
-            <input type="file" id="import-file" onchange="importBackupData(event)" style="display: none;" accept=".json, .txt, text/*">
+    <!-- Detailed Progress Modal -->
+    <div id="detailed-progress-modal" class="modal-overlay" onclick="if(event.target.id === 'detailed-progress-modal') document.getElementById('detailed-progress-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 600px; padding: 1.5rem;">
+            <button class="close-modal" onclick="document.getElementById('detailed-progress-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; display:flex; align-items:center; gap:8px; margin-bottom: 15px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8.11 3.99"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                मेरो विस्तृत प्रगति
+            </h3>
+            
+            <div class="progress-tabs">
+                <button id="tab-weekly" class="active" onclick="switchProgressTab('weekly')">साप्ताहिक</button>
+                <button id="tab-monthly" onclick="switchProgressTab('monthly')">मासिक</button>
+                <button id="tab-yearly" onclick="switchProgressTab('yearly')">वार्षिक</button>
+            </div>
+
+            <div id="progress-weekly-section">
+                <div class="chart-container" style="height: 220px;"><canvas id="weeklyBarChart"></canvas></div>
+            </div>
+            <div id="progress-monthly-section" style="display:none;">
+                <div class="chart-container" style="height: 220px;"><canvas id="monthlyLineChart"></canvas></div>
+                <div style="margin-top: 20px; max-height: 250px; overflow-y: auto;" id="progress-list"></div>
+            </div>
+            <div id="progress-yearly-section" style="display:none;">
+                <div class="chart-container" style="height: 220px;"><canvas id="yearlyBarChart"></canvas></div>
+            </div>
         </div>
     </div>
 
@@ -642,7 +659,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 86.1 (Clean UI & Mega Filter)</div>
+        <div>Version: 87.0 (Detailed Stats & Auto-Mega)</div>
     </div>
 </div>
 
@@ -684,7 +701,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "86.1"; 
+    const APP_VERSION = "87.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -725,6 +742,9 @@
     
     // Chart.js Instances
     let progressChartInstance = null;
+    let weeklyChartInstance = null;
+    let monthlyChartInstance = null;
+    let yearlyChartInstance = null;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -1582,7 +1602,8 @@
                 document.getElementById('murali-text').style.display = 'block'; 
                 document.getElementById('generator-actions').style.display = 'flex'; 
                 document.getElementById('custom-import-section').style.display = 'block';
-                document.getElementById('btn-mega').style.display = 'block'; 
+                document.getElementById('btn-monthly-mega').style.display = 'block'; 
+                document.getElementById('btn-custom-mega').style.display = 'block'; 
                 document.getElementById('quiz-config-tools').style.display = 'flex'; 
                 document.getElementById('exam-config-section').style.display = 'block'; 
                 document.getElementById('api-config-section').style.display = 'block';
@@ -1593,7 +1614,8 @@
                 document.getElementById('murali-text').style.display = 'none'; 
                 document.getElementById('generator-actions').style.display = 'none'; 
                 document.getElementById('custom-import-section').style.display = 'none';
-                document.getElementById('btn-mega').style.display = 'none';
+                document.getElementById('btn-monthly-mega').style.display = 'none';
+                document.getElementById('btn-custom-mega').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none'; 
                 document.getElementById('exam-config-section').style.display = 'none'; 
                 document.getElementById('api-config-section').style.display = 'none';
@@ -2003,10 +2025,27 @@ Text: ${text}`;
         document.getElementById('mega-quiz-modal').style.display = 'flex';
     }
 
-    // FIX: Mega Quiz Filter Logic
-    function executeMegaQuiz() {
-        let sDateStr = document.getElementById('mq-start-date').value;
-        let eDateStr = document.getElementById('mq-end-date').value;
+    function executeMonthlyMegaQuiz() {
+        if(!confirm("के तपाईं अघिल्लो महिनाको स्वचालित मेगा क्वीज बनाउन चाहनुहुन्छ?")) return;
+
+        let today = new Date();
+        let prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        
+        let year = prevMonth.getFullYear();
+        let month = prevMonth.getMonth();
+
+        let startDate = new Date(year, month, 1);
+        let endDate = new Date(year, month + 1, 0);
+
+        let startDateStr = startDate.toISOString().split('T')[0];
+        let endDateStr = endDate.toISOString().split('T')[0];
+
+        executeMegaQuiz(startDateStr, endDateStr);
+    }
+
+    function executeMegaQuiz(startDateStr, endDateStr) {
+        let sDateStr = startDateStr || document.getElementById('mq-start-date').value;
+        let eDateStr = endDateStr || document.getElementById('mq-end-date').value;
 
         if(!sDateStr || !eDateStr) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
 
@@ -2031,7 +2070,6 @@ Text: ${text}`;
         
         if(allQuestions.length < 5) return showToast("यो मिति भित्र पर्याप्त प्रश्नहरू छैनन्!", "error");
         
-        // NEW: Filter out context-specific questions
         let filteredQuestions = [];
         allQuestions.forEach(q => {
             let qText = (q.q || "").toLowerCase();
@@ -2905,10 +2943,10 @@ Text: ${text}`;
         let txt = document.getElementById('cal-toggle-text'); 
         if (cal.style.display === 'none') { 
             cal.style.display = 'block'; 
-            txt.innerText = '📅 क्यालेन्डर लुकाउनुहोस्'; 
+            txt.innerText = 'क्यालेन्डर लुकाउनुहोस्'; 
         } else { 
             cal.style.display = 'none'; 
-            txt.innerText = '📅 मासिक क्यालेन्डर हेर्नुहोस्'; 
+            txt.innerText = 'क्यालेन्डर'; 
         } 
     };
 
@@ -2952,7 +2990,6 @@ Text: ${text}`;
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-        // 1. Progress Line Chart
         let ctxLine = document.getElementById('progressLineChart').getContext('2d');
         if(progressChartInstance) progressChartInstance.destroy();
 
@@ -3018,10 +3055,8 @@ Text: ${text}`;
             <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
-        // Draw Charts
         drawCharts(filteredHistory);
 
-        // NEW: Vardan Logic (Moved to Top)
         let babaMessage = "";
         if (totalTaken === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
@@ -3090,33 +3125,135 @@ Text: ${text}`;
             }
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
+    }
 
-        // NEW: Show only recent 7 days in the list
-        const list = document.getElementById('progress-list'); 
-        if (totalTaken === 0) { 
-            list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; 
-            return; 
+    function openDetailedProgress() {
+        document.getElementById('detailed-progress-modal').style.display = 'flex';
+        renderDetailedProgressCharts();
+        switchProgressTab('weekly');
+    }
+
+    function switchProgressTab(tab) {
+        document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
+        document.getElementById('tab-monthly').classList.toggle('active', tab === 'monthly');
+        document.getElementById('tab-yearly').classList.toggle('active', tab === 'yearly');
+        document.getElementById('progress-weekly-section').style.display = tab === 'weekly' ? 'block' : 'none';
+        document.getElementById('progress-monthly-section').style.display = tab === 'monthly' ? 'block' : 'none';
+        document.getElementById('progress-yearly-section').style.display = tab === 'yearly' ? 'block' : 'none';
+    }
+
+    function renderDetailedProgressCharts() {
+        let history = safeJSON('murali_progress', []);
+        let isDark = document.body.hasAttribute('data-theme');
+        let textColor = isDark ? '#f8fafc' : '#1e293b';
+        let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+        const d = dict[lang];
+
+        // 1. Weekly Chart
+        let today = new Date();
+        let last7Days = new Date(today);
+        last7Days.setDate(today.getDate() - 6);
+        last7Days.setHours(0,0,0,0);
+
+        let weeklyHistory = history.filter(h => {
+            let dObj = getValidDate(h);
+            return dObj && dObj.getTime() >= last7Days.getTime();
+        }).slice(0, 7).reverse();
+
+        let weeklyLabels = weeklyHistory.map(h => {
+            let d = getValidDate(h);
+            return d ? `${d.getDate()}/${d.getMonth()+1}` : '';
+        });
+        let weeklyData = weeklyHistory.map(h => h.percent);
+
+        let ctxWeekly = document.getElementById('weeklyBarChart').getContext('2d');
+        if(weeklyChartInstance) weeklyChartInstance.destroy();
+        weeklyChartInstance = new Chart(ctxWeekly, {
+            type: 'bar',
+            data: {
+                labels: weeklyLabels,
+                datasets: [{
+                    label: 'Score (%)',
+                    data: weeklyData,
+                    backgroundColor: 'rgba(2, 132, 199, 0.6)',
+                    borderColor: 'rgba(2, 132, 199, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'पछिल्लो ७ दिनको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
+        });
+
+        // 2. Monthly Chart & List
+        let currentMonthHistory = history.filter(h => {
+            let dObj = getValidDate(h);
+            return dObj && dObj.getMonth() === new Date().getMonth() && dObj.getFullYear() === new Date().getFullYear();
+        }).reverse();
+
+        let monthlyLabels = currentMonthHistory.map(h => {
+            let d = getValidDate(h);
+            return d ? d.getDate() : '';
+        });
+        let monthlyData = currentMonthHistory.map(h => h.percent);
+
+        let ctxMonthly = document.getElementById('monthlyLineChart').getContext('2d');
+        if(monthlyChartInstance) monthlyChartInstance.destroy();
+        monthlyChartInstance = new Chart(ctxMonthly, {
+            type: 'line',
+            data: { labels: monthlyLabels, datasets: [{ label: 'Score (%)', data: monthlyData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.2)', fill: true, tension: 0.3 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'यो महिनाको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
+        });
+
+        const list = document.getElementById('progress-list');
+        if (currentMonthHistory.length > 0) {
+            list.innerHTML = currentMonthHistory.reverse().slice(0, 7).map(h => {
+                let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
+                let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+                let reviewBtn = h.quizData ? `<button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
+                return `<div class="progress-item"><div style="flex-grow: 1;"><div style="font-weight:800; font-size:1.1rem; color:var(--primary-color);">📅 ${h.date}</div><div class="prog-remark ${rClass}">${rText}</div><div>${reviewBtn}</div></div><div style="text-align: right;"><div class="prog-percent">${h.percent}%</div><div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div></div></div>`;
+            }).join('');
+        } else {
+            list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
         }
-        
-        let recentHistory = filteredHistory.slice(0, 7); // Only top 7
-        
-        list.innerHTML = recentHistory.map(h => {
-            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
-            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
-            let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
-            
-            return `<div class="progress-item">
-                <div style="flex-grow: 1;">
-                    <div style="font-weight:800; font-size:1.15rem; color:var(--primary-color);">📅 ${h.date}</div>
-                    <div class="prog-remark ${rClass}">${rText}</div>
-                    <div>${reviewBtn}</div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="prog-percent">${h.percent}%</div>
-                    <div style="font-size:0.95rem; color:var(--text-color); font-weight:800;">${h.score} / ${h.total}</div>
-                </div>
-            </div>`;
-        }).join('');
+
+        // 3. Yearly Chart
+        let yearlyData = {};
+        let currentYear = new Date().getFullYear();
+        history.forEach(h => {
+            let dObj = getValidDate(h);
+            if (dObj && dObj.getFullYear() === currentYear) {
+                let month = dObj.getMonth();
+                if (!yearlyData[month]) yearlyData[month] = { totalPercent: 0, count: 0 };
+                yearlyData[month].totalPercent += h.percent;
+                yearlyData[month].count++;
+            }
+        });
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let yearlyLabels = [];
+        let yearlyAvgData = [];
+        for (let i = 0; i < 12; i++) {
+            if (yearlyData[i]) {
+                yearlyLabels.push(monthNames[i]);
+                yearlyAvgData.push(Math.round(yearlyData[i].totalPercent / yearlyData[i].count));
+            }
+        }
+
+        let ctxYearly = document.getElementById('yearlyBarChart').getContext('2d');
+        if(yearlyChartInstance) yearlyChartInstance.destroy();
+        yearlyChartInstance = new Chart(ctxYearly, {
+            type: 'bar',
+            data: {
+                labels: yearlyLabels,
+                datasets: [{
+                    label: 'Average Score (%)',
+                    data: yearlyAvgData,
+                    backgroundColor: 'rgba(22, 163, 74, 0.6)',
+                    borderColor: 'rgba(22, 163, 74, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'यो वर्षको मासिक औसत प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
+        });
     }
 
     // ==========================================
@@ -3375,7 +3512,7 @@ ${tagHtml}
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 86.1)
+                Generated by BK Murali Quiz App (Version 87.0)
             </div>
         </body>
         </html>`;
@@ -3530,4 +3667,3 @@ ${tagHtml}
 </script>
 </body>
 </html>
-                
