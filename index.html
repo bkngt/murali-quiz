@@ -495,7 +495,7 @@
         </div>
     </div>
 
-    <!-- Monthly Mega Quiz Modal (NEW) -->
+    <!-- Monthly Mega Quiz Modal -->
     <div id="monthly-mega-modal" class="modal-overlay" onclick="if(event.target.id === 'monthly-mega-modal') document.getElementById('monthly-mega-modal').style.display='none';">
         <div class="modal-content" style="max-width: 400px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('monthly-mega-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
@@ -706,7 +706,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 88.0 (Interactive Stats)</div>
+        <div>Version: 88.2 (Interactive Stats)</div>
     </div>
 </div>
 
@@ -748,7 +748,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.0"; 
+    const APP_VERSION = "88.2"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1570,7 +1570,7 @@
     // 5. UI INITIALIZATION & DASHBOARD
     // ==========================================
     function updateProfileBadgeUI() {
-        let safeRole = userRole.toString().trim().toLowerCase();
+        let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
         let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
         let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
         let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
@@ -1632,7 +1632,7 @@
             updateProfileBadgeUI();
             backgroundProfileSync(); 
 
-            let safeRole = userRole.toString().trim().toLowerCase();
+            let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
             let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
             
             if (isPrivileged) {
@@ -1669,6 +1669,7 @@
             switchTab('gen');
         } catch(e) { 
             showToast("Error loading UI", "error"); 
+            console.error("Unlock App Error:", e);
         }
     }
 
@@ -1787,7 +1788,7 @@
             if (specialQuizzes.length > 0) {
                 html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">`;
                 specialQuizzes.forEach(sq => {
-                    let isCompleted = history.some(h => h.date === sq.quizDate);
+                    let isCompleted = history.some(h => String(h.date).trim() === String(sq.quizDate).trim());
                     if (isCompleted) { 
                         html += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
                     } else { 
@@ -1804,6 +1805,7 @@
         } catch (e) { 
             document.getElementById('quiz-area').innerHTML = `<div style="color:red; text-align:center; padding: 3rem;">डाटा लोड गर्न समस्या भयो! कृपया लगआउट गरेर फेरि लगइन गर्नुहोस्।</div>`; 
             document.getElementById('quiz-area').style.display = 'block'; 
+            console.error("Dashboard Load Error:", e);
         }
     }
 
@@ -3116,8 +3118,8 @@ Text: ${text}`;
             });
 
             let totalTaken = filteredHistory.length; 
-            let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
-            let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
+            let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + Number(h.percent), 0) / totalTaken) : 0; 
+            let excRate = totalTaken ? Math.round((filteredHistory.filter(h => Number(h.percent) >= 80).length / totalTaken) * 100) : 0;
             
             document.getElementById('dash-stats').innerHTML = `
                 <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
@@ -3423,7 +3425,6 @@ Text: ${text}`;
                 opt.value = item.index;
                 let displayDate = String(item.data.quizDate).replace(/T.*/, '');
                 opt.text = (item.data.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
-                optGroup.appendChild(optGroup);
                 optGroup.appendChild(opt);
             });
             select.appendChild(optGroup);
@@ -3626,7 +3627,8 @@ Text: ${text}`;
         quizData.forEach((q, i) => {
             let optsHtml = q.options.map(opt => {
                 let isCorrect = (opt === q.answer);
-                let liClass = isCorrect ? 'class="correct-ans"' : '';
+                let liClass =
+isCorrect ? 'class="correct-ans"' : '';
                 let icon = isCorrect ? '✅' : '⚪';
                 return `<li ${liClass}><span>${icon}</span> <span>${opt}</span></li>`;
             }).join('');
@@ -3637,8 +3639,7 @@ Text: ${text}`;
             html += `
             <div class="q-block">
                 ${tagHtml}
-                <p class="q-text
-">Q${i + 1}. ${q.q}</p>
+                <p class="q-text">Q${i + 1}. ${q.q}</p>
                 <ul class="options">
                     ${optsHtml}
                 </ul>
@@ -3648,7 +3649,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.0)
+                Generated by BK Murali Quiz App (Version 88.2)
             </div>
         </body>
         </html>`;
