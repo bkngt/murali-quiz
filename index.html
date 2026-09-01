@@ -405,7 +405,7 @@
             </div>
 
             <div id="lb-daily-input-group" style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <input type="date" id="lb-daily-date" class="input-field" style="flex: 2; margin:0; font-size:0.9rem; cursor:pointer;">
+                <select id="lb-daily-date" class="select-field" style="flex: 2; margin:0; font-size:0.9rem; cursor:pointer;"></select>
                 <select id="lb-limit-select-daily" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
                     <option value="all">All</option>
                     <option value="5">Top 5</option>
@@ -706,7 +706,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 88.3 (Bug Fixes & Sync Update)</div>
+        <div>Version: 88.4 (Leaderboard Dropdown & Formatting Fixes)</div>
     </div>
 </div>
 
@@ -748,7 +748,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.3"; 
+    const APP_VERSION = "88.4"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -3444,19 +3444,32 @@ Text: ${text}`;
     // ==========================================
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
-        document.getElementById('lb-result-text').value = "Select date and click Generate Data...";
+        document.getElementById('lb-result-text').value = "Select quiz and click Generate Data...";
         switchLbTab('wa'); 
         
-        let today = new Date();
-        let todayStr = today.toISOString().split('T')[0];
+        // Populate the dropdown with all available quizzes (including Mega Quizzes)
+        let select = document.getElementById('lb-daily-date');
+        select.innerHTML = '';
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
         
+        if(serverQuizzes.length > 0) {
+            serverQuizzes.forEach(sq => {
+                let opt = document.createElement('option');
+                opt.value = sq.quizDate; // Exact string from sheet
+                let displayDate = String(sq.quizDate).replace(/T.*/, '');
+                opt.text = (sq.isMegaQuiz ? "🏆 " : "📅 ") + displayDate;
+                select.appendChild(opt);
+            });
+        } else {
+            select.innerHTML = '<option value="">कुनै क्वीज छैन</option>';
+        }
+        
+        let today = new Date();
         let lastWeek = new Date();
         lastWeek.setDate(today.getDate() - 7);
-        let lastWeekStr = lastWeek.toISOString().split('T')[0];
         
-        document.getElementById('lb-daily-date').value = todayStr;
-        document.getElementById('lb-start-date').value = lastWeekStr;
-        document.getElementById('lb-end-date').value = todayStr;
+        document.getElementById('lb-start-date').value = lastWeek.toISOString().split('T')[0];
+        document.getElementById('lb-end-date').value = today.toISOString().split('T')[0];
     }
 
     window.toggleLbDateInputs = function() {
@@ -3495,9 +3508,11 @@ Text: ${text}`;
         let payload = { action: "getLeaderboard", reportType: type };
 
         if (type === 'daily') {
-            let rawDate = document.getElementById('lb-daily-date').value; 
-            if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
-            payload.targetDate = mapDateToSheetString(rawDate);
+            let selectedQuizDate = document.getElementById('lb-daily-date').value; 
+            if(!selectedQuizDate) return showToast("कृपया क्वीज छान्नुहोस्।", "error");
+            
+            // Directly use the selected string (works for both normal and Mega quizzes)
+            payload.targetDate = selectedQuizDate;
             payload.limit = document.getElementById('lb-limit-select-daily').value;
         } else {
             let sDate = document.getElementById('lb-start-date').value;
@@ -3516,7 +3531,8 @@ Text: ${text}`;
         let txtArea = document.getElementById('lb-result-text');
         let tableBody = document.getElementById('lb-table-body');
         let tableHead = document.getElementById('lb-table-head');
-btn.innerText = "Fetching from Server...";
+        
+        btn.innerText = "Fetching from Server...";
         btn.disabled = true;
         txtArea.value = "Loading data from Google Sheets... Please wait.";
         tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #64748b;">⏳ Loading data...</td></tr>`;
@@ -3655,7 +3671,7 @@ btn.innerText = "Fetching from Server...";
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.3)
+                Generated by BK Murali Quiz App (Version 88.4)
             </div>
         </body>
         </html>`;
@@ -3810,5 +3826,3 @@ btn.innerText = "Fetching from Server...";
 </script>
 </body>
 </html>
-        
-        
