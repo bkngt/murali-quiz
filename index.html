@@ -119,17 +119,16 @@
         .stat-card h3 { margin: 0; font-size: 1.8rem; color: var(--primary-color); font-weight: 800; line-height: 1;}
         .stat-card p { margin: 0.4rem 0 0; font-size: 0.8rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;}
         
-        .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem 0.5rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .cal-day { padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 55px; position: relative; overflow:hidden; word-break: break-word; line-height: 1.1; }
+        .calendar-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1rem 0.5rem; margin-bottom: 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .cal-day { padding: 6px 1px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; color: var(--text-color); border: 2px solid transparent; display: flex; flex-direction:column; align-items: center; justify-content: center; min-height: 50px; position: relative; overflow:hidden; word-break: break-word; line-height: 1.1; }
         .cal-day.empty { background: transparent; border: none; }
-        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; border: 1px solid var(--border-color); }
-        .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .cal-day.has-data { cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .cal-day.has-data:hover { transform: translateY(-2px) scale(1.05); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .cal-day.excellent { background: var(--success-bg); color: var(--success-color); border-color: var(--success-border); }
         .cal-day.good { background: var(--warning-bg); color: var(--warning-color); border-color: var(--warning-color); }
         .cal-day.poor { background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); }
-        .cal-score-badge { font-size: 0.65rem; background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 6px; margin-top: 3px; font-weight: 700; letter-spacing: 0.5px; }
         
-        .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+        .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
         .prog-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; color: var(--primary-color);}
         .prog-remark { font-size: 0.85rem; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 50px; margin-top: 0.4rem; display: inline-block;}
         .remark-excellent { background: var(--success-bg); color: var(--success-color); border: 1px solid var(--success-border);}
@@ -164,7 +163,7 @@
         #install-pwa-btn { display: block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
 
         /* Chart Container Styles */
-        .chart-container { position: relative; width: 100%; height: 220px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .chart-container { position: relative; width: 100%; height: 250px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -405,8 +404,7 @@
             </div>
 
             <div id="lb-daily-input-group" style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <!-- FIX: Changed from input type="date" to select dropdown for Mega Quiz support -->
-                <select id="lb-daily-date" class="select-field" style="flex: 2; margin:0; font-size:0.9rem;"></select>
+                <input type="date" id="lb-daily-date" class="input-field" style="flex: 2; margin:0; font-size:0.9rem; cursor:pointer;">
                 <select id="lb-limit-select-daily" class="select-field" style="flex: 1; margin:0; font-size:0.9rem;">
                     <option value="all">All</option>
                     <option value="5">Top 5</option>
@@ -593,19 +591,17 @@
         
         <div class="dashboard-stats" id="dash-stats"></div>
         
-        <!-- Chart.js Containers -->
-        <div class="chart-container">
-            <canvas id="weeklyBarChart"></canvas>
-        </div>
-        <div class="chart-container" style="height: 220px; display: none;" id="weakness-chart-container">
-            <canvas id="weaknessDoughnutChart"></canvas>
-        </div>
-
+        <!-- NEW: Vardan Container Moved to Top -->
         <div id="baba-message-container"></div>
         
+        <!-- NEW: Line Chart Only -->
+        <div class="chart-container">
+            <canvas id="progressLineChart"></canvas>
+        </div>
+
         <button onclick="toggleCalendar()" class="btn-small" style="width:100%; margin-bottom: 15px; background: rgba(56, 189, 248, 0.08); color: var(--primary-color); border-color: var(--primary-color); padding: 0.8rem; font-size: 1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">
             <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span id="cal-toggle-text">View Monthly Calendar</span>
+            <span id="cal-toggle-text">📅 मासिक क्यालेन्डर हेर्नुहोस्</span>
         </button>
         
         <div id="calendar-wrapper" style="display: none;">
@@ -621,9 +617,8 @@
             </div>
         </div>
 
-        <div id="weakness-alert"></div>
         <div style="margin-bottom:0.8rem; font-weight:800; font-size:1.1rem; display:flex; align-items:center; gap:6px;">
-            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Records for this Month
+            <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> पछिल्लो ७ दिनको नतिजा (Recent 7 Days)
         </div>
         <div id="progress-list"></div>
         
@@ -647,7 +642,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 86.1 (Secure PIN & Clean UI)</div>
+        <div>Version: 86.1 (Clean UI & Mega Filter)</div>
     </div>
 </div>
 
@@ -729,8 +724,7 @@
     let abortController = null;
     
     // Chart.js Instances
-    let weeklyChartInstance = null;
-    let tagsChartInstance = null;
+    let progressChartInstance = null;
 
     const dict = {
         ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
@@ -939,7 +933,7 @@
     }
 
     // ==========================================
-    // 3. AUTHENTICATION & PROFILE (SECURE PIN)
+    // 3. AUTHENTICATION & PROFILE
     // ==========================================
     function init() {
         if (localStorage.getItem('murali_app_version') !== APP_VERSION) {
@@ -2009,6 +2003,7 @@ Text: ${text}`;
         document.getElementById('mega-quiz-modal').style.display = 'flex';
     }
 
+    // FIX: Mega Quiz Filter Logic
     function executeMegaQuiz() {
         let sDateStr = document.getElementById('mq-start-date').value;
         let eDateStr = document.getElementById('mq-end-date').value;
@@ -2036,9 +2031,25 @@ Text: ${text}`;
         
         if(allQuestions.length < 5) return showToast("यो मिति भित्र पर्याप्त प्रश्नहरू छैनन्!", "error");
         
+        // NEW: Filter out context-specific questions
+        let filteredQuestions = [];
+        allQuestions.forEach(q => {
+            let qText = (q.q || "").toLowerCase();
+            let qTag = (q.tag || "").toLowerCase();
+            
+            let hasAaja = qText.includes("आज") || qText.includes("आजको");
+            let isExcludedTag = qTag.includes("वरदान") || qTag.includes("स्लोगन") || qTag.includes("अव्यक्त इसारा") || qTag.includes("इसारा");
+            
+            if (!hasAaja && !isExcludedTag) {
+                filteredQuestions.push(q);
+            }
+        });
+
+        if(filteredQuestions.length < 5) return showToast("फिल्टर गरेपछि पर्याप्त प्रश्नहरू बाँकी रहेनन्!", "error");
+
         let uniqueQ = []; 
         let qTextSet = new Set(); 
-        allQuestions.forEach(q => { 
+        filteredQuestions.forEach(q => { 
             if(!qTextSet.has(q.q)) { 
                 qTextSet.add(q.q); 
                 uniqueQ.push(q); 
@@ -2855,15 +2866,49 @@ Text: ${text}`;
         checkApiStatus();
     }
 
+    function calculateStreak(history) {
+        if (!history.length) return 0;
+        let uniqueDays = new Set(); 
+        history.forEach(h => { 
+            let d = getValidDate(h); 
+            if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()); 
+        });
+        
+        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); 
+        if (sortedDays.length === 0) return 0;
+    let streak = 0; 
+        let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); 
+        let expectedTime = todayTime;
+        
+        if (sortedDays[0] === todayTime) {
+        } else if (sortedDays[0] === todayTime - 86400000) { 
+            expectedTime = todayTime - 86400000; 
+        } else { 
+            return 0; 
+        }
+        
+        for (let time of sortedDays) { 
+            if (time === expectedTime) { 
+                streak++; 
+                expectedTime -= 86400000; 
+            } else if (time > expectedTime) { 
+                continue; 
+            } else { 
+                break; 
+            } 
+        } 
+        return streak;
+    }
+
     window.toggleCalendar = function() { 
         let cal = document.getElementById('calendar-wrapper'); 
         let txt = document.getElementById('cal-toggle-text'); 
         if (cal.style.display === 'none') { 
             cal.style.display = 'block'; 
-            txt.innerText = 'Hide Calendar'; 
+            txt.innerText = '📅 क्यालेन्डर लुकाउनुहोस्'; 
         } else { 
             cal.style.display = 'none'; 
-            txt.innerText = 'View Monthly Calendar'; 
+            txt.innerText = '📅 मासिक क्यालेन्डर हेर्नुहोस्'; 
         } 
     };
 
@@ -2902,31 +2947,35 @@ Text: ${text}`;
         renderDashboard();
     }
 
-    function drawCharts(history) {
+    function drawCharts(filteredHistory) {
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-        // 1. Weekly Bar Chart (Last 7 Exams)
-        let ctxBar = document.getElementById('weeklyBarChart').getContext('2d');
-        if(weeklyChartInstance) weeklyChartInstance.destroy();
+        // 1. Progress Line Chart
+        let ctxLine = document.getElementById('progressLineChart').getContext('2d');
+        if(progressChartInstance) progressChartInstance.destroy();
 
-        let recent7 = [...history].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime()).slice(-7);
-        let labels = recent7.map(h => {
+        let sortedHistory = [...filteredHistory].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime());
+        let labels = sortedHistory.map(h => {
             let d = getValidDate(h);
             return d ? d.getDate() : '';
         });
-        let dataPoints = recent7.map(h => parseInt(h.percent) || 0);
+        let dataPoints = sortedHistory.map(h => h.percent);
 
-        weeklyChartInstance = new Chart(ctxBar, {
-            type: 'bar',
+        progressChartInstance = new Chart(ctxLine, {
+            type: 'line',
             data: {
-                labels: labels.length ? labels : ['-','-','-','-','-','-','-'],
+                labels: labels,
                 datasets: [{
                     label: 'Score (%)',
-                    data: dataPoints.length ? dataPoints : [0,0,0,0,0,0,0],
-                    backgroundColor: '#0284c7',
-                    borderRadius: 6
+                    data: dataPoints,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#16a34a'
                 }]
             },
             options: {
@@ -2934,52 +2983,11 @@ Text: ${text}`;
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    title: { display: true, text: 'पछिल्लो ७ दिनको नतिजा (Weekly Score %)', color: textColor, font: {size: 14, family: 'Poppins'} }
+                    title: { display: true, text: 'Daily Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
                 },
                 scales: {
                     y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } },
                     x: { ticks: { color: textColor }, grid: { display: false } }
-                }
-            }
-        });
-
-        // 2. Weakness Doughnut Chart (Hidden by default, shown if weak tags exist)
-        let ctxDoughnut = document.getElementById('weaknessDoughnutChart').getContext('2d');
-        if(tagsChartInstance) tagsChartInstance.destroy();
-
-        let allWeakTags = []; 
-        history.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
-        
-        if(allWeakTags.length === 0) {
-            document.getElementById('weakness-chart-container').style.display = 'none';
-            return;
-        }
-        
-        document.getElementById('weakness-chart-container').style.display = 'block';
-
-        let tagCounts = {}; 
-        allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
-        
-        let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]).slice(0, 5);
-        let tagData = sortedTags.map(t => tagCounts[t]);
-
-        tagsChartInstance = new Chart(ctxDoughnut, {
-            type: 'doughnut',
-            data: {
-                labels: sortedTags,
-                datasets: [{
-                    data: tagData,
-                    backgroundColor: ['#dc2626', '#f59e0b', '#0284c7', '#8b5cf6', '#14b8a6'],
-                    borderWidth: 1,
-                    borderColor: isDark ? '#1e293b' : '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right', labels: { color: textColor, font: {size: 11} } },
-                    title: { display: true, text: 'Top Weak Areas', color: textColor, font: {size: 14, family: 'Poppins'} }
                 }
             }
         });
@@ -2988,6 +2996,7 @@ Text: ${text}`;
     function renderDashboard() {
         const d = dict[lang]; 
         let history = safeJSON('murali_progress', []); 
+        let streak = calculateStreak(history);
         let cy = currentCalDate.getFullYear(); 
         let cm = currentCalDate.getMonth();
         
@@ -2999,19 +3008,20 @@ Text: ${text}`;
         });
 
         let totalTaken = filteredHistory.length; 
-        let sumPercent = filteredHistory.reduce((sum, h) => sum + (parseInt(h.percent) || 0), 0);
-        let avgPercent = totalTaken ? Math.round(sumPercent / totalTaken) : 0; 
-        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => parseInt(h.percent) >= 80).length / totalTaken) * 100) : 0;
+        let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
+        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
         
         document.getElementById('dash-stats').innerHTML = `
             <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
             <div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div>
             <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
-            <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${totalTaken > 0 ? '7 Days' : '0'}</h3><p style="color: #38bdf8;">Weekly Track</p></div>
+            <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
         `;
         
-        drawCharts(history); // Pass full history for weekly chart
+        // Draw Charts
+        drawCharts(filteredHistory);
 
+        // NEW: Vardan Logic (Moved to Top)
         let babaMessage = "";
         if (totalTaken === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
@@ -3055,7 +3065,7 @@ Text: ${text}`;
             let dObj = getValidDate(h); 
             if (dObj) { 
                 let day = dObj.getDate(); 
-                if (!monthMap[day] || parseInt(h.percent) > parseInt(monthMap[day].percent)) monthMap[day] = h; 
+                if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
             } 
         });
         
@@ -3073,52 +3083,27 @@ Text: ${text}`;
                 calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
             } else if (monthMap[i]) { 
                 let h = monthMap[i]; 
-                let cClass = parseInt(h.percent) >= 80 ? 'excellent' : (parseInt(h.percent) >= 50 ? 'good' : 'poor'); 
-                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">
-                                <span>${i}</span>
-                                <span class="cal-score-badge">${h.score}/${h.total}</span>
-                            </div>`;
+                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
             } else { 
                 calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
             }
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        let allWeakTags = []; 
-        filteredHistory.forEach(h => { if(h.weakTags) allWeakTags.push(...h.weakTags); });
-        
-        if (allWeakTags.length > 0) { 
-            let tagCounts = {}; 
-            allWeakTags.forEach(t => tagCounts[t] = (tagCounts[t] || 0) + 1); 
-            let sortedTags = Object.keys(tagCounts).sort((a,b) => tagCounts[b] - tagCounts[a]); 
-            document.getElementById('weakness-alert').innerHTML = `<div style="margin-top: 15px; padding: 10px; background: rgba(217,119,6,0.1); border-left: 4px solid var(--warning-color); border-radius: 8px; font-size: 0.9rem;">यस महिनाको गल्तीहरूको आधारमा <b>'${sortedTags[0]}'</b> ${sortedTags[1] ? `र <b>'${sortedTags[1]}'</b>` : ''} विषयमा अलि बढी ध्यान दिनुहोला।</div>`;
-        } else { 
-            document.getElementById('weakness-alert').innerHTML = ''; 
-        }
-
+        // NEW: Show only recent 7 days in the list
         const list = document.getElementById('progress-list'); 
         if (totalTaken === 0) { 
             list.innerHTML = `<div style="text-align:center; padding: 2rem 1rem; color: #94a3b8; font-weight: 600; border: 2px dashed var(--border-color); border-radius: 12px;">यो महिनाको रेकर्ड खाली छ।</div>`; 
             return; 
         }
         
-        list.innerHTML = filteredHistory.map(h => {
-            let p = parseInt(h.percent) || 0;
-            let rText = p >= 80 ? d.remarkExc : (p >= 50 ? d.remarkGood : d.remarkPoor); 
-            let rClass = p >= 80 ? 'remark-excellent' : (p >= 50 ? 'remark-good' : 'remark-poor');
-            
-            // 7-Day Review Logic
-            let quizDateObj = getValidDate(h);
-            let diffDays = quizDateObj ? Math.floor((today - quizDateObj) / (1000 * 60 * 60 * 24)) : 999;
-            
-            let reviewBtn = '';
-            if (h.quizData) {
-                if (diffDays <= 7) {
-                    reviewBtn = `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>`;
-                } else {
-                    reviewBtn = `<span style="display:inline-block; margin-top:10px; font-size:0.8rem; color:#94a3b8; font-weight:600;">🔒 Review Expired</span>`;
-                }
-            }
+        let recentHistory = filteredHistory.slice(0, 7); // Only top 7
+        
+        list.innerHTML = recentHistory.map(h => {
+            let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
+            let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+            let reviewBtn = h.quizData ? `<button class="btn-small" style="margin-top: 10px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
             
             return `<div class="progress-item">
                 <div style="flex-grow: 1;">
@@ -3127,7 +3112,7 @@ Text: ${text}`;
                     <div>${reviewBtn}</div>
                 </div>
                 <div style="text-align: right;">
-                    <div class="prog-percent">${p}%</div>
+                    <div class="prog-percent">${h.percent}%</div>
                     <div style="font-size:0.95rem; color:var(--text-color); font-weight:800;">${h.score} / ${h.total}</div>
                 </div>
             </div>`;
@@ -3181,21 +3166,6 @@ Text: ${text}`;
         document.getElementById('lb-result-text').value = "Select date and click Generate Data...";
         switchLbTab('wa'); 
         
-        // Populate Dropdown with available quizzes
-        let select = document.getElementById('lb-daily-date');
-        let serverQuizzes = safeJSON('murali_server_quizzes', []);
-        select.innerHTML = '';
-        if(serverQuizzes.length === 0) {
-            select.innerHTML = '<option value="">No Quizzes Found</option>';
-        } else {
-            serverQuizzes.forEach(sq => {
-                let opt = document.createElement('option');
-                opt.value = sq.quizDate;
-                opt.text = sq.quizDate;
-                select.appendChild(opt);
-            });
-        }
-        
         let today = new Date();
         let todayStr = today.toISOString().split('T')[0];
         
@@ -3203,6 +3173,7 @@ Text: ${text}`;
         lastWeek.setDate(today.getDate() - 7);
         let lastWeekStr = lastWeek.toISOString().split('T')[0];
         
+        document.getElementById('lb-daily-date').value = todayStr;
         document.getElementById('lb-start-date').value = lastWeekStr;
         document.getElementById('lb-end-date').value = todayStr;
     }
@@ -3220,6 +3191,24 @@ Text: ${text}`;
         document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none';
     }
 
+    function mapDateToSheetString(yyyy_mm_dd) {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        let targetDateObj = new Date(yyyy_mm_dd);
+        
+        for (let sq of serverQuizzes) {
+            let dObj = getValidDate({date: sq.quizDate});
+            if (dObj) {
+                if (dObj.getFullYear() === targetDateObj.getFullYear() &&
+                    dObj.getMonth() === targetDateObj.getMonth() &&
+                    dObj.getDate() === targetDateObj.getDate()) {
+                    return sq.quizDate; 
+                }
+            }
+        }
+        let parts = yyyy_mm_dd.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
     window.fetchLeaderboard = function() {
         let type = document.querySelector('input[name="lb-report-type"]:checked').value;
         let payload = { action: "getLeaderboard", reportType: type };
@@ -3227,7 +3216,7 @@ Text: ${text}`;
         if (type === 'daily') {
             let rawDate = document.getElementById('lb-daily-date').value; 
             if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
-            payload.targetDate = rawDate; // Directly use the string from dropdown
+            payload.targetDate = mapDateToSheetString(rawDate);
             payload.limit = document.getElementById('lb-limit-select-daily').value;
         } else {
             let sDate = document.getElementById('lb-start-date').value;
@@ -3375,7 +3364,7 @@ Text: ${text}`;
 
             html += `
             <div class="q-block">
-                ${tagHtml}
+${tagHtml}
                 <p class="q-text">Q${i + 1}. ${q.q}</p>
                 <ul class="options">
                     ${optsHtml}
@@ -3541,3 +3530,4 @@ Text: ${text}`;
 </script>
 </body>
 </html>
+                
