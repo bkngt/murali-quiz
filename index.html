@@ -634,6 +634,13 @@
                 मेरो विस्तृत प्रगति
             </h3>
             
+            <!-- NEW: Month Navigation -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--bg-color); padding: 8px; border-radius: 8px;">
+                <button onclick="navigateProgressMonth(-1)" style="background: transparent; color: var(--primary-color); box-shadow: none; width: auto; padding: 5px 10px;">&lt; अघिल्लो</button>
+                <span id="progress-month-year" style="font-weight: 800; color: var(--primary-color);"></span>
+                <button onclick="navigateProgressMonth(1)" style="background: transparent; color: var(--primary-color); box-shadow: none; width: auto; padding: 5px 10px;">अर्को &gt;</button>
+            </div>
+
             <div class="progress-tabs">
                 <button id="tab-weekly" class="active" onclick="switchProgressTab('weekly')">साप्ताहिक</button>
                 <button id="tab-monthly" onclick="switchProgressTab('monthly')">मासिक</button>
@@ -653,6 +660,19 @@
         </div>
     </div>
 
+    <!-- NEW: Calendar Detail Modal -->
+    <div id="calendar-detail-modal" class="modal-overlay" onclick="if(event.target.id === 'calendar-detail-modal') document.getElementById('calendar-detail-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 380px; text-align: center;">
+            <h3 id="cal-detail-date" style="margin-top:0; color: var(--primary-color); font-size: 1.2rem;"></h3>
+            <div id="cal-detail-score" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;"></div>
+            <div id="cal-detail-remark" style="font-size: 1rem; font-weight: 700; padding: 5px 15px; border-radius: 50px; display: inline-block; margin-bottom: 20px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="document.getElementById('calendar-detail-modal').style.display='none';" style="background: #64748b; flex:1;">Close</button>
+                <button id="cal-detail-review-btn" style="background: var(--success-color); flex:1.5;">उत्तर रिभ्यु गर्नुहोस्</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Sticky Bottom Bar -->
     <div id="sticky-scorebar" class="sticky-scorebar" style="display: none;">
         <div style="font-weight: 800; font-size: 1rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
@@ -666,7 +686,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 87.1 (Mobile UI & Mega Stats Fix)</div>
+        <div>Version: 87.2 (Interactive Stats)</div>
     </div>
 </div>
 
@@ -708,7 +728,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "87.1"; 
+    const APP_VERSION = "87.2"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -729,6 +749,7 @@
     let isTimerStarted = false;
     
     let currentCalDate = new Date(); 
+    let progressModalDate = new Date();
     let reviewSource = 'current';
     
     let failedAttempts = 0; 
@@ -2047,10 +2068,10 @@ Text: ${text}`;
         let startDateStr = startDate.toISOString().split('T')[0];
         let endDateStr = endDate.toISOString().split('T')[0];
 
-        executeMegaQuiz(startDateStr, endDateStr);
+        executeMegaQuiz(startDateStr, endDateStr, true);
     }
 
-    function executeMegaQuiz(startDateStr, endDateStr) {
+    function executeMegaQuiz(startDateStr, endDateStr, isMonthly = false) {
         let sDateStr = startDateStr || document.getElementById('mq-start-date').value;
         let eDateStr = endDateStr || document.getElementById('mq-end-date').value;
 
@@ -2113,10 +2134,14 @@ Text: ${text}`;
         currentQuiz = uniqueQ.slice(0, qCount); 
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
-        let displayStart = sDateStr.split('-').reverse().join('-');
-        let displayEnd = eDateStr.split('-').reverse().join('-');
-        
-        currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`;
+        if (isMonthly) {
+            let monthName = sDate.toLocaleString('default', { month: 'long' });
+            currentMurliDate = `🏆 मासिक मेगा क्वीज (${monthName} ${sDate.getFullYear()})`;
+        } else {
+            let displayStart = sDateStr.split('-').reverse().join('-');
+            let displayEnd = eDateStr.split('-').reverse().join('-');
+            currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`;
+        }
         
         document.getElementById('mega-quiz-modal').style.display = 'none';
         document.getElementById('murali-text').style.display = 'none'; 
@@ -2126,7 +2151,7 @@ Text: ${text}`;
         
         document.getElementById('quiz-area').style.display = 'block';
         document.getElementById('online-quiz-actions').style.display = 'flex';
-        document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`;
+        document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
         
         renderQuizArea();
         
@@ -2403,7 +2428,7 @@ Text: ${text}`;
         document.getElementById('timer-text').innerText = `${m}:${s}`;
 
         document.getElementById('active-quiz-info').style.display = 'flex'; 
-        document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate}`; 
+        document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`; 
         document.getElementById('online-quiz-actions').style.display = 'flex'; 
         
         document.getElementById('main-header').style.display = 'none';
@@ -3069,16 +3094,18 @@ Text: ${text}`;
         drawCharts(filteredHistory);
 
         let babaMessage = "";
-        if (totalTaken === 0) {
+        if (history.length === 0) {
             babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
         } else {
             let latestHistory = standardHistory[0]; 
-            let serverQuizzes = safeJSON('murali_server_quizzes', []);
-            let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
-            
-            if (matchedQuiz && matchedQuiz.swaman) {
-                babaMessage = matchedQuiz.swaman;
-            } else {
+            if (latestHistory) {
+                let serverQuizzes = safeJSON('murali_server_quizzes', []);
+                let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
+                if (matchedQuiz && matchedQuiz.swaman) {
+                    babaMessage = matchedQuiz.swaman;
+                }
+            }
+            if (!babaMessage) {
                 let hash = 0;
                 let uniqueString = new Date().toDateString() + userName;
                 for (let i = 0; i < uniqueString.length; i++) {
@@ -3130,7 +3157,7 @@ Text: ${text}`;
             } else if (monthMap[i]) { 
                 let h = monthMap[i]; 
                 let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
-                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="reviewPastQuiz(${h.id})">${i}</div>`;
+                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">${i}</div>`;
             } else { 
                 calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
             }
@@ -3165,9 +3192,15 @@ Text: ${text}`;
     }
 
     function openDetailedProgress() {
+        progressModalDate = new Date(currentCalDate);
         document.getElementById('detailed-progress-modal').style.display = 'flex';
         renderDetailedProgressCharts();
         switchProgressTab('weekly');
+    }
+
+    function navigateProgressMonth(direction) {
+        progressModalDate.setMonth(progressModalDate.getMonth() + direction);
+        renderDetailedProgressCharts();
     }
 
     function switchProgressTab(tab) {
@@ -3187,7 +3220,9 @@ Text: ${text}`;
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
         const d = dict[lang];
 
-        // 1. Weekly Chart
+        document.getElementById('progress-month-year').innerText = progressModalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+        // 1. Weekly Chart (Always based on today)
         let today = new Date();
         let last7Days = new Date(today);
         last7Days.setDate(today.getDate() - 6);
@@ -3221,10 +3256,10 @@ Text: ${text}`;
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'पछिल्लो ७ दिनको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
         });
 
-        // 2. Monthly Chart & List
+        // 2. Monthly Chart & List (Based on progressModalDate)
         let currentMonthHistory = standardHistory.filter(h => {
             let dObj = getValidDate(h);
-            return dObj && dObj.getMonth() === currentCalDate.getMonth() && dObj.getFullYear() === currentCalDate.getFullYear();
+            return dObj && dObj.getMonth() === progressModalDate.getMonth() && dObj.getFullYear() === progressModalDate.getFullYear();
         }).reverse();
 
         let monthlyLabels = currentMonthHistory.map(h => {
@@ -3238,12 +3273,12 @@ Text: ${text}`;
         monthlyChartInstance = new Chart(ctxMonthly, {
             type: 'line',
             data: { labels: monthlyLabels, datasets: [{ label: 'Score (%)', data: monthlyData, borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.2)', fill: true, tension: 0.3 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'यो महिनाको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'मासिक प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
         });
 
         const list = document.getElementById('progress-list');
         if (currentMonthHistory.length > 0) {
-            list.innerHTML = currentMonthHistory.reverse().slice(0, 7).map(h => {
+            list.innerHTML = currentMonthHistory.reverse().map(h => {
                 let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); 
                 let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
                 let reviewBtn = h.quizData ? `<button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button>` : '';
@@ -3253,7 +3288,7 @@ Text: ${text}`;
             list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
         }
 
-        // 3. Yearly Chart
+        // 3. Yearly Chart (Always based on current year)
         let yearlyData = {};
         let currentYear = new Date().getFullYear();
         standardHistory.forEach(h => {
@@ -3292,6 +3327,29 @@ Text: ${text}`;
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'यो वर्षको मासिक औसत प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
         });
+    }
+
+    function showCalendarDetail(id) {
+        let history = safeJSON('murali_progress', []);
+        let record = history.find(item => item.id === id);
+        if (!record) return;
+
+        document.getElementById('cal-detail-date').innerText = record.date;
+        document.getElementById('cal-detail-score').innerText = `${record.score}/${record.total} (${record.percent}%)`;
+        
+        let remarkEl = document.getElementById('cal-detail-remark');
+        let rText = record.percent >= 80 ? 'Excellent' : (record.percent >= 50 ? 'Good' : 'Needs Practice');
+        let rClass = record.percent >= 80 ? 'remark-excellent' : (record.percent >= 50 ? 'remark-good' : 'remark-poor');
+        remarkEl.innerText = rText;
+        remarkEl.className = `prog-remark ${rClass}`;
+
+        let reviewBtn = document.getElementById('cal-detail-review-btn');
+        reviewBtn.onclick = () => {
+            document.getElementById('calendar-detail-modal').style.display = 'none';
+            reviewPastQuiz(id);
+        };
+
+        document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
 
     // ==========================================
@@ -3504,8 +3562,7 @@ Text: ${text}`;
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1e293b; max-width: 850px; margin: 0 auto; padding: 20px; background: #f8fafc; }
                 .header { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid #0284c7; }
                 h1 { color: #0284c7; margin-bottom: 5px; font-size: 28px;}
-                .date-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 5px 15px; border-radius: 
-font-weight: bold; font-size: 14px; }
+                .date-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; }
                 .q-block { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); page-break-inside: avoid; }
                 .q-text { font-weight: 700; font-size: 1.15em; margin-top: 0; color: #0f172a; margin-bottom: 15px; }
                 .options { list-style-type: none; padding-left: 0; margin: 0; }
@@ -3551,7 +3608,7 @@ font-weight: bold; font-size: 14px; }
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 87.1)
+                Generated by BK Murali Quiz App (Version 87.2)
             </div>
         </body>
         </html>`;
@@ -3585,7 +3642,7 @@ font-weight: bold; font-size: 14px; }
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success");
+showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success");
         });
     };
 
