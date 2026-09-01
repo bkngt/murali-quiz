@@ -299,7 +299,6 @@
         </select>
     </div>
 
-    <!-- FIXED: Top Action Bar (Save/Export/Cancel) is now responsive -->
     <div id="online-quiz-actions" style="display: none; width: 100%; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
         <div id="active-quiz-info" style="font-weight: 800; color: var(--primary-color); display: flex; align-items: center; flex: 1; min-width: 150px;">
             <span id="quiz-date-text" style="font-size: 0.85rem; word-break: break-word; line-height: 1.2;"></span>
@@ -496,6 +495,30 @@
         </div>
     </div>
 
+    <!-- Monthly Mega Quiz Modal (NEW) -->
+    <div id="monthly-mega-modal" class="modal-overlay" onclick="if(event.target.id === 'monthly-mega-modal') document.getElementById('monthly-mega-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 400px; padding: 1.5rem;">
+            <button class="close-modal" onclick="document.getElementById('monthly-mega-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800;">🏆 मासिक मेगा क्वीज</h3>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 15px;">कुन महिनाको मेगा क्वीज बनाउने?</p>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <select id="mm-month" class="select-field" style="flex: 1; margin:0;">
+                    <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+                    <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+                    <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+                    <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+                </select>
+                <select id="mm-year" class="select-field" style="flex: 1; margin:0;">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                </select>
+            </div>
+            <button onclick="generateSelectedMonthlyMega()" style="padding: 0.8rem; font-size: 1.05rem;">Generate Monthly Quiz</button>
+        </div>
+    </div>
+
     <!-- Honesty Pledge Modal -->
     <div id="pledge-modal" class="modal-overlay" style="z-index: 2500;">
         <div class="modal-content" style="text-align: center; max-width: 400px; padding: 2rem 1.5rem;">
@@ -515,9 +538,8 @@
     <div id="view-generator">
         <textarea id="murali-text" placeholder="आजको मुरली यहाँ पेस्ट गर्नुहोस्..."></textarea>
         
-        <!-- FIXED: Generator Buttons are now responsive and fit well on mobile -->
         <div style="display:flex; gap:8px; margin-top:1rem; flex-wrap: wrap;" id="generator-actions">
-            <button onclick="executeMonthlyMegaQuiz()" id="btn-monthly-mega" style="display:none; flex: 1 1 45%; padding: 0.8rem 0.5rem; font-size: 0.9rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
+            <button onclick="openMonthlyMegaModal()" id="btn-monthly-mega" style="display:none; flex: 1 1 45%; padding: 0.8rem 0.5rem; font-size: 0.9rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
                 🏆 मासिक मेगा
             </button>
             <button onclick="openMegaQuizModal()" id="btn-custom-mega" style="display:none; flex: 1 1 45%; padding: 0.8rem 0.5rem; font-size: 0.9rem; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #7c3aed); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.3);">
@@ -621,7 +643,6 @@
             </div>
         </div>
 
-        <!-- FIXED: Mega Quiz Results Container -->
         <div id="mega-quiz-results-container"></div>
     </div>
 
@@ -634,7 +655,6 @@
                 मेरो विस्तृत प्रगति
             </h3>
             
-            <!-- NEW: Month Navigation -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--bg-color); padding: 8px; border-radius: 8px;">
                 <button onclick="navigateProgressMonth(-1)" style="background: transparent; color: var(--primary-color); box-shadow: none; width: auto; padding: 5px 10px;">&lt; अघिल्लो</button>
                 <span id="progress-month-year" style="font-weight: 800; color: var(--primary-color);"></span>
@@ -660,7 +680,7 @@
         </div>
     </div>
 
-    <!-- NEW: Calendar Detail Modal -->
+    <!-- Calendar Detail Modal -->
     <div id="calendar-detail-modal" class="modal-overlay" onclick="if(event.target.id === 'calendar-detail-modal') document.getElementById('calendar-detail-modal').style.display='none';">
         <div class="modal-content" style="max-width: 380px; text-align: center;">
             <h3 id="cal-detail-date" style="margin-top:0; color: var(--primary-color); font-size: 1.2rem;"></h3>
@@ -686,7 +706,7 @@
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 87.2 (Interactive Stats)</div>
+        <div>Version: 88.0 (Interactive Stats)</div>
     </div>
 </div>
 
@@ -728,7 +748,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "87.2"; 
+    const APP_VERSION = "88.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -957,10 +977,13 @@
     }
 
     function getValidDate(h) {
-        if (!h.date) return h.timestamp ? new Date(h.timestamp) : null; 
-        let d = parseDateString(h.date);
-        if (!isNaN(d.getTime())) return d; 
-        return h.timestamp ? new Date(h.timestamp) : null;
+        if (!h) return new Date();
+        if (h.timestamp) return new Date(h.timestamp); 
+        if (h.date) {
+            let d = parseDateString(h.date);
+            if (!isNaN(d.getTime())) return d;
+        }
+        return new Date();
     }
 
     function getSafeFilename(dateStr) {
@@ -1476,19 +1499,12 @@
         .then(data => {
             if(data.status === "success" && data.results) {
                 let localHistory = safeJSON('murali_progress', []); 
-                let serverDates = data.results.map(sr => sr.date);
-                
-                let validLocalHistory = localHistory.filter(h => {
-                    if (h.synced === false) return true;
-                    return serverDates.includes(h.date);
-                });
-                
                 let isUpdated = false;
                 
                 data.results.forEach(sr => {
-                    let exists = validLocalHistory.find(lh => lh.date === sr.date);
+                    let exists = localHistory.find(lh => lh.date === sr.date);
                     if(!exists) { 
-                        validLocalHistory.push({ 
+                        localHistory.push({ 
                             id: Date.now() + Math.random(), 
                             name: userName, 
                             phone: userPhone, 
@@ -1504,9 +1520,9 @@
                     }
                 });
                 
-                if(validLocalHistory.length !== localHistory.length || isUpdated) { 
-                    validLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
-                    localStorage.setItem('murali_progress', JSON.stringify(validLocalHistory)); 
+                if(isUpdated) { 
+                    localHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
+                    localStorage.setItem('murali_progress', JSON.stringify(localHistory)); 
                     if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); 
                 }
             }
@@ -2053,25 +2069,36 @@ Text: ${text}`;
         document.getElementById('mega-quiz-modal').style.display = 'flex';
     }
 
-    function executeMonthlyMegaQuiz() {
-        if(!confirm("के तपाईं अघिल्लो महिनाको स्वचालित मेगा क्वीज बनाउन चाहनुहुन्छ?")) return;
-
+    window.openMonthlyMegaModal = function() {
         let today = new Date();
         let prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         
-        let year = prevMonth.getFullYear();
-        let month = prevMonth.getMonth();
+        document.getElementById('mm-month').value = prevMonth.getMonth();
+        let y = prevMonth.getFullYear();
+        document.getElementById('mm-year').value = y < 2026 ? 2026 : y;
+        
+        document.getElementById('monthly-mega-modal').style.display = 'flex';
+    }
 
-        let startDate = new Date(year, month, 1);
-        let endDate = new Date(year, month + 1, 0);
+    window.generateSelectedMonthlyMega = function() {
+        let m = parseInt(document.getElementById('mm-month').value);
+        let y = parseInt(document.getElementById('mm-year').value);
+
+        if (y === 2026 && m < 7) {
+            return showToast("एप १३ अगस्ट २०२६ देखि सुरु भएको हो। त्यो भन्दा अगाडिको डाटा छैन!", "error");
+        }
+
+        let startDate = new Date(y, m, 1);
+        let endDate = new Date(y, m + 1, 0);
 
         let startDateStr = startDate.toISOString().split('T')[0];
         let endDateStr = endDate.toISOString().split('T')[0];
 
-        executeMegaQuiz(startDateStr, endDateStr, true);
+        document.getElementById('monthly-mega-modal').style.display = 'none';
+        executeMegaQuiz(startDateStr, endDateStr, true, startDate);
     }
 
-    function executeMegaQuiz(startDateStr, endDateStr, isMonthly = false) {
+    function executeMegaQuiz(startDateStr, endDateStr, isMonthly = false, startDateObj = null) {
         let sDateStr = startDateStr || document.getElementById('mq-start-date').value;
         let eDateStr = endDateStr || document.getElementById('mq-end-date').value;
 
@@ -2135,8 +2162,9 @@ Text: ${text}`;
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
         if (isMonthly) {
-            let monthName = sDate.toLocaleString('default', { month: 'long' });
-            currentMurliDate = `🏆 मासिक मेगा क्वीज (${monthName} ${sDate.getFullYear()})`;
+            let targetDate = startDateObj || sDate;
+            let monthName = targetDate.toLocaleString('default', { month: 'long' });
+            currentMurliDate = `🏆 मासिक मेगा क्वीज (${monthName} ${targetDate.getFullYear()})`;
         } else {
             let displayStart = sDateStr.split('-').reverse().join('-');
             let displayEnd = eDateStr.split('-').reverse().join('-');
@@ -2176,7 +2204,7 @@ Text: ${text}`;
         document.getElementById('quiz-area').style.display = 'none'; 
         document.getElementById('sticky-scorebar').style.display = 'none';
         
-        let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("Review");
+        let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("मेगा") || currentMurliDate.includes("Review");
         
         fetch(API_URL, { 
             method: 'POST', 
@@ -3000,7 +3028,7 @@ Text: ${text}`;
 
         if(yearSelect.options.length === 0) {
             let currentYear = new Date().getFullYear();
-            for(let y = 2024; y <= currentYear + 1; y++) {
+            for(let y = 2026; y <= currentYear + 1; y++) {
                 let opt = document.createElement('option');
                 opt.value = y;
                 opt.text = y;
@@ -3063,131 +3091,141 @@ Text: ${text}`;
     }
 
     function renderDashboard() {
-        const d = dict[lang]; 
-        let history = safeJSON('murali_progress', []); 
-        let streak = calculateStreak(history);
-        let cy = currentCalDate.getFullYear(); 
-        let cm = currentCalDate.getMonth();
-        
-        populateCalendarPickers(cy, cm);
+        try {
+            const d = dict[lang]; 
+            let history = safeJSON('murali_progress', []); 
+            let streak = calculateStreak(history);
+            let cy = currentCalDate.getFullYear(); 
+            let cm = currentCalDate.getMonth();
+            
+            populateCalendarPickers(cy, cm);
 
-        // Filter out Mega Quizzes for standard stats
-        let standardHistory = history.filter(h => !h.date.includes("Mega"));
-        let megaHistory = history.filter(h => h.date.includes("Mega"));
+            let standardHistory = history.filter(h => {
+                let dStr = String(h.date || "");
+                return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review");
+            });
+            
+            let megaHistory = history.filter(h => {
+                let dStr = String(h.date || "");
+                return dStr.includes("Mega") || dStr.includes("मेगा") || dStr.includes("Review");
+            });
 
-        let filteredHistory = standardHistory.filter(h => { 
-            let dObj = getValidDate(h); 
-            return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
-        });
+            let filteredHistory = standardHistory.filter(h => { 
+                let dObj = getValidDate(h); 
+                return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
+            });
 
-        let totalTaken = filteredHistory.length; 
-        let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
-        let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
-        
-        document.getElementById('dash-stats').innerHTML = `
-            <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
-            <div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div>
-            <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
-            <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
-        `;
-        
-        drawCharts(filteredHistory);
+            let totalTaken = filteredHistory.length; 
+            let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + h.percent, 0) / totalTaken) : 0; 
+            let excRate = totalTaken ? Math.round((filteredHistory.filter(h => h.percent >= 80).length / totalTaken) * 100) : 0;
+            
+            document.getElementById('dash-stats').innerHTML = `
+                <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
+                <div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div>
+                <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
+                <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
+            `;
+            
+            drawCharts(filteredHistory);
 
-        let babaMessage = "";
-        if (history.length === 0) {
-            babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
-        } else {
-            let latestHistory = standardHistory[0]; 
-            if (latestHistory) {
-                let serverQuizzes = safeJSON('murali_server_quizzes', []);
-                let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
-                if (matchedQuiz && matchedQuiz.swaman) {
-                    babaMessage = matchedQuiz.swaman;
+            let babaMessage = "";
+            if (history.length === 0) {
+                babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
+            } else {
+                let latestHistory = standardHistory[0]; 
+                if (latestHistory) {
+                    let serverQuizzes = safeJSON('murali_server_quizzes', []);
+                    let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
+                    if (matchedQuiz && matchedQuiz.swaman) {
+                        babaMessage = matchedQuiz.swaman;
+                    }
+                }
+                if (!babaMessage) {
+                    let hash = 0;
+                    let uniqueString = new Date().toDateString() + userName;
+                    for (let i = 0; i < uniqueString.length; i++) {
+                        hash = uniqueString.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    babaMessage = fallbackSwaman[Math.abs(hash) % fallbackSwaman.length];
                 }
             }
-            if (!babaMessage) {
-                let hash = 0;
-                let uniqueString = new Date().toDateString() + userName;
-                for (let i = 0; i < uniqueString.length; i++) {
-                    hash = uniqueString.charCodeAt(i) + ((hash << 5) - hash);
+
+            let swamanHtml = `
+            <div style="margin-bottom: 15px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h3 style="margin: 0 0 8px 0; color: #a78bfa; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" style="color:#a78bfa;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    आजको वरदान र स्वमान
+                </h3>
+                <p style="margin: 0; font-size: 0.95rem; color: var(--text-color); font-weight: 600; line-height: 1.5;">
+                    ${babaMessage}
+                </p>
+            </div>`;
+            document.getElementById('baba-message-container').innerHTML = swamanHtml;
+            
+            let firstDay = new Date(cy, cm, 1).getDay(); 
+            let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
+            let today = new Date(); 
+            let monthMap = {}; 
+            
+            let launchDate = new Date(2026, 7, 13); 
+
+            filteredHistory.forEach(h => { 
+                let dObj = getValidDate(h); 
+                if (dObj) { 
+                    let day = dObj.getDate(); 
+                    if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
+                } 
+            });
+            
+            let calHtml = ''; 
+            for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                let renderDate = new Date(cy, cm, i);
+                let isPreLaunch = renderDate.getTime() < launchDate.getTime();
+                
+                let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
+                let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
+                
+                if (isPreLaunch) {
+                    calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
+                } else if (monthMap[i]) { 
+                    let h = monthMap[i]; 
+                    let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
+                    calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">${i}</div>`;
+                } else { 
+                    calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
                 }
-                babaMessage = fallbackSwaman[Math.abs(hash) % fallbackSwaman.length];
             }
-        }
+            document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        let swamanHtml = `
-        <div style="margin-bottom: 15px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-            <h3 style="margin: 0 0 8px 0; color: #a78bfa; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                <svg class="icon" viewBox="0 0 24 24" style="color:#a78bfa;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                आजको वरदान र स्वमान
-            </h3>
-            <p style="margin: 0; font-size: 0.95rem; color: var(--text-color); font-weight: 600; line-height: 1.5;">
-                ${babaMessage}
-            </p>
-        </div>`;
-        document.getElementById('baba-message-container').innerHTML = swamanHtml;
-        
-        let firstDay = new Date(cy, cm, 1).getDay(); 
-        let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
-        let today = new Date(); 
-        let monthMap = {}; 
-        
-        let launchDate = new Date(2026, 7, 13); 
+            if (megaHistory.length > 0) {
+                let megaHtml = `<div style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
+                    <h3 style="margin: 0 0 15px 0; color: var(--primary-color); font-size: 1.2rem; font-weight: 800;">🏆 विशेष परीक्षाहरूको नतिजा</h3>`;
 
-        filteredHistory.forEach(h => { 
-            let dObj = getValidDate(h); 
-            if (dObj) { 
-                let day = dObj.getDate(); 
-                if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
-            } 
-        });
-        
-        let calHtml = ''; 
-        for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
-        
-        for (let i = 1; i <= daysInMonth; i++) {
-            let renderDate = new Date(cy, cm, i);
-            let isPreLaunch = renderDate.getTime() < launchDate.getTime();
-            
-            let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
-            let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
-            
-            if (isPreLaunch) {
-                calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
-            } else if (monthMap[i]) { 
-                let h = monthMap[i]; 
-                let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
-                calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">${i}</div>`;
-            } else { 
-                calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
+                megaHtml += megaHistory.map(h => {
+                    let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor);
+                    let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+                    return `<div class="progress-item">
+                        <div style="flex-grow: 1;">
+                            <div style="font-weight:800; font-size:1rem; color:var(--primary-color); line-height:1.2; margin-bottom:4px;">${h.date}</div>
+                            <div class="prog-remark ${rClass}" style="margin-top:0;">${rText}</div>
+                            <button class="btn-small" style="margin-top: 8px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="prog-percent">${h.percent}%</div>
+                            <div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+                megaHtml += `</div>`;
+                document.getElementById('mega-quiz-results-container').innerHTML = megaHtml;
+            } else {
+                document.getElementById('mega-quiz-results-container').innerHTML = '';
             }
-        }
-        document.getElementById('cal-grid-days').innerHTML = calHtml;
-
-        // Mega Quiz Results Section
-        if (megaHistory.length > 0) {
-            let megaHtml = `<div style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
-                <h3 style="margin: 0 0 15px 0; color: var(--primary-color); font-size: 1.2rem; font-weight: 800;">🏆 विशेष परीक्षाहरूको नतिजा</h3>`;
-
-            megaHtml += megaHistory.map(h => {
-                let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor);
-                let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
-                return `<div class="progress-item">
-                    <div style="flex-grow: 1;">
-                        <div style="font-weight:800; font-size:1rem; color:var(--primary-color); line-height:1.2; margin-bottom:4px;">${h.date}</div>
-                        <div class="prog-remark ${rClass}" style="margin-top:0;">${rText}</div>
-                        <button class="btn-small" style="margin-top: 8px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="prog-percent">${h.percent}%</div>
-                        <div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
-                    </div>
-                </div>`;
-            }).join('');
-            megaHtml += `</div>`;
-            document.getElementById('mega-quiz-results-container').innerHTML = megaHtml;
-        } else {
-            document.getElementById('mega-quiz-results-container').innerHTML = '';
+        } catch (error) {
+            console.error("Dashboard Render Error:", error);
+            document.getElementById('dash-stats').innerHTML = `<div style="color:red; padding:10px;">ड्यासबोर्ड लोड गर्न समस्या भयो।</div>`;
         }
     }
 
@@ -3214,7 +3252,10 @@ Text: ${text}`;
 
     function renderDetailedProgressCharts() {
         let history = safeJSON('murali_progress', []);
-        let standardHistory = history.filter(h => !h.date.includes("Mega"));
+        let standardHistory = history.filter(h => {
+            let dStr = String(h.date || "");
+            return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review");
+        });
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
@@ -3222,7 +3263,6 @@ Text: ${text}`;
 
         document.getElementById('progress-month-year').innerText = progressModalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-        // 1. Weekly Chart (Always based on today)
         let today = new Date();
         let last7Days = new Date(today);
         last7Days.setDate(today.getDate() - 6);
@@ -3256,7 +3296,6 @@ Text: ${text}`;
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'पछिल्लो ७ दिनको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } }
         });
 
-        // 2. Monthly Chart & List (Based on progressModalDate)
         let currentMonthHistory = standardHistory.filter(h => {
             let dObj = getValidDate(h);
             return dObj && dObj.getMonth() === progressModalDate.getMonth() && dObj.getFullYear() === progressModalDate.getFullYear();
@@ -3288,7 +3327,6 @@ Text: ${text}`;
             list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
         }
 
-        // 3. Yearly Chart (Always based on current year)
         let yearlyData = {};
         let currentYear = new Date().getFullYear();
         standardHistory.forEach(h => {
@@ -3385,6 +3423,7 @@ Text: ${text}`;
                 opt.value = item.index;
                 let displayDate = String(item.data.quizDate).replace(/T.*/, '');
                 opt.text = (item.data.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
+                optGroup.appendChild(optGroup);
                 optGroup.appendChild(opt);
             });
             select.appendChild(optGroup);
@@ -3598,7 +3637,8 @@ Text: ${text}`;
             html += `
             <div class="q-block">
                 ${tagHtml}
-                <p class="q-text">Q${i + 1}. ${q.q}</p>
+                <p class="q-text
+">Q${i + 1}. ${q.q}</p>
                 <ul class="options">
                     ${optsHtml}
                 </ul>
@@ -3608,7 +3648,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 87.2)
+                Generated by BK Murali Quiz App (Version 88.0)
             </div>
         </body>
         </html>`;
@@ -3642,7 +3682,7 @@ Text: ${text}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success");
+            showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success");
         });
     };
 
