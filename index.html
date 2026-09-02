@@ -742,7 +742,8 @@
     </div>
     
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
-        <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
+        <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
+        <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
         <div>Version: 88.6 (Student Leaderboard Added)</div>
     </div>
 </div>
@@ -1820,7 +1821,17 @@
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
             
-            html += `</div></div><div style="margin-top:15px; font-size:0.85rem; color:#94a3b8; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color); font-weight:600;"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div>▶️ : आजको (खेल्न बाँकी)</div><div>✅ : सम्पन्न भएको</div><div>❌ : छुटेको (Locked)</div><div>➖ : एप सुरु नभएको</div></div></div>`;
+            html += `</div></div>
+            <div style="margin-top:15px; background:var(--card-bg); padding:12px; border-radius:16px; border:1px solid var(--border-color);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;">
+                    <div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div>
+                    <div style="white-space: nowrap;">✅ : सम्पन्न भएको</div>
+                    <div style="white-space: nowrap;">❌ : छुटेको (Locked)</div>
+                    <div>
+                        <button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 आजको र्‍याङ्क</button>
+                    </div>
+                </div>
+            </div>`;
 
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
@@ -1836,10 +1847,8 @@
                 html += `</div></div>`;
             }
             
-            // NEW: Added Student Leaderboard Button Here
-            html += `<div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+            html += `<div style="text-align:center; margin-top:20px;">
                         <button class="btn-small" onclick="syncServerQuizzes(true)" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button>
-                        <button class="btn-small" onclick="openStudentLeaderboard()" style="background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">🏆 आजको र्‍याङ्किङ (Top 10)</button>
                      </div>`;
                      
             qArea.innerHTML = html; 
