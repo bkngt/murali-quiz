@@ -704,9 +704,15 @@
         </button>
     </div>
     
-    <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
+   <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div>Version: 88.5 (Dynamic AI Prompts & Leaderboard Fix)</div>
+        <div style="margin-bottom: 10px;">Version: 88.5 (Dynamic AI Prompts)</div>
+        
+        <!-- Official NGT Branding -->
+        <div style="background: rgba(2, 132, 199, 0.05); padding: 6px 16px; border-radius: 50px; border: 1px solid rgba(2, 132, 199, 0.15); display: inline-block; color: var(--primary-color); font-size: 0.9rem; font-weight: 800;">
+            <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Brahmakumaris NGT, Nepal
+        </div>
     </div>
 </div>
 
@@ -1810,7 +1816,6 @@
             console.error("Dashboard Load Error:", e);
         }
     }
-
     // ==========================================
     // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
@@ -1857,6 +1862,7 @@
             showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error");
         }
     };
+    
     async function generateQuizWithAI() {
         const apiKey = localStorage.getItem('murali_gemini_key'); 
         if(!apiKey) { 
@@ -1899,16 +1905,26 @@
         }
 
         // ---------------------------------------------------------
-        // DAY DETECTION & DYNAMIC MODELS LOGIC
+        // DAY DETECTION & AVYAKT OVERRIDE LOGIC (CRITICAL FIX)
         // ---------------------------------------------------------
         let parsedDateForDay = parseDateString(currentMurliDate);
         let dayOfWeek = parsedDateForDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
         let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
         let currentDayName = dayNames[dayOfWeek];
 
+        // Check if it's an Avyakt Murli (No "मीठे बच्चे" or "प्रश्न:")
+        let isAvyaktMurli = !text.includes("मीठे बच्चे") && !text.includes("प्रश्न:");
+        
+        // Override Rule: If it's Avyakt but not Sunday, force it to use Sunday models
+        if (isAvyaktMurli && dayOfWeek !== 0) {
+            console.log("Avyakt Murli detected on a weekday. Overriding to SUNDAY models.");
+            dayOfWeek = 0; 
+            currentDayName = "SUNDAY (Avyakt Override)";
+        }
+
         let daySpecificModels = "";
         
-        if (dayOfWeek === 0) { // SUNDAY
+        if (dayOfWeek === 0) { // SUNDAY (Or Avyakt Override)
             daySpecificModels = `--- [SUNDAY MODELS: Avyakt & Deep States Focus] ---
 M1 (मुख्य हेडिङ): The core essence of today's main heading.
 M2 (अव्यक्त स्थिति): What specific practice was given to become Avyakt?
@@ -1928,7 +1944,7 @@ M15 (दृष्टान्त): A specific example Baba used to explain a dee
 M16 (पहिलो कदम): The very first step for a specific spiritual achievement.
 M17 (असत्य कथन): 3 exact statements + 1 slightly altered statement from today.
 M18 (खाली ठाउँ): Fill in the blank for a powerful Avyakt sentence.
-M19 (जोडा नमिल्ने): Match concepts, with one wrong pair.
+M19 (जोडा नमिल्ने): Match concepts, with one wrong pair. (Keep options very short, max 4-5 words).
 M20 (सारको सार): The ultimate bottom line of today's entire Murli.`;
         } else if (dayOfWeek === 1) { // MONDAY
             daySpecificModels = `--- [MONDAY MODELS: Essence & QnA Focus] ---
@@ -1970,7 +1986,7 @@ M13 (सच्चा ब्राह्मण): The sign of a true Brahmin menti
 M14 (पवित्रताको स्तर): A specific instruction regarding purity today.
 M15 (कर्मको गति): A point about the philosophy of Karma mentioned today.
 M16 (असत्य कथन): 3 exact statements + 1 altered statement.
-M17 (जोडा नमिल्ने): Match examples to their meanings, with one wrong pair.
+M17 (जोडा नमिल्ने): Match examples to their meanings, with one wrong pair. (Keep options very short, max 4-5 words).
 M18 (खाली ठाउँ): Fill in the blank from a key example used today.
 M19 (आज उल्लेख नभएको): 3 examples from today + 1 BK example NOT used today.
 M20 (सार): The main takeaway from all the examples used today.`;
@@ -2015,7 +2031,7 @@ M14 (मुख्य कारण): The reason for the soul's downfall mentioned
 M15 (परिणाम): The result of knowing the Creator and creation.
 M16 (स्थान): A specific realm (Paramdham, Sukshmavatan) mentioned today.
 M17 (खाली ठाउँ): Fill in the blank regarding a specific title or number.
-M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair.
+M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair. (Keep options very short, max 4-5 words).
 M19 (आज उल्लेख नभएको): 3 titles from today + 1 BK title NOT used today.
 M20 (सार): The main essence of today's historical/cycle knowledge.`;
         } else if (dayOfWeek === 5) { // FRIDAY
@@ -2027,8 +2043,8 @@ M4 (स्लोगनको मुख्य शब्द): The most important k
 M5 (स्लोगनको सन्देश): The practical application of today's Slogan.
 M6 (अव्यक्त इसारा १): The first main point of the Avyakt Signal.
 M7 (अव्यक्त इसारा २): The deep checking point in the Avyakt Signal.
-M8 (रात्रि क्लास/मातेश्वरी): A point from the Night Class or Mateshwari's quotes (If none, use Dharna point 1).
-M9 (रात्रि क्लास/मातेश्वरी २): Another point from the Night Class/Mateshwari (If none, use Dharna point 2).
+M8 (रात्रि क्लास/मातेश्वरी): A point from the Night Class or Mateshwari's quotes (If none, ask a deep question about the core 'Essence/सार' of today's Murli).
+M9 (रात्रि क्लास/मातेश्वरी २): Another point from the Night Class/Mateshwari (If none, ask about a specific 'Warning/सावधानी' Baba gave today).
 M10 (मीठे बच्चे): The opening line's essence.
 M11 (प्रश्नको सार): The core of the Q&A.
 M12 (उत्तरको सार): The core of the Answer.
@@ -2042,9 +2058,10 @@ M19 (आज उल्लेख नभएको): 3 points from today's Vardan/Sl
 M20 (सार): The combined essence of the Vardan, Slogan, and Signal.`;
         } else { // SATURDAY
             daySpecificModels = `--- [SATURDAY MODELS: Mega Revision & Tricky Formats] ---
+(Note: Strictly adhere to the word limit for options here, as tricky questions can get too long).
 M1 (आज उल्लेख नभएको): 3 correct facts from today + 1 genuine BK fact NOT in today's Murli.
 M2 (असत्य कथन): 3 exact statements from today + 1 slightly altered false statement.
-M3 (जोडा नमिल्ने): Match 3 correct concepts from today, with 1 wrong pair.
+M3 (जोडा नमिल्ने): Match 3 correct concepts from today, with 1 wrong pair. (Keep options very short, max 4-5 words).
 M4 (खाली ठाउँ): Fill in the blank for a crucial sentence from the essence.
 M5 (सूक्ष्म भिन्नता): Differentiating two similar concepts mentioned today.
 M6 (मुख्य कारण): The direct root cause for a specific state/event today.
