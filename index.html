@@ -1541,28 +1541,34 @@
                 let localHistory = safeJSON('murali_progress', []); 
                 let isUpdated = false;
                 
+                // १. सर्भरमा भएको नयाँ रिजल्ट मोबाइलमा थप्ने
                 data.results.forEach(sr => {
                     let exists = localHistory.find(lh => lh.date === sr.date);
                     if(!exists) { 
                         localHistory.push({ 
                             id: Date.now() + Math.random(), 
-                            name: userName, 
-                            phone: userPhone, 
-                            date: sr.date, 
-                            score: sr.score, 
-                            percent: sr.percent, 
-                            total: sr.total, 
-                            timeTaken: sr.timeTaken, 
-                            synced: true, 
-                            quizData: null 
+                            name: userName, phone: userPhone, date: sr.date, 
+                            score: sr.score, percent: sr.percent, total: sr.total, 
+                            timeTaken: sr.timeTaken, synced: true, quizData: null 
                         }); 
                         isUpdated = true; 
                     }
                 });
+
+                // २. एडमिनले गुगल सिटबाट डिलिट गरेको रिजल्ट मोबाइलबाट पनि हटाउने
+                let newLocalHistory = localHistory.filter(lh => {
+                    if (lh.synced === false) return true; // भर्खरै खेलेको तर सर्भरमा नगएकोलाई नहटाउने
+                    let existsOnServer = data.results.find(sr => sr.date === lh.date);
+                    if (!existsOnServer) {
+                        isUpdated = true;
+                        return false; // सर्भरमा छैन भने मोबाइलबाट पनि डिलिट गर्ने
+                    }
+                    return true;
+                });
                 
                 if(isUpdated) { 
-                    localHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
-                    localStorage.setItem('murali_progress', JSON.stringify(localHistory)); 
+                    newLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
+                    localStorage.setItem('murali_progress', JSON.stringify(newLocalHistory)); 
                     if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); 
                 }
             }
@@ -4137,14 +4143,23 @@ Text: ${text}`;
     }
     
     // ==========================================
-    // 12. APP STARTUP
+    // 12. APP STARTUP & AUTO-SYNC
     // ==========================================
     window.onload = function() {
         init();
     };
     
     setTimeout(syncPendingResults, 3000);
+
+    // प्रयोगकर्ताले मोबाइलमा एप खोल्ने बित्तिकै अटो-सिन्क हुने
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === 'visible') {
+            if (localStorage.getItem('murali_phone') && localStorage.getItem('murali_pin')) {
+                backgroundProfileSync();
+            }
+        }
+    });
+
 </script>
 </body>
 </html>
-
