@@ -693,6 +693,43 @@
         </div>
     </div>
 
+    <!-- Student Leaderboard Modal -->
+    <div id="student-leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'student-leaderboard-modal') document.getElementById('student-leaderboard-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
+            <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; text-align:center;">
+                🏆 आजको लिडरबोर्ड
+            </h3>
+            <p id="sl-date-text" style="text-align:center; font-size:0.9rem; color:#64748b; margin-top:-5px; margin-bottom:15px; font-weight:bold;"></p>
+            
+            <div id="sl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--primary-color);">
+                ⏳ डाटा लोड हुँदैछ...
+            </div>
+            
+            <div id="sl-content" style="display:none;">
+                <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                        <thead style="background: var(--primary-color); color: white;">
+                            <tr>
+                                <th style="padding: 10px; text-align:center;">Rank</th>
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px; text-align:center;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sl-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="sl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(167, 139, 250, 0.15); border: 2px dashed #a78bfa; border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको आजको र्‍याङ्क:</div>
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #8b5cf6; margin: 5px 0;" id="sl-my-rank-number">-- / --</div>
+                    <div style="font-size: 0.85rem; color: #64748b; font-weight: bold;" id="sl-my-score-text">Score: -- | Time: --</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sticky Bottom Bar -->
     <div id="sticky-scorebar" class="sticky-scorebar" style="display: none;">
         <div style="font-weight: 800; font-size: 1rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
@@ -704,15 +741,9 @@
         </button>
     </div>
     
-   <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
+    <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">✨ BK Murali Quiz</div>
-        <div style="margin-bottom: 10px;">Version: 88.5 (Dynamic AI Prompts)</div>
-        
-        <!-- Official NGT Branding -->
-        <div style="background: rgba(2, 132, 199, 0.05); padding: 6px 16px; border-radius: 50px; border: 1px solid rgba(2, 132, 199, 0.15); display: inline-block; color: var(--primary-color); font-size: 0.9rem; font-weight: 800;">
-            <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            Brahmakumaris NGT, Nepal
-        </div>
+        <div>Version: 88.6 (Student Leaderboard Added)</div>
     </div>
 </div>
 
@@ -754,7 +785,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.5"; 
+    const APP_VERSION = "88.6"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1573,7 +1604,6 @@
             });
         });
     }
-
     // ==========================================
     // 5. UI INITIALIZATION & DASHBOARD
     // ==========================================
@@ -1806,7 +1836,12 @@
                 html += `</div></div>`;
             }
             
-            html += `<div style="text-align:center; margin-top:20px;"><button class="btn-small" onclick="syncServerQuizzes(true)" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button></div>`;
+            // NEW: Added Student Leaderboard Button Here
+            html += `<div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                        <button class="btn-small" onclick="syncServerQuizzes(true)" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button>
+                        <button class="btn-small" onclick="openStudentLeaderboard()" style="background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">🏆 आजको र्‍याङ्किङ (Top 10)</button>
+                     </div>`;
+                     
             qArea.innerHTML = html; 
             qArea.style.display = 'block';
             
@@ -1816,6 +1851,7 @@
             console.error("Dashboard Load Error:", e);
         }
     }
+
     // ==========================================
     // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
@@ -1905,26 +1941,16 @@
         }
 
         // ---------------------------------------------------------
-        // DAY DETECTION & AVYAKT OVERRIDE LOGIC (CRITICAL FIX)
+        // DAY DETECTION & DYNAMIC MODELS LOGIC
         // ---------------------------------------------------------
         let parsedDateForDay = parseDateString(currentMurliDate);
         let dayOfWeek = parsedDateForDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
         let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
         let currentDayName = dayNames[dayOfWeek];
 
-        // Check if it's an Avyakt Murli (No "मीठे बच्चे" or "प्रश्न:")
-        let isAvyaktMurli = !text.includes("मीठे बच्चे") && !text.includes("प्रश्न:");
-        
-        // Override Rule: If it's Avyakt but not Sunday, force it to use Sunday models
-        if (isAvyaktMurli && dayOfWeek !== 0) {
-            console.log("Avyakt Murli detected on a weekday. Overriding to SUNDAY models.");
-            dayOfWeek = 0; 
-            currentDayName = "SUNDAY (Avyakt Override)";
-        }
-
         let daySpecificModels = "";
         
-        if (dayOfWeek === 0) { // SUNDAY (Or Avyakt Override)
+        if (dayOfWeek === 0) { // SUNDAY
             daySpecificModels = `--- [SUNDAY MODELS: Avyakt & Deep States Focus] ---
 M1 (मुख्य हेडिङ): The core essence of today's main heading.
 M2 (अव्यक्त स्थिति): What specific practice was given to become Avyakt?
@@ -1944,7 +1970,7 @@ M15 (दृष्टान्त): A specific example Baba used to explain a dee
 M16 (पहिलो कदम): The very first step for a specific spiritual achievement.
 M17 (असत्य कथन): 3 exact statements + 1 slightly altered statement from today.
 M18 (खाली ठाउँ): Fill in the blank for a powerful Avyakt sentence.
-M19 (जोडा नमिल्ने): Match concepts, with one wrong pair. (Keep options very short, max 4-5 words).
+M19 (जोडा नमिल्ने): Match concepts, with one wrong pair.
 M20 (सारको सार): The ultimate bottom line of today's entire Murli.`;
         } else if (dayOfWeek === 1) { // MONDAY
             daySpecificModels = `--- [MONDAY MODELS: Essence & QnA Focus] ---
@@ -1986,7 +2012,7 @@ M13 (सच्चा ब्राह्मण): The sign of a true Brahmin menti
 M14 (पवित्रताको स्तर): A specific instruction regarding purity today.
 M15 (कर्मको गति): A point about the philosophy of Karma mentioned today.
 M16 (असत्य कथन): 3 exact statements + 1 altered statement.
-M17 (जोडा नमिल्ने): Match examples to their meanings, with one wrong pair. (Keep options very short, max 4-5 words).
+M17 (जोडा नमिल्ने): Match examples to their meanings, with one wrong pair.
 M18 (खाली ठाउँ): Fill in the blank from a key example used today.
 M19 (आज उल्लेख नभएको): 3 examples from today + 1 BK example NOT used today.
 M20 (सार): The main takeaway from all the examples used today.`;
@@ -2031,7 +2057,7 @@ M14 (मुख्य कारण): The reason for the soul's downfall mentioned
 M15 (परिणाम): The result of knowing the Creator and creation.
 M16 (स्थान): A specific realm (Paramdham, Sukshmavatan) mentioned today.
 M17 (खाली ठाउँ): Fill in the blank regarding a specific title or number.
-M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair. (Keep options very short, max 4-5 words).
+M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair.
 M19 (आज उल्लेख नभएको): 3 titles from today + 1 BK title NOT used today.
 M20 (सार): The main essence of today's historical/cycle knowledge.`;
         } else if (dayOfWeek === 5) { // FRIDAY
@@ -2043,8 +2069,8 @@ M4 (स्लोगनको मुख्य शब्द): The most important k
 M5 (स्लोगनको सन्देश): The practical application of today's Slogan.
 M6 (अव्यक्त इसारा १): The first main point of the Avyakt Signal.
 M7 (अव्यक्त इसारा २): The deep checking point in the Avyakt Signal.
-M8 (रात्रि क्लास/मातेश्वरी): A point from the Night Class or Mateshwari's quotes (If none, ask a deep question about the core 'Essence/सार' of today's Murli).
-M9 (रात्रि क्लास/मातेश्वरी २): Another point from the Night Class/Mateshwari (If none, ask about a specific 'Warning/सावधानी' Baba gave today).
+M8 (रात्रि क्लास/मातेश्वरी): A point from the Night Class or Mateshwari's quotes (If none, use Dharna point 1).
+M9 (रात्रि क्लास/मातेश्वरी २): Another point from the Night Class/Mateshwari (If none, use Dharna point 2).
 M10 (मीठे बच्चे): The opening line's essence.
 M11 (प्रश्नको सार): The core of the Q&A.
 M12 (उत्तरको सार): The core of the Answer.
@@ -2058,10 +2084,9 @@ M19 (आज उल्लेख नभएको): 3 points from today's Vardan/Sl
 M20 (सार): The combined essence of the Vardan, Slogan, and Signal.`;
         } else { // SATURDAY
             daySpecificModels = `--- [SATURDAY MODELS: Mega Revision & Tricky Formats] ---
-(Note: Strictly adhere to the word limit for options here, as tricky questions can get too long).
 M1 (आज उल्लेख नभएको): 3 correct facts from today + 1 genuine BK fact NOT in today's Murli.
 M2 (असत्य कथन): 3 exact statements from today + 1 slightly altered false statement.
-M3 (जोडा नमिल्ने): Match 3 correct concepts from today, with 1 wrong pair. (Keep options very short, max 4-5 words).
+M3 (जोडा नमिल्ने): Match 3 correct concepts from today, with 1 wrong pair.
 M4 (खाली ठाउँ): Fill in the blank for a crucial sentence from the essence.
 M5 (सूक्ष्म भिन्नता): Differentiating two similar concepts mentioned today.
 M6 (मुख्य कारण): The direct root cause for a specific state/event today.
@@ -3608,7 +3633,7 @@ Text: ${text}`;
     }
 
     // ==========================================
-    // 🏆 LEADERBOARD LOGIC
+    // 🏆 LEADERBOARD LOGIC (ADMIN)
     // ==========================================
     window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
@@ -3846,7 +3871,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.5)
+                Generated by BK Murali Quiz App (Version 88.6)
             </div>
         </body>
         </html>`;
@@ -3991,7 +4016,119 @@ Text: ${text}`;
     }
     
     // ==========================================
-    // 10. APP STARTUP
+    // 11. STUDENT LEADERBOARD LOGIC
+    // ==========================================
+    window.openStudentLeaderboard = function() {
+        let today = new Date();
+        let cy = today.getFullYear(); 
+        let cm = today.getMonth(); 
+        
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        let targetDateStr = "";
+        
+        for(let sq of serverQuizzes) {
+            let d = getValidDate({date: sq.quizDate});
+            if(d && d.getDate() === today.getDate() && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) {
+                targetDateStr = sq.quizDate;
+                break;
+            }
+        }
+        
+        if(!targetDateStr) {
+            let dd = String(today.getDate()).padStart(2, '0');
+            let mm = String(today.getMonth() + 1).padStart(2, '0');
+            targetDateStr = `${dd}/${mm}/${cy}`; 
+        }
+
+        document.getElementById('student-leaderboard-modal').style.display = 'flex';
+        document.getElementById('sl-loading').style.display = 'block';
+        document.getElementById('sl-content').style.display = 'none';
+        document.getElementById('sl-date-text').innerText = `📅 मिति: ${targetDateStr}`;
+
+        if (!navigator.onLine) {
+            document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!";
+            return;
+        }
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ 
+                action: "getStudentLeaderboard", 
+                targetDate: targetDateStr, 
+                phone: userPhone 
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('sl-loading').style.display = 'none';
+            document.getElementById('sl-content').style.display = 'block';
+
+            if (data.status === "success") {
+                let tbody = document.getElementById('sl-table-body');
+                
+                if (data.total === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">आज कसैले पनि परीक्षा दिएको छैन।</td></tr>`;
+                    document.getElementById('sl-my-rank-box').style.display = 'none';
+                    return;
+                }
+
+                tbody.innerHTML = data.top10.map((user, index) => {
+                    let isMe = (data.myRank === index + 1);
+                    let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
+                    let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
+                    
+                    return `<tr style="${rowStyle}">
+                                <td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem;">${rankIcon}</td>
+                                <td style="padding: 10px;">
+                                    ${user.name} <br>
+                                    <span style="font-size:0.75rem; color:#64748b;">${user.address}</span>
+                                </td>
+                                <td style="padding: 10px; text-align:center; color:var(--primary-color); font-weight:bold;">
+                                    ${user.score}/${user.total}<br>
+                                    <span style="font-size:0.75rem; color:#64748b;">${user.timeText}</span>
+                                </td>
+                            </tr>`;
+                }).join('');
+
+                let myRankBox = document.getElementById('sl-my-rank-box');
+                if (data.myRank > 10) {
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = '#a78bfa';
+                    myRankBox.style.background = 'rgba(167, 139, 250, 0.15)';
+                    document.getElementById('sl-my-rank-number').innerText = `${data.myRank} / ${data.total}`;
+                    document.getElementById('sl-my-rank-number').style.fontSize = '1.8rem';
+                    document.getElementById('sl-my-rank-number').style.color = '#8b5cf6';
+                    document.getElementById('sl-my-score-text').innerText = `Score: ${data.myRankData.score}/${data.myRankData.total} | Time: ${data.myRankData.timeText} मि.`;
+                } else if (data.myRank > 0 && data.myRank <= 10) {
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = 'var(--success-color)';
+                    myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
+                    document.getElementById('sl-my-rank-number').innerText = `बधाई छ! तपाईं Top 10 मा हुनुहुन्छ।`;
+                    document.getElementById('sl-my-rank-number').style.fontSize = '1.2rem';
+                    document.getElementById('sl-my-rank-number').style.color = 'var(--success-color)';
+                    document.getElementById('sl-my-score-text').innerText = `Rank: ${data.myRank} / ${data.total}`;
+                } else {
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = 'var(--danger-color)';
+                    myRankBox.style.background = 'rgba(220, 38, 38, 0.1)';
+                    document.getElementById('sl-my-rank-number').innerText = `- / ${data.total}`;
+                    document.getElementById('sl-my-rank-number').style.color = 'var(--danger-color)';
+                    document.getElementById('sl-my-score-text').innerText = `तपाईंले आजको परीक्षा दिनुभएको छैन।`;
+                }
+            } else {
+                document.getElementById('sl-loading').style.display = 'block';
+                document.getElementById('sl-loading').innerHTML = "❌ डाटा ल्याउन समस्या भयो।";
+            }
+        })
+        .catch(err => {
+            document.getElementById('sl-loading').style.display = 'block';
+            document.getElementById('sl-loading').innerHTML = "❌ नेटवर्क समस्या!";
+        });
+    }
+    
+    // ==========================================
+    // 12. APP STARTUP
     // ==========================================
     window.onload = function() {
         init();
@@ -4001,3 +4138,4 @@ Text: ${text}`;
 </script>
 </body>
 </html>
+
