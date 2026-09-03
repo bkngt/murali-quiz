@@ -1016,11 +1016,14 @@
 
     function getValidDate(h) {
         if (!h) return new Date();
-        if (h.timestamp) return new Date(h.timestamp); 
+        // पहिलो प्राथमिकता: मुरलीको वास्तविक मिति (h.date) लाई दिने
         if (h.date) {
             let d = parseDateString(h.date);
             if (!isNaN(d.getTime())) return d;
         }
+        // दोस्रो प्राथमिकता: यदि मिति छैन भने मात्र खेल्दाको समय (timestamp) प्रयोग गर्ने
+        if (h.timestamp) return new Date(h.timestamp); 
+        
         return new Date();
     }
 
@@ -1742,10 +1745,14 @@
             
             let historyMap = {}; 
             history.forEach(h => { 
-                let d = getValidDate(h); 
-                if(d && d.getMonth() === cm && d.getFullYear() === cy) { 
-                    historyMap[d.getDate()] = h; 
-                } 
+                // Mega Quiz वा Review लाई दैनिक क्यालेन्डरमा नजोड्ने
+                let dStr = String(h.date || "");
+                if (!dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review")) {
+                    let d = getValidDate(h); 
+                    if(d && d.getMonth() === cm && d.getFullYear() === cy) { 
+                        historyMap[d.getDate()] = h; 
+                    } 
+                }
             });
 
             let html = `<div class="calendar-container">
