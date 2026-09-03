@@ -1003,11 +1003,13 @@
         return new Date(y, parseInt(dmy[2])-1, parseInt(dmy[1]));
       }
       
-      var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
+      var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
       if (dMy) {
         var y = parseInt(dMy[3]);
         if(y < 100) y += 2000;
-        var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(dMy[2].toLowerCase());
+        var mStr = dMy[2].toLowerCase();
+        if(mStr === 'sept') mStr = 'sep';
+        var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mStr);
         return new Date(y, mIndex, parseInt(dMy[1]));
       }
       
@@ -3922,8 +3924,9 @@ Text: ${text}`;
                     return;
                 }
 
-                // Changed to top20
-                tbody.innerHTML = data.top20.map((user, index) => {
+                // Changed to handle both old and new backend gracefully
+                let leaderboardData = data.top20 || data.top10 || [];
+                tbody.innerHTML = leaderboardData.map((user, index) => {
                     let isMe = (data.myRank === index + 1);
                     let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
                     let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
