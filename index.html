@@ -697,11 +697,10 @@
     <div id="student-leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'student-leaderboard-modal') document.getElementById('student-leaderboard-modal').style.display='none';">
         <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
-            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; text-align:center; margin-bottom: 10px;">
-                🏆 विद्यार्थी लिडरबोर्ड
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; text-align:center;">
+                🏆 आजको लिडरबोर्ड
             </h3>
-            
-            <select id="sl-date-select" class="select-field" onchange="fetchStudentLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;"></select>
+            <p id="sl-date-text" style="text-align:center; font-size:0.9rem; color:#64748b; margin-top:-5px; margin-bottom:15px; font-weight:bold;"></p>
             
             <div id="sl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--primary-color);">
                 ⏳ डाटा लोड हुँदैछ...
@@ -723,7 +722,7 @@
                 </div>
                 
                 <div id="sl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(167, 139, 250, 0.15); border: 2px dashed #a78bfa; border-radius: 12px; padding: 15px; text-align: center;">
-                    <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको र्‍याङ्क:</div>
+                    <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको आजको र्‍याङ्क:</div>
                     <div style="font-size: 1.8rem; font-weight: 900; color: #8b5cf6; margin: 5px 0;" id="sl-my-rank-number">-- / --</div>
                     <div style="font-size: 0.85rem; color: #64748b; font-weight: bold;" id="sl-my-score-text">Score: -- | Time: --</div>
                 </div>
@@ -745,9 +744,10 @@
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 88.8.1 (Mega Auto-Expire & Top 20)</div>
+        <div>Version: 88.6 (Student Leaderboard Added)</div>
     </div>
 </div>
+
 <script>
     // ==========================================
     // 0. PWA INSTALLATION LOGIC
@@ -786,7 +786,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.8.1"; 
+    const APP_VERSION = "88.6"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -989,7 +989,6 @@
         return str.replace(/[०-९]/g, match => nepaliNumbers.indexOf(match));
     }
 
-    // BUG FIX: Robust Date Parsing (Handles "Sept", "Sept.", etc.)
     function parseDateString(dateStr) {
       if(!dateStr) return new Date();
       var s = String(dateStr).replace(/['"]/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
@@ -1004,41 +1003,28 @@
         return new Date(y, parseInt(dmy[2])-1, parseInt(dmy[1]));
       }
       
-      var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+(\d{2,4})/i);
+      var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})/i);
       if (dMy) {
         var y = parseInt(dMy[3]);
         if(y < 100) y += 2000;
-        var mStr = dMy[2].toLowerCase();
-        if(mStr === 'sept') mStr = 'sep';
-        var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mStr);
+        var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(dMy[2].toLowerCase());
         return new Date(y, mIndex, parseInt(dMy[1]));
       }
       
-      var parsed = new Date(s);
-      if (!isNaN(parsed.getTime())) return parsed;
-      
-      return new Date();
+      return new Date(s);
     }
 
-    // UPDATE 1: getValidDate Function
     function getValidDate(h) {
         if (!h) return new Date();
+        // पहिलो प्राथमिकता: मुरलीको वास्तविक मिति (h.date) लाई दिने
         if (h.date) {
             let d = parseDateString(h.date);
             if (!isNaN(d.getTime())) return d;
         }
+        // दोस्रो प्राथमिकता: यदि मिति छैन भने मात्र खेल्दाको समय (timestamp) प्रयोग गर्ने
         if (h.timestamp) return new Date(h.timestamp); 
+        
         return new Date();
-    }
-
-    // UPDATE 2: Device ID Tracking
-    function getDeviceId() {
-        let deviceId = localStorage.getItem('murali_device_id');
-        if (!deviceId) {
-            deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-            localStorage.setItem('murali_device_id', deviceId);
-        }
-        return deviceId;
     }
 
     function getSafeFilename(dateStr) {
@@ -1065,9 +1051,6 @@
         if (localStorage.getItem('murali_app_version') !== APP_VERSION) {
             localStorage.setItem('murali_app_version', APP_VERSION);
         }
-        
-        // Initialize Device ID on load
-        getDeviceId();
         
         let meta = document.getElementById('theme-color-meta');
         if(localStorage.getItem('m_q_theme') === 'dark') {
@@ -1468,6 +1451,8 @@
             localStorage.removeItem('murali_role');
             localStorage.removeItem('murali_active_quiz_state'); 
             localStorage.removeItem('murali_lockout_time'); 
+            
+            // FIX: Clear progress so new user doesn't see old user's data
             localStorage.removeItem('murali_progress'); 
             
             window.location.reload();
@@ -1559,6 +1544,7 @@
                 let localHistory = safeJSON('murali_progress', []); 
                 let isUpdated = false;
                 
+                // १. सर्भरमा भएको नयाँ रिजल्ट मोबाइलमा थप्ने
                 data.results.forEach(sr => {
                     let exists = localHistory.find(lh => lh.date === sr.date);
                     if(!exists) { 
@@ -1572,12 +1558,13 @@
                     }
                 });
 
+                // २. एडमिनले गुगल सिटबाट डिलिट गरेको रिजल्ट मोबाइलबाट पनि हटाउने
                 let newLocalHistory = localHistory.filter(lh => {
-                    if (lh.synced === false) return true; 
+                    if (lh.synced === false) return true; // भर्खरै खेलेको तर सर्भरमा नगएकोलाई नहटाउने
                     let existsOnServer = data.results.find(sr => sr.date === lh.date);
                     if (!existsOnServer) {
                         isUpdated = true;
-                        return false; 
+                        return false; // सर्भरमा छैन भने मोबाइलबाट पनि डिलिट गर्ने
                     }
                     return true;
                 });
@@ -1614,8 +1601,7 @@
                     percent: data.percent, 
                     timeTaken: data.timeTaken, 
                     time: data.time, 
-                    weakTags: data.weakTags,
-                    deviceId: getDeviceId() // UPDATE 2: Sending Device ID
+                    weakTags: data.weakTags 
                 }) 
             })
             .then(res => res.json())
@@ -1628,7 +1614,6 @@
             });
         });
     }
-    
     // ==========================================
     // 5. UI INITIALIZATION & DASHBOARD
     // ==========================================
@@ -1760,6 +1745,7 @@
             
             let historyMap = {}; 
             history.forEach(h => { 
+                // Mega Quiz वा Review लाई दैनिक क्यालेन्डरमा नजोड्ने
                 let dStr = String(h.date || "");
                 if (!dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review")) {
                     let d = getValidDate(h); 
@@ -1860,41 +1846,18 @@
                 </div>
             </div>`;
 
-            // UPDATE 3: Mega Quiz Auto-Expire (48 hours)
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
-                let activeMegaHtml = '';
+                html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">`;
                 specialQuizzes.forEach(sq => {
                     let isCompleted = history.some(h => String(h.date).trim() === String(sq.quizDate).trim());
-                    
-                    // Check 48 hours expiration based on createdAt (if available) or fallback to parsing quizDate
-                    let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
-                    if (createdTime === 0) {
-                        // Fallback: try to parse the date from the string if it's a monthly mega
-                        let parsed = parseDateString(sq.quizDate);
-                        if (parsed && !isNaN(parsed.getTime())) {
-                            // If it's a monthly mega, assume it was created on the last day of that month
-                            createdTime = parsed.getTime();
-                        } else {
-                            // If we can't determine, assume it's active (or you can set a default)
-                            createdTime = Date.now(); 
-                        }
-                    }
-                    
-                    let isExpired = createdTime > 0 && (Date.now() - createdTime) > (48 * 60 * 60 * 1000);
-                    
                     if (isCompleted) { 
-                        activeMegaHtml += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
-                    } else if (!isExpired) { 
-                        activeMegaHtml += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; 
+                        html += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`;
+                    } else { 
+                        html += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; 
                     }
                 }); 
-                
-                if(activeMegaHtml !== '') {
-                    html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">`;
-                    html += activeMegaHtml;
-                    html += `</div></div>`;
-                }
+                html += `</div></div>`;
             }
             
             html += `<div style="text-align:center; margin-top:20px;">
@@ -1910,6 +1873,7 @@
             console.error("Dashboard Load Error:", e);
         }
     }
+
     // ==========================================
     // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
@@ -1920,7 +1884,7 @@
     };
 
     function extractDate(text) { 
-        let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{2,4}/i); 
+        let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{2,4}/i); 
         return m ? m[0] : new Date().toLocaleDateString('en-GB'); 
     }
 
@@ -1998,14 +1962,17 @@
             - Test the main teachings of today. Wrong options should be common misunderstandings.`;
         }
 
+        // ---------------------------------------------------------
+        // DAY DETECTION & DYNAMIC MODELS LOGIC
+        // ---------------------------------------------------------
         let parsedDateForDay = parseDateString(currentMurliDate);
-        let dayOfWeek = parsedDateForDay.getDay(); 
+        let dayOfWeek = parsedDateForDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
         let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
         let currentDayName = dayNames[dayOfWeek];
 
         let daySpecificModels = "";
         
-        if (dayOfWeek === 0) { 
+        if (dayOfWeek === 0) { // SUNDAY
             daySpecificModels = `--- [SUNDAY MODELS: Avyakt & Deep States Focus] ---
 M1 (मुख्य हेडिङ): The core essence of today's main heading.
 M2 (अव्यक्त स्थिति): What specific practice was given to become Avyakt?
@@ -2027,7 +1994,7 @@ M17 (असत्य कथन): 3 exact statements + 1 slightly altered stateme
 M18 (खाली ठाउँ): Fill in the blank for a powerful Avyakt sentence.
 M19 (जोडा नमिल्ने): Match concepts, with one wrong pair.
 M20 (सारको सार): The ultimate bottom line of today's entire Murli.`;
-        } else if (dayOfWeek === 1) { 
+        } else if (dayOfWeek === 1) { // MONDAY
             daySpecificModels = `--- [MONDAY MODELS: Essence & QnA Focus] ---
 M1 (मीठे बच्चे): The core instruction given in the "Sweet children" line.
 M2 (प्रश्नको आधार): The main premise of today's Question.
@@ -2049,7 +2016,7 @@ M17 (विपरीत अवस्था): Two opposite states discussed today
 M18 (आज उल्लेख नभएको): 3 facts from today + 1 genuine BK fact NOT mentioned today.
 M19 (खाली ठाउँ): Fill in the blank from the Q&A section.
 M20 (सीधा प्रश्न): A straightforward question from the core essence.`;
-        } else if (dayOfWeek === 2) { 
+        } else if (dayOfWeek === 2) { // TUESDAY
             daySpecificModels = `--- [TUESDAY MODELS: Examples & Illusions Focus] ---
 M1 (बाबाको उपमा): What Baba compared a concept to (e.g., Ocean, Sweet).
 M2 (लौकिक दृष्टान्त): A worldly example used today (e.g., Doctor, Laundry).
@@ -2071,7 +2038,7 @@ M17 (जोडा नमिल्ने): Match examples to their meanings, with
 M18 (खाली ठाउँ): Fill in the blank from a key example used today.
 M19 (आज उल्लेख नभएको): 3 examples from today + 1 BK example NOT used today.
 M20 (सार): The main takeaway from all the examples used today.`;
-        } else if (dayOfWeek === 3) { 
+        } else if (dayOfWeek === 3) { // WEDNESDAY
             daySpecificModels = `--- [WEDNESDAY MODELS: Karma, Dharna & Shrimat Focus] ---
 M1 (मुख्य आज्ञा): The most important Shrimat given today.
 M2 (धारणा १): The first main point of Dharna.
@@ -2093,7 +2060,7 @@ M17 (खाली ठाउँ): Fill in the blank from the Dharna section.
 M18 (असत्य कथन): 3 true Shrimats from today + 1 Shrimat NOT from today.
 M19 (आज उल्लेख नभएको): 3 virtues from today + 1 virtue NOT mentioned today.
 M20 (सार): The ultimate goal of today's Dharna.`;
-        } else if (dayOfWeek === 4) { 
+        } else if (dayOfWeek === 4) { // THURSDAY
             daySpecificModels = `--- [THURSDAY MODELS: History, Numbers & Titles Focus] ---
 M1 (सङ्ख्या): A specific number (years, births, etc.) mentioned today.
 M2 (समय/युग): A specific point about the cycle or Sangamyug today.
@@ -2115,7 +2082,7 @@ M17 (खाली ठाउँ): Fill in the blank regarding a specific title or
 M18 (जोडा नमिल्ने): Match titles to meanings, with one wrong pair.
 M19 (आज उल्लेख नभएको): 3 titles from today + 1 BK title NOT used today.
 M20 (सार): The main essence of today's historical/cycle knowledge.`;
-        } else if (dayOfWeek === 5) { 
+        } else if (dayOfWeek === 5) { // FRIDAY
             daySpecificModels = `--- [FRIDAY MODELS: End Sections & Special Focus] ---
 M1 (वरदानको टाइटल): The exact title ending with "भव:" in today's Vardan.
 M2 (वरदानको सर्त): The condition to achieve today's Vardan.
@@ -2137,7 +2104,7 @@ M17 (खाली ठाउँ २): Fill in the blank from the Slogan.
 M18 (असत्य कथन): 3 true points from the end sections + 1 false point.
 M19 (आज उल्लेख नभएको): 3 points from today's Vardan/Slogan + 1 from a past Murli.
 M20 (सार): The combined essence of the Vardan, Slogan, and Signal.`;
-        } else { 
+        } else { // SATURDAY
             daySpecificModels = `--- [SATURDAY MODELS: Mega Revision & Tricky Formats] ---
 M1 (आज उल्लेख नभएको): 3 correct facts from today + 1 genuine BK fact NOT in today's Murli.
 M2 (असत्य कथन): 3 exact statements from today + 1 slightly altered false statement.
@@ -2452,7 +2419,7 @@ Text: ${text}`;
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman, createdAt: Date.now() }) // Added createdAt for Mega Quiz Expiry
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman }) 
         })
         .then(res => res.json())
         .then(data => { 
@@ -3333,6 +3300,145 @@ Text: ${text}`;
         });
     }
 
+    function renderDashboard() {
+        try {
+            const d = dict[lang]; 
+            let history = safeJSON('murali_progress', []); 
+            let streak = calculateStreak(history);
+            let cy = currentCalDate.getFullYear(); 
+            let cm = currentCalDate.getMonth();
+            
+            populateCalendarPickers(cy, cm);
+
+            let standardHistory = history.filter(h => {
+                let dStr = String(h.date || "");
+                return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review");
+            });
+            
+            let megaHistory = history.filter(h => {
+                let dStr = String(h.date || "");
+                return dStr.includes("Mega") || dStr.includes("मेगा") || dStr.includes("Review");
+            });
+
+            let filteredHistory = standardHistory.filter(h => { 
+                let dObj = getValidDate(h); 
+                return dObj && dObj.getFullYear() === cy && dObj.getMonth() === cm; 
+            });
+
+            let totalTaken = filteredHistory.length; 
+            let avgPercent = totalTaken ? Math.round(filteredHistory.reduce((sum, h) => sum + Number(h.percent), 0) / totalTaken) : 0; 
+            let excRate = totalTaken ? Math.round((filteredHistory.filter(h => Number(h.percent) >= 80).length / totalTaken) * 100) : 0;
+            
+            document.getElementById('dash-stats').innerHTML = `
+                <div class="stat-card"><h3>${totalTaken}</h3><p>Exams (Month)</p></div>
+                <div class="stat-card"><h3>${avgPercent}%</h3><p>Avg. Score</p></div>
+                <div class="stat-card" style="background: var(--success-bg); border-color: var(--success-border);"><h3 style="color: var(--success-color);">${excRate}%</h3><p style="color: var(--success-color);">Excellence</p></div>
+                <div class="stat-card" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3);"><h3 style="color: #38bdf8;">${streak} <span style="font-size:0.9rem;">Days</span></h3><p style="color: #38bdf8;">Streak</p></div>
+            `;
+            
+            drawCharts(filteredHistory);
+
+            let babaMessage = "";
+            if (history.length === 0) {
+                babaMessage = "🌟 सफलता-मूर्त भव:! मीठे बच्चे, तिम्रो यो नयाँ सुरुवातको लागि धेरै-धेरै बधाई छ। बाबाको याद र मुरलीको चिन्तनले तिमीलाई सधैं अगाडि बढाउनेछ।";
+            } else {
+                let latestHistory = standardHistory[0]; 
+                if (latestHistory) {
+                    let serverQuizzes = safeJSON('murali_server_quizzes', []);
+                    let matchedQuiz = serverQuizzes.find(sq => sq.quizDate === latestHistory.date);
+                    if (matchedQuiz && matchedQuiz.swaman) {
+                        babaMessage = matchedQuiz.swaman;
+                    }
+                }
+                if (!babaMessage) {
+                    let hash = 0;
+                    let uniqueString = new Date().toDateString() + userName;
+                    for (let i = 0; i < uniqueString.length; i++) {
+                        hash = uniqueString.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    babaMessage = fallbackSwaman[Math.abs(hash) % fallbackSwaman.length];
+                }
+            }
+
+            let swamanHtml = `
+            <div style="margin-bottom: 15px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(56, 189, 248, 0.15)); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h3 style="margin: 0 0 8px 0; color: #a78bfa; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" style="color:#a78bfa;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    आजको वरदान र स्वमान
+                </h3>
+                <p style="margin: 0; font-size: 0.95rem; color: var(--text-color); font-weight: 600; line-height: 1.5;">
+                    ${babaMessage}
+                </p>
+            </div>`;
+            document.getElementById('baba-message-container').innerHTML = swamanHtml;
+            
+            let firstDay = new Date(cy, cm, 1).getDay(); 
+            let daysInMonth = new Date(cy, cm + 1, 0).getDate(); 
+            let today = new Date(); 
+            let monthMap = {}; 
+            
+            let launchDate = new Date(2026, 7, 13); 
+
+            filteredHistory.forEach(h => { 
+                let dObj = getValidDate(h); 
+                if (dObj) { 
+                    let day = dObj.getDate(); 
+                    if (!monthMap[day] || h.percent > monthMap[day].percent) monthMap[day] = h; 
+                } 
+            });
+            
+            let calHtml = ''; 
+            for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                let renderDate = new Date(cy, cm, i);
+                let isPreLaunch = renderDate.getTime() < launchDate.getTime();
+                
+                let isToday = (i === today.getDate() && cm === today.getMonth() && cy === today.getFullYear()); 
+                let borderStyle = isToday ? 'border: 2px dashed var(--primary-color); font-weight:800;' : '';
+                
+                if (isPreLaunch) {
+                    calHtml += `<div class="cal-day" style="${borderStyle} opacity:0.4; cursor:pointer;" onclick="showToast('यो दिन एप सुरु भएको थिएन।', 'info')"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">➖</span></div>`;
+                } else if (monthMap[i]) { 
+                    let h = monthMap[i]; 
+                    let cClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); 
+                    calHtml += `<div class="cal-day has-data ${cClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">${i}</div>`;
+                } else { 
+                    calHtml += `<div class="cal-day" style="${borderStyle}">${i}</div>`; 
+                }
+            }
+            document.getElementById('cal-grid-days').innerHTML = calHtml;
+
+            if (megaHistory.length > 0) {
+                let megaHtml = `<div style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
+                    <h3 style="margin: 0 0 15px 0; color: var(--primary-color); font-size: 1.2rem; font-weight: 800;">🏆 विशेष परीक्षाहरूको नतिजा</h3>`;
+
+                megaHtml += megaHistory.map(h => {
+                    let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor);
+                    let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+                    return `<div class="progress-item">
+                        <div style="flex-grow: 1;">
+                            <div style="font-weight:800; font-size:1rem; color:var(--primary-color); line-height:1.2; margin-bottom:4px;">${h.date}</div>
+                            <div class="prog-remark ${rClass}" style="margin-top:0;">${rText}</div>
+                            <button class="btn-small" style="margin-top: 8px; padding: 4px 14px; border-color: var(--primary-color); color: var(--primary-color); font-size: 0.85rem;" onclick="reviewPastQuiz(${h.id})">Review</button>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="prog-percent">${h.percent}%</div>
+                            <div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+                megaHtml += `</div>`;
+                document.getElementById('mega-quiz-results-container').innerHTML = megaHtml;
+            } else {
+                document.getElementById('mega-quiz-results-container').innerHTML = '';
+            }
+        } catch (error) {
+            console.error("Dashboard Render Error:", error);
+            document.getElementById('dash-stats').innerHTML = `<div style="color:red; padding:10px;">ड्यासबोर्ड लोड गर्न समस्या भयो।</div>`;
+        }
+    }
+
     function openDetailedProgress() {
         progressModalDate = new Date(currentCalDate);
         document.getElementById('detailed-progress-modal').style.display = 'flex';
@@ -3514,11 +3620,14 @@ Text: ${text}`;
             return;
         }
         
+        // ---------------------------------------------------------
+        // SORTING LOGIC: Latest Date First
+        // ---------------------------------------------------------
         let sortedQuizzes = serverQuizzes.map((sq, idx) => ({ data: sq, originalIndex: idx }))
             .sort((a, b) => {
                 let dA = getValidDate({date: a.data.quizDate}).getTime();
                 let dB = getValidDate({date: b.data.quizDate}).getTime();
-                return dB - dA; 
+                return dB - dA; // Descending order
             });
         
         let groupedQuizzes = {};
@@ -3558,10 +3667,13 @@ Text: ${text}`;
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         
         if(serverQuizzes.length > 0) {
+            // ---------------------------------------------------------
+            // SORTING LOGIC: Latest Date First for Leaderboard Dropdown
+            // ---------------------------------------------------------
             let sortedQuizzes = [...serverQuizzes].sort((a, b) => {
                 let dA = getValidDate({date: a.quizDate}).getTime();
                 let dB = getValidDate({date: b.quizDate}).getTime();
-                return dB - dA; 
+                return dB - dA; // Descending order
             });
 
             sortedQuizzes.forEach(sq => {
@@ -3594,6 +3706,24 @@ Text: ${text}`;
         document.getElementById('tab-table').classList.toggle('active', tab === 'table');
         document.getElementById('lb-wa-section').style.display = tab === 'wa' ? 'block' : 'none';
         document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none';
+    }
+
+    function mapDateToSheetString(yyyy_mm_dd) {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        let targetDateObj = new Date(yyyy_mm_dd);
+        
+        for (let sq of serverQuizzes) {
+            let dObj = getValidDate({date: sq.quizDate});
+            if (dObj) {
+                if (dObj.getFullYear() === targetDateObj.getFullYear() &&
+                    dObj.getMonth() === targetDateObj.getMonth() &&
+                    dObj.getDate() === targetDateObj.getDate()) {
+                    return sq.quizDate; 
+                }
+            }
+        }
+        let parts = yyyy_mm_dd.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     window.fetchLeaderboard = function() {
@@ -3763,7 +3893,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.8.1)
+                Generated by BK Murali Quiz App (Version 88.6)
             </div>
         </body>
         </html>`;
@@ -3843,62 +3973,99 @@ Text: ${text}`;
         showToast("Q&A List Downloaded", "success"); 
     }
 
+    async function exportBackupData() {
+        let history = safeJSON('murali_progress', []); 
+        if (history.length === 0) return showToast("कुनै पनि पुरानो नतिजा छैन।", "error");
+        
+        let jsonString = JSON.stringify({ app_version: APP_VERSION, data: history }, null, 2); 
+        let blob = new Blob([jsonString], { type: 'text/plain' }); 
+        let filename = `Murali_Quiz_Backup_${userName.replace(/ /g, '_')}.txt`; 
+        let file = new File([blob], filename, { type: "text/plain" });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { 
+            try { 
+                await navigator.share({ files: [file], title: 'Quiz Backup' }); 
+                showToast("फाइल सेयर मेनुमा पठाइयो!", "success"); 
+                return; 
+            } catch(e) {} 
+        }
+        
+        let a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = filename; 
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a); 
+        showToast("Backup exported.", "success");
+    }
+
+    function importBackupData(event) {
+        let file = event.target.files[0]; 
+        if (!file) return;
+        
+        let reader = new FileReader(); 
+        reader.onload = function(e) {
+            try { 
+                let importedFile = JSON.parse(e.target.result); 
+                let importedData = Array.isArray(importedFile) ? importedFile : (importedFile.data || []); 
+                
+                if (Array.isArray(importedData)) { 
+                    let localData = safeJSON('murali_progress', []); 
+                    let merged = [...importedData, ...localData];
+                    let uniqueMap = new Map(); 
+                    
+                    merged.forEach(item => { 
+                        let uniqueKey = item.id || (item.date + "_" + item.name); 
+                        if(!uniqueMap.has(uniqueKey)) uniqueMap.set(uniqueKey, item); 
+                    });
+                    
+                    let finalArray = Array.from(uniqueMap.values()); 
+                    finalArray.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    
+                    localStorage.setItem('murali_progress', JSON.stringify(finalArray)); 
+                    showToast("Backup Restored!", "success"); 
+                    renderDashboard();
+                } 
+            } catch(err) { 
+                showToast("Invalid backup file.", "error"); 
+            }
+        }; 
+        reader.readAsText(file);
+    }
+
     function updateLanguageUI() { 
         lang = document.getElementById('lang-select').value; 
     }
     
     // ==========================================
-    // 11. STUDENT LEADERBOARD LOGIC (UPDATE 4)
+    // 11. STUDENT LEADERBOARD LOGIC
     // ==========================================
     window.openStudentLeaderboard = function() {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []);
-        let select = document.getElementById('sl-date-select');
-        select.innerHTML = '';
-        
         let today = new Date();
-        let yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
+        let cy = today.getFullYear(); 
+        let cm = today.getMonth(); 
         
-        let ddT = String(today.getDate()).padStart(2, '0');
-        let mmT = String(today.getMonth() + 1).padStart(2, '0');
-        let yyyyT = today.getFullYear();
-        let todayStr = `${ddT}/${mmT}/${yyyyT}`;
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        let targetDateStr = "";
         
-        let ddY = String(yesterday.getDate()).padStart(2, '0');
-        let mmY = String(yesterday.getMonth() + 1).padStart(2, '0');
-        let yyyyY = yesterday.getFullYear();
-        let yesterdayStr = `${ddY}/${mmY}/${yyyyY}`;
-
-        // Add Today and Yesterday
-        select.innerHTML += `<option value="${todayStr}">📅 आज (${todayStr})</option>`;
-        select.innerHTML += `<option value="${yesterdayStr}">📅 हिजो (${yesterdayStr})</option>`;
-        
-        // Add Active Mega Quizzes (Not expired)
-        serverQuizzes.forEach(sq => {
-            if (sq.isMegaQuiz) {
-                let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
-                if (createdTime === 0) {
-                    let parsed = parseDateString(sq.quizDate);
-                    if (parsed && !isNaN(parsed.getTime())) createdTime = parsed.getTime();
-                    else createdTime = Date.now(); 
-                }
-                let isExpired = createdTime > 0 && (Date.now() - createdTime) > (48 * 60 * 60 * 1000);
-                
-                if (!isExpired) {
-                    select.innerHTML += `<option value="${sq.quizDate}">🏆 ${sq.quizDate}</option>`;
-                }
+        for(let sq of serverQuizzes) {
+            let d = getValidDate({date: sq.quizDate});
+            if(d && d.getDate() === today.getDate() && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) {
+                targetDateStr = sq.quizDate;
+                break;
             }
-        });
+        }
+        
+        if(!targetDateStr) {
+            let dd = String(today.getDate()).padStart(2, '0');
+            let mm = String(today.getMonth() + 1).padStart(2, '0');
+            targetDateStr = `${dd}/${mm}/${cy}`; 
+        }
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
-        fetchStudentLeaderboardData();
-    }
-
-    window.fetchStudentLeaderboardData = function() {
-        let targetDateStr = document.getElementById('sl-date-select').value;
-        
         document.getElementById('sl-loading').style.display = 'block';
         document.getElementById('sl-content').style.display = 'none';
+        document.getElementById('sl-date-text').innerText = `📅 मिति: ${targetDateStr}`;
 
         if (!navigator.onLine) {
             document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!";
@@ -3923,14 +4090,12 @@ Text: ${text}`;
                 let tbody = document.getElementById('sl-table-body');
                 
                 if (data.total === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि परीक्षा दिएको छैन।</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">आज कसैले पनि परीक्षा दिएको छैन।</td></tr>`;
                     document.getElementById('sl-my-rank-box').style.display = 'none';
                     return;
                 }
 
-                // Changed to handle both old and new backend gracefully
-                let leaderboardData = data.top20 || data.top10 || [];
-                tbody.innerHTML = leaderboardData.map((user, index) => {
+                tbody.innerHTML = data.top10.map((user, index) => {
                     let isMe = (data.myRank === index + 1);
                     let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
                     let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
@@ -3949,7 +4114,7 @@ Text: ${text}`;
                 }).join('');
 
                 let myRankBox = document.getElementById('sl-my-rank-box');
-                if (data.myRank > 20) { // Changed from 10 to 20
+                if (data.myRank > 10) {
                     myRankBox.style.display = 'block';
                     myRankBox.style.borderColor = '#a78bfa';
                     myRankBox.style.background = 'rgba(167, 139, 250, 0.15)';
@@ -3957,11 +4122,11 @@ Text: ${text}`;
                     document.getElementById('sl-my-rank-number').style.fontSize = '1.8rem';
                     document.getElementById('sl-my-rank-number').style.color = '#8b5cf6';
                     document.getElementById('sl-my-score-text').innerText = `Score: ${data.myRankData.score}/${data.myRankData.total} | Time: ${data.myRankData.timeText} मि.`;
-                } else if (data.myRank > 0 && data.myRank <= 20) { // Changed from 10 to 20
+                } else if (data.myRank > 0 && data.myRank <= 10) {
                     myRankBox.style.display = 'block';
                     myRankBox.style.borderColor = 'var(--success-color)';
                     myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
-                    document.getElementById('sl-my-rank-number').innerText = `बधाई छ! तपाईं Top 20 मा हुनुहुन्छ।`;
+                    document.getElementById('sl-my-rank-number').innerText = `बधाई छ! तपाईं Top 10 मा हुनुहुन्छ।`;
                     document.getElementById('sl-my-rank-number').style.fontSize = '1.2rem';
                     document.getElementById('sl-my-rank-number').style.color = 'var(--success-color)';
                     document.getElementById('sl-my-score-text').innerText = `Rank: ${data.myRank} / ${data.total}`;
@@ -3971,7 +4136,7 @@ Text: ${text}`;
                     myRankBox.style.background = 'rgba(220, 38, 38, 0.1)';
                     document.getElementById('sl-my-rank-number').innerText = `- / ${data.total}`;
                     document.getElementById('sl-my-rank-number').style.color = 'var(--danger-color)';
-                    document.getElementById('sl-my-score-text').innerText = `तपाईंले यो परीक्षा दिनुभएको छैन।`;
+                    document.getElementById('sl-my-score-text').innerText = `तपाईंले आजको परीक्षा दिनुभएको छैन।`;
                 }
             } else {
                 document.getElementById('sl-loading').style.display = 'block';
@@ -3993,6 +4158,7 @@ Text: ${text}`;
     
     setTimeout(syncPendingResults, 3000);
 
+    // प्रयोगकर्ताले मोबाइलमा एप खोल्ने बित्तिकै अटो-सिन्क हुने
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === 'visible') {
             if (localStorage.getItem('murali_phone') && localStorage.getItem('murali_pin')) {
