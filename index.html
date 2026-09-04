@@ -3967,43 +3967,50 @@ window.renderDashboard = function() {
         let select = document.getElementById('sl-date-select');
         select.innerHTML = '';
         
-        let today = new Date();
-        let yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        let ddT = String(today.getDate()).padStart(2, '0');
-        let mmT = String(today.getMonth() + 1).padStart(2, '0');
-        let yyyyT = today.getFullYear();
-        let todayStr = `${ddT}/${mmT}/${yyyyT}`;
-        
-        let ddY = String(yesterday.getDate()).padStart(2, '0');
-        let mmY = String(yesterday.getMonth() + 1).padStart(2, '0');
-        let yyyyY = yesterday.getFullYear();
-        let yesterdayStr = `${ddY}/${mmY}/${yyyyY}`;
-
-        // Add Today and Yesterday
-        select.innerHTML += `<option value="${todayStr}">📅 आज (${todayStr})</option>`;
-        select.innerHTML += `<option value="${yesterdayStr}">📅 हिजो (${yesterdayStr})</option>`;
-        
-        // Add Active Mega Quizzes (Not expired)
-        serverQuizzes.forEach(sq => {
-            if (sq.isMegaQuiz) {
-                let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
-                if (createdTime === 0) {
-                    let parsed = parseDateString(sq.quizDate);
-                    if (parsed && !isNaN(parsed.getTime())) createdTime = parsed.getTime();
-                    else createdTime = Date.now(); 
-                }
-                let isExpired = createdTime > 0 && (Date.now() - createdTime) > (48 * 60 * 60 * 1000);
-                
-                if (!isExpired) {
-                    select.innerHTML += `<option value="${sq.quizDate}">🏆 ${sq.quizDate}</option>`;
-                }
+        // ४८ घण्टा भित्रका सबै क्वीज (दैनिक र मेगा) फिल्टर गर्ने
+        let recentQuizzes = serverQuizzes.filter(sq => {
+            let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
+            if (createdTime === 0) {
+                let parsed = parseDateString(sq.quizDate);
+                if (parsed && !isNaN(parsed.getTime())) createdTime = parsed.getTime();
+                else createdTime = Date.now(); 
             }
+            let ageHours = (Date.now() - createdTime) / (1000 * 60 * 60);
+            return ageHours < 48;
         });
 
+        if (recentQuizzes.length === 0) {
+            select.innerHTML = '<option value="">कुनै सक्रिय क्वीज छैन</option>';
+            document.getElementById('sl-date-select').disabled = true;
+        } else {
+            document.getElementById('sl-date-select').disabled = false;
+            
+            // नयाँ क्वीज माथि देखाउन Sort गर्ने
+            recentQuizzes.sort((a, b) => {
+                let tA = a.createdAt ? a.createdAt : parseDateString(a.quizDate).getTime();
+                let tB = b.createdAt ? b.createdAt : parseDateString(b.quizDate).getTime();
+                return tB - tA;
+            });
+            
+            recentQuizzes.forEach(sq => {
+                let opt = document.createElement('option');
+                opt.value = sq.quizDate;
+                let displayDate = String(sq.quizDate).replace(/T.*/, '');
+                opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
+                select.appendChild(opt);
+            });
+        }
+
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
-        fetchStudentLeaderboardData();
+        
+        if (recentQuizzes.length > 0) {
+            fetchStudentLeaderboardData();
+        } else {
+            document.getElementById('sl-loading').style.display = 'none';
+            document.getElementById('sl-content').style.display = 'block';
+            document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">अहिले कुनै पनि सक्रिय परीक्षा छैन।</td></tr>`;
+            document.getElementById('sl-my-rank-box').style.display = 'none';
+        }
     }
 
     window.fetchStudentLeaderboardData = function() {
