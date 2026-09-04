@@ -3967,16 +3967,34 @@ window.renderDashboard = function() {
         let select = document.getElementById('sl-date-select');
         select.innerHTML = '';
         
-        // ४८ घण्टा भित्रका सबै क्वीज (दैनिक र मेगा) फिल्टर गर्ने
+        let todayDateOnly = new Date();
+        todayDateOnly.setHours(0, 0, 0, 0); // आजको मिति (समय हटाएर)
+
+        // ४८ घण्टा भित्रका र भविष्यका नभएका सबै क्वीज फिल्टर गर्ने
         let recentQuizzes = serverQuizzes.filter(sq => {
+            let parsedDate = parseDateString(sq.quizDate);
             let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
+            
             if (createdTime === 0) {
-                let parsed = parseDateString(sq.quizDate);
-                if (parsed && !isNaN(parsed.getTime())) createdTime = parsed.getTime();
+                if (parsedDate && !isNaN(parsedDate.getTime())) createdTime = parsedDate.getTime();
                 else createdTime = Date.now(); 
             }
+            
             let ageHours = (Date.now() - createdTime) / (1000 * 60 * 60);
-            return ageHours < 48;
+            let isWithin48Hours = ageHours < 48;
+
+            // भविष्यको मिति हो कि होइन चेक गर्ने (मेगा क्वीज बाहेक)
+            let isFutureQuiz = false;
+            if (!sq.isMegaQuiz && parsedDate && !isNaN(parsedDate.getTime())) {
+                let quizDateOnly = new Date(parsedDate);
+                quizDateOnly.setHours(0, 0, 0, 0);
+                if (quizDateOnly > todayDateOnly) {
+                    isFutureQuiz = true; // यो भोलि वा पर्सीको क्वीज हो
+                }
+            }
+
+            // ४८ घण्टाभित्रको हुनुपर्छ र भविष्यको हुनुहुँदैन
+            return isWithin48Hours && !isFutureQuiz;
         });
 
         if (recentQuizzes.length === 0) {
