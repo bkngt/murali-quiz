@@ -4008,7 +4008,10 @@ Text: ${text}`;
                 }
             }
 
-            return isWithin48Hours && !isFutureQuiz && !sq.isMegaQuiz && !sq.quizDate.includes("Mega") && !sq.quizDate.includes("मेगा");
+            // मेगा क्विजलाई नामबाटै रोक्ने कोड
+            let isMegaByName = String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा");
+            return isWithin48Hours && !isFutureQuiz && !sq.isMegaQuiz && !isMegaByName;
+        });
 
         if (recentQuizzes.length === 0) {
             select.innerHTML = '<option value="">कुनै सक्रिय क्वीज छैन</option>';
