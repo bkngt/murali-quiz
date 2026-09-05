@@ -4008,8 +4008,7 @@ Text: ${text}`;
                 }
             }
 
-            return isWithin48Hours && !isFutureQuiz && !sq.isMegaQuiz;
-        });
+            return isWithin48Hours && !isFutureQuiz && !sq.isMegaQuiz && !sq.quizDate.includes("Mega") && !sq.quizDate.includes("मेगा");
 
         if (recentQuizzes.length === 0) {
             select.innerHTML = '<option value="">कुनै सक्रिय क्वीज छैन</option>';
