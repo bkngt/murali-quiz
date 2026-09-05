@@ -4008,7 +4008,7 @@ Text: ${text}`;
                 }
             }
 
-            return isWithin48Hours && !isFutureQuiz;
+            return isWithin48Hours && !isFutureQuiz && !sq.isMegaQuiz;
         });
 
         if (recentQuizzes.length === 0) {
@@ -4153,4 +4153,3 @@ Text: ${text}`;
 </script>
 </body>
 </html>
-
