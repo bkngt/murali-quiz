@@ -745,7 +745,7 @@
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 88.8.1 (Mega Auto-Expire & Top 20)</div>
+        <div>Version: 89.4.0 (Anti-Cheat Security & Accurate Avg Score)</div>
     </div>
 </div>
 <script>
@@ -786,7 +786,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "88.8.1"; 
+    const APP_VERSION = "89.4.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -989,7 +989,6 @@
         return str.replace(/[०-९]/g, match => nepaliNumbers.indexOf(match));
     }
 
-    // BUG FIX: Robust Date Parsing (Handles "Sept", "Sept.", etc.)
     function parseDateString(dateStr) {
       if(!dateStr) return new Date();
       var s = String(dateStr).replace(/['"]/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
@@ -1020,7 +1019,6 @@
       return new Date();
     }
 
-    // UPDATE 1: getValidDate Function
     function getValidDate(h) {
         if (!h) return new Date();
         if (h.date) {
@@ -1031,7 +1029,6 @@
         return new Date();
     }
 
-    // UPDATE 2: Device ID Tracking
     function getDeviceId() {
         let deviceId = localStorage.getItem('murali_device_id');
         if (!deviceId) {
@@ -1066,7 +1063,6 @@
             localStorage.setItem('murali_app_version', APP_VERSION);
         }
         
-        // Initialize Device ID on load
         getDeviceId();
         
         let meta = document.getElementById('theme-color-meta');
@@ -1267,7 +1263,7 @@
             fetch(API_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN })
+                body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN, deviceId: getDeviceId() })
             })
             .then(r => r.json())
             .then(data => { 
@@ -1276,7 +1272,11 @@
                     saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
                     showToast("Server Login Successful!", "success"); 
                 } else { 
-                    handleFailedAttempt(); 
+                    if (data.message && data.message.includes("ब्लक")) {
+                        alert(data.message);
+                    } else {
+                        handleFailedAttempt(); 
+                    }
                 }
             })
             .catch(e => { 
@@ -1311,7 +1311,7 @@
                 fetch(API_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal })
+                    body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal, deviceId: getDeviceId() })
                 })
                 .then(r => r.json())
                 .then(data => { 
@@ -1320,7 +1320,11 @@
                         showToast("Registration Successful!", "success"); 
                     } else { 
                         submitBtn.innerHTML = `Enter`; 
-                        showToast(data.message, "error"); 
+                        if (data.message && data.message.includes("ब्लक")) {
+                            alert(data.message);
+                        } else {
+                            showToast(data.message, "error"); 
+                        }
                     }
                 })
                 .catch(e => { 
@@ -1345,7 +1349,7 @@
              fetch(API_URL, { 
                  method: 'POST', 
                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                 body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN })
+                 body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN, deviceId: getDeviceId() })
              })
              .then(r => r.json())
              .then(data => { 
@@ -1354,7 +1358,11 @@
                      saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
                      showToast("Server Login Successful!", "success"); 
                  } else { 
-                     handleFailedAttempt(); 
+                     if (data.message && data.message.includes("ब्लक")) {
+                         alert(data.message);
+                     } else {
+                         handleFailedAttempt(); 
+                     }
                  }
              })
              .catch(e => { 
@@ -1505,7 +1513,7 @@
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin })
+            body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin, deviceId: getDeviceId() })
         })
         .then(r => r.json())
         .then(data => {
@@ -1521,7 +1529,11 @@
                     showToast("Profile auto-updated from server.", "info");
                 }
             } else {
-                alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
+                if (data.message && data.message.includes("ब्लक")) {
+                    alert(data.message);
+                } else {
+                    alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
+                }
                 clearLocalDataAndReload(true);
             }
         }).catch(e => console.log("Background sync failed", e));
@@ -1615,7 +1627,7 @@
                     timeTaken: data.timeTaken, 
                     time: data.time, 
                     weakTags: data.weakTags,
-                    deviceId: getDeviceId() // UPDATE 2: Sending Device ID
+                    deviceId: getDeviceId()
                 }) 
             })
             .then(res => res.json())
@@ -1860,23 +1872,18 @@
                 </div>
             </div>`;
 
-            // UPDATE 3: Mega Quiz Auto-Expire (48 hours)
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
                 let activeMegaHtml = '';
                 specialQuizzes.forEach(sq => {
                     let isCompleted = history.some(h => String(h.date).trim() === String(sq.quizDate).trim());
                     
-                    // Check 48 hours expiration based on createdAt (if available) or fallback to parsing quizDate
                     let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
                     if (createdTime === 0) {
-                        // Fallback: try to parse the date from the string if it's a monthly mega
                         let parsed = parseDateString(sq.quizDate);
                         if (parsed && !isNaN(parsed.getTime())) {
-                            // If it's a monthly mega, assume it was created on the last day of that month
                             createdTime = parsed.getTime();
                         } else {
-                            // If we can't determine, assume it's active (or you can set a default)
                             createdTime = Date.now(); 
                         }
                     }
@@ -2452,7 +2459,7 @@ Text: ${text}`;
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman, createdAt: Date.now() }) // Added createdAt for Mega Quiz Expiry
+            body: JSON.stringify({ action: "saveQuiz", quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman, createdAt: Date.now() })
         })
         .then(res => res.json())
         .then(data => { 
@@ -2495,7 +2502,8 @@ Text: ${text}`;
                 action: "saveActiveState",
                 phone: userPhone,
                 date: stateObj.date,
-                stateData: stateObj
+                stateData: stateObj,
+                deviceId: getDeviceId()
             })
         }).catch(e => console.log("Background state save failed"));
     }
@@ -3217,7 +3225,7 @@ Text: ${text}`;
         
         let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); 
         if (sortedDays.length === 0) return 0;
-    let streak = 0; 
+        let streak = 0; 
         let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); 
         let expectedTime = todayTime;
         
@@ -3287,19 +3295,25 @@ Text: ${text}`;
         currentCalDate = new Date(y, m, 1);
         renderDashboard();
     }
-window.renderDashboard = function() {
+
+    window.renderDashboard = function() {
         let history = safeJSON('murali_progress', []);
         let standardHistory = history.filter(h => {
             let dStr = String(h.date || "");
             return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review");
         });
 
-        // 1. Calculate Stats
+        // 1. Calculate Stats (ACCURATE AVERAGE SCORE)
         let totalExams = standardHistory.length;
         let avgScore = 0;
         if (totalExams > 0) {
-            let sum = standardHistory.reduce((acc, curr) => acc + curr.percent, 0);
-            avgScore = Math.round(sum / totalExams);
+            let totalObtained = 0;
+            let totalMax = 0;
+            standardHistory.forEach(h => {
+                totalObtained += (h.score || 0);
+                totalMax += (h.total || 0);
+            });
+            avgScore = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
         }
         let streak = calculateStreak(standardHistory);
 
@@ -3548,14 +3562,16 @@ window.renderDashboard = function() {
             list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
         }
 
+        // ACCURATE YEARLY AVERAGE SCORE
         let yearlyData = {};
         let currentYear = new Date().getFullYear();
         standardHistory.forEach(h => {
             let dObj = getValidDate(h);
             if (dObj && dObj.getFullYear() === currentYear) {
                 let month = dObj.getMonth();
-                if (!yearlyData[month]) yearlyData[month] = { totalPercent: 0, count: 0 };
-                yearlyData[month].totalPercent += h.percent;
+                if (!yearlyData[month]) yearlyData[month] = { totalScore: 0, totalMax: 0, count: 0 };
+                yearlyData[month].totalScore += (h.score || 0);
+                yearlyData[month].totalMax += (h.total || 0);
                 yearlyData[month].count++;
             }
         });
@@ -3566,7 +3582,8 @@ window.renderDashboard = function() {
         for (let i = 0; i < 12; i++) {
             if (yearlyData[i]) {
                 yearlyLabels.push(monthNames[i]);
-                yearlyAvgData.push(Math.round(yearlyData[i].totalPercent / yearlyData[i].count));
+                let mAvg = yearlyData[i].totalMax > 0 ? Math.round((yearlyData[i].totalScore / yearlyData[i].totalMax) * 100) : 0;
+                yearlyAvgData.push(mAvg);
             }
         }
 
@@ -3875,7 +3892,7 @@ window.renderDashboard = function() {
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 88.8.1)
+                Generated by BK Murali Quiz App (Version 89.4.0)
             </div>
         </body>
         </html>`;
@@ -3968,9 +3985,8 @@ window.renderDashboard = function() {
         select.innerHTML = '';
         
         let todayDateOnly = new Date();
-        todayDateOnly.setHours(0, 0, 0, 0); // आजको मिति (समय हटाएर)
+        todayDateOnly.setHours(0, 0, 0, 0); 
 
-        // ४८ घण्टा भित्रका र भविष्यका नभएका सबै क्वीज फिल्टर गर्ने
         let recentQuizzes = serverQuizzes.filter(sq => {
             let parsedDate = parseDateString(sq.quizDate);
             let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
@@ -3983,17 +3999,15 @@ window.renderDashboard = function() {
             let ageHours = (Date.now() - createdTime) / (1000 * 60 * 60);
             let isWithin48Hours = ageHours < 48;
 
-            // भविष्यको मिति हो कि होइन चेक गर्ने (मेगा क्वीज बाहेक)
             let isFutureQuiz = false;
             if (!sq.isMegaQuiz && parsedDate && !isNaN(parsedDate.getTime())) {
                 let quizDateOnly = new Date(parsedDate);
                 quizDateOnly.setHours(0, 0, 0, 0);
                 if (quizDateOnly > todayDateOnly) {
-                    isFutureQuiz = true; // यो भोलि वा पर्सीको क्वीज हो
+                    isFutureQuiz = true; 
                 }
             }
 
-            // ४८ घण्टाभित्रको हुनुपर्छ र भविष्यको हुनुहुँदैन
             return isWithin48Hours && !isFutureQuiz;
         });
 
@@ -4003,7 +4017,6 @@ window.renderDashboard = function() {
         } else {
             document.getElementById('sl-date-select').disabled = false;
             
-            // नयाँ क्वीज माथि देखाउन Sort गर्ने
             recentQuizzes.sort((a, b) => {
                 let tA = a.createdAt ? a.createdAt : parseDateString(a.quizDate).getTime();
                 let tB = b.createdAt ? b.createdAt : parseDateString(b.quizDate).getTime();
@@ -4065,7 +4078,6 @@ window.renderDashboard = function() {
                     return;
                 }
 
-                // Changed to handle both old and new backend gracefully
                 let leaderboardData = data.top20 || data.top10 || [];
                 tbody.innerHTML = leaderboardData.map((user, index) => {
                     let isMe = (data.myRank === index + 1);
@@ -4086,7 +4098,7 @@ window.renderDashboard = function() {
                 }).join('');
 
                 let myRankBox = document.getElementById('sl-my-rank-box');
-                if (data.myRank > 20) { // Changed from 10 to 20
+                if (data.myRank > 20) { 
                     myRankBox.style.display = 'block';
                     myRankBox.style.borderColor = '#a78bfa';
                     myRankBox.style.background = 'rgba(167, 139, 250, 0.15)';
@@ -4094,7 +4106,7 @@ window.renderDashboard = function() {
                     document.getElementById('sl-my-rank-number').style.fontSize = '1.8rem';
                     document.getElementById('sl-my-rank-number').style.color = '#8b5cf6';
                     document.getElementById('sl-my-score-text').innerText = `Score: ${data.myRankData.score}/${data.myRankData.total} | Time: ${data.myRankData.timeText} मि.`;
-                } else if (data.myRank > 0 && data.myRank <= 20) { // Changed from 10 to 20
+                } else if (data.myRank > 0 && data.myRank <= 20) { 
                     myRankBox.style.display = 'block';
                     myRankBox.style.borderColor = 'var(--success-color)';
                     myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
@@ -4141,3 +4153,4 @@ window.renderDashboard = function() {
 </script>
 </body>
 </html>
+
