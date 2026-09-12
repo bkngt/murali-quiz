@@ -164,13 +164,14 @@
 
         .chart-container { position: relative; width: 100%; height: 250px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* NEW CSS FOR DAILY CHART */
-        .chart-section { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: var(--box-shadow-main); }
-        .chart-title { color: var(--primary-color); font-weight: 800; margin-bottom: 12px; font-size: 1.1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .chart-option { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; font-size: 0.95rem; font-weight: 600; color: var(--text-color); }
-        .chart-option:hover { background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2); }
-        .chart-option input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.3); cursor: pointer; }
-        .chart-sub-title { font-size: 0.9rem; color: #8b5cf6; font-weight: 700; margin: 10px 0 5px 0; }
+        /* NEW CSS FOR COMPACT DAILY CHART */
+        .chart-section-compact { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .chart-title-compact { color: var(--primary-color); font-weight: 800; font-size: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+        .chart-option-compact { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600; color: var(--text-color); background: var(--bg-color); line-height: 1.3; }
+        .chart-option-compact:hover { border-color: var(--primary-color); background: rgba(56, 189, 248, 0.05); }
+        .chart-option-compact input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); margin-top: 2px; cursor: pointer; flex-shrink: 0; }
+        .chart-sub-title-compact { font-size: 0.85rem; color: #8b5cf6; font-weight: 700; margin: 10px 0 6px 0; }
     </style>
 </head>
 <body>
@@ -300,8 +301,7 @@
             </button>
         </div>
     </div>
-
-    <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
+<div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
         <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
         <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
             <option value="10">10 Qs</option><option value="20" selected>20 Qs</option><option value="30">30 Qs</option><option value="50">50 Qs</option><option value="100">100 Qs</option>
@@ -620,68 +620,83 @@
         </div>
     </div>
 
-    <!-- NEW: Daily Chart View -->
+    <!-- NEW: Compact Daily Chart View -->
     <div id="view-chart" style="display: none;">
         <div style="text-align: center; margin-bottom: 15px;">
             <h2 style="color: var(--primary-color); margin: 0; font-weight: 800; font-size: 1.4rem;">📊 मेरो आध्यात्मिक चार्ट</h2>
             <p style="color: #64748b; font-size: 0.9rem; margin: 5px 0 0 0; font-weight: 600;">(दैनिक स्व-चेकिङ)</p>
         </div>
 
-        <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-            <input type="date" id="chart-date" class="input-field" style="width: auto; padding: 0.5rem 1rem; margin: 0; font-size: 1rem; cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
+            <input type="date" id="chart-date" class="input-field" style="width: auto; padding: 0.5rem 1rem; margin: 0; font-size: 1rem; cursor: pointer; flex: 1;">
+            <button onclick="openChartLeaderboard()" class="btn-small" style="background: var(--primary-gradient); color: white; border: none; padding: 0.6rem 1rem; font-weight: bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); flex-shrink: 0;">🏆 र्‍याङ्क हेर्नुहोस्</button>
         </div>
 
         <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
             
             <!-- 1. Amritvela -->
-            <div class="chart-section">
-                <div class="chart-title">१. अमृतवेला (३० अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_amritvela" value="30" required> २:०० देखि ३:०० बजे (अति उत्तम)</label>
-                <label class="chart-option"><input type="radio" name="chart_amritvela" value="25"> ३:०० देखि ४:०० बजे (उत्तम)</label>
-                <label class="chart-option"><input type="radio" name="chart_amritvela" value="15"> ४:०० देखि ४:४५ बजे (सामान्य)</label>
-                <label class="chart-option"><input type="radio" name="chart_amritvela" value="0"> ४:४५ पछि वा उठ्दै नउठेको</label>
+            <div class="chart-section-compact">
+                <div class="chart-title-compact">१. अमृतवेला (३० अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="30" required> २:०० - ३:०० बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="25"> ३:०० - ४:०० बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="15"> ४:०० - ४:४५ बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="0"> ४:४५ पछि / उठिनँ</label>
+                </div>
             </div>
 
             <!-- 2. Murli Study -->
-            <div class="chart-section">
-                <div class="chart-title">२. मुरली अध्ययन (२० अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_murli" value="20" required> सेवाकेन्द्रमै गएर सुनेको</label>
-                <label class="chart-option"><input type="radio" name="chart_murli" value="15"> घरमै अनलाइन/पढेको (पूरा)</label>
-                <label class="chart-option"><input type="radio" name="chart_murli" value="5"> सार मात्र पढेको/सुनेको</label>
-                <label class="chart-option"><input type="radio" name="chart_murli" value="0"> छुट्यो</label>
+            <div class="chart-section-compact">
+                <div class="chart-title-compact">२. मुरली अध्ययन (२० अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="20" required> सेवाकेन्द्रमै सुनें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="15"> घरमै पूरा सुनें/पढें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="5"> सार मात्र पढें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="0"> छुट्यो</label>
+                </div>
             </div>
 
             <!-- 3. Remembrance & Drills -->
-            <div class="chart-section">
-                <div class="chart-title">३. दिनभरिको याद र अभ्यास (३० अंक)</div>
+            <div class="chart-section-compact">
+                <div class="chart-title-compact">३. दिनभरिको याद र अभ्यास (३० अंक)</div>
                 
-                <div class="chart-sub-title">क) हरेक घण्टाको स्वमान/ड्रिल (१५ अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_hourly" value="15" required> लगभग हरेक घण्टा (८-१० पटक भन्दा बढी)</label>
-                <label class="chart-option"><input type="radio" name="chart_hourly" value="10"> ५ देखि ७ पटक गरें</label>
-                <label class="chart-option"><input type="radio" name="chart_hourly" value="5"> २ देखि ४ पटक मात्र भयो</label>
-                <label class="chart-option"><input type="radio" name="chart_hourly" value="0"> काममै व्यस्त भएँ, छुट्यो</label>
+                <div class="chart-sub-title-compact">क) हरेक घण्टाको स्वमान/ड्रिल (१५ अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="15" required> ८-१० पटक भन्दा बढी</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="10"> ५ देखि ७ पटक</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="5"> २ देखि ४ पटक</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="0"> काममै व्यस्त भएँ</label>
+                </div>
 
-                <div class="chart-sub-title" style="margin-top: 15px;">ख) साँझको योग (१० अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_evening" value="10" required> आधा घण्टा वा बढी बसें</label>
-                <label class="chart-option"><input type="radio" name="chart_evening" value="5"> १०-१५ मिनेट मात्र बसें</label>
-                <label class="chart-option"><input type="radio" name="chart_evening" value="0"> छुट्यो</label>
+                <div class="chart-sub-title-compact">ख) साँझको योग (१० अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="10" required> आधा घण्टा वा बढी</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="5"> १०-१५ मिनेट</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="0"> छुट्यो</label>
+                </div>
 
-                <div class="chart-sub-title" style="margin-top: 15px;">ग) सुत्नु अघिको चेकिङ (५ अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_sleep" value="5" required> बाबालाई पोतामेल दिएर/गुडनाइट गरेर सुतें</label>
-                <label class="chart-option"><input type="radio" name="chart_sleep" value="0"> बिर्सिएर यत्तिकै सुतें</label>
+                <div class="chart-sub-title-compact">ग) सुत्नु अघिको चेकिङ (५ अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_sleep" value="5" required> बाबालाई गुडनाइट गरेर सुतें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_sleep" value="0"> यत्तिकै सुतें</label>
+                </div>
             </div>
 
             <!-- 4. Behavior & Dharna -->
-            <div class="chart-section">
-                <div class="chart-title">४. चलन र धारणा (२० अंक)</div>
+            <div class="chart-section-compact">
+                <div class="chart-title-compact">४. चलन र धारणा (२० अंक)</div>
                 
-                <div class="chart-sub-title">क) क्रोध / अशान्ति (१० अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_anger" value="10" required> आज कसैलाई दुःख दिइनँ, शान्त रहें</label>
-                <label class="chart-option"><input type="radio" name="chart_anger" value="0"> अलिअलि क्रोध वा अशान्ति भयो</label>
+                <div class="chart-sub-title-compact">क) क्रोध / अशान्ति (१० अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="10" required> शान्त रहें, दुःख दिइनँ</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="0"> क्रोध वा अशान्ति भयो</label>
+                </div>
 
-                <div class="chart-sub-title" style="margin-top: 15px;">ख) ब्रह्माभोजन (खानपान) (१० अंक)</div>
-                <label class="chart-option"><input type="radio" name="chart_food" value="10" required> मौन रहेर, बाबाको यादमा भोजन गरें</label>
-                <label class="chart-option"><input type="radio" name="chart_food" value="0"> याद बिना वा बोल्दै खाइयो</label>
+                <div class="chart-sub-title-compact">ख) ब्रह्माभोजन (१० अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="10" required> बाबाको यादमा भोजन गरें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="0"> याद बिना / बोल्दै खाएँ</label>
+                </div>
             </div>
 
             <button type="submit" id="btn-submit-chart" style="padding: 1rem; font-size: 1.1rem; border-radius: 14px; margin-bottom: 20px;">
@@ -704,8 +719,23 @@
     <div id="view-progress" style="display: none;">
         <div id="baba-message-container"></div>
         <div class="dashboard-stats" id="dash-stats"></div>
-        <div class="chart-container">
-            <canvas id="progressLineChart"></canvas>
+        
+        <!-- Tabs for Quiz vs Chart Analytics -->
+        <div class="progress-tabs" style="margin-bottom: 10px;">
+            <button id="tab-stat-quiz" class="active" onclick="switchStatTab('quiz')">📝 Quiz Stats</button>
+            <button id="tab-stat-chart" onclick="switchStatTab('chart')">📊 Chart Stats</button>
+        </div>
+
+        <div id="stat-quiz-section">
+            <div class="chart-container">
+                <canvas id="progressLineChart"></canvas>
+            </div>
+        </div>
+
+        <div id="stat-chart-section" style="display: none;">
+            <div class="chart-container">
+                <canvas id="chartAnalyticsLine"></canvas>
+            </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
@@ -820,6 +850,44 @@
         </div>
     </div>
 
+    <!-- Chart Leaderboard Modal (NEW) -->
+    <div id="chart-leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'chart-leaderboard-modal') document.getElementById('chart-leaderboard-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
+            <button class="close-modal" onclick="document.getElementById('chart-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; text-align:center; margin-bottom: 10px;">
+                📊 चार्ट र्‍याङ्किङ
+            </h3>
+            
+            <input type="date" id="cl-date-select" class="input-field" onchange="fetchChartLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;">
+            
+            <div id="cl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--primary-color);">
+                ⏳ डाटा लोड हुँदैछ...
+            </div>
+            
+            <div id="cl-content" style="display:none;">
+                <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                        <thead style="background: var(--primary-color); color: white;">
+                            <tr>
+                                <th style="padding: 10px; text-align:center;">Rank</th>
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px; text-align:center;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cl-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="cl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(167, 139, 250, 0.15); border: 2px dashed #a78bfa; border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको र्‍याङ्क:</div>
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #8b5cf6; margin: 5px 0;" id="cl-my-rank-number">-- / --</div>
+                    <div style="font-size: 0.85rem; color: #64748b; font-weight: bold;" id="cl-my-score-text">Score: --</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sticky Bottom Bar -->
     <div id="sticky-scorebar" class="sticky-scorebar" style="display: none;">
         <div style="font-weight: 800; font-size: 1rem; color: var(--text-color); display: flex; align-items: center; gap: 10px;">
@@ -834,7 +902,7 @@
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 89.4.0 (Anti-Cheat Security & Daily Chart)</div>
+        <div>Version: 89.5.0 (Chart Analytics & Leaderboard)</div>
     </div>
 </div>
 <script>
@@ -875,7 +943,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "89.4.0"; 
+    const APP_VERSION = "89.5.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -917,6 +985,7 @@
     
     // Chart.js Instances
     let progressChartInstance = null;
+    let chartAnalyticsInstance = null; // NEW: For Chart Stats
     let weeklyChartInstance = null;
     let monthlyChartInstance = null;
     let yearlyChartInstance = null;
@@ -1108,6 +1177,20 @@
         }
         if (h.timestamp) return new Date(h.timestamp); 
         return new Date();
+    }
+
+    // NEW: Helper to extract sortable time for Mega Quizzes
+    function getSortableTime(sq) {
+        if (sq.createdAt) return sq.createdAt;
+        let parsed = parseDateString(sq.quizDate);
+        if (parsed && !isNaN(parsed.getTime())) return parsed.getTime();
+        
+        let match = String(sq.quizDate).match(/\d{2}-\d{2}-\d{4}/);
+        if (match) {
+            let parts = match[0].split('-');
+            return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+        }
+        return 0;
     }
 
     function getDeviceId() {
@@ -1722,7 +1805,6 @@
         });
     }
 
-    // NEW: Sync Pending Daily Charts
     function syncPendingCharts() {
         if (!navigator.onLine) return;
         let charts = safeJSON('murali_daily_charts', []); 
@@ -1824,7 +1906,7 @@
             document.getElementById('edit-address').value = userAddress;
 
             syncPendingResults(); 
-            syncPendingCharts(); // NEW
+            syncPendingCharts(); 
             syncMyResults();
             updateProfileBadgeUI();
             backgroundProfileSync(); 
@@ -1996,20 +2078,13 @@
 
             let specialQuizzes = serverQuizzes.filter(sq => sq.isMegaQuiz || !getValidDate({date: sq.quizDate}));
             if (specialQuizzes.length > 0) {
+                // MEGA QUIZ SORTING FIX
+                specialQuizzes.sort((a, b) => getSortableTime(b) - getSortableTime(a));
+
                 let activeMegaHtml = '';
                 specialQuizzes.forEach(sq => {
                     let isCompleted = history.some(h => String(h.date).trim() === String(sq.quizDate).trim());
-                    
-                    let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
-                    if (createdTime === 0) {
-                        let parsed = parseDateString(sq.quizDate);
-                        if (parsed && !isNaN(parsed.getTime())) {
-                            createdTime = parsed.getTime();
-                        } else {
-                            createdTime = Date.now(); 
-                        }
-                    }
-                    
+                    let createdTime = getSortableTime(sq);
                     let isExpired = createdTime > 0 && (Date.now() - createdTime) > (48 * 60 * 60 * 1000);
                     
                     if (isCompleted) { 
@@ -3287,6 +3362,14 @@ Text: ${text}`;
             document.getElementById('sticky-scorebar').style.display = 'flex'; 
         }
     }
+
+    // NEW: Switch between Quiz Stats and Chart Stats
+    window.switchStatTab = function(tab) {
+        document.getElementById('tab-stat-quiz').classList.toggle('active', tab === 'quiz');
+        document.getElementById('tab-stat-chart').classList.toggle('active', tab === 'chart');
+        document.getElementById('stat-quiz-section').style.display = tab === 'quiz' ? 'block' : 'none';
+        document.getElementById('stat-chart-section').style.display = tab === 'chart' ? 'block' : 'none';
+    }
     
     function openSettings() { 
         document.getElementById('settings-modal').style.display = 'flex'; 
@@ -3507,12 +3590,13 @@ Text: ${text}`;
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        // 3. Draw Charts
+        // 3. Draw Charts (Quiz & Chart Analytics)
         let currentMonthHistory = standardHistory.filter(h => {
             let d = getValidDate(h);
             return d && d.getMonth() === cm && d.getFullYear() === cy;
         });
         drawCharts(currentMonthHistory);
+        drawChartAnalytics(cm, cy); // NEW
 
         // 4. Mega Quiz Results
         let megaHistory = history.filter(h => {
@@ -3565,7 +3649,7 @@ Text: ${text}`;
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Score (%)',
+                    label: 'Quiz Score (%)',
                     data: dataPoints,
                     borderColor: '#0284c7',
                     backgroundColor: 'rgba(2, 132, 199, 0.2)',
@@ -3580,7 +3664,56 @@ Text: ${text}`;
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    title: { display: true, text: 'Daily Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
+                    title: { display: true, text: 'Daily Quiz Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } },
+                    x: { ticks: { color: textColor }, grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // NEW: Draw Chart Analytics
+    function drawChartAnalytics(cm, cy) {
+        let isDark = document.body.hasAttribute('data-theme');
+        let textColor = isDark ? '#f8fafc' : '#1e293b';
+        let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+        let charts = safeJSON('murali_daily_charts', []);
+        let currentMonthCharts = charts.filter(c => {
+            let d = new Date(c.date);
+            return d && d.getMonth() === cm && d.getFullYear() === cy;
+        });
+
+        let sortedCharts = [...currentMonthCharts].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        let labels = sortedCharts.map(c => new Date(c.date).getDate());
+        let dataPoints = sortedCharts.map(c => c.totalScore);
+
+        let ctxLine = document.getElementById('chartAnalyticsLine').getContext('2d');
+        if(chartAnalyticsInstance) chartAnalyticsInstance.destroy();
+
+        chartAnalyticsInstance = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Chart Score',
+                    data: dataPoints,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#f59e0b'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Daily Chart Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} }
                 },
                 scales: {
                     y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } },
@@ -3774,17 +3907,18 @@ Text: ${text}`;
             return;
         }
         
+        // MEGA QUIZ SORTING FIX
         let sortedQuizzes = serverQuizzes.map((sq, idx) => ({ data: sq, originalIndex: idx }))
             .sort((a, b) => {
-                let dA = getValidDate({date: a.data.quizDate}).getTime();
-                let dB = getValidDate({date: b.data.quizDate}).getTime();
-                return dB - dA; 
+                let tA = getSortableTime(a.data);
+                let tB = getSortableTime(b.data);
+                return tB - tA; 
             });
         
         let groupedQuizzes = {};
         sortedQuizzes.forEach(item => {
-            let dObj = getValidDate({date: item.data.quizDate});
-            let monthYear = dObj ? dObj.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : "Special/Mega Quizzes";
+            let dObj = parseDateString(item.data.quizDate);
+            let monthYear = (dObj && !isNaN(dObj.getTime())) ? dObj.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : "Special/Mega Quizzes";
             
             if(!groupedQuizzes[monthYear]) groupedQuizzes[monthYear] = [];
             groupedQuizzes[monthYear].push(item);
@@ -3819,9 +3953,9 @@ Text: ${text}`;
         
         if(serverQuizzes.length > 0) {
             let sortedQuizzes = [...serverQuizzes].sort((a, b) => {
-                let dA = getValidDate({date: a.quizDate}).getTime();
-                let dB = getValidDate({date: b.quizDate}).getTime();
-                return dB - dA; 
+                let tA = getSortableTime(a);
+                let tB = getSortableTime(b);
+                return tB - tA; 
             });
 
             sortedQuizzes.forEach(sq => {
@@ -4023,7 +4157,7 @@ Text: ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 89.4.0)
+                Generated by BK Murali Quiz App (Version 89.5.0)
             </div>
         </body>
         </html>`;
@@ -4120,12 +4254,7 @@ Text: ${text}`;
 
         let recentQuizzes = serverQuizzes.filter(sq => {
             let parsedDate = parseDateString(sq.quizDate);
-            let createdTime = sq.createdAt ? new Date(sq.createdAt).getTime() : 0;
-            
-            if (createdTime === 0) {
-                if (parsedDate && !isNaN(parsedDate.getTime())) createdTime = parsedDate.getTime();
-                else createdTime = Date.now(); 
-            }
+            let createdTime = getSortableTime(sq);
             
             let ageHours = (Date.now() - createdTime) / (1000 * 60 * 60);
             let isWithin48Hours = ageHours < 48;
@@ -4149,17 +4278,13 @@ Text: ${text}`;
         } else {
             document.getElementById('sl-date-select').disabled = false;
             
-            recentQuizzes.sort((a, b) => {
-                let tA = a.createdAt ? a.createdAt : parseDateString(a.quizDate).getTime();
-                let tB = b.createdAt ? b.createdAt : parseDateString(b.quizDate).getTime();
-                return tB - tA;
-            });
+            recentQuizzes.sort((a, b) => getSortableTime(b) - getSortableTime(a));
             
             recentQuizzes.forEach(sq => {
                 let opt = document.createElement('option');
                 opt.value = sq.quizDate;
                 let displayDate = String(sq.quizDate).replace(/T.*/, '');
-                opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
+opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
                 select.appendChild(opt);
             });
         }
@@ -4340,9 +4465,111 @@ Text: ${text}`;
         document.getElementById('daily-chart-form').style.display = 'block';
         document.getElementById('daily-chart-form').reset();
     }
+
+    // ==========================================
+    // 13. CHART LEADERBOARD LOGIC (NEW)
+    // ==========================================
+    window.openChartLeaderboard = function() {
+        let dateVal = document.getElementById('chart-date').value;
+        if(!dateVal) {
+            dateVal = new Date().toISOString().split('T')[0];
+        }
+        document.getElementById('cl-date-select').value = dateVal;
+        document.getElementById('chart-leaderboard-modal').style.display = 'flex';
+        fetchChartLeaderboardData();
+    }
+
+    window.fetchChartLeaderboardData = function() {
+        let targetDateStr = document.getElementById('cl-date-select').value;
+        
+        document.getElementById('cl-loading').style.display = 'block';
+        document.getElementById('cl-content').style.display = 'none';
+
+        if (!navigator.onLine) {
+            document.getElementById('cl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!";
+            return;
+        }
+
+        fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ 
+                action: "getStudentChartLeaderboard", 
+                targetDate: targetDateStr, 
+                phone: userPhone 
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('cl-loading').style.display = 'none';
+            document.getElementById('cl-content').style.display = 'block';
+
+            if (data.status === "success") {
+                let tbody = document.getElementById('cl-table-body');
+                
+                if (data.total === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
+                    document.getElementById('cl-my-rank-box').style.display = 'none';
+                    return;
+                }
+
+                let leaderboardData = data.top20 || [];
+                tbody.innerHTML = leaderboardData.map((user, index) => {
+                    let isMe = (data.myRank === index + 1);
+                    let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
+                    let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
+                    
+                    return `<tr style="${rowStyle}">
+                                <td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem;">${rankIcon}</td>
+                                <td style="padding: 10px;">
+                                    ${user.name} <br>
+                                    <span style="font-size:0.75rem; color:#64748b;">${user.address}</span>
+                                </td>
+                                <td style="padding: 10px; text-align:center; color:var(--primary-color); font-weight:bold;">
+                                    ${user.totalScore}<br>
+                                    <span style="font-size:0.75rem; color:#64748b;">${user.stage.split(' ')[0]}</span>
+                                </td>
+                            </tr>`;
+                }).join('');
+
+                let myRankBox = document.getElementById('cl-my-rank-box');
+                if (data.myRank > 20) { 
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = '#a78bfa';
+                    myRankBox.style.background = 'rgba(167, 139, 250, 0.15)';
+                    document.getElementById('cl-my-rank-number').innerText = `${data.myRank} / ${data.total}`;
+                    document.getElementById('cl-my-rank-number').style.fontSize = '1.8rem';
+                    document.getElementById('cl-my-rank-number').style.color = '#8b5cf6';
+                    document.getElementById('cl-my-score-text').innerText = `Score: ${data.myRankData.totalScore} | Stage: ${data.myRankData.stage}`;
+                } else if (data.myRank > 0 && data.myRank <= 20) { 
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = 'var(--success-color)';
+                    myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
+                    document.getElementById('cl-my-rank-number').innerText = `बधाई छ! तपाईं Top 20 मा हुनुहुन्छ।`;
+                    document.getElementById('cl-my-rank-number').style.fontSize = '1.2rem';
+                    document.getElementById('cl-my-rank-number').style.color = 'var(--success-color)';
+                    document.getElementById('cl-my-score-text').innerText = `Rank: ${data.myRank} / ${data.total}`;
+                } else {
+                    myRankBox.style.display = 'block';
+                    myRankBox.style.borderColor = 'var(--danger-color)';
+                    myRankBox.style.background = 'rgba(220, 38, 38, 0.1)';
+                    document.getElementById('cl-my-rank-number').innerText = `- / ${data.total}`;
+                    document.getElementById('cl-my-rank-number').style.color = 'var(--danger-color)';
+                    document.getElementById('cl-my-score-text').innerText = `तपाईंले यो दिनको चार्ट भर्नुभएको छैन।`;
+                }
+            } else {
+                document.getElementById('cl-loading').style.display = 'block';
+                document.getElementById('cl-loading').innerHTML = "❌ डाटा ल्याउन समस्या भयो।";
+            }
+        })
+        .catch(err => {
+            document.getElementById('cl-loading').style.display = 'block';
+            document.getElementById('cl-loading').innerHTML = "❌ नेटवर्क समस्या!";
+        });
+    }
     
     // ==========================================
-    // 13. APP STARTUP & AUTO-SYNC
+    // 14. APP STARTUP & AUTO-SYNC
     // ==========================================
     window.onload = function() {
         init();
@@ -4364,3 +4591,4 @@ Text: ${text}`;
 </script>
 </body>
 </html>
+
