@@ -632,15 +632,15 @@
             <button onclick="openChartLeaderboard()" class="btn-small" style="background: var(--primary-gradient); color: white; border: none; padding: 0.6rem 1rem; font-weight: bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); flex-shrink: 0;">🏆 र्‍याङ्क हेर्नुहोस्</button>
         </div>
 
-        <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
+       <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
             
             <!-- 1. Amritvela -->
             <div class="chart-section-compact">
-                <div class="chart-title-compact">१. अमृतवेला (३० अंक)</div>
+                <div class="chart-title-compact">१. अमृतवेला (२५ अंक)</div>
                 <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="30" required> २:०० - ३:०० बजे</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="25"> ३:०० - ४:०० बजे</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="15"> ४:०० - ४:४५ बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="25" required> २:०० - ३:०० बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="20"> ३:०० - ४:०० बजे</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="10"> ४:०० - ४:४५ बजे</label>
                     <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="0"> ४:४५ पछि / उठिनँ</label>
                 </div>
             </div>
@@ -684,17 +684,29 @@
 
             <!-- 4. Behavior & Dharna -->
             <div class="chart-section-compact">
-                <div class="chart-title-compact">४. चलन र धारणा (२० अंक)</div>
+                <div class="chart-title-compact">४. चलन र धारणा (२५ अंक)</div>
                 
-                <div class="chart-sub-title-compact">क) क्रोध / अशान्ति (१० अंक)</div>
+                <div class="chart-sub-title-compact">क) पवित्रता (दृष्टि/वृत्ति) (१० अंक)</div>
                 <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="10" required> शान्त रहें, दुःख दिइनँ</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_purity" value="10" required> आत्मिक दृष्टि, वृत्ति शुद्ध</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_purity" value="0"> देहभान / अशुद्ध विचार आयो</label>
+                </div>
+
+                <div class="chart-sub-title-compact">ख) मीठो बोल (५ अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_speech" value="5" required> कम, बिस्तारै र मीठो बोलें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_speech" value="0"> व्यर्थ / ठूलो स्वरले बोलें</label>
+                </div>
+
+                <div class="chart-sub-title-compact">ग) क्रोध / अशान्ति (५ अंक)</div>
+                <div class="chart-grid">
+                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="5" required> शान्त रहें, दुःख दिइनँ</label>
                     <label class="chart-option-compact"><input type="radio" name="chart_anger" value="0"> क्रोध वा अशान्ति भयो</label>
                 </div>
 
-                <div class="chart-sub-title-compact">ख) ब्रह्माभोजन (१० अंक)</div>
+                <div class="chart-sub-title-compact">घ) ब्रह्माभोजन (५ अंक)</div>
                 <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="10" required> बाबाको यादमा भोजन गरें</label>
+                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="5" required> बाबाको यादमा भोजन गरें</label>
                     <label class="chart-option-compact"><input type="radio" name="chart_food" value="0"> याद बिना / बोल्दै खाएँ</label>
                 </div>
             </div>
@@ -711,7 +723,10 @@
             <div id="cr-stage" style="font-size: 1.4rem; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;"></div>
             <div id="cr-msg" style="font-size: 0.95rem; color: #64748b; font-weight: 600; margin-bottom: 20px;"></div>
             
-            <button onclick="resetChartForm()" style="background: #475569; color: white; width:auto; border-radius:50px; box-shadow: none; padding: 0.6rem 1.5rem;">Back</button>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="editChartForm()" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); width:auto; border-radius:50px; box-shadow: none; padding: 0.6rem 1.5rem;">✏️ सच्याउनुहोस् (Edit)</button>
+                <button onclick="resetChartForm()" style="background: #475569; color: white; width:auto; border-radius:50px; box-shadow: none; padding: 0.6rem 1.5rem;">नयाँ भर्नुहोस्</button>
+            </div>
         </div>
     </div>
 
@@ -4538,6 +4553,31 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
     // ==========================================
     // 12. DAILY CHART SUBMISSION LOGIC (NEW)
     // ==========================================
+    
+    // मिति परिवर्तन गर्दा पुरानो डाटा छ भने आफैं फर्ममा भर्ने
+    document.getElementById('chart-date').addEventListener('change', function() {
+        let dateVal = this.value;
+        let charts = safeJSON('murali_daily_charts', []);
+        let existingChart = charts.find(c => c.date === dateVal);
+        
+        if(existingChart) {
+            let form = document.getElementById('daily-chart-form');
+            if(form.chart_amritvela) form.chart_amritvela.value = existingChart.amritvela;
+            if(form.chart_murli) form.chart_murli.value = existingChart.murli;
+            if(form.chart_hourly) form.chart_hourly.value = existingChart.hourlyDrill;
+            if(form.chart_evening) form.chart_evening.value = existingChart.eveningYoga;
+            if(form.chart_sleep) form.chart_sleep.value = existingChart.sleep;
+            if(form.chart_purity) form.chart_purity.value = existingChart.purity || 0;
+            if(form.chart_speech) form.chart_speech.value = existingChart.speech || 0;
+            if(form.chart_anger) form.chart_anger.value = existingChart.anger;
+            if(form.chart_food) form.chart_food.value = existingChart.food;
+            
+            showToast("यो मितिको पुरानो चार्ट लोड भयो। सच्याउन सक्नुहुन्छ।", "info");
+        } else {
+            document.getElementById('daily-chart-form').reset();
+        }
+    });
+
     window.submitDailyChart = function() {
         let dateVal = document.getElementById('chart-date').value;
         if(!dateVal) return showToast("कृपया मिति छान्नुहोस्।", "error");
@@ -4548,10 +4588,12 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
         let hourly = parseInt(form.chart_hourly.value || 0);
         let evening = parseInt(form.chart_evening.value || 0);
         let sleep = parseInt(form.chart_sleep.value || 0);
+        let purity = parseInt(form.chart_purity.value || 0);
+        let speech = parseInt(form.chart_speech.value || 0);
         let anger = parseInt(form.chart_anger.value || 0);
         let food = parseInt(form.chart_food.value || 0);
 
-        let totalScore = amritvela + murli + hourly + evening + sleep + anger + food;
+        let totalScore = amritvela + murli + hourly + evening + sleep + purity + speech + anger + food;
         
         let stage = "";
         let msg = "";
@@ -4570,6 +4612,7 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
         }
 
         let charts = safeJSON('murali_daily_charts', []);
+        // पुरानो डाटा छ भने हटाउने (Edit को लागि)
         charts = charts.filter(c => c.date !== dateVal);
         
         let chartData = {
@@ -4585,6 +4628,8 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
             hourlyDrill: hourly,
             eveningYoga: evening,
             sleep: sleep,
+            purity: purity,
+            speech: speech,
             anger: anger,
             food: food,
             synced: false
@@ -4609,6 +4654,15 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
         document.getElementById('chart-result-box').style.display = 'none';
         document.getElementById('daily-chart-form').style.display = 'block';
         document.getElementById('daily-chart-form').reset();
+        
+        let todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('chart-date').value = todayStr;
+    }
+
+    window.editChartForm = function() {
+        document.getElementById('chart-result-box').style.display = 'none';
+        document.getElementById('daily-chart-form').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ==========================================
