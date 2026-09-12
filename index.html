@@ -1277,8 +1277,8 @@
             }
         }
         syncServerQuizzes(); 
-    }
-// NEW: Chart Auto-Scroll Logic
+
+        // NEW: Chart Auto-Scroll Logic
         setTimeout(() => {
             document.querySelectorAll('.chart-option-compact input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -1295,6 +1295,7 @@
                 });
             });
         }, 1000);
+    }
 
     function startLockoutTimer(unlockTime) {
         isLockedOut = true; 
@@ -3386,11 +3387,15 @@ Text: ${text}`;
     }
 
     // NEW: Switch between Quiz Stats and Chart Stats
+    // NEW: Switch between Quiz Stats and Chart Stats
     window.switchStatTab = function(tab) {
         document.getElementById('tab-stat-quiz').classList.toggle('active', tab === 'quiz');
         document.getElementById('tab-stat-chart').classList.toggle('active', tab === 'chart');
         document.getElementById('stat-quiz-section').style.display = tab === 'quiz' ? 'block' : 'none';
         document.getElementById('stat-chart-section').style.display = tab === 'chart' ? 'block' : 'none';
+        
+        // ट्याब फेर्दा क्यालेन्डर र डाटा पनि फेर्न यो कल गर्नुपर्छ
+        renderDashboard(); 
     }
     
     function openSettings() { 
@@ -3533,43 +3538,76 @@ Text: ${text}`;
     }
 
     window.renderDashboard = function() {
+        let isChartTab = document.getElementById('tab-stat-chart').classList.contains('active');
+
         let history = safeJSON('murali_progress', []);
         let standardHistory = history.filter(h => {
             let dStr = String(h.date || "");
             return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review");
         });
 
-        // 1. Calculate Stats (ACCURATE AVERAGE SCORE)
-        let totalExams = standardHistory.length;
-        let avgScore = 0;
-        if (totalExams > 0) {
-            let totalObtained = 0;
-            let totalMax = 0;
-            standardHistory.forEach(h => {
-                totalObtained += (h.score || 0);
-                totalMax += (h.total || 0);
-            });
-            avgScore = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
-        }
-        let streak = calculateStreak(standardHistory);
+        let charts = safeJSON('murali_daily_charts', []);
 
-        let statsHtml = `
-            <div class="stat-card"><h3>${totalExams}</h3><p>Total Exams</p></div>
-            <div class="stat-card"><h3>${avgScore}%</h3><p>Avg Score</p></div>
-            <div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>
-        `;
-        document.getElementById('dash-stats').innerHTML = statsHtml;
-
-        // Baba Message
+        // 1. Calculate Stats (माथिको ३ वटा बक्स)
+        let statsHtml = '';
         let msgContainer = document.getElementById('baba-message-container');
-        if (totalExams > 0) {
-            let msg = avgScore >= 80 ? "✨ मीठे बच्चे, तिम्रो चार्ट धेरै राम्रो छ। यसरी नै अगाडि बढ।" :
-                      (avgScore >= 50 ? "🌟 मीठे बच्चे, अभ्यास राम्रो छ तर अझै ध्यान देऊ।" :
-                      "🌱 मीठे बच्चे, ज्ञानको मनन-चिन्तन अझै बढाउनुपर्छ।");
-            msgContainer.innerHTML = `<div style="background: rgba(167, 139, 250, 0.1); border: 1px dashed #a78bfa; padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; color: var(--primary-color); margin-bottom: 15px;">${msg}</div>`;
+
+        if (!isChartTab) {
+            // QUIZ STATS
+            let totalExams = standardHistory.length;
+            let avgScore = 0;
+            if (totalExams > 0) {
+                let totalObtained = 0;
+                let totalMax = 0;
+                standardHistory.forEach(h => {
+                    totalObtained += (h.score || 0);
+                    totalMax += (h.total || 0);
+                });
+                avgScore = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0;
+            }
+            let streak = calculateStreak(standardHistory);
+
+            statsHtml = `
+                <div class="stat-card"><h3>${totalExams}</h3><p>Total Exams</p></div>
+                <div class="stat-card"><h3>${avgScore}%</h3><p>Avg Score</p></div>
+                <div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>
+            `;
+            
+            if (totalExams > 0) {
+                let msg = avgScore >= 80 ? "✨ मीठे बच्चे, तिम्रो चार्ट धेरै राम्रो छ। यसरी नै अगाडि बढ।" :
+                          (avgScore >= 50 ? "🌟 मीठे बच्चे, अभ्यास राम्रो छ तर अझै ध्यान देऊ।" :
+                          "🌱 मीठे बच्चे, ज्ञानको मनन-चिन्तन अझै बढाउनुपर्छ।");
+                msgContainer.innerHTML = `<div style="background: rgba(167, 139, 250, 0.1); border: 1px dashed #a78bfa; padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; color: var(--primary-color); margin-bottom: 15px;">${msg}</div>`;
+            } else {
+                msgContainer.innerHTML = '';
+            }
         } else {
-            msgContainer.innerHTML = '';
+            // CHART STATS
+            let totalCharts = charts.length;
+            let avgChartScore = 0;
+            if (totalCharts > 0) {
+                let totalObtained = 0;
+                charts.forEach(c => { totalObtained += (c.totalScore || 0); });
+                avgChartScore = Math.round(totalObtained / totalCharts);
+            }
+            let chartStreak = calculateStreak(charts.map(c => ({date: c.date}))); 
+
+            statsHtml = `
+                <div class="stat-card"><h3>${totalCharts}</h3><p>Total Charts</p></div>
+                <div class="stat-card"><h3>${avgChartScore}</h3><p>Avg Score</p></div>
+                <div class="stat-card"><h3>${chartStreak} 🔥</h3><p>Day Streak</p></div>
+            `;
+            
+            if (totalCharts > 0) {
+                let msg = avgChartScore >= 90 ? "✨ मीठे बच्चे, तिम्रो उड्ती कलाको स्थिति धेरै राम्रो छ।" :
+                          (avgChartScore >= 70 ? "🌟 मीठे बच्चे, चढ्ती कला छ, अझै अटेन्सन देऊ।" :
+                          "🌱 मीठे बच्चे, योग र धारणामा विशेष ध्यान दिनुपर्छ।");
+                msgContainer.innerHTML = `<div style="background: rgba(16, 185, 129, 0.1); border: 1px dashed #10b981; padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; color: #10b981; margin-bottom: 15px;">${msg}</div>`;
+            } else {
+                msgContainer.innerHTML = '';
+            }
         }
+        document.getElementById('dash-stats').innerHTML = statsHtml;
 
         // 2. Calendar Logic
         let cy = currentCalDate.getFullYear();
@@ -3579,79 +3617,122 @@ Text: ${text}`;
         let daysInMonth = new Date(cy, cm + 1, 0).getDate();
         let firstDay = new Date(cy, cm, 1).getDay();
 
-        let historyMap = {};
-        standardHistory.forEach(h => {
-            let d = getValidDate(h);
-            if (d && d.getMonth() === cm && d.getFullYear() === cy) {
-                if (!historyMap[d.getDate()] || historyMap[d.getDate()].percent < h.percent) {
-                    historyMap[d.getDate()] = h;
-                }
-            }
-        });
-
         let calHtml = '';
         for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`;
-
         let today = new Date();
-        for (let i = 1; i <= daysInMonth; i++) {
-            let isToday = (today.getDate() === i && today.getMonth() === cm && today.getFullYear() === cy);
-            let borderStyle = isToday ? 'border: 2px dashed var(--primary-color);' : '';
 
-            if (historyMap[i]) {
-                let h = historyMap[i];
-                let rClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor');
-                calHtml += `<div class="cal-day has-data ${rClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">
-                                <span>${i}</span>
-                                <span style="font-size:0.65rem; margin-top:2px;">${h.percent}%</span>
-                            </div>`;
-            } else {
-                let isPast = new Date(cy, cm, i) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                let opacity = isPast ? 'opacity: 0.5;' : '';
-                calHtml += `<div class="cal-day" style="${borderStyle} ${opacity}"><span>${i}</span></div>`;
+        if (!isChartTab) {
+            // QUIZ CALENDAR
+            let historyMap = {};
+            standardHistory.forEach(h => {
+                let d = getValidDate(h);
+                if (d && d.getMonth() === cm && d.getFullYear() === cy) {
+                    if (!historyMap[d.getDate()] || historyMap[d.getDate()].percent < h.percent) {
+                        historyMap[d.getDate()] = h;
+                    }
+                }
+            });
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let isToday = (today.getDate() === i && today.getMonth() === cm && today.getFullYear() === cy);
+                let borderStyle = isToday ? 'border: 2px dashed var(--primary-color);' : '';
+
+                if (historyMap[i]) {
+                    let h = historyMap[i];
+                    let rClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor');
+                    calHtml += `<div class="cal-day has-data ${rClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})">
+                                    <span>${i}</span>
+                                    <span style="font-size:0.65rem; margin-top:2px;">${h.percent}%</span>
+                                </div>`;
+                } else {
+                    let isPast = new Date(cy, cm, i) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    let opacity = isPast ? 'opacity: 0.5;' : '';
+                    calHtml += `<div class="cal-day" style="${borderStyle} ${opacity}"><span>${i}</span></div>`;
+                }
+            }
+        } else {
+            // CHART CALENDAR
+            let chartMap = {};
+            charts.forEach(c => {
+                let d = new Date(c.date);
+                if (d && d.getMonth() === cm && d.getFullYear() === cy) {
+                    chartMap[d.getDate()] = c;
+                }
+            });
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let isToday = (today.getDate() === i && today.getMonth() === cm && today.getFullYear() === cy);
+                let borderStyle = isToday ? 'border: 2px dashed var(--primary-color);' : '';
+
+                if (chartMap[i]) {
+                    let c = chartMap[i];
+                    let rClass = c.totalScore >= 90 ? 'excellent' : (c.totalScore >= 70 ? 'good' : 'poor');
+                    calHtml += `<div class="cal-day has-data ${rClass}" style="${borderStyle}" onclick="showChartCalendarDetail(${c.id})">
+                                    <span>${i}</span>
+                                    <span style="font-size:0.65rem; margin-top:2px;">${c.totalScore}</span>
+                                </div>`;
+                } else {
+                    let isPast = new Date(cy, cm, i) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    let opacity = isPast ? 'opacity: 0.5;' : '';
+                    calHtml += `<div class="cal-day" style="${borderStyle} ${opacity}"><span>${i}</span></div>`;
+                }
             }
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        // 3. Draw Charts (Quiz & Chart Analytics)
+        // 3. Draw Charts
         let currentMonthHistory = standardHistory.filter(h => {
             let d = getValidDate(h);
             return d && d.getMonth() === cm && d.getFullYear() === cy;
         });
         drawCharts(currentMonthHistory);
-        drawChartAnalytics(cm, cy); // NEW
+        drawChartAnalytics(cm, cy);
 
-        // 4. Mega Quiz Results
-        let megaHistory = history.filter(h => {
-            let dStr = String(h.date || "");
-            return dStr.includes("Mega") || dStr.includes("मेगा") || dStr.includes("Review");
-        });
-
+        // 4. Mega Quiz Results & Buttons Visibility
         let megaContainer = document.getElementById('mega-quiz-results-container');
-        if (megaHistory.length > 0) {
-            let megaHtml = `<h4 style="margin: 20px 0 10px 0; color: var(--primary-color); font-weight: 800;">🏆 Special/Mega Exams</h4>`;
-            megaHistory.forEach(h => {
-                let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
-                let rText = h.percent >= 80 ? 'Excellent' : (h.percent >= 50 ? 'Good' : 'Needs Practice');
-                megaHtml += `
-                <div class="progress-item">
-                    <div style="flex-grow: 1;">
-                        <div style="font-weight:800; font-size:1rem; color:var(--primary-color);">${h.date}</div>
-                        <div class="prog-remark ${rClass}">${rText}</div>
-                        <div style="margin-top: 5px;"><button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button></div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="prog-percent">${h.percent}%</div>
-                        <div style="font-size:0.85rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
-                    </div>
-                </div>`;
+        let detailedProgBtn = document.querySelector('button[onclick="openDetailedProgress()"]');
+        let calToggleBtn = document.querySelector('button[onclick="toggleCalendar()"]');
+
+        if (!isChartTab) {
+            // क्वीज ट्याबमा 'मेरो प्रगति' बटन देखाउने र मेगा क्वीज देखाउने
+            if (detailedProgBtn) detailedProgBtn.style.display = 'flex';
+            if (calToggleBtn) calToggleBtn.style.gridColumn = 'auto';
+
+            let megaHistory = history.filter(h => {
+                let dStr = String(h.date || "");
+                return dStr.includes("Mega") || dStr.includes("मेगा") || dStr.includes("Review");
             });
-            megaContainer.innerHTML = megaHtml;
+
+            if (megaHistory.length > 0) {
+                let megaHtml = `<h4 style="margin: 20px 0 10px 0; color: var(--primary-color); font-weight: 800;">🏆 Special/Mega Exams</h4>`;
+                megaHistory.forEach(h => {
+                    let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor');
+                    let rText = h.percent >= 80 ? 'Excellent' : (h.percent >= 50 ? 'Good' : 'Needs Practice');
+                    megaHtml += `
+                    <div class="progress-item">
+                        <div style="flex-grow: 1;">
+                            <div style="font-weight:800; font-size:1rem; color:var(--primary-color);">${h.date}</div>
+                            <div class="prog-remark ${rClass}">${rText}</div>
+                            <div style="margin-top: 5px;"><button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="prog-percent">${h.percent}%</div>
+                            <div style="font-size:0.85rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div>
+                        </div>
+                    </div>`;
+                });
+                megaContainer.innerHTML = megaHtml;
+            } else {
+                megaContainer.innerHTML = '';
+            }
         } else {
-            megaContainer.innerHTML = '';
+            // चार्ट ट्याबमा 'मेरो प्रगति' बटन लुकाउने र मेगा क्वीज लुकाउने
+            if (detailedProgBtn) detailedProgBtn.style.display = 'none';
+            if (calToggleBtn) calToggleBtn.style.gridColumn = '1 / -1'; // क्यालेन्डर बटनलाई फुल साइज बनाउने
+            megaContainer.innerHTML = ''; 
         }
     }
-
-    function drawCharts(filteredHistory) {
+function drawCharts(filteredHistory) {
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
@@ -3906,10 +3987,32 @@ Text: ${text}`;
         remarkEl.className = `prog-remark ${rClass}`;
 
         let reviewBtn = document.getElementById('cal-detail-review-btn');
+        reviewBtn.style.display = 'block'; // क्वीजमा रिभ्यु बटन देखाउने
         reviewBtn.onclick = () => {
             document.getElementById('calendar-detail-modal').style.display = 'none';
             reviewPastQuiz(id);
         };
+
+        document.getElementById('calendar-detail-modal').style.display = 'flex';
+    }
+
+    // NEW: चार्टको क्यालेन्डरमा क्लिक गर्दा देखाउने पप-अप
+    window.showChartCalendarDetail = function(id) {
+        let charts = safeJSON('murali_daily_charts', []);
+        let record = charts.find(item => item.id === id);
+        if (!record) return;
+
+        document.getElementById('cal-detail-date').innerText = record.date + " (Chart)";
+        document.getElementById('cal-detail-score').innerText = `${record.totalScore}`;
+        
+        let remarkEl = document.getElementById('cal-detail-remark');
+        let rText = record.stage; 
+        let rClass = record.totalScore >= 90 ? 'remark-excellent' : (record.totalScore >= 70 ? 'remark-good' : 'remark-poor');
+        remarkEl.innerText = rText;
+        remarkEl.className = `prog-remark ${rClass}`;
+
+        let reviewBtn = document.getElementById('cal-detail-review-btn');
+        reviewBtn.style.display = 'none'; // चार्टमा रिभ्यु बटन लुकाउने
 
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
@@ -4633,4 +4736,7 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
 </script>
 </body>
 </html>
+
+
+    
 
