@@ -4554,28 +4554,32 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
     // 12. DAILY CHART SUBMISSION LOGIC (NEW)
     // ==========================================
     
-    // मिति परिवर्तन गर्दा पुरानो डाटा छ भने आफैं फर्ममा भर्ने
-    document.getElementById('chart-date').addEventListener('change', function() {
-        let dateVal = this.value;
+    // मिति परिवर्तन गर्दा वा 'Edit' गर्दा डाटा लोड गर्ने साझा function
+    function loadChartDataForDate(dateVal) {
+        let form = document.getElementById('daily-chart-form');
+        form.reset(); // सुरुमा फर्म खाली गर्ने
+
         let charts = safeJSON('murali_daily_charts', []);
         let existingChart = charts.find(c => c.date === dateVal);
         
         if(existingChart) {
-            let form = document.getElementById('daily-chart-form');
-            if(form.chart_amritvela) form.chart_amritvela.value = existingChart.amritvela;
-            if(form.chart_murli) form.chart_murli.value = existingChart.murli;
-            if(form.chart_hourly) form.chart_hourly.value = existingChart.hourlyDrill;
-            if(form.chart_evening) form.chart_evening.value = existingChart.eveningYoga;
-            if(form.chart_sleep) form.chart_sleep.value = existingChart.sleep;
-            if(form.chart_purity) form.chart_purity.value = existingChart.purity || 0;
-            if(form.chart_speech) form.chart_speech.value = existingChart.speech || 0;
-            if(form.chart_anger) form.chart_anger.value = existingChart.anger;
-            if(form.chart_food) form.chart_food.value = existingChart.food;
-            
-            showToast("यो मितिको पुरानो चार्ट लोड भयो। सच्याउन सक्नुहुन्छ।", "info");
-        } else {
-            document.getElementById('daily-chart-form').reset();
+            // रेडियो ग्रुपको value सेट गर्दा सही अप्सन आफैं छानिन्छ
+            form.chart_amritvela.value = existingChart.amritvela;
+            form.chart_murli.value = existingChart.murli;
+            form.chart_hourly.value = existingChart.hourlyDrill;
+            form.chart_evening.value = existingChart.eveningYoga;
+            form.chart_sleep.value = existingChart.sleep;
+            form.chart_purity.value = existingChart.purity;
+            form.chart_speech.value = existingChart.speech;
+            form.chart_anger.value = existingChart.anger;
+            form.chart_food.value = existingChart.food;
         }
+    }
+
+    // मिति परिवर्तन गर्दा डाटा लोड गर्न नयाँ function लाई कल गर्ने
+    document.getElementById('chart-date').addEventListener('change', function() {
+        loadChartDataForDate(this.value);
+        showToast("यो मितिको पुरानो चार्ट लोड भयो। सच्याउन सक्नुहुन्छ।", "info");
     });
 
     window.submitDailyChart = function() {
@@ -4682,6 +4686,11 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
     }
 
     window.editChartForm = function() {
+        // पहिले हालको मितिको डाटा लोड गर्ने
+        let currentDate = document.getElementById('chart-date').value;
+        loadChartDataForDate(currentDate); 
+
+        // त्यसपछि मात्र फर्म देखाउने
         document.getElementById('chart-result-box').style.display = 'none';
         document.getElementById('daily-chart-form').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
