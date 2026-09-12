@@ -1278,6 +1278,23 @@
         }
         syncServerQuizzes(); 
     }
+// NEW: Chart Auto-Scroll Logic
+        setTimeout(() => {
+            document.querySelectorAll('.chart-option-compact input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    let currentSection = this.closest('.chart-section-compact');
+                    let nextSection = currentSection.nextElementSibling;
+                    
+                    setTimeout(() => {
+                        if (nextSection && nextSection.classList.contains('chart-section-compact')) {
+                            nextSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            document.getElementById('btn-submit-chart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 250);
+                });
+            });
+        }, 1000);
 
     function startLockoutTimer(unlockTime) {
         isLockedOut = true; 
@@ -2611,7 +2628,12 @@ Text: ${text}`;
         if (isMonthly) {
             let targetDate = startDateObj || sDate;
             let monthName = targetDate.toLocaleString('default', { month: 'long' });
-            currentMurliDate = `🏆 मासिक मेगा क्वीज (${monthName} ${targetDate.getFullYear()})`;
+            let year = targetDate.getFullYear();
+            
+            let nextMonth = new Date(year, targetDate.getMonth() + 1, 1);
+            let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-');
+            
+            currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`;
         } else {
             let displayStart = sDateStr.split('-').reverse().join('-');
             let displayEnd = eDateStr.split('-').reverse().join('-');
@@ -3942,7 +3964,7 @@ Text: ${text}`;
     // ==========================================
     // 🏆 LEADERBOARD LOGIC (ADMIN)
     // ==========================================
-    window.openLeaderboardModal = function() {
+   window.openLeaderboardModal = function() {
         document.getElementById('leaderboard-modal').style.display = 'flex';
         document.getElementById('lb-result-text').value = "Select quiz and click Generate Data...";
         switchLbTab('wa'); 
@@ -3958,13 +3980,33 @@ Text: ${text}`;
                 return tB - tA; 
             });
 
+            let groupedQuizzes = {};
             sortedQuizzes.forEach(sq => {
-                let opt = document.createElement('option');
-                opt.value = sq.quizDate; 
-                let displayDate = String(sq.quizDate).replace(/T.*/, '');
-                opt.text = (sq.isMegaQuiz ? "🏆 " : "📅 ") + displayDate;
-                select.appendChild(opt);
+                let dObj = parseDateString(sq.quizDate);
+                let monthYear = (dObj && !isNaN(dObj.getTime())) ? dObj.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : "Special/Mega Quizzes";
+                
+                if(!groupedQuizzes[monthYear]) groupedQuizzes[monthYear] = [];
+                groupedQuizzes[monthYear].push(sq);
             });
+
+            for (let group in groupedQuizzes) {
+                let optGroup = document.createElement('optgroup');
+                optGroup.label = group; 
+                
+                groupedQuizzes[group].forEach(sq => {
+                    let opt = document.createElement('option');
+                    opt.value = sq.quizDate; 
+                    let displayDate = String(sq.quizDate).replace(/T.*/, '');
+                    
+                    if(displayDate.includes("13-08-2026 to 31-08-2026")) {
+                        displayDate = "01-09-2026 🏆 Mega Quiz August 2026";
+                    }
+                    
+                    opt.text = (sq.isMegaQuiz && !displayDate.includes("🏆") ? "🏆 " : (sq.isMegaQuiz ? "" : "📅 ")) + displayDate;
+                    optGroup.appendChild(opt);
+                });
+                select.appendChild(optGroup);
+            }
         } else {
             select.innerHTML = '<option value="">कुनै क्वीज छैन</option>';
         }
