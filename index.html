@@ -10,7 +10,7 @@
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <link rel="manifest" href="manifest.json">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789443231273&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000b5388211a7645876df38a576%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0_chart_v2.html%26cd%3Dattachment%26ts%3D497068%26p%3Dfs%26cid%3D1%26sig%3D5228192919b933627d479d6ad0d55db6c8a21ee973a84a38301dfbef8be22e28%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789443231273&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -172,6 +172,42 @@
         .chart-option-compact:hover { border-color: var(--primary-color); background: rgba(56, 189, 248, 0.05); }
         .chart-option-compact input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); margin-top: 2px; cursor: pointer; flex-shrink: 0; }
         .chart-sub-title-compact { font-size: 0.85rem; color: #8b5cf6; font-weight: 700; margin: 10px 0 6px 0; }
+
+        /* DAILY CHART V2 */
+        .chart-topbar-v2 { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+        .chart-date-btn-v2 { flex:1; width:auto; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none; }
+        .chart-hidden-date { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+        .chart-progress-head-v2 { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; margin-bottom:8px; background:var(--bg-color); border:1px solid var(--border-color); border-radius:16px; }
+        .chart-progress-label-v2 { font-size:.78rem; color:#64748b; font-weight:800; }
+        .chart-total-v2 { font-size:2rem; font-weight:900; line-height:1.05; color:var(--primary-color); }
+        .chart-total-max-v2 { font-size:.95rem; color:#94a3b8; margin-left:3px; }
+        .chart-progress-ring-v2 { width:58px; height:58px; border-radius:50%; border:5px solid var(--primary-color); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:900; background:var(--card-bg); }
+        .chart-progress-track-v2 { width:100%; height:8px; border-radius:999px; background:rgba(148,163,184,.18); overflow:hidden; margin:0 0 12px; }
+        .chart-progress-fill-v2 { height:100%; border-radius:999px; background:var(--primary-gradient); transition:width .25s ease; }
+        .chart-section-v2 { background:var(--card-bg); border:1px solid var(--border-color); border-radius:15px; padding:.85rem; margin-bottom:.7rem; box-shadow:0 2px 8px rgba(0,0,0,.04); scroll-margin-top:12px; }
+        .chart-section-v2.chart-section-active-v2 { border-color:var(--primary-color); box-shadow:0 0 0 3px rgba(2,132,199,.08); }
+        .chart-title-v2 { display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:900; color:var(--text-color); margin-bottom:8px; }
+        .chart-title-v2 b { min-width:32px; text-align:center; padding:3px 7px; border-radius:999px; background:rgba(2,132,199,.1); color:var(--primary-color); font-size:.78rem; }
+        .chart-subnote-v2 { font-size:.78rem; color:#64748b; font-weight:700; margin:-2px 0 8px; }
+        .chart-options-v2 { display:flex; flex-direction:column; gap:7px; }
+        .chart-option-v2 { display:flex; align-items:center; gap:9px; padding:.62rem .7rem; border:1px solid var(--border-color); border-radius:11px; cursor:pointer; background:var(--bg-color); color:var(--text-color); font-size:.88rem; font-weight:650; transition:all .18s ease; }
+        .chart-option-v2.selected-v2 { border-color:var(--primary-color); background:rgba(2,132,199,.08); transform:translateX(2px); }
+        .chart-option-v2 input { position:absolute; opacity:0; pointer-events:none; }
+        .check-box-v2 { width:24px; height:24px; flex:0 0 24px; display:flex; align-items:center; justify-content:center; border:2px solid #94a3b8; border-radius:7px; font-size:15px; font-weight:900; color:transparent; background:var(--card-bg); }
+        .chart-option-v2.selected-v2 .check-box-v2 { color:#fff; background:var(--primary-color); border-color:var(--primary-color); }
+        .chart-submit-wrap-v2 { position:sticky; bottom:88px; z-index:997; margin-top:4px; padding:10px; background:var(--glass-bg); backdrop-filter:blur(12px); border:1px solid var(--border-color); border-radius:16px; box-shadow:0 10px 28px rgba(0,0,0,.18); }
+        .chart-final-score-v2 { text-align:center; font-size:.95rem; font-weight:800; color:var(--text-color); margin-bottom:7px; }
+        .chart-final-score-v2 strong { color:var(--primary-color); font-size:1.25rem; }
+        .chart-result-v2 { text-align:center; padding:1.4rem 1rem; background:var(--card-bg); border-radius:20px; border:2px solid var(--border-color); box-shadow:var(--box-shadow-main); margin-bottom:18px; }
+        .chart-result-title-v2 { font-weight:900; color:var(--text-color); margin-bottom:7px; }
+        .chart-result-total-v2 { font-size:3.2rem; font-weight:900; line-height:1; color:var(--primary-color); }
+        .chart-result-total-v2 small { font-size:1rem; color:#94a3b8; margin-left:3px; }
+        .chart-result-stage-v2 { margin-top:7px; font-weight:850; color:var(--primary-color); }
+        .chart-result-msg-v2 { margin-top:4px; color:#64748b; font-size:.9rem; font-weight:650; }
+        .chart-result-actions-v2 { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+        .chart-result-actions-v2 button { width:auto; border-radius:50px; padding:.62rem 1rem; }
+        .chart-result-actions-v2 button.secondary { background:transparent; color:var(--primary-color); border:1px solid var(--primary-color); box-shadow:none; }
+        .chart-privacy-note-v2 { text-align:center; color:#64748b; font-size:.78rem; font-weight:700; padding:8px 4px 18px; }
     </style>
 </head>
 <body>
@@ -620,113 +656,142 @@
         </div>
     </div>
 
-    <!-- NEW: Compact Daily Chart View -->
+    <!-- NEW: Daily Spiritual Chart v2 -->
     <div id="view-chart" style="display: none;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <h2 style="color: var(--primary-color); margin: 0; font-weight: 800; font-size: 1.4rem;">📊 मेरो आध्यात्मिक चार्ट</h2>
-            <p style="color: #64748b; font-size: 0.9rem; margin: 5px 0 0 0; font-weight: 600;">(दैनिक स्व-चेकिङ)</p>
+        <div style="text-align:center; margin-bottom:14px;">
+            <h2 style="color:var(--primary-color); margin:0; font-weight:800; font-size:1.4rem;">📊 मेरो आध्यात्मिक चार्ट</h2>
+            <p style="color:#64748b; font-size:.9rem; margin:5px 0 0; font-weight:600;">दैनिक स्व-चेकिङ • १०० अंक</p>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
-            <input type="date" id="chart-date" class="input-field" style="width: auto; padding: 0.5rem 1rem; margin: 0; font-size: 1rem; cursor: pointer; flex: 1;">
-            <button onclick="openChartLeaderboard()" class="btn-small" style="background: var(--primary-gradient); color: white; border: none; padding: 0.6rem 1rem; font-weight: bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); flex-shrink: 0;">🏆 र्‍याङ्क हेर्नुहोस्</button>
+        <div class="chart-topbar-v2">
+            <button class="chart-date-btn-v2" type="button" onclick="openChartDatePicker()">📅 <span id="chart-date-label">आज</span></button>
+            <input type="date" id="chart-date" class="chart-hidden-date" aria-label="चार्ट मिति">
+            <button class="btn-small" type="button" onclick="openChartLeaderboard()" style="background:var(--primary-gradient); color:#fff; border:none; padding:.62rem .9rem; font-weight:800;">👥 सहभागी</button>
         </div>
 
-       <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
-            
-            <!-- 1. Amritvela -->
-            <div class="chart-section-compact">
-                <div class="chart-title-compact">१. अमृतवेला (२५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="25"> २:०० - ३:०० बजे</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="20"> ३:०० - ४:०० बजे</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="10"> ४:०० - ४:४५ बजे</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_amritvela" value="0"> ४:४५ पछि / उठिनँ</label>
+        <div class="chart-progress-head-v2">
+            <div>
+                <div class="chart-progress-label-v2">आजको कुल अंक</div>
+                <div class="chart-total-v2"><span id="chart-live-score">0</span><span class="chart-total-max-v2">/100</span></div>
+            </div>
+            <div class="chart-progress-ring-v2" id="chart-progress-ring"><span id="chart-live-percent">0%</span></div>
+        </div>
+
+        <div class="chart-progress-track-v2"><div id="chart-live-progress" class="chart-progress-fill-v2" style="width:0%"></div></div>
+
+        <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
+
+            <div class="chart-section-v2" data-chart-section="1">
+                <div class="chart-title-v2"><span>१. 🌅 अमृतवेला + जागृति</span><b>२०</b></div>
+                <div class="chart-subnote-v2">२:००–५:०० बजेभित्रको कुल योग/यादको समय</div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="20"><span class="check-box-v2">✓</span><span><b>२०</b> — २ घन्टाभन्दा बढी</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span><b>१५</b> — ठ्याक्कै २ घन्टा</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — १ घन्टा</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — आधा घन्टा</span></label>
                 </div>
             </div>
 
-            <!-- 2. Murli Study -->
-            <div class="chart-section-compact">
-                <div class="chart-title-compact">२. मुरली अध्ययन (२० अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="20"> सेवाकेन्द्रमै सुनें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="15"> घरमै पूरा सुनें/पढें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="5"> सार मात्र पढें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_murli" value="0"> छुट्यो</label>
+            <div class="chart-section-v2" data-chart-section="2">
+                <div class="chart-title-v2"><span>२. 📖 मुरली अध्ययन</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — सेन्टरमा पूरा सुनेँ/पढेँ</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — व्यक्तिगत रूपमा पूरा पढेँ/सुनेँ</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="2"><span class="check-box-v2">✓</span><span><b>२</b> — सार/मुख्य अंश मात्र</span></label>
                 </div>
             </div>
 
-            <!-- 3. Remembrance & Drills -->
-            <div class="chart-section-compact">
-                <div class="chart-title-compact">३. दिनभरिको याद र अभ्यास (३० अंक)</div>
-                
-                <div class="chart-sub-title-compact">क) हरेक घण्टाको स्वमान/ड्रिल (१५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="15"> ८-१० पटक भन्दा बढी</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="10"> ५ देखि ७ पटक</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="5"> २ देखि ४ पटक</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_hourly" value="0"> काममै व्यस्त भएँ</label>
-                </div>
-
-                <div class="chart-sub-title-compact">ख) साँझको योग (१० अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="10"> आधा घण्टा वा बढी</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="5"> १०-१५ मिनेट</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_evening" value="0"> छुट्यो</label>
-                </div>
-
-                <div class="chart-sub-title-compact">ग) सुत्नु अघिको चेकिङ (५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_sleep" value="5"> बाबालाई गुडनाइट गरेर सुतें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_sleep" value="0"> यत्तिकै सुतें</label>
+            <div class="chart-section-v2" data-chart-section="3">
+                <div class="chart-title-v2"><span>३. 🧘‍♂️ व्यक्तिगत योग / स्व-अध्ययन</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_personal_yoga" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — ३० मिनेटभन्दा बढी</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_personal_yoga" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — १५–३० मिनेट</span></label>
                 </div>
             </div>
 
-            <!-- 4. Behavior & Dharna -->
-            <div class="chart-section-compact">
-                <div class="chart-title-compact">४. चलन र धारणा (२५ अंक)</div>
-                
-                <div class="chart-sub-title-compact">क) पवित्रता (दृष्टि/वृत्ति) (१० अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_purity" value="10"> आत्मिक दृष्टि, वृत्ति शुद्ध</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_purity" value="0"> देहभान / अशुद्ध विचार आयो</label>
-                </div>
-
-                <div class="chart-sub-title-compact">ख) मीठो बोल (५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_speech" value="5"> कम, बिस्तारै र मीठो बोलें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_speech" value="0"> व्यर्थ / ठूलो स्वरले बोलें</label>
-                </div>
-
-                <div class="chart-sub-title-compact">ग) क्रोध / अशान्ति (५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="5"> शान्त रहें, दुःख दिइनँ</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_anger" value="0"> क्रोध वा अशान्ति भयो</label>
-                </div>
-
-                <div class="chart-sub-title-compact">घ) ब्रह्माभोजन (५ अंक)</div>
-                <div class="chart-grid">
-                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="5"> बाबाको यादमा भोजन गरें</label>
-                    <label class="chart-option-compact"><input type="radio" name="chart_food" value="0"> याद बिना / बोल्दै खाएँ</label>
+            <div class="chart-section-v2" data-chart-section="4">
+                <div class="chart-title-v2"><span>४. 🏃 व्यायाम</span><b>५</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_exercise" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — आफ्नो अनुकूलताअनुसार व्यायाम गरें</span></label>
                 </div>
             </div>
 
-            <button type="submit" id="btn-submit-chart" style="padding: 1rem; font-size: 1.1rem; border-radius: 14px; margin-bottom: 20px;">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Submit Chart
-            </button>
+            <div class="chart-section-v2" data-chart-section="5">
+                <div class="chart-title-v2"><span>५. 🌸 धारणा तथा चालचलन</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — सम्मानपूर्वक व्यवहार</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — सानो कमी भए पनि सम्हालेर सुधारें</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="6">
+                <div class="chart-title-v2"><span>६. 🔄 स्वमान / ड्रिल</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_drill" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — आज निर्धारित समयमा ड्रिल गरें</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_drill" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — समय मिलाएर केही पटक ड्रिल गरें</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="7">
+                <div class="chart-title-v2"><span>७. 🚦 ट्राफिक कन्ट्रोल</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — ट्राफिक नियम पूर्ण पालना गरें ५ पटक</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — सामान्यतः पालना गरें</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="8">
+                <div class="chart-title-v2"><span>८. 🍚 ब्रह्माभोजन / भोजन अनुशासन</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — याद/शान्त भावमा भोजन गरें</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — अधिकांश पालना गरें</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="9">
+                <div class="chart-title-v2"><span>९. 🌇 साँझको योग</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="10"><span class="check-box-v2">✓</span><span><b>१०</b> — ३० मिनेट वा बढी</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — १५–२९ मिनेट</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="10">
+                <div class="chart-title-v2"><span>१०. 🌙 गुडनाइट एवं दैनिक समीक्षा</span><b>५</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_goodnight" value="5"><span class="check-box-v2">✓</span><span><b>५</b> — दिनको समीक्षा गरी चार्ट पूरा गरें</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_goodnight" value="3"><span class="check-box-v2">✓</span><span><b>३</b> — समीक्षा/चार्ट पूरा गर्न केही कमी रह्यो</span></label>
+                </div>
+            </div>
+
+            <div class="chart-submit-wrap-v2">
+                <div class="chart-final-score-v2">कुल <strong id="chart-submit-score">0</strong> / 100</div>
+                <button type="submit" id="btn-submit-chart" style="padding:1rem; font-size:1.05rem; border-radius:14px;">✅ चार्ट सुरक्षित गर्नुहोस्</button>
+            </div>
         </form>
 
-        <!-- Chart Result Box -->
-        <div id="chart-result-box" style="display: none; text-align: center; padding: 2rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-bottom: 20px;">
-            <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">तपाईंको आजको कुल अंक:</div>
-            <div class="result-score-circle" id="cr-score" style="width: 100px; height: 100px; font-size: 2rem; margin-bottom: 10px;">0</div>
-            <div id="cr-stage" style="font-size: 1.4rem; font-weight: 800; color: var(--primary-color); margin-bottom: 5px;"></div>
-            <div id="cr-msg" style="font-size: 0.95rem; color: #64748b; font-weight: 600; margin-bottom: 20px;"></div>
-            
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="editChartForm()" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); width:auto; border-radius:50px; box-shadow: none; padding: 0.6rem 1.5rem;">✏️ सच्याउनुहोस् (Edit)</button>
-                <button onclick="resetChartForm()" style="background: #475569; color: white; width:auto; border-radius:50px; box-shadow: none; padding: 0.6rem 1.5rem;">नयाँ भर्नुहोस्</button>
+        <div id="chart-result-box" class="chart-result-v2" style="display:none;">
+            <div class="chart-result-title-v2">आजको चार्ट पूरा भयो ✅</div>
+            <div class="chart-result-total-v2"><span id="cr-score">0</span><small>/100</small></div>
+            <div id="cr-stage" class="chart-result-stage-v2"></div>
+            <div id="cr-msg" class="chart-result-msg-v2"></div>
+            <div class="chart-result-actions-v2">
+                <button type="button" onclick="openMyChartGraph()">📈 मेरो ग्राफ</button>
+                <button type="button" onclick="editChartForm()" class="secondary">✏️ सच्याउनुहोस्</button>
+                <button type="button" onclick="resetChartForm()" class="secondary">➕ नयाँ मिति</button>
             </div>
+        </div>
+
+        <div class="chart-privacy-note-v2">🔒 तपाईंको पूरा चार्ट र category-wise score तपाईं आफैं र Leadership/Admin ले मात्र हेर्न सक्नुहुन्छ।</div>
+    </div>
+
+    <!-- Chart Personal Graph Modal -->
+    <div id="my-chart-graph-modal" class="modal-overlay" onclick="if(event.target.id==='my-chart-graph-modal') document.getElementById('my-chart-graph-modal').style.display='none';">
+        <div class="modal-content" style="max-width:600px; padding:1.25rem;">
+            <button class="close-modal" onclick="document.getElementById('my-chart-graph-modal').style.display='none';" style="position:absolute; top:12px; right:12px; border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color:var(--primary-color); text-align:center;">📈 मेरो चार्ट ग्राफ</h3>
+            <div id="my-chart-graph-summary" style="text-align:center; font-weight:800; margin-bottom:10px;"></div>
+            <div class="chart-container" style="height:300px;"><canvas id="myChartCategoryGraph"></canvas></div>
         </div>
     </div>
 
@@ -870,7 +935,7 @@
         <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
             <button class="close-modal" onclick="document.getElementById('chart-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
             <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.3rem; font-weight: 800; text-align:center; margin-bottom: 10px;">
-                📊 चार्ट र्‍याङ्किङ
+                📊 चार्ट सहभागी सूची
             </h3>
             
             <input type="date" id="cl-date-select" class="input-field" onchange="fetchChartLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;">
@@ -886,7 +951,8 @@
                             <tr>
                                 <th style="padding: 10px; text-align:center;">Rank</th>
                                 <th style="padding: 10px;">Name</th>
-                                <th style="padding: 10px; text-align:center;">Score</th>
+                                <th style="padding: 10px; text-align:center;">स्थिति</th>
+                                <th id="cl-detail-head" style="padding: 10px; text-align:center; display:none;">विवरण</th>
                             </tr>
                         </thead>
                         <tbody id="cl-table-body">
@@ -1850,6 +1916,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ 
                     action: "saveChart", 
+                    chartVersion: 2,
                     name: data.name, 
                     address: data.address, 
                     phone: data.phone, 
@@ -1858,17 +1925,20 @@
                     stage: data.stage,
                     amritvela: data.amritvela,
                     murli: data.murli,
-                    hourlyDrill: data.hourlyDrill,
-                    eveningYoga: data.eveningYoga,
-                    sleep: data.sleep,
-                    anger: data.anger,
+                    personalYogaStudy: data.personalYogaStudy,
+                    exercise: data.exercise,
+                    conduct: data.conduct,
+                    drill: data.drill,
+                    traffic: data.traffic,
                     food: data.food,
+                    eveningYoga: data.eveningYoga,
+                    goodnight: data.goodnight,
                     deviceId: getDeviceId()
                 }) 
             })
             .then(res => res.json())
             .then(result => { 
-                if(result.status === "success" || result.message === "Already saved.") { 
+                if(result.status === "success" && Number(result.chartVersion || 0) >= 2) { 
                     data.synced = true; 
                     localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); 
                     console.log("Chart synced!"); 
@@ -3394,8 +3464,11 @@ Text: ${text}`;
             renderDashboard(); 
         } else if (tab === 'chart') {
             document.getElementById('sticky-scorebar').style.display = 'none';
+            initChartV2Interactions();
             let todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('chart-date').value = todayStr;
+            updateChartDateLabel(todayStr);
+            loadChartDataForDate(todayStr);
         } else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block') {
             document.getElementById('sticky-scorebar').style.display = 'flex'; 
         }
@@ -4551,150 +4624,243 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
     }
 
     // ==========================================
-    // 12. DAILY CHART SUBMISSION LOGIC (NEW)
+    // 12. DAILY CHART SUBMISSION LOGIC (V2)
     // ==========================================
-    
-    // मिति परिवर्तन गर्दा वा 'Edit' गर्दा डाटा लोड गर्ने साझा function
-    function loadChartDataForDate(dateVal) {
-        let form = document.getElementById('daily-chart-form');
-        form.reset(); // सुरुमा फर्म खाली गर्ने
+    const CHART_V2_GROUPS = [
+        'chart_amritvela','chart_murli','chart_personal_yoga','chart_exercise','chart_conduct',
+        'chart_drill','chart_traffic','chart_food','chart_evening','chart_goodnight'
+    ];
 
-        let charts = safeJSON('murali_daily_charts', []);
-        let existingChart = charts.find(c => c.date === dateVal);
-        
-        if(existingChart) {
-            // रेडियो ग्रुपको value सेट गर्दा सही अप्सन आफैं छानिन्छ
-            form.chart_amritvela.value = existingChart.amritvela;
-            form.chart_murli.value = existingChart.murli;
-            form.chart_hourly.value = existingChart.hourlyDrill;
-            form.chart_evening.value = existingChart.eveningYoga;
-            form.chart_sleep.value = existingChart.sleep;
-            form.chart_purity.value = existingChart.purity;
-            form.chart_speech.value = existingChart.speech;
-            form.chart_anger.value = existingChart.anger;
-            form.chart_food.value = existingChart.food;
+    const CHART_V2_META = {
+        chart_amritvela: { max:20, key:'amritvela' },
+        chart_murli: { max:10, key:'murli' },
+        chart_personal_yoga: { max:10, key:'personalYogaStudy' },
+        chart_exercise: { max:5, key:'exercise' },
+        chart_conduct: { max:10, key:'conduct' },
+        chart_drill: { max:10, key:'drill' },
+        chart_traffic: { max:10, key:'traffic' },
+        chart_food: { max:10, key:'food' },
+        chart_evening: { max:10, key:'eveningYoga' },
+        chart_goodnight: { max:5, key:'goodnight' }
+    };
+
+    function getChartOptionValue(groupName) {
+        let selected = Array.from(document.querySelectorAll(`#daily-chart-form input[name="${groupName}"]:checked`));
+        return selected.length ? Number(selected[0].value) : 0;
+    }
+
+    function getChartV2Score() {
+        return CHART_V2_GROUPS.reduce((sum, name) => sum + getChartOptionValue(name), 0);
+    }
+
+    function updateChartV2Total() {
+        let score = getChartV2Score();
+        let pct = Math.round((score / 100) * 100);
+        document.getElementById('chart-live-score').innerText = score;
+        document.getElementById('chart-live-percent').innerText = pct + '%';
+        document.getElementById('chart-live-progress').style.width = pct + '%';
+        document.getElementById('chart-submit-score').innerText = score;
+    }
+
+    function activateNextChartSection(currentSection) {
+        let next = currentSection.nextElementSibling;
+        if(next && next.classList.contains('chart-section-v2')) {
+            document.querySelectorAll('.chart-section-v2').forEach(s => s.classList.remove('chart-section-active-v2'));
+            next.classList.add('chart-section-active-v2');
+            setTimeout(() => next.scrollIntoView({behavior:'smooth', block:'center'}), 80);
         }
     }
 
-    // मिति परिवर्तन गर्दा डाटा लोड गर्न नयाँ function लाई कल गर्ने
+    function initChartV2Interactions() {
+        let form = document.getElementById('daily-chart-form');
+        if(!form || form.dataset.v2Ready === '1') return;
+        form.dataset.v2Ready = '1';
+
+        CHART_V2_GROUPS.forEach(groupName => {
+            let inputs = form.querySelectorAll(`input[name="${groupName}"]`);
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    // One selection per scoring group; checkbox UI gives the requested tick mark.
+                    inputs.forEach(other => {
+                        if(other !== input) other.checked = false;
+                        other.closest('.chart-option-v2')?.classList.toggle('selected-v2', other.checked);
+                    });
+                    this.closest('.chart-option-v2')?.classList.add('selected-v2');
+                    updateChartV2Total();
+                    activateNextChartSection(this.closest('.chart-section-v2'));
+                });
+            });
+        });
+
+        let first = form.querySelector('.chart-section-v2');
+        first?.classList.add('chart-section-active-v2');
+        updateChartV2Total();
+    }
+
+    function openChartDatePicker() {
+        const input = document.getElementById('chart-date');
+        if(input.showPicker) input.showPicker();
+        else input.focus();
+    }
+
+    function updateChartDateLabel(dateVal) {
+        let d = new Date(dateVal + 'T00:00:00');
+        if(isNaN(d.getTime())) return;
+        let today = new Date(); today.setHours(0,0,0,0);
+        let dd = new Date(d); dd.setHours(0,0,0,0);
+        let label = d.toLocaleDateString('ne-NP', {year:'numeric', month:'short', day:'numeric'});
+        if(dd.getTime() === today.getTime()) label = 'आज • ' + label;
+        document.getElementById('chart-date-label').innerText = label;
+    }
+
+    function clearChartV2Form() {
+        let form = document.getElementById('daily-chart-form');
+        form.reset();
+        document.querySelectorAll('.chart-option-v2').forEach(el => el.classList.remove('selected-v2'));
+        updateChartV2Total();
+        document.querySelectorAll('.chart-section-v2').forEach(s => s.classList.remove('chart-section-active-v2'));
+        document.querySelector('.chart-section-v2')?.classList.add('chart-section-active-v2');
+    }
+
+    function loadChartDataForDate(dateVal) {
+        clearChartV2Form();
+        let charts = safeJSON('murali_daily_charts', []);
+        let existingChart = charts.find(c => c.date === dateVal);
+        if(!existingChart) return;
+
+        CHART_V2_GROUPS.forEach(groupName => {
+            let key = CHART_V2_META[groupName].key;
+            let value = Number(existingChart[key] || 0);
+            // Legacy aliases
+            if(groupName === 'chart_drill' && !value) value = Number(existingChart.hourlyDrill || 0);
+            if(groupName === 'chart_evening' && !value) value = Number(existingChart.eveningYoga || 0);
+            if(groupName === 'chart_food' && !value) value = Number(existingChart.food || 0);
+            if(groupName === 'chart_goodnight' && !value) value = Number(existingChart.goodnight || existingChart.sleep || 0);
+            if(groupName === 'chart_conduct' && !value) value = Number(existingChart.conduct || existingChart.anger || 0);
+            let match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${value}"]`);
+            if(match) {
+                match.checked = true;
+                match.closest('.chart-option-v2')?.classList.add('selected-v2');
+            }
+        });
+        updateChartV2Total();
+    }
+
     document.getElementById('chart-date').addEventListener('change', function() {
+        updateChartDateLabel(this.value);
+        document.getElementById('chart-result-box').style.display = 'none';
+        document.getElementById('daily-chart-form').style.display = 'block';
         loadChartDataForDate(this.value);
-        showToast("यो मितिको पुरानो चार्ट लोड भयो। सच्याउन सक्नुहुन्छ।", "info");
+        let exists = safeJSON('murali_daily_charts', []).some(c => c.date === this.value && c.phone === userPhone);
+        showToast(exists ? 'यो मितिको पुरानो चार्ट लोड भयो।' : 'नयाँ मिति छानिएको छ।', 'info');
     });
 
     window.submitDailyChart = function() {
         let dateVal = document.getElementById('chart-date').value;
-        if(!dateVal) return showToast("कृपया मिति छान्नुहोस्।", "error");
+        if(!dateVal) return showToast('कृपया मिति छान्नुहोस्।', 'error');
 
-        let form = document.getElementById('daily-chart-form');
-        
-        // --- नयाँ कोड सुरु ---
-        // सबै रेडियो ग्रुपका नामहरू
-        const radioGroups = ['chart_amritvela', 'chart_murli', 'chart_hourly', 'chart_evening', 'chart_sleep', 'chart_purity', 'chart_speech', 'chart_anger', 'chart_food'];
-        
-        // कतिवटा भरिएन, गणना गर्ने
-        let unansweredCount = 0;
-        radioGroups.forEach(groupName => {
-            // form.elements बाट सिधै नामले पहुँच गर्ने
-            if (!form.elements[groupName].value) {
-                unansweredCount++;
-            }
-        });
-
-        // यदि कुनै प्रश्न छुटेको छ भने सोध्ने
-        if (unansweredCount > 0) {
-            if (!confirm(`तपाईंले ${unansweredCount} वटा प्रश्न भर्नुभएको छैन। के तपाईं साँच्चै सबमिट गर्न चाहनुहुन्छ?\n\n(नभरेको प्रश्नको अंक ० हुनेछ।)`)) {
-                return; // प्रयोगकर्ताले 'Cancel' थिचेमा सबमिट रोक्ने
-            }
-        }
-        // --- नयाँ कोड अन्त्य ---
-
-        // अंक गणना गर्दा खाली भएमा ० मान्ने
-        let amritvela = parseInt(form.chart_amritvela.value || 0);
-        let murli = parseInt(form.chart_murli.value || 0);
-        let hourly = parseInt(form.chart_hourly.value || 0);
-        let evening = parseInt(form.chart_evening.value || 0);
-        let sleep = parseInt(form.chart_sleep.value || 0);
-        let purity = parseInt(form.chart_purity.value || 0);
-        let speech = parseInt(form.chart_speech.value || 0);
-        let anger = parseInt(form.chart_anger.value || 0);
-        let food = parseInt(form.chart_food.value || 0);
-
-        let totalScore = amritvela + murli + hourly + evening + sleep + purity + speech + anger + food;
-        
-        let stage = "";
-        let msg = "";
-        if(totalScore >= 90) { 
-            stage = "उड्ती कला (Flying Stage) 🕊️"; 
-            msg = "अति उत्तम! हजुरको स्थिति निकै शक्तिशाली छ।"; 
-        } else if(totalScore >= 70) { 
-            stage = "चढ्ती कला (Ascending Stage) 🚶"; 
-            msg = "धेरै राम्रो! अझै थोरै अटेन्सन दिए उड्ती कलामा पुग्न सकिन्छ।"; 
-        } else if(totalScore >= 50) { 
-            stage = "पुरुषार्थी जीवन (Effort-maker) 🌱"; 
-            msg = "राम्रो प्रयास! तर मायाको विघ्नबाट बच्न विशेष ध्यान दिनुहोला।"; 
-        } else { 
-            stage = "विशेष अटेन्सन आवश्यक ⚠️"; 
-            msg = "बाबाको याद र श्रीमतमा धेरै ध्यान दिनुपर्ने देखिन्छ। हिम्मत नहार्नुहोस्!"; 
-        }
-
-        let charts = safeJSON('murali_daily_charts', []);
-        charts = charts.filter(c => c.date !== dateVal);
-        
         let chartData = {
             id: Date.now(),
+            schemaVersion: 2,
             date: dateVal,
             name: userName,
             address: userAddress,
             phone: userPhone,
-            totalScore: totalScore,
-            stage: stage,
-            amritvela: amritvela,
-            murli: murli,
-            hourlyDrill: hourly,
-            eveningYoga: evening,
-            sleep: sleep,
-            purity: purity,
-            speech: speech,
-            anger: anger,
-            food: food,
+            amritvela: getChartOptionValue('chart_amritvela'),
+            murli: getChartOptionValue('chart_murli'),
+            personalYogaStudy: getChartOptionValue('chart_personal_yoga'),
+            exercise: getChartOptionValue('chart_exercise'),
+            conduct: getChartOptionValue('chart_conduct'),
+            drill: getChartOptionValue('chart_drill'),
+            traffic: getChartOptionValue('chart_traffic'),
+            food: getChartOptionValue('chart_food'),
+            eveningYoga: getChartOptionValue('chart_evening'),
+            goodnight: getChartOptionValue('chart_goodnight'),
+            totalScore: getChartV2Score(),
+            stage: '',
             synced: false
         };
+
+        // Compatibility aliases retained locally and for future backend migration.
+        chartData.hourlyDrill = chartData.drill;
+        chartData.sleep = chartData.goodnight;
+        chartData.anger = chartData.conduct;
+        chartData.purity = chartData.conduct;
+        chartData.speech = chartData.conduct;
+
+        if(chartData.totalScore >= 90) {
+            chartData.stage = 'उड्ती कला 🕊️';
+        } else if(chartData.totalScore >= 70) {
+            chartData.stage = 'चढ्ती कला 🚶';
+        } else if(chartData.totalScore >= 50) {
+            chartData.stage = 'पुरुषार्थी जीवन 🌱';
+        } else {
+            chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
+        }
+
+        let charts = safeJSON('murali_daily_charts', []);
+        charts = charts.filter(c => c.date !== dateVal || c.phone !== userPhone);
         charts.push(chartData);
+        charts.sort((a,b) => String(b.date).localeCompare(String(a.date)));
         localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
 
-        form.style.display = 'none';
-        let resBox = document.getElementById('chart-result-box');
-        resBox.style.display = 'block';
-        
-        document.getElementById('cr-score').innerText = totalScore;
-        document.getElementById('cr-stage').innerText = stage;
-        document.getElementById('cr-msg').innerText = msg;
+        document.getElementById('daily-chart-form').style.display = 'none';
+        document.querySelector('.chart-progress-head-v2').style.display = 'flex';
+        document.querySelector('.chart-progress-track-v2').style.display = 'block';
+        document.getElementById('chart-result-box').style.display = 'block';
+        document.getElementById('cr-score').innerText = chartData.totalScore;
+        document.getElementById('cr-stage').innerText = chartData.stage;
+        document.getElementById('cr-msg').innerText = chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'अझै थोरै ध्यान दिँदा अझ राम्रो हुन्छ।';
 
-        if(totalScore >= 90) fireConfetti();
-
+        updateChartV2Total();
+        if(chartData.totalScore >= 90) fireConfetti();
         syncPendingCharts();
-    }
+        renderDashboard();
+    };
 
     window.resetChartForm = function() {
         document.getElementById('chart-result-box').style.display = 'none';
         document.getElementById('daily-chart-form').style.display = 'block';
-        document.getElementById('daily-chart-form').reset();
-        
         let todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('chart-date').value = todayStr;
+        updateChartDateLabel(todayStr);
+        clearChartV2Form();
     }
 
     window.editChartForm = function() {
-        // पहिले हालको मितिको डाटा लोड गर्ने
         let currentDate = document.getElementById('chart-date').value;
-        loadChartDataForDate(currentDate); 
-
-        // त्यसपछि मात्र फर्म देखाउने
+        loadChartDataForDate(currentDate);
         document.getElementById('chart-result-box').style.display = 'none';
         document.getElementById('daily-chart-form').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top:0, behavior:'smooth' });
     }
+
+    window.openMyChartGraph = function() {
+        let charts = safeJSON('murali_daily_charts', []);
+        let dateVal = document.getElementById('chart-date').value;
+        let rec = charts.find(c => c.date === dateVal && c.phone === userPhone);
+        if(!rec) return showToast('यो मितिको चार्ट भेटिएन।', 'error');
+        document.getElementById('my-chart-graph-summary').innerText = `${rec.date} • ${rec.totalScore}/100`;
+        document.getElementById('my-chart-graph-modal').style.display = 'flex';
+
+        let labels = ['अमृतवेला','मुरली','व्यक्तिगत योग','व्यायाम','धारणा','ड्रिल','ट्राफिक','भोजन','साँझको योग','गुडनाइट'];
+        let values = [rec.amritvela,rec.murli,rec.personalYogaStudy,rec.exercise,rec.conduct,rec.drill,rec.traffic,rec.food,rec.eveningYoga,rec.goodnight];
+        let ctx = document.getElementById('myChartCategoryGraph').getContext('2d');
+        if(window.myChartCategoryGraphInstance) window.myChartCategoryGraphInstance.destroy();
+        window.myChartCategoryGraphInstance = new Chart(ctx, {
+            type:'bar',
+            data:{ labels, datasets:[{ label:'आजको अंक', data:values }] },
+            options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:20}} }
+        });
+    }
+
+    // Initialize chart v2 once DOM is ready.
+    setTimeout(() => {
+        initChartV2Interactions();
+        let todayStr = new Date().toISOString().split('T')[0];
+        let dateInput = document.getElementById('chart-date');
+        if(dateInput) { dateInput.value = todayStr; updateChartDateLabel(todayStr); }
+    }, 0);
 
     // ==========================================
     // 13. CHART LEADERBOARD LOGIC (NEW)
@@ -4725,6 +4891,9 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ 
                 action: "getStudentChartLeaderboard", 
+                chartVersion: 2,
+                view: "participant_list",
+                role: userRole || "Student",
                 targetDate: targetDateStr, 
                 phone: userPhone 
             })
@@ -4736,29 +4905,41 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
 
             if (data.status === "success") {
                 let tbody = document.getElementById('cl-table-body');
+                let isPrivilegedViewer = (String(userRole).toLowerCase() === 'admin' || String(userRole).toLowerCase() === 'manager');
+                document.getElementById('cl-detail-head').style.display = isPrivilegedViewer ? 'table-cell' : 'none';
                 
                 if (data.total === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${isPrivilegedViewer ? 4 : 3}" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
                     document.getElementById('cl-my-rank-box').style.display = 'none';
                     return;
                 }
 
-                let leaderboardData = data.top20 || [];
+                let leaderboardData = data.participants || data.records || data.top20 || [];
+                let categoryLabels = [
+                    ['अमृतवेला', 'amritvela'], ['मुरली', 'murli'], ['व्यक्तिगत योग/स्व-अध्ययन', 'personalYogaStudy'],
+                    ['व्यायाम', 'exercise'], ['धारणा/चालचलन', 'conduct'], ['ड्रिल', 'drill'], ['ट्राफिक कन्ट्रोल', 'traffic'],
+                    ['भोजन अनुशासन', 'food'], ['साँझको योग', 'eveningYoga'], ['गुडनाइट/समीक्षा', 'goodnight']
+                ];
                 tbody.innerHTML = leaderboardData.map((user, index) => {
                     let isMe = (data.myRank === index + 1);
                     let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
                     let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
+                    let detailHtml = '';
+                    if (isPrivilegedViewer) {
+                        let detailRows = categoryLabels.map(function(pair){ return `<div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--border-color);padding:3px 0;"><span>${pair[0]}</span><b>${Number(user[pair[1]] ?? 0)}</b></div>`; }).join('');
+                        detailHtml = `<div style="font-size:0.72rem;line-height:1.35;min-width:150px;">${detailRows}<div style="margin-top:5px;font-weight:900;text-align:right;color:var(--primary-color);">जम्मा: ${user.totalScore ?? 0}/100 • ${user.stage || ''}</div></div>`;
+                    }
                     
                     return `<tr style="${rowStyle}">
-                                <td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem;">${rankIcon}</td>
-                                <td style="padding: 10px;">
+                                <td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem; vertical-align:top;">${rankIcon}</td>
+                                <td style="padding: 10px; vertical-align:top;">
                                     ${user.name} <br>
                                     <span style="font-size:0.75rem; color:#64748b;">${user.address}</span>
                                 </td>
-                                <td style="padding: 10px; text-align:center; color:var(--primary-color); font-weight:bold;">
-                                    ${user.totalScore}<br>
-                                    <span style="font-size:0.75rem; color:#64748b;">${user.stage.split(' ')[0]}</span>
+                                <td style="padding: 10px; text-align:center; color:var(--primary-color); font-weight:bold; vertical-align:top;">
+                                    ${isPrivilegedViewer ? (user.totalScore ?? '—') : 'सहभागी'}
                                 </td>
+                                <td style="padding:10px; vertical-align:top; display:${isPrivilegedViewer ? 'table-cell' : 'none'};">${detailHtml}</td>
                             </tr>`;
                 }).join('');
 
@@ -4770,7 +4951,7 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
                     document.getElementById('cl-my-rank-number').innerText = `${data.myRank} / ${data.total}`;
                     document.getElementById('cl-my-rank-number').style.fontSize = '1.8rem';
                     document.getElementById('cl-my-rank-number').style.color = '#8b5cf6';
-                    document.getElementById('cl-my-score-text').innerText = `Score: ${data.myRankData.totalScore} | Stage: ${data.myRankData.stage}`;
+                    document.getElementById('cl-my-score-text').innerText = (String(userRole).toLowerCase() === 'admin' || String(userRole).toLowerCase() === 'manager') ? `Score: ${data.myRankData.totalScore} | Stage: ${(data.myRankData.stage || '').split(' ')[0]}` : `तपाईंको क्रम: ${data.myRank}`;
                 } else if (data.myRank > 0 && data.myRank <= 20) { 
                     myRankBox.style.display = 'block';
                     myRankBox.style.borderColor = 'var(--success-color)';
