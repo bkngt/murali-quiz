@@ -10,7 +10,7 @@
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789446831744&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000092588211aaa66ee14a1969f2%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0_chart_v2_ADMINclick_final.html%26cd%3Dattachment%26ts%3D497068%26p%3Dfs%26cid%3D1%26sig%3D9c62ab7e5e451211457c6c4b3daf66a8b8437b652de5bc0f0bf171b6be17de38%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789446831744&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789461230872&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000006b7482119a03248298149a81%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0%252520ChartV2%252520AdminClick%252520ReviewSync%252520Final.html%26cd%3Dattachment%26ts%3D497072%26p%3Dfs%26cid%3D1%26sig%3Dfb43e71792e41e133761a0f7512dc95d03a86953ba0050a78cfda0ac59112883%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789461230872&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -646,7 +646,7 @@
             <div class="result-submsg" id="rs-submsg" style="margin-bottom: 20px;"></div>
             
             <button onclick="shareMyResult()" style="background: #25D366; color: white; width:auto; border-radius:50px; box-shadow: none; margin-bottom: 20px; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer;">
-                <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share Result
+                <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 🔗 लिंक सेयर गर्नुहोस्
             </button>
             
             <div class="result-actions" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
@@ -1832,10 +1832,17 @@
 
     function syncMyResults() {
         if (!navigator.onLine || !userPhone || userPhone === "N/A") return;
+        const savedPin = localStorage.getItem('murali_pin') || '';
+        if (!savedPin) return;
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-            body: JSON.stringify({ action: "fetchMyResults", phone: userPhone }) 
+            body: JSON.stringify({
+                action: "fetchMyResults",
+                phone: userPhone,
+                pin: savedPin,
+                deviceId: getDeviceId()
+            }) 
         })
         .then(res => res.json())
         .then(data => {
@@ -1850,9 +1857,22 @@
                             id: Date.now() + Math.random(), 
                             name: userName, phone: userPhone, date: sr.date, 
                             score: sr.score, percent: sr.percent, total: sr.total, 
-                            timeTaken: sr.timeTaken, synced: true, quizData: null 
+                            timeTaken: sr.timeTaken, synced: true,
+                            quizData: sr.reviewData || null
                         }); 
-                        isUpdated = true; 
+                        isUpdated = true;
+                    } else if (exists.synced !== false) {
+                        if (sr.reviewData && !exists.quizData) {
+                            exists.quizData = sr.reviewData;
+                            isUpdated = true;
+                        }
+                        if (String(exists.score) !== String(sr.score) || String(exists.percent) !== String(sr.percent)) {
+                            exists.score = sr.score;
+                            exists.percent = sr.percent;
+                            exists.total = sr.total;
+                            exists.timeTaken = sr.timeTaken;
+                            isUpdated = true;
+                        }
                     }
                 });
 
@@ -1871,6 +1891,8 @@
                     localStorage.setItem('murali_progress', JSON.stringify(newLocalHistory)); 
                     if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); 
                 }
+            } else if (data.status === "error") {
+                console.log("Result sync auth/server error:", data.message || data);
             }
         })
         .catch(e => console.log("Sync Results Error", e));
@@ -1899,6 +1921,7 @@
                     timeTaken: data.timeTaken, 
                     time: data.time, 
                     weakTags: data.weakTags,
+                    reviewData: data.quizData,
                     deviceId: getDeviceId()
                 }) 
             })
@@ -3287,20 +3310,18 @@ Text: ${text}`;
     }
     
     window.shareMyResult = function() {
-        let percent = Math.round((currentScore / currentQuiz.length) * 100);
-        let textToShare = `✨ *मेरो आजको अभ्यास!* ✨\nमैले आजको BK Murali Quiz मा *[${currentScore}/${currentQuiz.length}] (${percent}%)* ल्याएँ! 🎉\n\nहजुर पनि आजको मुरलीको मनन-चिन्तन र आफ्नो ज्ञानको परीक्षण गर्न तलको लिंकमा गएर क्वीज खेल्नुहोस्:\n🔗 https://bkngt.github.io/murali-quiz/`;
-        
+        const shareUrl = 'https://bkngt.github.io/murali-quiz/';
         if (navigator.share) {
             navigator.share({
-                title: 'BK Murali Quiz Result',
-                text: textToShare
+                title: 'BK Murali Quiz',
+                url: shareUrl
             }).then(() => {
-                showToast("नतिजा सफलतापूर्वक सेयर भयो!", "success");
-            }).catch(err => {
-                copyToClipboardFallback(textToShare);
+                showToast("लिंक सफलतापूर्वक सेयर भयो!", "success");
+            }).catch(() => {
+                copyToClipboardFallback(shareUrl);
             });
         } else {
-            copyToClipboardFallback(textToShare);
+            copyToClipboardFallback(shareUrl);
         }
     };
 
