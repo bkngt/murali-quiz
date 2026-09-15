@@ -10,7 +10,7 @@
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789461230872&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000006b7482119a03248298149a81%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0%252520ChartV2%252520AdminClick%252520ReviewSync%252520Final.html%26cd%3Dattachment%26ts%3D497072%26p%3Dfs%26cid%3D1%26sig%3Dfb43e71792e41e133761a0f7512dc95d03a86953ba0050a78cfda0ac59112883%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789461230872&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000041d081f4b3bb0c67682ce821%26fn%3DBK_Murali_Quiz_89.7.0_RevisionSync_FINAL.html%26cd%3Dattachment%26ts%3D497073%26p%3Dfs%26cid%3D1%26sig%3Db0c28b99427f974b0b7c043ed494af050930ec1da2070a9bd641f9f49ce887e7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -992,7 +992,7 @@
     <div style="font-size: 0.85rem; color: #64748b; text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 89.5.0 (Chart Analytics & Leaderboard)</div>
+        <div>Version: 89.6.0 (Smart Quiz Sync)</div>
     </div>
 </div>
 <script>
@@ -1025,7 +1025,13 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Reg Failed:', err));
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    // Ask the browser to check for an updated service worker.
+                    reg.update().catch(() => {});
+                    setInterval(() => reg.update().catch(() => {}), 10 * 60 * 1000);
+                })
+                .catch(err => console.log('SW Reg Failed:', err));
         });
     }
 
@@ -1033,13 +1039,15 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "89.5.0"; 
+    const APP_VERSION = "89.7.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
     let currentScore = 0; 
     let answeredCount = 0; 
     let currentMurliDate = "";
+    let currentQuizRevision = 1;
+    let currentQuizId = "";
     
     let lang = "ne"; 
     let userName = "Student"; 
@@ -1072,6 +1080,8 @@
     let audioCtx = null;
     
     let abortController = null;
+let quizAutoSyncTimer = null;
+let quizSyncInProgress = false;
     
     // Chart.js Instances
     let progressChartInstance = null;
@@ -1812,7 +1822,8 @@
     }
 
     function syncServerQuizzes(refreshUI = false) {
-        if (!navigator.onLine) return;
+        if (!navigator.onLine || quizSyncInProgress || isQuizActive) return;
+        quizSyncInProgress = true;
         fetch(API_URL, { 
             method: 'POST', 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
@@ -1820,14 +1831,57 @@
         })
         .then(res => res.json())
         .then(data => { 
-            if(data.status === "success" && data.quizzes) { 
-                localStorage.setItem('murali_server_quizzes', JSON.stringify(data.quizzes)); 
-                console.log("☁️ Quizzes updated from server."); 
-                populateSavedQuizzes(); 
-                if(refreshUI) unlockApp(); 
+            if(data.status === "success" && Array.isArray(data.quizzes)) { 
+                const oldSerialized = localStorage.getItem('murali_server_quizzes') || '';
+                const newSerialized = JSON.stringify(data.quizzes);
+                const changed = oldSerialized !== newSerialized;
+
+                localStorage.setItem('murali_server_quizzes', newSerialized);
+                populateSavedQuizzes();
+
+                if (changed && oldSerialized) {
+                    showToast("☁️ नयाँ/संशोधित क्वीज सर्भरबाट अपडेट भयो।", "info");
+                }
+
+                if(refreshUI) unlockApp();
+                console.log(changed ? "☁️ Quiz cache refreshed with latest revisions." : "☁️ Quiz list checked; no change.");
             }
         })
-        .catch(e => console.log("Fetch error: ", e));
+        .catch(e => console.log("Fetch error: ", e))
+        .finally(() => { quizSyncInProgress = false; });
+    }
+
+    function startQuizAutoSync() {
+        // Smart sync: no repeating timer.
+        // Check once after unlock, then rely on foreground/online events.
+        if (quizAutoSyncTimer) {
+            clearInterval(quizAutoSyncTimer);
+            quizAutoSyncTimer = null;
+        }
+        if (!isQuizActive && !document.hidden) {
+            syncServerQuizzes(false);
+        }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !isQuizActive) {
+            syncServerQuizzes(false);
+        }
+    });
+
+    window.addEventListener('online', () => {
+        if (!isQuizActive) {
+            syncServerQuizzes(false);
+        }
+    });
+
+    function getQuizRevisionValue(item) {
+        const rev = parseInt(item && (item.quizRevision || item.revision), 10);
+        return (rev && rev > 0) ? rev : 1;
+    }
+
+    function getHistoryQuizKey(item) {
+        return String(item && item.date || "") + "-R" + getQuizRevisionValue(item);
     }
 
     function syncMyResults() {
@@ -1851,14 +1905,16 @@
                 let isUpdated = false;
                 
                 data.results.forEach(sr => {
-                    let exists = localHistory.find(lh => lh.date === sr.date);
+                    let exists = localHistory.find(lh => getHistoryQuizKey(lh) === getHistoryQuizKey(sr));
                     if(!exists) { 
                         localHistory.push({ 
                             id: Date.now() + Math.random(), 
                             name: userName, phone: userPhone, date: sr.date, 
                             score: sr.score, percent: sr.percent, total: sr.total, 
                             timeTaken: sr.timeTaken, synced: true,
-                            quizData: sr.reviewData || null
+                            quizData: sr.reviewData || null,
+                            quizRevision: getQuizRevisionValue(sr),
+                            quizId: sr.quizId || (String(sr.date) + "-R" + getQuizRevisionValue(sr))
                         }); 
                         isUpdated = true;
                     } else if (exists.synced !== false) {
@@ -1878,7 +1934,7 @@
 
                 let newLocalHistory = localHistory.filter(lh => {
                     if (lh.synced === false) return true; 
-                    let existsOnServer = data.results.find(sr => sr.date === lh.date);
+                    let existsOnServer = data.results.find(sr => getHistoryQuizKey(sr) === getHistoryQuizKey(lh));
                     if (!existsOnServer) {
                         isUpdated = true;
                         return false; 
@@ -1922,6 +1978,8 @@
                     time: data.time, 
                     weakTags: data.weakTags,
                     reviewData: data.quizData,
+                    quizRevision: getQuizRevisionValue(data),
+                    quizId: data.quizId || (String(data.date) + "-R" + getQuizRevisionValue(data)),
                     deviceId: getDeviceId()
                 }) 
             })
@@ -2043,6 +2101,7 @@
             syncPendingResults(); 
             syncPendingCharts(); 
             syncMyResults();
+            startQuizAutoSync();
             updateProfileBadgeUI();
             backgroundProfileSync(); 
 
@@ -2840,45 +2899,99 @@ Text: ${text}`;
                 phone: userPhone,
                 date: stateObj.date,
                 stateData: stateObj,
+                quizRevision: currentQuizRevision,
+                quizId: currentQuizId,
                 deviceId: getDeviceId()
             })
         }).catch(e => console.log("Background state save failed"));
     }
 
     window.startSpecificQuiz = async function(dateStr) {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); 
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
         let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
-        
-        if(!targetQuiz || !targetQuiz.quizData) {
-            return showToast("क्वीज फेला परेन!", "error"); 
+
+        // Before a student starts, always verify the exact quiz revision from the server.
+        // This is the key protection against an old localStorage quiz being used after replacement.
+        if (navigator.onLine) {
+            try {
+                let quizRes = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "fetchQuizByDate", quizDate: dateStr })
+                });
+                let quizData = await quizRes.json();
+                if (quizData.status === "success" && quizData.quiz && quizData.quiz.quizData) {
+                    targetQuiz = quizData.quiz;
+                    // Update only this date in local cache; no full cache/history clear is needed.
+                    let cached = safeJSON('murali_server_quizzes', []);
+                    let idx = cached.findIndex(q => q.quizDate === dateStr);
+                    if (idx >= 0) cached[idx] = targetQuiz; else cached.push(targetQuiz);
+                    localStorage.setItem('murali_server_quizzes', JSON.stringify(cached));
+                    populateSavedQuizzes();
+                }
+            } catch(e) {
+                console.log("Latest quiz check failed; using cached quiz.");
+            }
         }
 
+        if(!targetQuiz || !targetQuiz.quizData) {
+            return showToast("क्वीज फेला परेन!", "error");
+        }
+
+        const targetRevision = parseInt(targetQuiz.revision || 1, 10) || 1;
+        const savedPin = localStorage.getItem('murali_pin') || '';
+
         document.getElementById('loading-box').style.display = 'block';
-        document.getElementById('loading-text').innerText = "Checking previous progress...";
+        document.getElementById('loading-text').innerText = "परीक्षाको स्थिति जाँच हुँदैछ...";
         document.getElementById('quiz-area').style.display = 'none';
-        
+
         let cloudState = null;
-        if(navigator.onLine) {
+        if(navigator.onLine && userPhone !== "N/A" && savedPin) {
             try {
                 let res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "fetchActiveState", phone: userPhone, date: dateStr })
+                    body: JSON.stringify({
+                        action: "getQuizAttemptStatus",
+                        phone: userPhone,
+                        pin: savedPin,
+                        deviceId: getDeviceId(),
+                        quizDate: dateStr,
+                        revision: targetRevision
+                    })
                 });
                 let data = await res.json();
-                if(data.status === "success" && data.stateData) {
-                    cloudState = data.stateData;
+                if(data.status === "success") {
+                    if(data.attemptStatus === "completed") {
+                        document.getElementById('loading-box').style.display = 'none';
+                        return showToast("यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।", "warning", 4000);
+                    }
+                    if(data.attemptStatus === "in_progress" && data.stateData) {
+                        cloudState = data.stateData;
+                    }
                 }
+            } catch(e) {
+                console.log("Attempt status check failed; using normal cloud-state check.");
+            }
+        }
+
+        if(!cloudState && navigator.onLine) {
+            try {
+                let res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "fetchActiveState", phone: userPhone, date: dateStr, quizRevision: targetRevision })
+                });
+                let data = await res.json();
+                if(data.status === "success" && data.stateData) cloudState = data.stateData;
             } catch(e) {
                 console.log("Could not fetch cloud state, falling back to local.");
             }
         }
 
         document.getElementById('loading-box').style.display = 'none';
-        
         window.tempCloudState = cloudState;
         window.tempTargetQuiz = targetQuiz;
-        
         document.getElementById('pledge-modal').style.display = 'flex';
     }
 
@@ -2895,6 +3008,8 @@ Text: ${text}`;
         
         currentMurliDate = targetQuiz.quizDate; 
         currentSwaman = targetQuiz.swaman || ""; 
+        currentQuizRevision = parseInt(targetQuiz.revision || 1, 10) || 1;
+        currentQuizId = targetQuiz.quizId || (currentMurliDate + "-R" + currentQuizRevision);
         
         startQuizSession(cloudState, targetQuiz.quizData);
     }
@@ -2995,9 +3110,11 @@ Text: ${text}`;
         let localState = localStateStr ? JSON.parse(localStateStr) : null;
 
         let stateToUse = null;
-        if (cloudState && cloudState.date === currentMurliDate) {
+        const cloudRevision = cloudState ? (parseInt(cloudState.quizRevision || cloudState.revision || 1, 10) || 1) : 1;
+        const localRevision = localState ? (parseInt(localState.quizRevision || localState.revision || 1, 10) || 1) : 1;
+        if (cloudState && cloudState.date === currentMurliDate && cloudRevision === currentQuizRevision) {
             stateToUse = cloudState;
-        } else if (localState && localState.date === currentMurliDate) {
+        } else if (localState && localState.date === currentMurliDate && localRevision === currentQuizRevision) {
             stateToUse = localState;
         }
 
@@ -3188,7 +3305,9 @@ Text: ${text}`;
                     score: tempScore,
                     time: totalTimeSec,
                     answeredCount: answeredCount,
-                    quizData: currentQuiz
+                    quizData: currentQuiz,
+                    quizRevision: currentQuizRevision,
+                    quizId: currentQuizId
                 };
                 
                 localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj));
@@ -3214,6 +3333,7 @@ Text: ${text}`;
         stopTimer(); 
         clearInterval(qLockInterval);
         isQuizActive = false;
+        // Quiz cache refresh happens on foreground/online events; do not add a network request to submit flow.
         
         currentScore = 0;
         currentQuiz.forEach(q => {
@@ -3358,6 +3478,8 @@ Text: ${text}`;
             timestamp: Date.now(), 
             weakTags: incorrectTags, 
             quizData: currentQuiz, 
+            quizRevision: currentQuizRevision,
+            quizId: currentQuizId,
             synced: false 
         });
         
@@ -4420,7 +4542,7 @@ function drawCharts(filteredHistory) {
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 89.5.0)
+                Generated by BK Murali Quiz App (Version 89.6.0)
             </div>
         </body>
         </html>`;
