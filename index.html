@@ -10,7 +10,7 @@
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789443231273&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000b5388211a7645876df38a576%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0_chart_v2.html%26cd%3Dattachment%26ts%3D497068%26p%3Dfs%26cid%3D1%26sig%3D5228192919b933627d479d6ad0d55db6c8a21ee973a84a38301dfbef8be22e28%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789443231273&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789446831744&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000092588211aaa66ee14a1969f2%26fn%3DMQ%252520for%252520github%252520index%25252089.5.0_chart_v2_ADMINclick_final.html%26cd%3Dattachment%26ts%3D497068%26p%3Dfs%26cid%3D1%26sig%3D9c62ab7e5e451211457c6c4b3daf66a8b8437b652de5bc0f0bf171b6be17de38%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789446831744&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -949,23 +949,32 @@
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
                         <thead style="background: var(--primary-color); color: white;">
                             <tr>
-                                <th style="padding: 10px; text-align:center;">Rank</th>
-                                <th style="padding: 10px;">Name</th>
-                                <th style="padding: 10px; text-align:center;">स्थिति</th>
-                                <th id="cl-detail-head" style="padding: 10px; text-align:center; display:none;">विवरण</th>
+                                <th style="padding: 10px; text-align:center; width:54px;">Rank</th>
+                                <th style="padding: 10px;">नाम</th>
+                                <th style="padding: 10px;">सेवा केन्द्र</th>
+                                <th id="cl-score-head" style="padding: 10px; text-align:center;">अंक</th>
                             </tr>
                         </thead>
-                        <tbody id="cl-table-body">
-                        </tbody>
+                        <tbody id="cl-table-body"></tbody>
                     </table>
                 </div>
-                
                 <div id="cl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(167, 139, 250, 0.15); border: 2px dashed #a78bfa; border-radius: 12px; padding: 15px; text-align: center;">
                     <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको र्‍याङ्क:</div>
                     <div style="font-size: 1.8rem; font-weight: 900; color: #8b5cf6; margin: 5px 0;" id="cl-my-rank-number">-- / --</div>
                     <div style="font-size: 0.85rem; color: #64748b; font-weight: bold;" id="cl-my-score-text">Score: --</div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Admin Chart Detail Modal -->
+    <div id="chart-admin-detail-modal" class="modal-overlay" onclick="if(event.target.id === 'chart-admin-detail-modal') closeChartAdminDetail();">
+        <div class="modal-content" style="max-width: 390px; padding: 1.2rem;">
+            <button type="button" onclick="closeChartAdminDetail();" style="position:absolute; top:10px; right:10px; width:auto; min-width:42px; padding:8px; border:none; background:transparent; box-shadow:none; font-size:1.25rem; color:var(--text-color);">✕</button>
+            <div id="cad-name" style="font-size:1.15rem; font-weight:900; color:var(--primary-color); padding-right:40px;"></div>
+            <div id="cad-address" style="font-size:0.78rem; color:#64748b; font-weight:700; margin-top:2px;"></div>
+            <div id="cad-total" style="margin-top:12px; padding:10px; border-radius:12px; background:var(--bg-color); border:1px solid var(--border-color); text-align:center; font-size:1.15rem; font-weight:900;"></div>
+            <div id="cad-details" style="margin-top:10px;"></div>
         </div>
     </div>
 
@@ -4865,120 +4874,107 @@ opt.text = (sq.isMegaQuiz ? "🏆 Mega: " : "📅 ") + displayDate;
     // ==========================================
     // 13. CHART LEADERBOARD LOGIC (NEW)
     // ==========================================
+    window._chartAdminRecords = [];
+
     window.openChartLeaderboard = function() {
         let dateVal = document.getElementById('chart-date').value;
-        if(!dateVal) {
-            dateVal = new Date().toISOString().split('T')[0];
-        }
+        if(!dateVal) dateVal = new Date().toISOString().split('T')[0];
         document.getElementById('cl-date-select').value = dateVal;
         document.getElementById('chart-leaderboard-modal').style.display = 'flex';
         fetchChartLeaderboardData();
-    }
+    };
+
+    window.openChartAdminDetail = function(index) {
+        const user = window._chartAdminRecords[index];
+        if (!user) return;
+        const maxByKey = {amritvela:20,murli:10,personalYogaStudy:10,exercise:5,conduct:10,drill:10,traffic:10,food:10,eveningYoga:10,goodnight:5};
+        const labels = [
+            ['🌅 अमृतवेला + जागृति','amritvela'],['📖 मुरली अध्ययन','murli'],['🧘‍♂️ व्यक्तिगत योग / स्व-अध्ययन','personalYogaStudy'],
+            ['🏃 व्यायाम','exercise'],['🌸 धारणा तथा चालचलन','conduct'],['🔄 स्वमान / ड्रिल','drill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],
+            ['🍚 ब्रह्माभोजन / भोजन अनुशासन','food'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट एवं दैनिक समीक्षा','goodnight']
+        ];
+        document.getElementById('cad-name').textContent = user.name || '—';
+        document.getElementById('cad-address').textContent = user.address || '—';
+        document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--primary-color);">${Number(user.totalScore || 0)}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${user.stage || ''}</span>`;
+        document.getElementById('cad-details').innerHTML = labels.map(function(item){
+            const score = Number(user[item[1]] || 0);
+            const max = maxByKey[item[1]];
+            return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span>${item[0]}</span><b style="min-width:52px;text-align:center;color:var(--primary-color);">${score}/${max}</b></div>`;
+        }).join('');
+        document.getElementById('chart-admin-detail-modal').style.display = 'flex';
+    };
+
+    window.closeChartAdminDetail = function() {
+        document.getElementById('chart-admin-detail-modal').style.display = 'none';
+    };
 
     window.fetchChartLeaderboardData = function() {
-        let targetDateStr = document.getElementById('cl-date-select').value;
-        
+        const targetDateStr = document.getElementById('cl-date-select').value;
         document.getElementById('cl-loading').style.display = 'block';
         document.getElementById('cl-content').style.display = 'none';
-
         if (!navigator.onLine) {
-            document.getElementById('cl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!";
+            document.getElementById('cl-loading').innerHTML = '❌ इन्टरनेट कनेक्सन छैन!';
             return;
         }
-
         fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ 
-                action: "getStudentChartLeaderboard", 
-                chartVersion: 2,
-                view: "participant_list",
-                role: userRole || "Student",
-                targetDate: targetDateStr, 
-                phone: userPhone 
-            })
+            headers: {'Content-Type':'text/plain;charset=utf-8'},
+            body: JSON.stringify({action:'getStudentChartLeaderboard',chartVersion:2,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone})
         })
         .then(r => r.json())
         .then(data => {
             document.getElementById('cl-loading').style.display = 'none';
             document.getElementById('cl-content').style.display = 'block';
-
-            if (data.status === "success") {
-                let tbody = document.getElementById('cl-table-body');
-                let isPrivilegedViewer = (String(userRole).toLowerCase() === 'admin' || String(userRole).toLowerCase() === 'manager');
-                document.getElementById('cl-detail-head').style.display = isPrivilegedViewer ? 'table-cell' : 'none';
-                
-                if (data.total === 0) {
-                    tbody.innerHTML = `<tr><td colspan="${isPrivilegedViewer ? 4 : 3}" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
-                    document.getElementById('cl-my-rank-box').style.display = 'none';
-                    return;
-                }
-
-                let leaderboardData = data.participants || data.records || data.top20 || [];
-                let categoryLabels = [
-                    ['अमृतवेला', 'amritvela'], ['मुरली', 'murli'], ['व्यक्तिगत योग/स्व-अध्ययन', 'personalYogaStudy'],
-                    ['व्यायाम', 'exercise'], ['धारणा/चालचलन', 'conduct'], ['ड्रिल', 'drill'], ['ट्राफिक कन्ट्रोल', 'traffic'],
-                    ['भोजन अनुशासन', 'food'], ['साँझको योग', 'eveningYoga'], ['गुडनाइट/समीक्षा', 'goodnight']
-                ];
-                tbody.innerHTML = leaderboardData.map((user, index) => {
-                    let isMe = (data.myRank === index + 1);
-                    let rowStyle = isMe ? 'background: rgba(22, 163, 74, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);';
-                    let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
-                    let detailHtml = '';
-                    if (isPrivilegedViewer) {
-                        let detailRows = categoryLabels.map(function(pair){ return `<div style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--border-color);padding:3px 0;"><span>${pair[0]}</span><b>${Number(user[pair[1]] ?? 0)}</b></div>`; }).join('');
-                        detailHtml = `<div style="font-size:0.72rem;line-height:1.35;min-width:150px;">${detailRows}<div style="margin-top:5px;font-weight:900;text-align:right;color:var(--primary-color);">जम्मा: ${user.totalScore ?? 0}/100 • ${user.stage || ''}</div></div>`;
-                    }
-                    
-                    return `<tr style="${rowStyle}">
-                                <td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem; vertical-align:top;">${rankIcon}</td>
-                                <td style="padding: 10px; vertical-align:top;">
-                                    ${user.name} <br>
-                                    <span style="font-size:0.75rem; color:#64748b;">${user.address}</span>
-                                </td>
-                                <td style="padding: 10px; text-align:center; color:var(--primary-color); font-weight:bold; vertical-align:top;">
-                                    ${isPrivilegedViewer ? (user.totalScore ?? '—') : 'सहभागी'}
-                                </td>
-                                <td style="padding:10px; vertical-align:top; display:${isPrivilegedViewer ? 'table-cell' : 'none'};">${detailHtml}</td>
-                            </tr>`;
-                }).join('');
-
-                let myRankBox = document.getElementById('cl-my-rank-box');
-                if (data.myRank > 20) { 
-                    myRankBox.style.display = 'block';
-                    myRankBox.style.borderColor = '#a78bfa';
-                    myRankBox.style.background = 'rgba(167, 139, 250, 0.15)';
-                    document.getElementById('cl-my-rank-number').innerText = `${data.myRank} / ${data.total}`;
-                    document.getElementById('cl-my-rank-number').style.fontSize = '1.8rem';
-                    document.getElementById('cl-my-rank-number').style.color = '#8b5cf6';
-                    document.getElementById('cl-my-score-text').innerText = (String(userRole).toLowerCase() === 'admin' || String(userRole).toLowerCase() === 'manager') ? `Score: ${data.myRankData.totalScore} | Stage: ${(data.myRankData.stage || '').split(' ')[0]}` : `तपाईंको क्रम: ${data.myRank}`;
-                } else if (data.myRank > 0 && data.myRank <= 20) { 
-                    myRankBox.style.display = 'block';
-                    myRankBox.style.borderColor = 'var(--success-color)';
-                    myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
-                    document.getElementById('cl-my-rank-number').innerText = `बधाई छ! तपाईं Top 20 मा हुनुहुन्छ।`;
-                    document.getElementById('cl-my-rank-number').style.fontSize = '1.2rem';
-                    document.getElementById('cl-my-rank-number').style.color = 'var(--success-color)';
-                    document.getElementById('cl-my-score-text').innerText = `Rank: ${data.myRank} / ${data.total}`;
-                } else {
-                    myRankBox.style.display = 'block';
-                    myRankBox.style.borderColor = 'var(--danger-color)';
-                    myRankBox.style.background = 'rgba(220, 38, 38, 0.1)';
-                    document.getElementById('cl-my-rank-number').innerText = `- / ${data.total}`;
-                    document.getElementById('cl-my-rank-number').style.color = 'var(--danger-color)';
-                    document.getElementById('cl-my-score-text').innerText = `तपाईंले यो दिनको चार्ट भर्नुभएको छैन।`;
-                }
-            } else {
+            if (data.status !== 'success') {
                 document.getElementById('cl-loading').style.display = 'block';
-                document.getElementById('cl-loading').innerHTML = "❌ डाटा ल्याउन समस्या भयो।";
+                document.getElementById('cl-loading').innerHTML = '❌ डाटा ल्याउन समस्या भयो।';
+                return;
+            }
+            const tbody = document.getElementById('cl-table-body');
+            const isPrivilegedViewer = ['admin','manager'].includes(String(userRole||'').toLowerCase());
+            document.getElementById('cl-score-head').style.display = isPrivilegedViewer ? 'table-cell' : 'none';
+            window._chartAdminRecords = isPrivilegedViewer ? (data.participants || data.records || []) : [];
+            if (data.total === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isPrivilegedViewer?4:3}" style="text-align:center;padding:15px;color:var(--danger-color);font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
+                document.getElementById('cl-my-rank-box').style.display = 'none';
+                return;
+            }
+            const list = data.participants || data.records || data.top20 || [];
+            tbody.innerHTML = list.map((u,index) => {
+                const isMe = data.myRank === index+1;
+                const rowStyle = (isMe ? 'background:rgba(22,163,74,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);') + (isPrivilegedViewer ? 'cursor:pointer;' : '');
+                const icon = index===0?'🥇':(index===1?'🥈':(index===2?'🥉':index+1));
+                if (isPrivilegedViewer) {
+                    return `<tr style="${rowStyle}" onclick="openChartAdminDetail(${index})" title="विवरण हेर्न क्लिक गर्नुहोस्"><td style="padding:9px 5px;text-align:center;font-weight:bold;">${icon}</td><td style="padding:9px 6px;">${u.name||'—'}</td><td style="padding:9px 6px;color:#64748b;font-size:.75rem;">${u.address||'—'}</td><td style="padding:9px 5px;text-align:center;color:var(--primary-color);font-weight:900;">${Number(u.totalScore||0)}</td></tr>`;
+                }
+                return `<tr style="${rowStyle}"><td style="padding:9px 5px;text-align:center;font-weight:bold;">${icon}</td><td style="padding:9px 6px;">${u.name||'—'}</td><td style="padding:9px 6px;color:#64748b;font-size:.75rem;">${u.address||'—'}</td></tr>`;
+            }).join('');
+
+            const myBox = document.getElementById('cl-my-rank-box');
+            if (data.myRank > 0) {
+                myBox.style.display = 'block';
+                myBox.style.borderColor = data.myRank <= 20 ? 'var(--success-color)' : '#a78bfa';
+                myBox.style.background = data.myRank <= 20 ? 'rgba(22,163,74,.1)' : 'rgba(167,139,250,.15)';
+                document.getElementById('cl-my-rank-number').innerText = data.myRank <= 20 ? `Top 20 • Rank ${data.myRank}/${data.total}` : `${data.myRank} / ${data.total}`;
+                document.getElementById('cl-my-rank-number').style.color = data.myRank <= 20 ? 'var(--success-color)' : '#8b5cf6';
+                document.getElementById('cl-my-rank-number').style.fontSize = '1.2rem';
+                document.getElementById('cl-my-score-text').innerText = (isPrivilegedViewer && data.myRankData) ? `Score: ${data.myRankData.totalScore}` : 'यहाँ तपाईंको आफ्नै अंक मात्र देखाइन्छ।';
+            } else {
+                myBox.style.display = 'block';
+                myBox.style.borderColor = 'var(--danger-color)';
+                myBox.style.background = 'rgba(220,38,38,.1)';
+                document.getElementById('cl-my-rank-number').innerText = `- / ${data.total}`;
+                document.getElementById('cl-my-rank-number').style.color = 'var(--danger-color)';
+                document.getElementById('cl-my-score-text').innerText = 'तपाईंले यो दिनको चार्ट भर्नुभएको छैन।';
             }
         })
-        .catch(err => {
+        .catch(() => {
             document.getElementById('cl-loading').style.display = 'block';
-            document.getElementById('cl-loading').innerHTML = "❌ नेटवर्क समस्या!";
+            document.getElementById('cl-content').style.display = 'none';
+            document.getElementById('cl-loading').innerHTML = '❌ नेटवर्क समस्या!';
         });
-    }
-    
+    };
+
     // ==========================================
     // 14. APP STARTUP & AUTO-SYNC
     // ==========================================
