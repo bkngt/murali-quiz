@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789532637960&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000003e048211a0e9986f07bc922f%26ts%3D497092%26p%3Dfs%26cid%3D1%26sig%3D9aebf5b1bb76b51a5a5d3325c793b7de9bd09821bca9f09e5daaa392d8064e43%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789532637960&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -25,7 +25,7 @@
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000041d081f4b3bb0c67682ce821%26fn%3DBK_Murali_Quiz_89.7.0_RevisionSync_FINAL.html%26cd%3Dattachment%26ts%3D497073%26p%3Dfs%26cid%3D1%26sig%3Db0c28b99427f974b0b7c043ed494af050930ec1da2070a9bd641f9f49ce887e7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -296,7 +296,7 @@
                 <input type="text" id="address-input" class="input-field" placeholder="सेवा केन्द्रको पूरा नाम (Sewa Kendra)" autocomplete="off" enterkeyhint="next" oninput="enforceEnglish(this)">
             </div>
 
-            <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
+            <input type="tel" id="phone-input" class="input-field" placeholder="फोन नम्बर (Phone)" autocomplete="off" enterkeyhint="next" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9+]/g, '')">
             
             <div style="margin: 0.4rem 0;">
                 <p id="pin-instruction" style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 6px 0; text-align: left; font-weight: 700;">(सम्झनैपर्ने ४ अंक)</p>
@@ -450,7 +450,7 @@
                     <input type="text" id="edit-last-name" class="input-field" placeholder="Last Name" style="margin:0; flex: 1;" oninput="enforceEnglish(this)">
                 </div>
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <input type="tel" id="edit-phone" class="input-field" placeholder="Phone" style="margin:0; flex: 1;" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9]/g, '')">
+                    <input type="tel" id="edit-phone" class="input-field" placeholder="Phone" style="margin:0; flex: 1;" oninput="this.value = convertNepaliToEnglishNumber(this.value).replace(/[^0-9+]/g, '')">
                     <input type="text" id="edit-address" class="input-field" placeholder="Sewa Kendra" style="margin:0; flex: 1;" oninput="enforceEnglish(this)">
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1035,10 +1035,11 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.3 (Eye Comfort • Dark Login • Smart Sync • Rank & Mega Archive)</div>
+        <div>Version: 90.2.4 (Stable Login & Sync)</div>
     </div>
 </div>
 <script>
+
     // ==========================================
     // 0. PWA INSTALLATION LOGIC
     // ==========================================
@@ -1097,7 +1098,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.3"; 
+    const APP_VERSION = "90.2.4"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1138,8 +1139,8 @@
     let audioCtx = null;
     
     let abortController = null;
-let quizAutoSyncTimer = null;
-let quizSyncInProgress = false;
+    let quizAutoSyncTimer = null;
+    let quizSyncInProgress = false;
     
     // Chart.js Instances
     let progressChartInstance = null;
@@ -1340,7 +1341,6 @@ let quizSyncInProgress = false;
         return new Date();
     }
 
-    // NEW: Helper to extract sortable time for Mega Quizzes
     function getSortableTime(sq) {
         if (sq.createdAt) return sq.createdAt;
         let parsed = parseDateString(sq.quizDate);
@@ -1440,7 +1440,6 @@ let quizSyncInProgress = false;
         }
         syncServerQuizzes(); 
 
-        // NEW: Chart Auto-Scroll Logic
         setTimeout(() => {
             document.querySelectorAll('.chart-option-compact input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -1569,7 +1568,11 @@ let quizSyncInProgress = false;
     function handlePIN() {
         if(isLockedOut) return;
         
-        const inputPhone = document.getElementById('phone-input').value.trim(); 
+        let rawPhone = document.getElementById('phone-input').value.trim(); 
+        let inputPhone = rawPhone;
+        if(inputPhone.length > 10 && inputPhone.startsWith("977")) inputPhone = inputPhone.substring(3);
+        else if(inputPhone.length > 10 && inputPhone.startsWith("+977")) inputPhone = inputPhone.substring(4);
+
         const inputPIN = document.getElementById('pin-input').value; 
         const month = document.getElementById('month-select').value;
         let submitBtn = document.getElementById('btn-login-submit');
@@ -1583,14 +1586,19 @@ let quizSyncInProgress = false;
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                 body: JSON.stringify({ action: "recoverPin", phone: inputPhone, month: month })
             })
-            .then(r => r.json())
-            .then(data => { 
+            .then(r => r.text())
+            .then(text => { 
                 submitBtn.innerHTML = `Recover PIN`;
-                if (data.status === "success") { 
-                    alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); 
-                    window.location.reload(); 
-                } else { 
-                    showToast(data.message || "विवरण मिलेन!", "error"); 
+                try {
+                    let data = JSON.parse(text);
+                    if (data.status === "success") { 
+                        alert("प्रमाणीकरण सफल! \nतपाईंको पिन नम्बर हो: " + data.pin + "\n(यसलाई सुरक्षित राख्नुहोला)"); 
+                        window.location.reload(); 
+                    } else { 
+                        showToast(data.message || "विवरण मिलेन!", "error"); 
+                    }
+                } catch(e) {
+                    showToast("सर्भर व्यस्त छ, कृपया एकछिन पछि प्रयास गर्नुहोस्।", "error");
                 }
             })
             .catch(e => { 
@@ -1609,18 +1617,23 @@ let quizSyncInProgress = false;
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                 body: JSON.stringify({ action: "login", phone: inputPhone, pin: inputPIN, deviceId: getDeviceId() })
             })
-            .then(r => r.json())
-            .then(data => { 
+            .then(r => r.text())
+            .then(text => { 
                 submitBtn.innerHTML = `Login`;
-                if(data.status === "success") { 
-                    saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
-                    showToast("Server Login Successful!", "success"); 
-                } else { 
-                    if (data.message && data.message.includes("ब्लक")) {
-                        alert(data.message);
-                    } else {
-                        handleFailedAttempt(); 
+                try {
+                    let data = JSON.parse(text);
+                    if(data.status === "success") { 
+                        saveLocalDataAndUnlock(data.name, inputPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
+                        showToast("Server Login Successful!", "success"); 
+                    } else { 
+                        if (data.message && data.message.includes("ब्लक")) {
+                            alert(data.message);
+                        } else {
+                            handleFailedAttempt(); 
+                        }
                     }
+                } catch(e) {
+                    showToast("सर्भर व्यस्त छ, कृपया एकछिन पछि प्रयास गर्नुहोस्।", "error");
                 }
             })
             .catch(e => { 
@@ -1657,18 +1670,24 @@ let quizSyncInProgress = false;
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                     body: JSON.stringify({ action: "register", name: finalFullName, phone: inputPhone, address: address, pin: inputPIN, month: month, country: countryVal, deviceId: getDeviceId() })
                 })
-                .then(r => r.json())
-                .then(data => { 
-                    if (data.status === "success") { 
-                        saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); 
-                        showToast("Registration Successful!", "success"); 
-                    } else { 
-                        submitBtn.innerHTML = `Enter`; 
-                        if (data.message && data.message.includes("ब्लक")) {
-                            alert(data.message);
-                        } else {
-                            showToast(data.message, "error"); 
+                .then(r => r.text())
+                .then(text => { 
+                    try {
+                        let data = JSON.parse(text);
+                        if (data.status === "success") { 
+                            saveLocalDataAndUnlock(finalFullName, inputPhone, address, month, countryVal, inputPIN, "Student"); 
+                            showToast("Registration Successful!", "success"); 
+                        } else { 
+                            submitBtn.innerHTML = `Enter`; 
+                            if (data.message && data.message.includes("ब्लक")) {
+                                alert(data.message);
+                            } else {
+                                showToast(data.message, "error"); 
+                            }
                         }
+                    } catch(e) {
+                        submitBtn.innerHTML = `Enter`; 
+                        showToast("सर्भर व्यस्त छ, कृपया एकछिन पछि प्रयास गर्नुहोस्।", "error");
                     }
                 })
                 .catch(e => { 
@@ -1695,18 +1714,23 @@ let quizSyncInProgress = false;
                  headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                  body: JSON.stringify({ action: "login", phone: savedPhone, pin: inputPIN, deviceId: getDeviceId() })
              })
-             .then(r => r.json())
-             .then(data => { 
+             .then(r => r.text())
+             .then(text => { 
                  submitBtn.innerHTML = `Enter`;
-                 if(data.status === "success") { 
-                     saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
-                     showToast("Server Login Successful!", "success"); 
-                 } else { 
-                     if (data.message && data.message.includes("ब्लक")) {
-                         alert(data.message);
-                     } else {
-                         handleFailedAttempt(); 
+                 try {
+                     let data = JSON.parse(text);
+                     if(data.status === "success") { 
+                         saveLocalDataAndUnlock(data.name, savedPhone, data.address || "N/A", data.month || "", data.country || "N/A", inputPIN, data.role || "Student"); 
+                         showToast("Server Login Successful!", "success"); 
+                     } else { 
+                         if (data.message && data.message.includes("ब्लक")) {
+                             alert(data.message);
+                         } else {
+                             handleFailedAttempt(); 
+                         }
                      }
+                 } catch(e) {
+                     showToast("सर्भर व्यस्त छ, कृपया एकछिन पछि प्रयास गर्नुहोस्।", "error");
                  }
              })
              .catch(e => { 
@@ -1717,7 +1741,11 @@ let quizSyncInProgress = false;
             handleFailedAttempt(); 
         }
     }
-    
+
+भाग ३ (Part 3): Script को बाँकी खण्ड (checkLocalPIN देखि अन्त्यसम्म)
+
+(यसलाई भाग २ को ठीक तल राख्नुहोस्)
+
     function handleFailedAttempt() {
         failedAttempts++;
         if (failedAttempts >= 4) { 
@@ -1759,7 +1787,12 @@ let quizSyncInProgress = false;
     window.updateLocalProfile = function() {
         let fNameRaw = document.getElementById('edit-first-name').value.trim();
         let lNameRaw = document.getElementById('edit-last-name').value.trim();
-        let newPhone = document.getElementById('edit-phone').value.trim();
+        let rawPhone = document.getElementById('edit-phone').value.trim();
+        
+        let newPhone = rawPhone;
+        if(newPhone.length > 10 && newPhone.startsWith("977")) newPhone = newPhone.substring(3);
+        else if(newPhone.length > 10 && newPhone.startsWith("+977")) newPhone = newPhone.substring(4);
+
         let newAddress = document.getElementById('edit-address').value.trim();
         let oldPhone = localStorage.getItem('murali_phone'); 
         let pin = localStorage.getItem('murali_pin');
@@ -1784,15 +1817,20 @@ let quizSyncInProgress = false;
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: "updateProfile", oldPhone: oldPhone, pin: pin, newName: finalName, newPhone: newPhone, newAddress: newAddress })
             })
-            .then(r => r.json())
-            .then(data => { 
+            .then(r => r.text())
+            .then(text => { 
                 document.getElementById('btn-save-profile').innerText = "Save Profile";
-                if(data.status === "success") { 
-                    showToast("Profile Synced to Google Sheet! ☁️", "success"); 
-                    updateProfileBadgeUI();
-                } else { 
-                    showToast("Google Sheet Sync Error: " + data.message, "error"); 
-                } 
+                try {
+                    let data = JSON.parse(text);
+                    if(data.status === "success") { 
+                        showToast("Profile Synced to Google Sheet! ☁️", "success"); 
+                        updateProfileBadgeUI();
+                    } else { 
+                        showToast("Google Sheet Sync Error: " + data.message, "error"); 
+                    } 
+                } catch(e) {
+                    showToast("सर्भर व्यस्त छ, तर मोबाइलमा सेभ भयो।", "warning");
+                }
                 closeSettings(); 
             })
             .catch(e => { 
@@ -1859,26 +1897,26 @@ let quizSyncInProgress = false;
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin, deviceId: getDeviceId() })
         })
-        .then(r => r.json())
-        .then(data => {
-            if (data.status === "success") {
-                let updated = false;
-                if (data.name !== userName) { localStorage.setItem('murali_user_name', data.name); userName = data.name; updated = true; }
-                if (data.address !== userAddress) { localStorage.setItem('murali_address', data.address); userAddress = data.address; updated = true; }
-                if (data.role !== userRole) { localStorage.setItem('murali_role', data.role); userRole = data.role; updated = true; }
-                if (data.country !== userCountry) { localStorage.setItem('murali_country', data.country); userCountry = data.country; updated = true; }
-                
-                if (updated) {
-                    updateProfileBadgeUI();
-                    showToast("Profile auto-updated from server.", "info");
-                }
-            } else {
-                if (data.message && data.message.includes("ब्लक")) {
+        .then(r => r.text())
+        .then(text => {
+            try {
+                let data = JSON.parse(text);
+                if (data.status === "success") {
+                    let updated = false;
+                    if (data.name !== userName) { localStorage.setItem('murali_user_name', data.name); userName = data.name; updated = true; }
+                    if (data.address !== userAddress) { localStorage.setItem('murali_address', data.address); userAddress = data.address; updated = true; }
+                    if (data.role !== userRole) { localStorage.setItem('murali_role', data.role); userRole = data.role; updated = true; }
+                    if (data.country !== userCountry) { localStorage.setItem('murali_country', data.country); userCountry = data.country; updated = true; }
+                    
+                    if (updated) {
+                        updateProfileBadgeUI();
+                    }
+                } else if (data.message && data.message.includes("ब्लक")) {
                     alert(data.message);
-                } else {
-                    alert("तपाईंको खाताको विवरण एडमिनद्वारा परिवर्तन गरिएको छ। कृपया पुनः लगइन गर्नुहोस्।");
+                    clearLocalDataAndReload(true);
                 }
-                clearLocalDataAndReload(true);
+            } catch (e) {
+                console.log("Background sync JSON parse error, ignoring...");
             }
         }).catch(e => console.log("Background sync failed", e));
     }
@@ -1901,7 +1939,6 @@ let quizSyncInProgress = false;
                 localStorage.setItem('murali_server_quizzes', newSerialized);
                 populateSavedQuizzes();
 
-                // Student dashboard must immediately reflect the freshly synced quiz list.
                 if (!isQuizActive && !isAdminViewActive && document.getElementById('view-generator')) {
                     loadStudentDashboard();
                 }
@@ -1921,8 +1958,6 @@ let quizSyncInProgress = false;
     }
 
     function startQuizAutoSync() {
-        // Smart sync: no repeating timer.
-        // Check once after unlock, then rely on foreground/online events.
         if (quizAutoSyncTimer) {
             clearInterval(quizAutoSyncTimer);
             quizAutoSyncTimer = null;
@@ -2015,7 +2050,6 @@ let quizSyncInProgress = false;
                     newLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
                     localStorage.setItem('murali_progress', JSON.stringify(newLocalHistory)); 
 
-                    // Refresh whichever student-facing view is currently visible.
                     if (document.getElementById('view-progress').style.display === 'block') {
                         renderDashboard();
                     }
@@ -2023,9 +2057,6 @@ let quizSyncInProgress = false;
                     const safeRole = (userRole || '').toString().trim().toLowerCase();
                     const isStudent = safeRole !== 'admin' && safeRole !== 'manager';
 
-                    // Exam Calendar uses murali_progress to mark completed days.
-                    // Re-render it immediately after cloud results are merged so
-                    // users do not need to press "Refresh Sync" manually.
                     if (isStudent && !isQuizActive && typeof loadStudentDashboard === 'function') {
                         loadStudentDashboard();
                     }
@@ -2364,7 +2395,6 @@ let quizSyncInProgress = false;
                 return recent || future;
             });
             if (specialQuizzes.length > 0 || serverQuizzes.some(q => q.isMegaQuiz)) {
-                // MEGA QUIZ SORTING FIX
                 specialQuizzes.sort((a, b) => getSortableTime(b) - getSortableTime(a));
 
                 let activeMegaHtml = '';
@@ -2496,13 +2526,8 @@ let quizSyncInProgress = false;
         let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
         let currentDayName = dayNames[dayOfWeek];
 
-        // ==========================================================
-        // QUIZ MODEL 60.3 — MURALI FIRST
-        // Integrated from the tested Google AI Studio 60.3 prompt.
-        // Day pools guide selection; they are NOT fixed Q1=M1...Q20=M20 slots.
-        // ==========================================================
         const QUIZ_MODEL_VERSION = "60.3";
-        const QUIZ_MODEL_60_3 = "[Version: 60.3 FINAL — OPTIMIZED GENERATION]\n\nROLE\nYou are an expert Brahma Kumaris quiz creator. Generate exactly {{QCOUNT}} high-quality, source-grounded, natural and answerable quiz questions from the supplied Murali.\n\n1) MURALI FIRST\n- The supplied Murali is the primary source of truth.\n- Day Pool is guidance only, never a fixed slot system.\n- NEVER use Q1=M1, Q2=M2... mapping.\n- Never create a weak question only to cover a model/category.\n- Question quality and source accuracy come before model coverage.\n\n2) DATE / MURLI TYPE\n- Read the date from the supplied Murali and determine weekday.\n- If the Murali clearly has “मीठे बच्चे” or Sakar Q&A structure, treat as Sakar.\n- Otherwise, when clearly Avyakt style, treat as Avyakt.\n- Avyakt uses the SUNDAY pool; Sakar uses the actual weekday pool.\n- Do not expose detection logic in output.\n\n3) SOURCE RULE\n- Every question, answer and explanation must be supported by the supplied Murali.\n- “original” must be an exact short quotation from the supplied Murali.\n- Preserve Baba/Murali terminology and meaning.\n- Do not invent facts or silently substitute outside knowledge.\n\n4) DAY POOLS — USE FLEXIBLY\nMONDAY: core knowledge, Dharna, practical understanding, Soul/Supreme Soul, Yoga, cause/result.\nTUESDAY: example/upama, Maya, Yoga, application, obstacle/solution, practical Dharna.\nWEDNESDAY: Karma, Service, inner state, Shrimat, spiritual treasures, cause/result, application.\nTHURSDAY: Cycle, Time, Sangamyug, numbers, titles, stages, spiritual history when explicitly supported.\nFRIDAY: Vardan, Slogan, Avyakt Signal, subtle knowledge, checking point, deep Gyan, caution, practical situation.\nSATURDAY: weekly mix, revision, practical wisdom, true/false, contrast, cause/result, final essence.\nSUNDAY/AVYAKT: Avyakt stage, subtle phrase, spiritual self-respect, Maya, service, Vardan, Slogan, Avyakt Signal, essence.\nUse only families genuinely supported by the Murali.\n\n5) QUESTION QUALITY\n- Prefer natural Nepali, normally 6–12 words; 13–15 only when needed.\n- Avoid unnecessary “आज”, “आजको”, “अनुसार”.\n- Questions must sound human-made, not template-generated.\n- No semantic duplication. Two questions may share a theme only when testing a genuinely different dimension (e.g. fact vs application).\n\n6) DIFFICULTY\nTarget approximately 8 EASY/direct, 8 MEDIUM/thinking, 4 CHALLENGING/subtle for a 20-question quiz. This is a target, not a rigid quota.\n\n7) DISTRACTORS — NON-NEGOTIABLE\n- Correct answer must be supported by TODAY’S Murali.\n- Every distractor must be genuinely attested in TODAY’S Murali or an approved historical Murali corpus actually available in context.\n- Never invent generic spiritual distractors merely to fill four options.\n- Every option must match the exact grammatical, semantic and functional role requested by the question.\n- If three valid distractors cannot be sourced, discard that question and choose another question.\n- Same category alone is not enough; the distractor must be contextually plausible but wrong for THIS question.\n\n8) FORMAT VARIETY\nUse genuine variety across the quiz when fairly supported:\n- direct question\n- fill blank / ...\n- true/false statement\n- two true + two false\n- answer/blank dash style\n- all correct / “यी सबै”\n- which is wrong\n- all wrong\nDo not force a format just to fill a quota.\nDo not use the same construction more than twice in the full quiz or more than twice consecutively.\n\n9) MID-MURALI COVERAGE\nFor medium/long Murali, give strong priority to the substantive middle portion. Do not mine most questions from the opening, Vardan, Slogan or closing lines.\nFor a long 20-question Murali, aim for about 9–12 middle-grounded questions when the content supports it.\n\n10) OPTIONS\n- Four options should have similar grammatical form, semantic level, specificity and plausibility.\n- Avoid answer-position patterns.\n- Do not make the correct option obviously longest/shortest or uniquely polished.\n- The question itself must not leak the answer, synonym, unique phrase or grammatical clue.\n\n11) TAG\nEach question gets exactly one broad 1–2 word tag such as ज्ञान, योग, धारणा, सेवा, माया, कर्म, समय, चक्र, स्वमान, आत्मा, परमात्मा, शक्ति, पवित्रता, वर्सा, स्मृति.\nNever reveal the answer through the tag.\n\n12) SPECIAL CONTENT\n- Vardan/Slogan/Avyakt Signal: 0–2 only when genuinely useful.\n- Q&A is content, not a mandatory format.\n- No worldly song-lyric questions.\n- is_mega_eligible=true only for 2–4 foundational reusable concepts (e.g. Soul, Supreme Soul, Cycle, foundational principles). Murali-specific facts are false.\n\n13) SWAMAN\nUse the Vardan when available. Create a short emoji title ending with “भव:!” and exactly 2 short, encouraging, Vardan-grounded sentences. Do not invent qualities.\n\n14) FINAL SILENT AUDIT — BEFORE OUTPUT\nFor every question verify:\n- answer is supported by the Murali;\n- explanation is supported;\n- original is an exact Murali quote;\n- exactly ONE option is defensible as correct;\n- all four options match the same role/category;\n- distractors are source-attested;\n- no answer leak;\n- no semantic duplicate;\n- natural length and wording;\n- fair difficulty.\nIf any check fails, rewrite or replace the question before output.\n\nOUTPUT\nReturn ONLY one JSON object. No markdown fences. No commentary before or after it.\nSchema:\n{\n  \"swaman\": \"string\",\n  \"quiz\": [\n    {\n      \"q\": \"string\",\n      \"options\": [\"string\", \"string\", \"string\", \"string\"],\n      \"answer\": \"string\",\n      \"explanation\": \"string\",\n      \"tag\": \"string\",\n      \"original\": \"string\",\n      \"is_mega_eligible\": false\n    }\n  ]\n}\n";
+        const QUIZ_MODEL_60_3 = "[Version: 60.3 FINAL — OPTIMIZED GENERATION]\n\nROLE\nYou are an expert Brahma Kumaris quiz creator. Generate exactly {{QCOUNT}} high-quality, source-grounded, natural and answerable quiz questions from the supplied Murali.\n\n1) MURALI FIRST\n- The supplied Murali is the primary source of truth.\n- Day Pool is guidance only, never a fixed slot system.\n- NEVER use Q1=M1, Q2=M2... mapping.\n- Never create a weak question only to cover a model/category.\n- Question quality and source accuracy come before model coverage.\n\n2) DATE / MURLI TYPE\n- Read the date from the supplied Murali and determine weekday.\n- If the Murali clearly has “मीठे बच्चे” or Sakar Q&A structure, treat as Sakar.\n- Otherwise, when clearly Avyakt style, treat as Avyakt.\n- Avyakt uses the SUNDAY pool; Sakar uses the actual weekday pool.\n- Do not expose detection logic in output.\n\n3) SOURCE RULE\n- Every question, answer and explanation must be supported by the supplied Murali.\n- “original” must be an exact short quotation from the supplied Murali.\n- Preserve Baba/Murali terminology and meaning.\n- Do not invent facts or silently substitute outside knowledge.\n\n4) DAY POOLS — USE FLEXIBLY\nMONDAY: core knowledge, Dharna, practical understanding, Soul/Supreme Soul, Yoga, cause/result.\nTUESDAY: example/upama, Maya, Yoga, application, obstacle/solution, practical Dharna.\nWEDNESDAY: Karma, Service, inner state, Shrimat, spiritual treasures, cause/result, application.\nTHURSDAY: Cycle, Time, Sangamyug, numbers, titles, stages, spiritual history when explicitly supported.\nFRIDAY: Vardan, Slogan, Avyakt Signal, subtle knowledge, checking point, deep Gyan, caution, practical situation.\nSATURDAY: weekly mix, revision, practical wisdom, true/false, contrast, cause/result, final essence.\nSUNDAY/AVYAKT: Avyakt stage, subtle phrase, spiritual self-respect, Maya, service, Vardan, Slogan, Avyakt Signal, essence.\nUse only families genuinely supported by the Murali.\n\n5) QUESTION QUALITY\n- Prefer natural Nepali, normally 6–12 words; 13–15 only when needed.\n- Avoid unnecessary “आज”, “आजको”, “अनुसार”.\n- Questions must sound human-made, not template-generated.\n- No semantic duplicate. Two questions may share a theme only when testing a genuinely different dimension (e.g. fact vs application).\n\n6) DIFFICULTY\nTarget approximately 8 EASY/direct, 8 MEDIUM/thinking, 4 CHALLENGING/subtle for a 20-question quiz. This is a target, not a rigid quota.\n\n7) DISTRACTORS — NON-NEGOTIABLE\n- Correct answer must be supported by TODAY’S Murali.\n- Every distractor must be genuinely attested in TODAY’S Murali or an approved historical Murali corpus actually available in context.\n- Never invent generic spiritual distractors merely to fill four options.\n- Every option must match the exact grammatical, semantic and functional role requested by the question.\n- If three valid distractors cannot be sourced, discard that question and choose another question.\n- Same category alone is not enough; the distractor must be contextually plausible but wrong for THIS question.\n\n8) FORMAT VARIETY\nUse genuine variety across the quiz when fairly supported:\n- direct question\n- fill blank / ...\n- true/false statement\n- two true + two false\n- answer/blank dash style\n- all correct / “यी सबै”\n- which is wrong\n- all wrong\nDo not force a format just to fill a quota.\nDo not use the same construction more than twice in the full quiz or more than twice consecutively.\n\n9) MID-MURALI COVERAGE\nFor medium/long Murali, give strong priority to the substantive middle portion. Do not mine most questions from the opening, Vardan, Slogan or closing lines.\nFor a long 20-question Murali, aim for about 9–12 middle-grounded questions when the content supports it.\n\n10) OPTIONS\n- Four options should have similar grammatical form, semantic level, specificity and plausibility.\n- Avoid answer-position patterns.\n- Do not make the correct option obviously longest/shortest or uniquely polished.\n- The question itself must not leak the answer, synonym, unique phrase or grammatical clue.\n\n11) TAG\nEach question gets exactly one broad 1–2 word tag such as ज्ञान, योग, धारणा, सेवा, माया, कर्म, समय, चक्र, स्वमान, आत्मा, परमात्मा, शक्ति, पवित्रता, वर्सा, स्मृति.\nNever reveal the answer through the tag.\n\n12) SPECIAL CONTENT\n- Vardan/Slogan/Avyakt Signal: 0–2 only when genuinely useful.\n- Q&A is content, not a mandatory format.\n- No worldly song-lyric questions.\n- is_mega_eligible=true only for 2–4 foundational reusable concepts (e.g. Soul, Supreme Soul, Cycle, foundational principles). Murali-specific facts are false.\n\n13) SWAMAN\nUse the Vardan when available. Create a short emoji title ending with “भव:!” and exactly 2 short, encouraging, Vardan-grounded sentences. Do not invent qualities.\n\n14) FINAL SILENT AUDIT — BEFORE OUTPUT\nFor every question verify:\n- answer is supported by the Murali;\n- explanation is supported;\n- original is an exact Murali quote;\n- exactly ONE option is defensible as correct;\n- all four options match the same role/category;\n- distractors are source-attested;\n- no answer leak;\n- no semantic duplicate;\n- natural length and wording;\n- fair difficulty.\nIf any check fails, rewrite or replace the question before output.\n\nOUTPUT\nReturn ONLY one JSON object. No markdown fences. No commentary before or after it.\nSchema:\n{\n  \"swaman\": \"string\",\n  \"quiz\": [\n    {\n      \"q\": \"string\",\n      \"options\": [\"string\", \"string\", \"string\", \"string\"],\n      \"answer\": \"string\",\n      \"explanation\": \"string\",\n      \"tag\": \"string\",\n      \"original\": \"string\",\n      \"is_mega_eligible\": false\n    }\n  ]\n}\n";
 
         const promptText = QUIZ_MODEL_60_3
             .replaceAll("{QCOUNT}", String(qCount))
@@ -2527,7 +2552,6 @@ ${text}`;
             const retryableStatuses = new Set([429, 500, 502, 503, 504]);
             let retryDelay = 3000;
 
-            // Structured output schema keeps the response machine-parseable and removes JSON-fence failures.
             const quizSchema = {
                 type: "object",
                 properties: {
@@ -2561,8 +2585,6 @@ ${text}`;
                 additionalProperties: false
             };
 
-            // Gemini 3.x: use tunable thinking and do not send deprecated sampling controls.
-            // Gemini 2.5: retain a small temperature for compatibility.
             const isGemini3 = /^gemini-3\./.test(selectedModel);
             const generationConfig = {
                 maxOutputTokens: 12000,
@@ -3284,7 +3306,6 @@ ${text}`;
         stopTimer(); 
         clearInterval(qLockInterval);
         isQuizActive = false;
-        // Quiz cache refresh happens on foreground/online events; do not add a network request to submit flow.
         
         currentScore = 0;
         currentQuiz.forEach(q => {
@@ -3553,7 +3574,6 @@ ${text}`;
     // ==========================================
     // 8. DASHBOARD, CHARTS & CALENDAR
     // ==========================================
-    // Local calendar date (not UTC) so Nepal and other timezones never shift "today" to yesterday.
     function getLocalDateISO() {
         const d = new Date();
         const y = d.getFullYear();
@@ -3627,15 +3647,12 @@ ${text}`;
         }
     }
 
-    // NEW: Switch between Quiz Stats and Chart Stats
-    // NEW: Switch between Quiz Stats and Chart Stats
     window.switchStatTab = function(tab) {
         document.getElementById('tab-stat-quiz').classList.toggle('active', tab === 'quiz');
         document.getElementById('tab-stat-chart').classList.toggle('active', tab === 'chart');
         document.getElementById('stat-quiz-section').style.display = tab === 'quiz' ? 'block' : 'none';
         document.getElementById('stat-chart-section').style.display = tab === 'chart' ? 'block' : 'none';
         
-        // ट्याब फेर्दा क्यालेन्डर र डाटा पनि फेर्न यो कल गर्नुपर्छ
         renderDashboard(); 
     }
     
@@ -3789,12 +3806,10 @@ ${text}`;
 
         let charts = safeJSON('murali_daily_charts', []);
 
-        // 1. Calculate Stats (माथिको ३ वटा बक्स)
         let statsHtml = '';
         let msgContainer = document.getElementById('baba-message-container');
 
         if (!isChartTab) {
-            // QUIZ STATS
             let totalExams = standardHistory.length;
             let avgScore = 0;
             if (totalExams > 0) {
@@ -3823,7 +3838,6 @@ ${text}`;
                 msgContainer.innerHTML = '';
             }
         } else {
-            // CHART STATS
             let totalCharts = charts.length;
             let avgChartScore = 0;
             if (totalCharts > 0) {
@@ -3850,7 +3864,6 @@ ${text}`;
         }
         document.getElementById('dash-stats').innerHTML = statsHtml;
 
-        // 2. Calendar Logic
         let cy = currentCalDate.getFullYear();
         let cm = currentCalDate.getMonth();
         populateCalendarPickers(cy, cm);
@@ -3863,7 +3876,6 @@ ${text}`;
         let today = new Date();
 
         if (!isChartTab) {
-            // QUIZ CALENDAR
             let historyMap = {};
             standardHistory.forEach(h => {
                 let d = getValidDate(h);
@@ -3892,7 +3904,6 @@ ${text}`;
                 }
             }
         } else {
-            // CHART CALENDAR
             let chartMap = {};
             charts.forEach(c => {
                 let d = new Date(c.date);
@@ -3921,7 +3932,6 @@ ${text}`;
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        // 3. Draw Charts
         let currentMonthHistory = standardHistory.filter(h => {
             let d = getValidDate(h);
             return d && d.getMonth() === cm && d.getFullYear() === cy;
@@ -3929,13 +3939,11 @@ ${text}`;
         drawCharts(currentMonthHistory);
         drawChartAnalytics(cm, cy);
 
-        // 4. Mega Quiz Results & Buttons Visibility
         let megaContainer = document.getElementById('mega-quiz-results-container');
         let detailedProgBtn = document.querySelector('button[onclick="openDetailedProgress()"]');
         let calToggleBtn = document.querySelector('button[onclick="toggleCalendar()"]');
 
         if (!isChartTab) {
-            // क्वीज ट्याबमा 'मेरो प्रगति' बटन देखाउने र मेगा क्वीज देखाउने
             if (detailedProgBtn) detailedProgBtn.style.display = 'flex';
             if (calToggleBtn) calToggleBtn.style.gridColumn = 'auto';
 
@@ -3967,13 +3975,13 @@ ${text}`;
                 megaContainer.innerHTML = '';
             }
         } else {
-            // चार्ट ट्याबमा 'मेरो प्रगति' बटन लुकाउने र मेगा क्वीज लुकाउने
             if (detailedProgBtn) detailedProgBtn.style.display = 'none';
-            if (calToggleBtn) calToggleBtn.style.gridColumn = '1 / -1'; // क्यालेन्डर बटनलाई फुल साइज बनाउने
+            if (calToggleBtn) calToggleBtn.style.gridColumn = '1 / -1'; 
             megaContainer.innerHTML = ''; 
         }
     }
-function drawCharts(filteredHistory) {
+
+    function drawCharts(filteredHistory) {
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
         let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
@@ -4018,7 +4026,6 @@ function drawCharts(filteredHistory) {
         });
     }
 
-    // NEW: Draw Chart Analytics
     function drawChartAnalytics(cm, cy) {
         let isDark = document.body.hasAttribute('data-theme');
         let textColor = isDark ? '#f8fafc' : '#1e293b';
@@ -4170,7 +4177,6 @@ function drawCharts(filteredHistory) {
             list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
         }
 
-        // ACCURATE YEARLY AVERAGE SCORE
         let yearlyData = {};
         let currentYear = new Date().getFullYear();
         standardHistory.forEach(h => {
@@ -4228,7 +4234,7 @@ function drawCharts(filteredHistory) {
         remarkEl.className = `prog-remark ${rClass}`;
 
         let reviewBtn = document.getElementById('cal-detail-review-btn');
-        reviewBtn.style.display = 'block'; // क्वीजमा रिभ्यु बटन देखाउने
+        reviewBtn.style.display = 'block'; 
         reviewBtn.onclick = () => {
             document.getElementById('calendar-detail-modal').style.display = 'none';
             reviewPastQuiz(id);
@@ -4237,7 +4243,6 @@ function drawCharts(filteredHistory) {
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
 
-    // NEW: चार्टको क्यालेन्डरमा क्लिक गर्दा देखाउने पप-अप
     window.showChartCalendarDetail = function(id) {
         let charts = safeJSON('murali_daily_charts', []);
         let record = charts.find(item => item.id === id);
@@ -4253,7 +4258,7 @@ function drawCharts(filteredHistory) {
         remarkEl.className = `prog-remark ${rClass}`;
 
         let reviewBtn = document.getElementById('cal-detail-review-btn');
-        reviewBtn.style.display = 'none'; // चार्टमा रिभ्यु बटन लुकाउने
+        reviewBtn.style.display = 'none'; 
 
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
@@ -4273,7 +4278,6 @@ function drawCharts(filteredHistory) {
             return;
         }
         
-        // MEGA QUIZ SORTING FIX
         let sortedQuizzes = serverQuizzes.map((sq, idx) => ({ data: sq, originalIndex: idx }))
             .sort((a, b) => {
                 let tA = getSortableTime(a.data);
@@ -4694,7 +4698,6 @@ function drawCharts(filteredHistory) {
             return quizDateOnly <= todayDateOnly && (quizDateOnly.getTime() >= todayDateOnly.getTime() - 24 * 60 * 60 * 1000);
         });
 
-        // Calendar clicks may request any historical quiz date.
         if (targetDateStr) {
             let historical = serverQuizzes.find(sq => String(sq.quizDate) === String(targetDateStr));
             if (historical && !historical.isMegaQuiz && !recentQuizzes.some(sq => sq.quizDate === historical.quizDate)) {
@@ -4876,7 +4879,6 @@ function drawCharts(filteredHistory) {
             let inputs = form.querySelectorAll(`input[name="${groupName}"]`);
             inputs.forEach(input => {
                 input.addEventListener('change', function() {
-                    // One selection per scoring group; checkbox UI gives the requested tick mark.
                     inputs.forEach(other => {
                         if(other !== input) other.checked = false;
                         other.closest('.chart-option-v2')?.classList.toggle('selected-v2', other.checked);
@@ -4927,7 +4929,6 @@ function drawCharts(filteredHistory) {
         CHART_V2_GROUPS.forEach(groupName => {
             let key = CHART_V2_META[groupName].key;
             let value = Number(existingChart[key] || 0);
-            // Legacy aliases
             if(groupName === 'chart_drill' && !value) value = Number(existingChart.hourlyDrill || 0);
             if(groupName === 'chart_evening' && !value) value = Number(existingChart.eveningYoga || 0);
             if(groupName === 'chart_food' && !value) value = Number(existingChart.food || 0);
@@ -4977,7 +4978,6 @@ function drawCharts(filteredHistory) {
             synced: false
         };
 
-        // Compatibility aliases retained locally and for future backend migration.
         chartData.hourlyDrill = chartData.drill;
         chartData.sleep = chartData.goodnight;
         chartData.anger = chartData.conduct;
@@ -5050,7 +5050,6 @@ function drawCharts(filteredHistory) {
         });
     }
 
-    // Initialize chart v2 once DOM is ready.
     setTimeout(() => {
         initChartV2Interactions();
         let todayStr = getLocalDateISO();
