@@ -7,10 +7,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789530830192&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000598882119435a015830c7ae0%26ts%3D497091%26p%3Dfs%26cid%3D1%26sig%3D32f9286d19900e410c96fbd9f8d8e582c0d6d92b9b37f0125808735e985aa19f%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789530830192&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+        // Apply the saved theme before the first paint so Dark Mode does not flash white.
+        try {
+            const savedTheme = localStorage.getItem('m_q_theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                const themeMeta = document.getElementById('theme-color-meta');
+                if (themeMeta) themeMeta.content = '#0b0f19';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                const themeMeta = document.getElementById('theme-color-meta');
+                if (themeMeta) themeMeta.content = '#f3efe5';
+            }
+        } catch (e) {}
+    </script>
     <title>BK Murali Quiz</title>
     
     <!-- PWA Manifest Link -->
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789527232037&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000028ac821196365b632ce19d15%26fn%3Dindex.html%26cd%3Dattachment%26ts%3D497091%26p%3Dfs%26cid%3D1%26sig%3D616da5ce48257a40f8bd2e12e8899972630e736f0f8dada71b38fc5ea22439ea%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789527232037&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000041d081f4b3bb0c67682ce821%26fn%3DBK_Murali_Quiz_89.7.0_RevisionSync_FINAL.html%26cd%3Dattachment%26ts%3D497073%26p%3Dfs%26cid%3D1%26sig%3Db0c28b99427f974b0b7c043ed494af050930ec1da2070a9bd641f9f49ce887e7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000041d081f4b3bb0c67682ce821%26fn%3DBK_Murali_Quiz_89.7.0_RevisionSync_FINAL.html%26cd%3Dattachment%26ts%3D497073%26p%3Dfs%26cid%3D1%26sig%3Db0c28b99427f974b0b7c043ed494af050930ec1da2070a9bd641f9f49ce887e7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789464835474&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><link rel="manifest" href="manifest.json">
     
     <!-- JSZip for Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -39,6 +54,7 @@
             --q-text-color: #175269; --opt-text-color: #17665f;
             --box-shadow-main: 0 12px 30px -8px rgba(35, 52, 59, 0.12), 0 4px 12px rgba(35,52,59,0.05);
             --glass-bg: rgba(255, 253, 248, 0.90);
+            --logo-bg: #fff8e8;
             --font-size: 18px; 
             --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
             --success-color: #16a34a; --danger-color: #dc2626;
@@ -60,6 +76,7 @@
             --q-text-color: #fbbf24; --opt-text-color: #7dd3fc; 
             --box-shadow-main: 0 15px 35px -5px rgba(0, 0, 0, 0.5); 
             --glass-bg: rgba(15, 23, 42, 0.85);
+            --logo-bg: #111827;
         }
 
         html, body { background: var(--bg-color); }
@@ -232,7 +249,7 @@
             <p id="pin-msg" style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 1rem; font-weight: 600;">कृपया आफ्नो पूर्ण विवरण भर्नुहोस्</p>
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
-                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: white;">
+                <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: var(--logo-bg);">
                      <div class="baba-logo-container">
                         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                           <defs>
@@ -305,7 +322,7 @@
 <div id="main-app" class="container" style="display: none;">
     
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 1rem; gap: 12px;">
-        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: white; margin: 0;">
+        <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: var(--logo-bg); margin: 0;">
              <div class="baba-logo-container">
                 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                   <defs>
@@ -1009,7 +1026,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.0 (Smart Sync • Eye Comfort • Rank & Mega Archive)</div>
+        <div>Version: 90.2.1 (Eye Comfort • Dark Login • Smart Sync • Rank & Mega Archive)</div>
     </div>
 </div>
 <script>
@@ -1071,7 +1088,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.0"; 
+    const APP_VERSION = "90.2.1"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
