@@ -1,11 +1,11 @@
 {
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "version": "90.2.2",
+  "version": "90.2.3",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f3efe5",
-  "theme_color": "#0b789c",
+  "background_color": "#f5f7f3",
+  "theme_color": "#0284c7",
   "description": "Daily Brahma Kumaris Murali Quiz App",
   "icons": [
     {
