@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789530830192&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e8e4820885614bc93f4ffe50%26ts%3D497092%26p%3Dfs%26cid%3D1%26sig%3D7d6ea7613ac9c7a1c806084a382ecc5b8c220c222744fda25fb7ee281fd69437%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789530830192&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789532637960&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000003e048211a0e9986f07bc922f%26ts%3D497092%26p%3Dfs%26cid%3D1%26sig%3D9aebf5b1bb76b51a5a5d3325c793b7de9bd09821bca9f09e5daaa392d8064e43%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789532637960&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -1035,7 +1035,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.2 (Eye Comfort • Dark Login • Smart Sync • Rank & Mega Archive)</div>
+        <div>Version: 90.2.3 (Eye Comfort • Dark Login • Smart Sync • Rank & Mega Archive)</div>
     </div>
 </div>
 <script>
@@ -1097,7 +1097,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.2"; 
+    const APP_VERSION = "90.2.3"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -2014,7 +2014,21 @@ let quizSyncInProgress = false;
                 if(isUpdated) { 
                     newLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); 
                     localStorage.setItem('murali_progress', JSON.stringify(newLocalHistory)); 
-                    if(document.getElementById('view-progress').style.display === 'block') renderDashboard(); 
+
+                    // Refresh whichever student-facing view is currently visible.
+                    if (document.getElementById('view-progress').style.display === 'block') {
+                        renderDashboard();
+                    }
+
+                    const safeRole = (userRole || '').toString().trim().toLowerCase();
+                    const isStudent = safeRole !== 'admin' && safeRole !== 'manager';
+
+                    // Exam Calendar uses murali_progress to mark completed days.
+                    // Re-render it immediately after cloud results are merged so
+                    // users do not need to press "Refresh Sync" manually.
+                    if (isStudent && !isQuizActive && typeof loadStudentDashboard === 'function') {
+                        loadStudentDashboard();
+                    }
                 }
             } else if (data.status === "error") {
                 console.log("Result sync auth/server error:", data.message || data);
