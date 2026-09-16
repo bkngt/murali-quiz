@@ -1,4 +1,4 @@
-const CACHE_NAME = 'murali-quiz-v90-2-2';
+const CACHE_NAME = 'murali-quiz-v90-2-3';
 
 const URLS_TO_CACHE = [
   './',
@@ -33,7 +33,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Google Apps Script/API requests must always use the network.
+  // Google Apps Script/API requests always go directly to the network.
   if (
     event.request.method !== 'GET' ||
     event.request.url.includes('script.google.com')
