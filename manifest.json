@@ -1,7 +1,7 @@
 {
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "version": "90.2.3",
+  "version": "90.2.4",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5f7f3",
