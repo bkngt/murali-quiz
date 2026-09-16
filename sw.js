@@ -1,4 +1,5 @@
-const CACHE_NAME = 'murali-quiz-v89-9-0';
+const CACHE_NAME = 'murali-quiz-v90-0-0';
+
 const URLS_TO_CACHE = [
   './',
   './index.html',
@@ -8,6 +9,7 @@ const URLS_TO_CACHE = [
 
 self.addEventListener('install', event => {
   self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(URLS_TO_CACHE))
@@ -26,12 +28,16 @@ self.addEventListener('activate', event => {
       );
     })
   );
+
   self.clients.claim();
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET' || event.request.url.includes('script.google.com')) {
-    return; 
+  if (
+    event.request.method !== 'GET' ||
+    event.request.url.includes('script.google.com')
+  ) {
+    return;
   }
 
   event.respondWith(
