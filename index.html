@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000005e548211a463245262dbc17f%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3Da2f4c3a6bb48cbd21a8e36173470e1a9f0204a715b7b58b15be65207a69d385d%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789612882418&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000031108211b04c62e5f017e392%26fn%3Dtest%25252090.2.7.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3D15c21552d82d84b667d28137f42d044af8ff081e95bc681358267ec8d2dfd2ac%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789612882418&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000005e548211a463245262dbc17f%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3Da2f4c3a6bb48cbd21a8e36173470e1a9f0204a715b7b58b15be65207a69d385d%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -1040,7 +1040,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.6 (Stable Login & Sync)</div>
+        <div>Version: 90.2.7 (AI JSON Output Fix)</div>
     </div>
 </div>
 <script>
@@ -1103,7 +1103,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.6"; 
+    const APP_VERSION = "90.2.7"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -2599,11 +2599,13 @@ ${text}`;
             };
 
             const isGemini3 = /^gemini-3\./.test(selectedModel);
+            // Gemini structured JSON output: responseFormat.text.mimeType is an enum.
+            // Use APPLICATION_JSON (not the MIME string "application/json") for the REST v1beta payload.
             const generationConfig = {
                 maxOutputTokens: 12000,
                 responseFormat: {
                     text: {
-                        mimeType: "application/json",
+                        mimeType: "APPLICATION_JSON",
                         schema: quizSchema
                     }
                 }
