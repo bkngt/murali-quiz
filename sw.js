@@ -1,4 +1,4 @@
-const CACHE_NAME = 'murali-quiz-v90-2-6';
+const CACHE_NAME = 'murali-quiz-v90-2-7';
 
 const URLS_TO_CACHE = [
   './',
@@ -20,9 +20,9 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
           }
         })
       );
