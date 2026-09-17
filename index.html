@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789609286515&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e85c8211a710197a996b7b20%26fn%3Dindex%25281%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3D7d8b875266d0e9fc5413e03044811fdb6c7714c21b7e73c92ab2c36a714cabbb%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789609286515&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000005e548211a463245262dbc17f%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3Da2f4c3a6bb48cbd21a8e36173470e1a9f0204a715b7b58b15be65207a69d385d%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -943,7 +943,12 @@
                 🏆 विद्यार्थी लिडरबोर्ड
             </h3>
             
-            <input id="sl-date-select" type="date" class="select-field" onchange="fetchStudentLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;" aria-label="परीक्षा मिति छान्नुहोस्">
+            <div style="display:flex; gap:8px; margin-bottom:15px;">
+                <button class="chart-date-btn-v2" type="button" onclick="openStudentLeaderboardDatePicker()" style="flex:1; width:100%; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none;">
+                    📅 <span id="sl-date-label">आज</span>
+                </button>
+                <input id="sl-date-select" type="date" class="chart-hidden-date" aria-label="परीक्षा मिति छान्नुहोस्">
+            </div>
             
             <div id="sl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--primary-color);">
                 ⏳ डाटा लोड हुँदैछ...
@@ -1035,7 +1040,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.4 (Stable Login & Sync)</div>
+        <div>Version: 90.2.6 (Stable Login & Sync)</div>
     </div>
 </div>
 <script>
@@ -1098,7 +1103,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.5"; 
+    const APP_VERSION = "90.2.6"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -4687,6 +4692,46 @@ ${text}`;
     // ==========================================
     // 11. STUDENT LEADERBOARD LOGIC
     // ==========================================
+    function openStudentLeaderboardDatePicker() {
+        const input = document.getElementById('sl-date-select');
+        if (!input) return;
+        if (input.showPicker) input.showPicker();
+        else input.focus();
+    }
+
+    function updateStudentLeaderboardDateLabel(dateVal) {
+        const labelEl = document.getElementById('sl-date-label');
+        if (!labelEl || !dateVal) return;
+        const d = new Date(dateVal + 'T00:00:00');
+        if (isNaN(d.getTime())) return;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const dd = new Date(d);
+        dd.setHours(0,0,0,0);
+        let label = d.toLocaleDateString('ne-NP', {year:'numeric', month:'short', day:'numeric'});
+        if (dd.getTime() === today.getTime()) label = 'आज • ' + label;
+        labelEl.innerText = label;
+    }
+
+    function getExamQuizForPickerDate(pickerDate) {
+        if (!pickerDate) return null;
+        const serverQuizzes = safeJSON('murali_server_quizzes', []);
+        return serverQuizzes.find(q => {
+            if (q.isMegaQuiz) return false;
+            const raw = String(q.quizDate || '');
+            if (raw.includes('Mega') || raw.includes('मेगा') || raw.includes('Review')) return false;
+            const d = parseDateString(raw);
+            if (!d || isNaN(d.getTime())) return false;
+            const normalized = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            return normalized === pickerDate;
+        }) || null;
+    }
+
+    document.getElementById('sl-date-select')?.addEventListener('change', function() {
+        updateStudentLeaderboardDateLabel(this.value);
+        fetchStudentLeaderboardData();
+    });
+
     window.openStudentLeaderboard = function(targetDateStr = "") {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         let dateInput = document.getElementById('sl-date-select');
@@ -4698,46 +4743,60 @@ ${text}`;
             if (String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा") || String(sq.quizDate).includes("Review")) return false;
             let parsedDate = parseDateString(sq.quizDate);
             if (!parsedDate || isNaN(parsedDate.getTime())) return false;
-            let quizDateOnly = new Date(parsedDate);
-            quizDateOnly.setHours(0, 0, 0, 0);
+            let quizDateOnly = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
             let todayDateOnly = new Date();
-            todayDateOnly.setHours(0, 0, 0, 0);
+            todayDateOnly = new Date(todayDateOnly.getFullYear(), todayDateOnly.getMonth(), todayDateOnly.getDate());
             return quizDateOnly <= todayDateOnly;
         });
 
-        // De-duplicate dates.
+        // De-duplicate by calendar date. Keep the latest object found.
         let byDate = new Map();
-        availableQuizzes.forEach(sq => byDate.set(String(sq.quizDate).trim(), sq));
+        availableQuizzes.forEach(sq => {
+            let d = parseDateString(sq.quizDate);
+            if (!d || isNaN(d.getTime())) return;
+            let key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            byDate.set(key, sq);
+        });
         availableQuizzes = Array.from(byDate.values());
         availableQuizzes.sort((a, b) => parseDateString(b.quizDate) - parseDateString(a.quizDate));
 
-        let availableDates = availableQuizzes
-            .map(sq => String(sq.quizDate).replace(/T.*/, '').trim())
-            .filter(Boolean);
+        // Native <input type="date"> requires YYYY-MM-DD.
+        // Backend, however, must receive the original stored quizDate string
+        // (for example DD-MM-YYYY), so we keep both representations.
+        const toPickerDate = (dateValue) => {
+            let d = parseDateString(dateValue);
+            if (!d || isNaN(d.getTime())) return '';
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        };
 
-        if (availableDates.length === 0) {
+        const requestedPickerDate = toPickerDate(targetDateStr);
+        const todayPickerDate = toPickerDate(new Date());
+        let selectedQuiz = null;
+
+        if (requestedPickerDate) {
+            selectedQuiz = availableQuizzes.find(q => toPickerDate(q.quizDate) === requestedPickerDate) || null;
+        }
+        if (!selectedQuiz) {
+            selectedQuiz = availableQuizzes.find(q => toPickerDate(q.quizDate) === todayPickerDate) || availableQuizzes[0] || null;
+        }
+
+        if (availableQuizzes.length === 0) {
             dateInput.value = '';
             dateInput.min = '';
             dateInput.max = '';
             dateInput.disabled = true;
+            updateStudentLeaderboardDateLabel('');
         } else {
             dateInput.disabled = false;
-            dateInput.min = availableDates[availableDates.length - 1];
-            dateInput.max = availableDates[0];
-
-            // Prefer a calendar-supplied date. Otherwise use today when available,
-            // falling back to the newest available exam date.
-            let selectedDate = targetDateStr ? String(targetDateStr).replace(/T.*/, '').trim() : '';
-            if (!availableDates.includes(selectedDate)) {
-                let todayDate = new Date().toISOString().split('T')[0];
-                selectedDate = availableDates.includes(todayDate) ? todayDate : availableDates[0];
-            }
-            dateInput.value = selectedDate;
+            dateInput.min = toPickerDate(availableQuizzes[availableQuizzes.length - 1].quizDate);
+            dateInput.max = toPickerDate(availableQuizzes[0].quizDate);
+            dateInput.value = selectedQuiz ? toPickerDate(selectedQuiz.quizDate) : '';
+            updateStudentLeaderboardDateLabel(dateInput.value);
         }
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
 
-        if (availableDates.length > 0 && dateInput.value) {
+        if (selectedQuiz && dateInput.value) {
             fetchStudentLeaderboardData();
         } else {
             document.getElementById('sl-loading').style.display = 'none';
@@ -4748,7 +4807,9 @@ ${text}`;
     };
 
     window.fetchStudentLeaderboardData = function() {
-        let targetDateStr = document.getElementById('sl-date-select').value;
+        const pickerDate = document.getElementById('sl-date-select').value;
+        const matchingQuiz = getExamQuizForPickerDate(pickerDate);
+        const targetDateStr = matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate;
         
         document.getElementById('sl-loading').style.display = 'block';
         document.getElementById('sl-content').style.display = 'none';
