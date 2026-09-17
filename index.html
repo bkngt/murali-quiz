@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789607481829&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000bea88208a6d10aabefd57cfa%26fn%3DMQ%252520for%252520github%252520v90-2-4%252520-%252520HISTORICAL%252520RANK%252520FIX.html%26cd%3Dattachment%26ts%3D497113%26p%3Dfs%26cid%3D1%26sig%3D9958399cc5bf5f9951ed430172bab82c5436df8bb1124736717be516121551b7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789607481829&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789609286515&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e85c8211a710197a996b7b20%26fn%3Dindex%25281%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3D7d8b875266d0e9fc5413e03044811fdb6c7714c21b7e73c92ab2c36a714cabbb%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789609286515&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -943,7 +943,7 @@
                 🏆 विद्यार्थी लिडरबोर्ड
             </h3>
             
-            <select id="sl-date-select" class="select-field" onchange="fetchStudentLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;"></select>
+            <input id="sl-date-select" type="date" class="select-field" onchange="fetchStudentLeaderboardData()" style="margin-bottom:15px; font-weight:bold; color:var(--primary-color); text-align:center; padding: 0.5rem;" aria-label="परीक्षा मिति छान्नुहोस्">
             
             <div id="sl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--primary-color);">
                 ⏳ डाटा लोड हुँदैछ...
@@ -1098,7 +1098,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.4"; 
+    const APP_VERSION = "90.2.5"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -4689,12 +4689,10 @@ ${text}`;
     // ==========================================
     window.openStudentLeaderboard = function(targetDateStr = "") {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
-        let select = document.getElementById('sl-date-select');
-        select.innerHTML = '';
-        select.disabled = false;
+        let dateInput = document.getElementById('sl-date-select');
 
-        // Show ALL available regular exam dates (past + today), not only the
-        // last 48 hours. Mega/Review quizzes remain excluded from this ranking.
+        // Use all available regular exam dates (past + today).
+        // Mega/Review quizzes remain excluded from exam ranking.
         let availableQuizzes = serverQuizzes.filter(sq => {
             if (sq.isMegaQuiz) return false;
             if (String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा") || String(sq.quizDate).includes("Review")) return false;
@@ -4707,48 +4705,39 @@ ${text}`;
             return quizDateOnly <= todayDateOnly;
         });
 
-        // De-duplicate by quiz date so a duplicated/cached record cannot create
-        // duplicate entries in the date selector. Keep the latest object found.
+        // De-duplicate dates.
         let byDate = new Map();
-        availableQuizzes.forEach(sq => {
-            let key = String(sq.quizDate).trim();
-            byDate.set(key, sq);
-        });
+        availableQuizzes.forEach(sq => byDate.set(String(sq.quizDate).trim(), sq));
         availableQuizzes = Array.from(byDate.values());
         availableQuizzes.sort((a, b) => parseDateString(b.quizDate) - parseDateString(a.quizDate));
 
-        // If a calendar click supplied a specific date, prefer that date.
-        // Otherwise select today when available; if not, select the newest quiz.
-        let selectedDate = targetDateStr ? String(targetDateStr) : '';
-        if (!selectedDate || !availableQuizzes.some(sq => String(sq.quizDate) === selectedDate)) {
-            let todayDateOnly = new Date();
-            todayDateOnly.setHours(0, 0, 0, 0);
-            let todayQuiz = availableQuizzes.find(sq => {
-                let d = parseDateString(sq.quizDate);
-                if (!d || isNaN(d.getTime())) return false;
-                d.setHours(0, 0, 0, 0);
-                return d.getTime() === todayDateOnly.getTime();
-            });
-            selectedDate = todayQuiz ? todayQuiz.quizDate : (availableQuizzes[0] ? availableQuizzes[0].quizDate : '');
-        }
+        let availableDates = availableQuizzes
+            .map(sq => String(sq.quizDate).replace(/T.*/, '').trim())
+            .filter(Boolean);
 
-        if (availableQuizzes.length === 0) {
-            select.innerHTML = '<option value="">कुनै परीक्षा भेटिएन</option>';
-            select.disabled = true;
+        if (availableDates.length === 0) {
+            dateInput.value = '';
+            dateInput.min = '';
+            dateInput.max = '';
+            dateInput.disabled = true;
         } else {
-            availableQuizzes.forEach(sq => {
-                let opt = document.createElement('option');
-                opt.value = sq.quizDate;
-                let displayDate = String(sq.quizDate).replace(/T.*/, '');
-                opt.text = "📅 " + displayDate;
-                if (String(sq.quizDate) === String(selectedDate)) opt.selected = true;
-                select.appendChild(opt);
-            });
+            dateInput.disabled = false;
+            dateInput.min = availableDates[availableDates.length - 1];
+            dateInput.max = availableDates[0];
+
+            // Prefer a calendar-supplied date. Otherwise use today when available,
+            // falling back to the newest available exam date.
+            let selectedDate = targetDateStr ? String(targetDateStr).replace(/T.*/, '').trim() : '';
+            if (!availableDates.includes(selectedDate)) {
+                let todayDate = new Date().toISOString().split('T')[0];
+                selectedDate = availableDates.includes(todayDate) ? todayDate : availableDates[0];
+            }
+            dateInput.value = selectedDate;
         }
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
 
-        if (availableQuizzes.length > 0 && selectedDate) {
+        if (availableDates.length > 0 && dateInput.value) {
             fetchStudentLeaderboardData();
         } else {
             document.getElementById('sl-loading').style.display = 'none';
