@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script>
+    <script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789607481829&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000bea88208a6d10aabefd57cfa%26fn%3DMQ%252520for%252520github%252520v90-2-4%252520-%252520HISTORICAL%252520RANK%252520FIX.html%26cd%3Dattachment%26ts%3D497113%26p%3Dfs%26cid%3D1%26sig%3D9958399cc5bf5f9951ed430172bab82c5436df8bb1124736717be516121551b7%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789607481829&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -2347,16 +2347,28 @@
                         }
                     }
                 } else if (isPast) {
-                    if (isCompleted) { 
-                        boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`; 
-                        statusIcon = `✅`; 
-                        cursor = `cursor:pointer; opacity:0.8;`; 
-                        clickAction = quizMap[i] ? `onclick="openStudentLeaderboard('${quizMap[i].quizDate}')"` : `onclick="showQuizStatus('past-completed', '')"`;
-                    } else { 
-                        boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; 
-                        statusIcon = `❌ Miss`; 
-                        clickAction = `onclick="showToast('तपाईंले यो दिनको क्वीज छुटाउनुभयो! (म्याद सकियो)', 'error')"`; 
-                        cursor = `cursor:pointer;`; 
+                    if (quizMap[i]) {
+                        // Historical exam days remain viewable for Rank, whether or not the
+                        // current student personally attempted that exam.
+                        if (isCompleted) {
+                            boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`;
+                            statusIcon = `✅`;
+                        } else {
+                            boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color:white; opacity:0.78;`;
+                            statusIcon = `🏆`;
+                        }
+                        cursor = `cursor:pointer;`;
+                        clickAction = `onclick="openStudentLeaderboard('${quizMap[i].quizDate}')"`;
+                    } else if (isCompleted) {
+                        boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`;
+                        statusIcon = `✅`;
+                        cursor = `cursor:pointer; opacity:0.8;`;
+                        clickAction = `onclick="showQuizStatus('past-completed', '')"`;
+                    } else {
+                        boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`;
+                        statusIcon = `❌ Miss`;
+                        clickAction = `onclick="showToast('यस दिनको क्वीज उपलब्ध छैन।', 'error')"`;
+                        cursor = `cursor:pointer;`;
                     }
                 } else { 
                     statusIcon = `🔒`; 
@@ -2375,7 +2387,7 @@
                     <div style="white-space: nowrap;">✅ : सम्पन्न भएको</div>
                     <div style="white-space: nowrap;">❌ : छुटेको (Locked)</div>
                     <div>
-                        <button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 आजको र्‍याङ्क</button>
+                        <button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 परीक्षा र्‍याङ्क</button>
                     </div>
                 </div>
             </div>`;
@@ -4681,45 +4693,62 @@ ${text}`;
         select.innerHTML = '';
         select.disabled = false;
 
-        let todayDateOnly = new Date();
-        todayDateOnly.setHours(0, 0, 0, 0);
-
-        let recentQuizzes = serverQuizzes.filter(sq => {
+        // Show ALL available regular exam dates (past + today), not only the
+        // last 48 hours. Mega/Review quizzes remain excluded from this ranking.
+        let availableQuizzes = serverQuizzes.filter(sq => {
             if (sq.isMegaQuiz) return false;
-            if (String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा")) return false;
+            if (String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा") || String(sq.quizDate).includes("Review")) return false;
             let parsedDate = parseDateString(sq.quizDate);
             if (!parsedDate || isNaN(parsedDate.getTime())) return false;
             let quizDateOnly = new Date(parsedDate);
             quizDateOnly.setHours(0, 0, 0, 0);
-            return quizDateOnly <= todayDateOnly && (quizDateOnly.getTime() >= todayDateOnly.getTime() - 24 * 60 * 60 * 1000);
+            let todayDateOnly = new Date();
+            todayDateOnly.setHours(0, 0, 0, 0);
+            return quizDateOnly <= todayDateOnly;
         });
 
-        if (targetDateStr) {
-            let historical = serverQuizzes.find(sq => String(sq.quizDate) === String(targetDateStr));
-            if (historical && !historical.isMegaQuiz && !recentQuizzes.some(sq => sq.quizDate === historical.quizDate)) {
-                recentQuizzes.push(historical);
-            }
+        // De-duplicate by quiz date so a duplicated/cached record cannot create
+        // duplicate entries in the date selector. Keep the latest object found.
+        let byDate = new Map();
+        availableQuizzes.forEach(sq => {
+            let key = String(sq.quizDate).trim();
+            byDate.set(key, sq);
+        });
+        availableQuizzes = Array.from(byDate.values());
+        availableQuizzes.sort((a, b) => parseDateString(b.quizDate) - parseDateString(a.quizDate));
+
+        // If a calendar click supplied a specific date, prefer that date.
+        // Otherwise select today when available; if not, select the newest quiz.
+        let selectedDate = targetDateStr ? String(targetDateStr) : '';
+        if (!selectedDate || !availableQuizzes.some(sq => String(sq.quizDate) === selectedDate)) {
+            let todayDateOnly = new Date();
+            todayDateOnly.setHours(0, 0, 0, 0);
+            let todayQuiz = availableQuizzes.find(sq => {
+                let d = parseDateString(sq.quizDate);
+                if (!d || isNaN(d.getTime())) return false;
+                d.setHours(0, 0, 0, 0);
+                return d.getTime() === todayDateOnly.getTime();
+            });
+            selectedDate = todayQuiz ? todayQuiz.quizDate : (availableQuizzes[0] ? availableQuizzes[0].quizDate : '');
         }
 
-        recentQuizzes.sort((a, b) => parseDateString(b.quizDate) - parseDateString(a.quizDate));
-
-        if (recentQuizzes.length === 0) {
+        if (availableQuizzes.length === 0) {
             select.innerHTML = '<option value="">कुनै परीक्षा भेटिएन</option>';
             select.disabled = true;
         } else {
-            recentQuizzes.forEach(sq => {
+            availableQuizzes.forEach(sq => {
                 let opt = document.createElement('option');
                 opt.value = sq.quizDate;
                 let displayDate = String(sq.quizDate).replace(/T.*/, '');
                 opt.text = "📅 " + displayDate;
-                if (targetDateStr && sq.quizDate === targetDateStr) opt.selected = true;
+                if (String(sq.quizDate) === String(selectedDate)) opt.selected = true;
                 select.appendChild(opt);
             });
         }
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
 
-        if (recentQuizzes.length > 0) {
+        if (availableQuizzes.length > 0 && selectedDate) {
             fetchStudentLeaderboardData();
         } else {
             document.getElementById('sl-loading').style.display = 'none';
@@ -4727,7 +4756,7 @@ ${text}`;
             document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`;
             document.getElementById('sl-my-rank-box').style.display = 'none';
         }
-    }
+    };
 
     window.fetchStudentLeaderboardData = function() {
         let targetDateStr = document.getElementById('sl-date-select').value;
