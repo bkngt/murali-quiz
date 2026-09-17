@@ -2439,7 +2439,7 @@
             console.error("Dashboard Load Error:", e);
         }
     }
-</script>
+
     // ==========================================
     // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
@@ -4703,10 +4703,9 @@ ${text}`;
         if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
         
         let html = generateQnAHtml(currentQuiz, currentMurliDate);
-        let b = new Blob([html], { type: 'text/html;charset=utf-8' });
-        let filename = getSafeFilename(currentMurliDate); 
-        let file = new File([b], filename, { type: "text/html"
-let file = new File([b], filename, { type: "text/html" });
+    let b = new Blob([html], { type: 'text/html;charset=utf-8' });
+    let filename = getSafeFilename(currentMurliDate); 
+    let file = new File([b], filename, { type: "text/html" });
         
         if (navigator.canShare && navigator.canShare({ files: [file] })) { 
             navigator.share({ files: [file], title: 'BK Murali Q&A List', text: 'Q&A List HTML File' })
