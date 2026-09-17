@@ -7,7 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
-    <script type="text/javascript" nonce="68b27cc1435b461da626a028920" src="//local.adguard.org?ts=1789653140464&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000fc148211957beb8338ec5ecd%26fn%3DBK_Murali_Quiz_90.2.9_test.html%26cd%3Dattachment%26ts%3D497125%26p%3Dfs%26cid%3D1%26sig%3Ded4e30b2a05b4eeb9ff724c678358844b1e233df0ec6074a3eff603ee6ba8995%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="68b27cc1435b461da626a028920" src="//local.adguard.org?ts=1789653140464&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000005e548211a463245262dbc17f%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D497114%26p%3Dfs%26cid%3D1%26sig%3Da2f4c3a6bb48cbd21a8e36173470e1a9f0204a715b7b58b15be65207a69d385d%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="887c64d6b784442db870af3b727" src="//local.adguard.org?ts=1789611088762&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    
+    <script>
         // Apply the saved theme before the first paint so Dark Mode does not flash white.
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
@@ -1040,11 +1041,10 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 90.2.9 (Cross-Browser Compatibility Fix)</div>
+        <div>Version: 91.0 (Cross-Browser Compatibility Fix)</div>
     </div>
 </div>
 <script>
-
     // ==========================================
     // 0. PWA INSTALLATION LOGIC
     // ==========================================
@@ -1076,8 +1076,6 @@
         window.addEventListener('load', () => {
             let reloadWhenUpdated = false;
 
-            // When a newer Service Worker takes control, refresh automatically.
-            // The first install has no controller, so it will NOT cause a refresh loop.
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!reloadWhenUpdated) return;
                 reloadWhenUpdated = false;
@@ -1088,11 +1086,7 @@
                 .then(reg => {
                     const alreadyControlled = !!navigator.serviceWorker.controller;
                     if (alreadyControlled) reloadWhenUpdated = true;
-
-                    // Check immediately for a newer Service Worker.
                     reg.update().catch(() => {});
-
-                    // Check periodically while the app remains open.
                     setInterval(() => reg.update().catch(() => {}), 10 * 60 * 1000);
                 })
                 .catch(err => console.log('SW Reg Failed:', err));
@@ -1103,7 +1097,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "90.2.9"; 
+    const APP_VERSION = "91.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1149,7 +1143,7 @@
     
     // Chart.js Instances
     let progressChartInstance = null;
-    let chartAnalyticsInstance = null; // NEW: For Chart Stats
+    let chartAnalyticsInstance = null; 
     let weeklyChartInstance = null;
     let monthlyChartInstance = null;
     let yearlyChartInstance = null;
@@ -1330,7 +1324,8 @@
         return new Date(y, mIndex, parseInt(dMy[1]));
       }
       
-      var parsed = new Date(s);
+      // FIX FOR SAFARI: Replace dashes with slashes before parsing
+      var parsed = new Date(s.replace(/-/g, '/'));
       if (!isNaN(parsed.getTime())) return parsed;
       
       return new Date();
@@ -2353,8 +2348,6 @@
                     }
                 } else if (isPast) {
                     if (quizMap[i]) {
-                        // Historical exam days remain viewable for Rank, whether or not the
-                        // current student personally attempted that exam.
                         if (isCompleted) {
                             boxStyle += `background: var(--success-bg); border-color: var(--success-border); color: var(--success-color); opacity:0.8;`;
                             statusIcon = `✅`;
@@ -2446,6 +2439,7 @@
             console.error("Dashboard Load Error:", e);
         }
     }
+</script>
     // ==========================================
     // 6. QUIZ GENERATION (AI & MEGA & CUSTOM)
     // ==========================================
@@ -2589,11 +2583,6 @@ ${text}`;
             additionalProperties: false
         };
 
-        // AI Studio parity:
-        // - selected model is always tried first;
-        // - structured JSON output uses the format accepted by the current API;
-        // - Gemini 3.x keeps its model/default thinking behavior instead of forcing "low";
-        // - transient 429/5xx failures retry, then automatically fall back to another model.
         function buildGenerationConfig(model) {
             const config = {
                 maxOutputTokens: 12000,
@@ -2690,14 +2679,10 @@ ${text}`;
                         error.model = model;
                         lastError = error;
 
-                        // Configuration/auth/schema errors should be shown directly;
-                        // do not hide them by switching to another model.
                         if (!transientStatuses.has(response.status)) {
                             throw error;
                         }
 
-                        // Temporary capacity/rate-limit/server failure:
-                        // retry this model, then try the next model.
                         if (attempt < maxAttemptsPerModel) {
                             await new Promise(r => setTimeout(r, retryDelays[attempt - 1]));
                             continue;
@@ -2853,9 +2838,10 @@ ${text}`;
 
         if(!sDateStr || !eDateStr) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
 
-        let sDate = new Date(sDateStr);
+        // FIX FOR SAFARI: Replace dashes with slashes
+        let sDate = new Date(sDateStr.replace(/-/g, '/'));
         sDate.setHours(0, 0, 0, 0);
-        let eDate = new Date(eDateStr);
+        let eDate = new Date(eDateStr.replace(/-/g, '/'));
         eDate.setHours(23, 59, 59, 999);
 
         if(sDate > eDate) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
@@ -3723,7 +3709,8 @@ ${text}`;
             const mergedMine = Array.from(localByDate.values()).sort((a,b) => String(b.date).localeCompare(String(a.date)));
             localStorage.setItem('murali_daily_charts', JSON.stringify(otherUsers.concat(mergedMine)));
 
-            const currentDate = document.getElementById('chart-date')?.value;
+            let chartDateEl = document.getElementById('chart-date');
+            const currentDate = chartDateEl ? chartDateEl.value : null;
             if (currentDate) loadChartDataForDate(currentDate);
         } catch (e) {
             console.log('Chart cloud sync skipped:', e);
@@ -4014,7 +4001,8 @@ ${text}`;
         } else {
             let chartMap = {};
             charts.forEach(c => {
-                let d = new Date(c.date);
+                // FIX FOR SAFARI
+                let d = new Date(c.date.replace(/-/g, '/'));
                 if (d && d.getMonth() === cm && d.getFullYear() === cy) {
                     chartMap[d.getDate()] = c;
                 }
@@ -4141,12 +4129,13 @@ ${text}`;
 
         let charts = safeJSON('murali_daily_charts', []);
         let currentMonthCharts = charts.filter(c => {
-            let d = new Date(c.date);
+            // FIX FOR SAFARI
+            let d = new Date(c.date.replace(/-/g, '/'));
             return d && d.getMonth() === cm && d.getFullYear() === cy;
         });
 
-        let sortedCharts = [...currentMonthCharts].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        let labels = sortedCharts.map(c => new Date(c.date).getDate());
+        let sortedCharts = [...currentMonthCharts].sort((a,b) => new Date(a.date.replace(/-/g, '/')).getTime() - new Date(b.date.replace(/-/g, '/')).getTime());
+        let labels = sortedCharts.map(c => new Date(c.date.replace(/-/g, '/')).getDate());
         let dataPoints = sortedCharts.map(c => c.totalScore);
 
         let ctxLine = document.getElementById('chartAnalyticsLine').getContext('2d');
@@ -4502,7 +4491,9 @@ ${text}`;
             let sDate = document.getElementById('lb-start-date').value;
             let eDate = document.getElementById('lb-end-date').value;
             if(!sDate || !eDate) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
-            if(new Date(sDate) > new Date(eDate)) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
+            
+            // FIX FOR SAFARI
+            if(new Date(sDate.replace(/-/g, '/')) > new Date(eDate.replace(/-/g, '/'))) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
             
             payload.startDate = sDate;
             payload.endDate = eDate;
@@ -4655,7 +4646,7 @@ ${text}`;
 
         html += `
             <div class="footer">
-                Generated by BK Murali Quiz App (Version 90.1.0 • Quiz Model 60.3 Optimized)
+                Generated by BK Murali Quiz App (Version 91.0 • Quiz Model 60.3 Optimized)
             </div>
         </body>
         </html>`;
@@ -4714,7 +4705,8 @@ ${text}`;
         let html = generateQnAHtml(currentQuiz, currentMurliDate);
         let b = new Blob([html], { type: 'text/html;charset=utf-8' });
         let filename = getSafeFilename(currentMurliDate); 
-        let file = new File([b], filename, { type: "text/html" });
+        let file = new File([b], filename, { type: "text/html"
+let file = new File([b], filename, { type: "text/html" });
         
         if (navigator.canShare && navigator.canShare({ files: [file] })) { 
             navigator.share({ files: [file], title: 'BK Murali Q&A List', text: 'Q&A List HTML File' })
@@ -4797,7 +4789,8 @@ ${text}`;
     function updateStudentLeaderboardDateLabel(dateVal) {
         const labelEl = document.getElementById('sl-date-label');
         if (!labelEl || !dateVal) return;
-        const d = new Date(dateVal + 'T00:00:00');
+        // FIX FOR SAFARI: Replace dashes with slashes
+        const d = new Date(dateVal.replace(/-/g, '/') + ' 00:00:00');
         if (isNaN(d.getTime())) return;
         const today = new Date();
         today.setHours(0,0,0,0);
@@ -4822,17 +4815,18 @@ ${text}`;
         }) || null;
     }
 
-    document.getElementById('sl-date-select')?.addEventListener('change', function() {
-        updateStudentLeaderboardDateLabel(this.value);
-        fetchStudentLeaderboardData();
-    });
+    let slDateSelectEl = document.getElementById('sl-date-select');
+    if(slDateSelectEl) {
+        slDateSelectEl.addEventListener('change', function() {
+            updateStudentLeaderboardDateLabel(this.value);
+            fetchStudentLeaderboardData();
+        });
+    }
 
     window.openStudentLeaderboard = function(targetDateStr = "") {
         let serverQuizzes = safeJSON('murali_server_quizzes', []);
         let dateInput = document.getElementById('sl-date-select');
 
-        // Use all available regular exam dates (past + today).
-        // Mega/Review quizzes remain excluded from exam ranking.
         let availableQuizzes = serverQuizzes.filter(sq => {
             if (sq.isMegaQuiz) return false;
             if (String(sq.quizDate).includes("Mega") || String(sq.quizDate).includes("मेगा") || String(sq.quizDate).includes("Review")) return false;
@@ -4844,7 +4838,6 @@ ${text}`;
             return quizDateOnly <= todayDateOnly;
         });
 
-        // De-duplicate by calendar date. Keep the latest object found.
         let byDate = new Map();
         availableQuizzes.forEach(sq => {
             let d = parseDateString(sq.quizDate);
@@ -4855,9 +4848,6 @@ ${text}`;
         availableQuizzes = Array.from(byDate.values());
         availableQuizzes.sort((a, b) => parseDateString(b.quizDate) - parseDateString(a.quizDate));
 
-        // Native <input type="date"> requires YYYY-MM-DD.
-        // Backend, however, must receive the original stored quizDate string
-        // (for example DD-MM-YYYY), so we keep both representations.
         const toPickerDate = (dateValue) => {
             let d = parseDateString(dateValue);
             if (!d || isNaN(d.getTime())) return '';
@@ -5051,9 +5041,12 @@ ${text}`;
                 input.addEventListener('change', function() {
                     inputs.forEach(other => {
                         if(other !== input) other.checked = false;
-                        other.closest('.chart-option-v2')?.classList.toggle('selected-v2', other.checked);
+                        // FIX FOR SAFARI: Removed optional chaining
+                        let optV2 = other.closest('.chart-option-v2');
+                        if(optV2) optV2.classList.toggle('selected-v2', other.checked);
                     });
-                    this.closest('.chart-option-v2')?.classList.add('selected-v2');
+                    let myOptV2 = this.closest('.chart-option-v2');
+                    if(myOptV2) myOptV2.classList.add('selected-v2');
                     updateChartV2Total();
                     activateNextChartSection(this.closest('.chart-section-v2'));
                 });
@@ -5061,7 +5054,7 @@ ${text}`;
         });
 
         let first = form.querySelector('.chart-section-v2');
-        first?.classList.add('chart-section-active-v2');
+        if(first) first.classList.add('chart-section-active-v2');
         updateChartV2Total();
     }
 
@@ -5072,7 +5065,8 @@ ${text}`;
     }
 
     function updateChartDateLabel(dateVal) {
-        let d = new Date(dateVal + 'T00:00:00');
+        // FIX FOR SAFARI
+        let d = new Date(dateVal.replace(/-/g, '/') + ' 00:00:00');
         if(isNaN(d.getTime())) return;
         let today = new Date(); today.setHours(0,0,0,0);
         let dd = new Date(d); dd.setHours(0,0,0,0);
@@ -5087,7 +5081,8 @@ ${text}`;
         document.querySelectorAll('.chart-option-v2').forEach(el => el.classList.remove('selected-v2'));
         updateChartV2Total();
         document.querySelectorAll('.chart-section-v2').forEach(s => s.classList.remove('chart-section-active-v2'));
-        document.querySelector('.chart-section-v2')?.classList.add('chart-section-active-v2');
+        let firstSec = document.querySelector('.chart-section-v2');
+        if(firstSec) firstSec.classList.add('chart-section-active-v2');
     }
 
     function loadChartDataForDate(dateVal) {
@@ -5107,20 +5102,24 @@ ${text}`;
             let match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${value}"]`);
             if(match) {
                 match.checked = true;
-                match.closest('.chart-option-v2')?.classList.add('selected-v2');
+                let optV2 = match.closest('.chart-option-v2');
+                if(optV2) optV2.classList.add('selected-v2');
             }
         });
         updateChartV2Total();
     }
 
-    document.getElementById('chart-date').addEventListener('change', function() {
-        updateChartDateLabel(this.value);
-        document.getElementById('chart-result-box').style.display = 'none';
-        document.getElementById('daily-chart-form').style.display = 'block';
-        loadChartDataForDate(this.value);
-        let exists = safeJSON('murali_daily_charts', []).some(c => c.date === this.value && c.phone === userPhone);
-        showToast(exists ? 'यो मितिको पुरानो चार्ट लोड भयो।' : 'नयाँ मिति छानिएको छ।', 'info');
-    });
+    let chartDateEl = document.getElementById('chart-date');
+    if(chartDateEl) {
+        chartDateEl.addEventListener('change', function() {
+            updateChartDateLabel(this.value);
+            document.getElementById('chart-result-box').style.display = 'none';
+            document.getElementById('daily-chart-form').style.display = 'block';
+            loadChartDataForDate(this.value);
+            let exists = safeJSON('murali_daily_charts', []).some(c => c.date === this.value && c.phone === userPhone);
+            showToast(exists ? 'यो मितिको पुरानो चार्ट लोड भयो।' : 'नयाँ मिति छानिएको छ।', 'info');
+        });
+    }
 
     window.submitDailyChart = function() {
         let dateVal = document.getElementById('chart-date').value;
