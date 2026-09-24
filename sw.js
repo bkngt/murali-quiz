@@ -1,10 +1,11 @@
-const CACHE_NAME = 'murali-quiz-v91-0';
+const CACHE_NAME = 'murali-quiz-v96-0';
 
 const URLS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+  'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 self.addEventListener('install', event => {
