@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" id="theme-color-meta" content="#f8fafc">
-    <!-- FIX: Force Dark Mode Bug -->
     <meta name="color-scheme" content="light dark">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -51,7 +50,6 @@
             --box-shadow-main: 0 12px 30px -8px rgba(35, 52, 59, 0.12), 0 4px 12px rgba(35,52,59,0.05);
             --glass-bg: rgba(255, 253, 248, 0.90);
             --logo-bg: #fff8e8;
-            --base-font-size: 18px; /* NEW: Dynamic Font Size */
             --submit-gradient: linear-gradient(135deg, #16a34a, #059669);
             --success-color: #16a34a; --danger-color: #dc2626;
         }
@@ -76,7 +74,7 @@
 
         html, body { background: var(--bg-color); }
         html { min-height: 100%; }
-        body { background: var(--bg-color); color: var(--text-color); font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: var(--base-font-size); line-height: 1.5; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; display: flex; justify-content: center; min-height: 100vh;}
+        body { background: var(--bg-color); color: var(--text-color); font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif; font-size: 16px; line-height: 1.5; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; display: flex; justify-content: center; min-height: 100vh;}
         .container { width: 100%; max-width: 760px; background: var(--card-bg); min-height: 100vh; padding: 0.6rem; padding-bottom: 85px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
         @media (min-width: 600px) { .container { padding: 1.2rem; padding-bottom: 80px; border-radius: 20px; margin-top: 15px; margin-bottom: 15px; min-height: auto; border: 1px solid var(--border-color); box-shadow: var(--box-shadow-main);} }
         @media (max-width: 600px) { .container { padding-bottom: 90px !important; padding-left: 0.4rem; padding-right: 0.4rem; } }
@@ -115,19 +113,11 @@
         .question-meta { font-size: 0.75rem; color: #a78bfa; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
         .q-tag { background: rgba(167, 139, 250, 0.15); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; color: #a78bfa; border: 1px solid rgba(167, 139, 250, 0.3);}
         
-        /* NEW: TTS and Font Size Styles */
-        .q-header-flex { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 0.8rem; }
-        .question-text { font-weight: 800; font-size: 1.1em; margin: 0; color: var(--text-color) !important; line-height: 1.4; flex: 1; }
-        .tts-btn { background: rgba(2, 132, 199, 0.1); color: var(--primary-color); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: none; padding: 0; }
-        .tts-btn:active { transform: scale(0.9); }
-        .tts-btn svg { width: 18px; height: 18px; fill: currentColor; }
-        .font-btn { background: rgba(2, 132, 199, 0.1); color: var(--primary-color); border: none; border-radius: 6px; padding: 4px 8px; font-weight: bold; cursor: pointer; box-shadow: none; font-size: 0.85rem; }
-
+        .question-text { font-weight: 800; font-size: 1.1em; margin: 0 0 0.8rem 0; color: var(--text-color) !important; line-height: 1.4; }
         .lock-timer-msg { font-size: 0.9rem; font-weight: 800; text-align: center; padding: 8px; margin-bottom: 10px; border-radius: 8px; background: var(--bg-color); border: 1px dashed var(--border-color); transition: all 0.3s; }
         
         .options-group { display: flex; flex-direction: column; gap: 10px; }
         
-        /* IMPROVED: Bigger Touch Targets for Options */
         .option-container { border-radius: 14px; border: 2px solid var(--border-color); background: var(--card-bg); overflow: hidden; transition: all 0.25s ease; cursor: pointer; position: relative; padding: 0.8rem 1rem;}
         .option-text { display: flex; align-items: center; gap: 0.8rem; font-weight: 600; color: var(--text-color) !important; line-height: 1.3; font-size: 1em;}
         .option-letter { font-weight: 800; color: #fff; background: var(--primary-gradient); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.95rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.3); }
@@ -148,7 +138,6 @@
         
         .sticky-scorebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); max-width: 760px; background: var(--glass-bg) !important; backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: space-between; z-index: 998; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         
-        /* NEW: Bottom Navigation for Mobile */
         .bottom-nav { display: none; }
         @media (max-width: 600px) {
             #main-tabs { display: none !important; } 
@@ -167,7 +156,7 @@
             .bottom-nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
             .bottom-nav button.active { color: var(--primary-color); transform: translateY(-3px); }
             .bottom-nav button.active svg { stroke-width: 2.5; }
-            .sticky-scorebar { bottom: 80px; } /* Adjust scorebar above bottom nav */
+            .sticky-scorebar { bottom: 80px; } 
         }
 
         #result-screen { display: none; text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem; }
@@ -372,12 +361,6 @@
             </div>
             <div id="profile-badge-container" style="display: flex; align-items: center;"></div>
         </div>
-        
-        <!-- NEW: Font Size Toggle Buttons -->
-        <div style="display: flex; gap: 5px;">
-            <button class="font-btn" onclick="changeFontSize(-1)" title="अक्षर सानो बनाउनुहोस्">A-</button>
-            <button class="font-btn" onclick="changeFontSize(1)" title="अक्षर ठूलो बनाउनुहोस्">A+</button>
-        </div>
     </div>
     
     <div class="toolbar-one-line" id="top-toolbar">
@@ -398,7 +381,7 @@
         </div>
     </div>
 
-    <!-- NEW: Mobile Bottom Navigation -->
+    <!-- Mobile Bottom Navigation -->
     <div class="bottom-nav" id="mobile-bottom-nav">
         <button id="nav-gen" class="active" onclick="switchTab('gen')">
             <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -768,7 +751,7 @@
                 <div class="chart-subnote-v2">२:००–५:०० बजेभित्रको कुल योग/यादको समय</div>
                 <div class="chart-options-v2">
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="20"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२ घन्टाभन्दा बढी</span><span class="chart-score-v2">२०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ठ्याक्कै २ घन्टा</span><span class="chart-score-v2">१५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2"> २ घन्टा</span><span class="chart-score-v2">१५</span></label>
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१ घन्टा</span><span class="chart-score-v2">१०</span></label>
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आधा घन्टा</span><span class="chart-score-v2">५</span></label>
                 </div>
@@ -876,8 +859,7 @@
             <div class="chart-container" style="height:300px;"><canvas id="myChartCategoryGraph"></canvas></div>
         </div>
     </div>
-
-    <!-- Progress View -->
+<!-- Progress View -->
     <div id="view-progress" style="display: none;">
         <div id="baba-message-container"></div>
         <div class="dashboard-stats" id="dash-stats"></div>
@@ -1078,7 +1060,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 92.0 (UI/UX & TTS Upgrade)</div>
+        <div>Version: 93.0 (Clean UI & Stability Update)</div>
     </div>
 </div>
 <script>
@@ -1128,7 +1110,6 @@
         });
     }
 
-    // NEW: Offline/Online Notifications
     window.addEventListener('offline', () => {
         showToast("तपाईं अफलाइन हुनुहुन्छ। डाटा मोबाइलमै सुरक्षित हुनेछ।", "warning", 5000);
     });
@@ -1142,7 +1123,7 @@
     // 1. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "92.0"; 
+    const APP_VERSION = "93.0"; 
 
     let currentQuiz = []; 
     let currentSwaman = ""; 
@@ -1199,7 +1180,7 @@
     };
 
     // ==========================================
-    // 2. UTILITY FUNCTIONS & NEW FEATURES
+    // 2. UTILITY FUNCTIONS
     // ==========================================
     function safeJSON(key, defaultVal) { 
         try { 
@@ -1242,50 +1223,6 @@
             osc.start(audioCtx.currentTime);
             osc.stop(audioCtx.currentTime + 0.1);
         } catch (e) { console.log("Audio not supported"); }
-    }
-
-    // NEW: Font Size Toggle Logic
-    let currentFontSize = 18;
-    window.changeFontSize = function(step) {
-        currentFontSize += step * 2;
-        if(currentFontSize < 14) currentFontSize = 14;
-        if(currentFontSize > 26) currentFontSize = 26;
-        document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
-        showToast(step > 0 ? "अक्षर ठूलो भयो" : "अक्षर सानो भयो", "info", 1000);
-    };
-
-    // NEW: Text-to-Speech (TTS) Logic
-    window.readQuestionOutLoud = function(qIndex) {
-        if (!('speechSynthesis' in window)) {
-            showToast("तपाईंको डिभाइसमा आवाज सुविधा छैन।", "error");
-            return;
-        }
-        window.speechSynthesis.cancel(); // Stop previous audio
-        
-        let q = currentQuiz[qIndex];
-        if(!q) return;
-        
-        let textToRead = "प्रश्न: " + q.q + ". विकल्पहरू: ";
-        q.options.forEach((opt, i) => {
-            textToRead += ["ए", "बी", "सी", "डी"][i] + ", " + opt + ". ";
-        });
-
-        let utterance = new SpeechSynthesisUtterance(textToRead);
-        
-        // Try to find Nepali, fallback to Hindi
-        let voices = window.speechSynthesis.getVoices();
-        let selectedVoice = voices.find(v => v.lang.includes('ne')) || voices.find(v => v.lang.includes('hi')) || voices[0];
-        if(selectedVoice) utterance.voice = selectedVoice;
-        
-        utterance.rate = 0.9; // Slightly slower for clarity
-        window.speechSynthesis.speak(utterance);
-    };
-
-    // Ensure voices are loaded
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = function() {
-            window.speechSynthesis.getVoices();
-        };
     }
 
     function toggleDarkMode() { 
@@ -2731,17 +2668,9 @@
             let displayStyle = qIndex === activeQuestionIndex ? 'block' : 'none'; 
             let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : '';
             
-            // NEW: TTS Button
-            let ttsBtn = `<button class="tts-btn" onclick="readQuestionOutLoud(${qIndex})" title="प्रश्न सुन्नुहोस्">
-                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-            </button>`;
-            
             htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
                 <div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div>
-                <div class="q-header-flex">
-                    <p class="question-text">${item.q}</p>
-                    ${ttsBtn}
-                </div>
+                <p class="question-text">${item.q}</p>
                 <div id="lock-timer-${qIndex}" class="lock-timer-msg" style="display: ${reviewSource === 'past' ? 'none' : 'block'};"></div>
                 <div class="options-group">${optsHTML}</div>
             </div>`;
@@ -2833,7 +2762,6 @@
         window.scrollTo(0, 0); syncPendingResults();
     }
     
-    // NEW: Improved Share Result Logic
     window.shareMyResult = function() {
         const shareUrl = 'https://bkngt.github.io/murali-quiz/';
         const textToShare = `🏆 मैले आजको BK Murali Quiz मा ${currentScore}/${currentQuiz.length} अंक ल्याएँ!\nतपाईं पनि आफ्नो ज्ञान चेक गर्नुहोस्:`;
@@ -2953,7 +2881,6 @@
         } catch (e) { console.log('Chart cloud sync skipped:', e); }
     }
 
-    // NEW: Updated switchTab to handle bottom navigation
     function switchTab(tab) {
         document.getElementById('tab-gen').classList.toggle('active', tab === 'gen'); 
         document.getElementById('tab-chart').classList.toggle('active', tab === 'chart'); 
@@ -3361,7 +3288,7 @@
             let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 92.0 • Quiz Model 60.3 Optimized)</div></body></html>`;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 93.0 • Quiz Model 60.3 Optimized)</div></body></html>`;
         return html;
     }
 
