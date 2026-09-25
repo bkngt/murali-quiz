@@ -709,7 +709,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 98.0 (Optimized Core & Settings Restored)</div>
+        <div>Version: 99.0 (Optimized Core & Settings Restored)</div>
     </div>
 </div>
 
@@ -1132,7 +1132,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "98.0"; 
+    const APP_VERSION = "99.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1539,7 +1539,7 @@
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC (98.0)
+    // 5. DATA SYNCING LOGIC (99.0)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
         const retries = Number(options.retries ?? 2);
@@ -1574,7 +1574,7 @@
         activeStateSaveInFlight = true;
         const stateObj = pendingActiveState; pendingActiveState = null;
         try {
-            const data = await apiPostJSON({ action:'saveActiveState', phone:userPhone, date:stateObj.date, stateData:stateObj,
+            const data = await apiPostJSON({ action:'saveActiveState', phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), date:stateObj.date, stateData:stateObj,
                 quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
                 stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
             if (!data || data.status !== 'success') { pendingActiveState = stateObj; scheduleActiveStateFlush(data && data.retryable ? 1200 : 1800); return false; }
@@ -1605,10 +1605,10 @@
         try {
             for (const data of pendingData) {
                 try {
-                    const result = await apiPostJSON({action:'saveResult', name:data.name, address:data.address, country:data.country, phone:data.phone,
+                    const result = await apiPostJSON({action:'saveResult', name:data.name, address:data.address, country:data.country, phone:data.phone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId(),
                         date:data.date, score:data.score, total:data.total, percent:data.percent, timeTaken:data.timeTaken, time:data.time,
                         weakTags:data.weakTags, reviewData:data.quizData, quizRevision:data.quizRevision||1,
-                        quizId:data.quizId || (String(data.date)+'-R'+(data.quizRevision||1)), deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                        quizId:data.quizId || (String(data.date)+'-R'+(data.quizRevision||1))}, {retries:3, timeoutMs:12000});
                     if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); }
                 } catch(e) {}
             }
@@ -1623,7 +1623,7 @@
         try {
             for (const data of pendingData) {
                 try {
-                    const result = await apiPostJSON({action:'saveChart', chartVersion:3, name:data.name, address:data.address, phone:data.phone, date:data.date,
+                    const result = await apiPostJSON({action:'saveChart', chartVersion:3, name:data.name, address:data.address, phone:data.phone, pin:(localStorage.getItem('murali_pin') || ''), date:data.date,
                         totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, personalYogaStudy:data.personalYogaStudy,
                         exercise:data.exercise, conduct:data.conduct, drill:data.drill, traffic:data.traffic, food:data.food,
                         eveningYoga:data.eveningYoga, goodnight:data.goodnight, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
@@ -1662,7 +1662,7 @@
         if (!navigator.onLine || !userPhone || userPhone === 'N/A' || myChartsSyncInProgress) return false;
         myChartsSyncInProgress = true;
         try {
-            const data = await apiPostJSON({action:'fetchMyCharts', phone:userPhone, deviceId:getDeviceId(), chartVersion:3}, {retries:2, timeoutMs:12000});
+            const data = await apiPostJSON({action:'fetchMyCharts', phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId(), chartVersion:3}, {retries:2, timeoutMs:12000});
             if (data && data.status === 'success' && Array.isArray(data.charts)) {
                 let localCharts = safeJSON('murali_daily_charts', []);
                 const otherUsers = localCharts.filter(c => c && c.phone && c.phone !== userPhone);
@@ -2615,7 +2615,7 @@
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 98.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 99.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
