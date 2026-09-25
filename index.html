@@ -110,11 +110,34 @@
         button:disabled { opacity: 0.5; cursor: not-allowed; background: #64748b; transform: none; box-shadow: none;}
         .btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); width: auto; border-radius: 50px; box-shadow: none;}
         
-        /* Top Tabs */
-        .nav-tabs button { background: transparent; color: var(--text-color); border: none; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 700; width: auto; font-size: 0.9rem; opacity: 0.85; transition: all 0.2s; box-shadow: none;}
-        .nav-tabs button#tab-gen.active { background: var(--exam-color); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
-        .nav-tabs button#tab-chart.active { background: var(--chart-color); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
-        .nav-tabs button#tab-prog.active { background: var(--stats-color); color: #fff; opacity: 1; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        /* Top Tabs — distinct visual identity in both light & dark modes */
+        .nav-tabs { --tabs-gap: 4px; }
+        .nav-tabs button {
+            color: var(--tab-text, var(--text-color));
+            border: 1px solid var(--tab-border, var(--border-color));
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 800;
+            width: auto;
+            font-size: 0.9rem;
+            opacity: 1;
+            transition: all 0.2s ease;
+            box-shadow: none;
+            background: var(--tab-bg, transparent);
+        }
+        .nav-tabs button#tab-gen { --tab-bg: #e0f2fe; --tab-text: #0369a1; --tab-border: #7dd3fc; }
+        .nav-tabs button#tab-chart { --tab-bg: #f3e8ff; --tab-text: #7e22ce; --tab-border: #d8b4fe; }
+        .nav-tabs button#tab-prog { --tab-bg: #dcfce7; --tab-text: #047857; --tab-border: #86efac; }
+        .nav-tabs button:hover:not(.active) { transform: translateY(-1px); filter: saturate(1.08); }
+        .nav-tabs button#tab-gen.active { background: var(--exam-color); color: #fff; border-color: var(--exam-color); box-shadow: 0 5px 15px rgba(2,132,199,.34); }
+        .nav-tabs button#tab-chart.active { background: var(--chart-color); color: #fff; border-color: var(--chart-color); box-shadow: 0 5px 15px rgba(139,92,246,.34); }
+        .nav-tabs button#tab-prog.active { background: var(--stats-color); color: #fff; border-color: var(--stats-color); box-shadow: 0 5px 15px rgba(16,185,129,.34); }
+        html[data-theme="dark"] .nav-tabs button#tab-gen { --tab-bg: rgba(56,189,248,.15); --tab-text: #7dd3fc; --tab-border: rgba(56,189,248,.42); }
+        html[data-theme="dark"] .nav-tabs button#tab-chart { --tab-bg: rgba(168,85,247,.16); --tab-text: #d8b4fe; --tab-border: rgba(168,85,247,.42); }
+        html[data-theme="dark"] .nav-tabs button#tab-prog { --tab-bg: rgba(52,211,153,.15); --tab-text: #6ee7b7; --tab-border: rgba(52,211,153,.42); }
+        html[data-theme="dark"] .nav-tabs button#tab-gen.active { background: var(--exam-color); color: #062033; border-color: var(--exam-color); box-shadow: 0 5px 18px rgba(56,189,248,.28); }
+        html[data-theme="dark"] .nav-tabs button#tab-chart.active { background: var(--chart-color); color: #fff; border-color: var(--chart-color); box-shadow: 0 5px 18px rgba(168,85,247,.28); }
+        html[data-theme="dark"] .nav-tabs button#tab-prog.active { background: var(--stats-color); color: #062a1f; border-color: var(--stats-color); box-shadow: 0 5px 18px rgba(52,211,153,.28); }
         
         textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-color); font-family: inherit; font-size: 0.95rem; height: 45vh; min-height: 280px; resize: vertical; outline: none; transition: all 0.2s;}
         textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
@@ -166,11 +189,15 @@
             }
             .bottom-nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
             
-            /* Active Colors for Bottom Nav */
-            .bottom-nav button#nav-gen.active { color: var(--exam-color); transform: translateY(-3px); }
-            .bottom-nav button#nav-chart.active { color: var(--chart-color); transform: translateY(-3px); }
-            .bottom-nav button#nav-prog.active { color: var(--stats-color); transform: translateY(-3px); }
-            .bottom-nav button.active svg { stroke-width: 2.5; }
+            /* Distinct Exam / Chart / Stats tiles on mobile */
+            .bottom-nav button#nav-gen { color: var(--exam-color); background: rgba(2,132,199,.10); border: 1px solid rgba(2,132,199,.20); border-radius: 12px; }
+            .bottom-nav button#nav-chart { color: var(--chart-color); background: rgba(139,92,246,.10); border: 1px solid rgba(139,92,246,.20); border-radius: 12px; }
+            .bottom-nav button#nav-prog { color: var(--stats-color); background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.20); border-radius: 12px; }
+            .bottom-nav button.active { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,.14); filter: saturate(1.12); }
+            .bottom-nav button.active svg { stroke-width: 2.7; }
+            html[data-theme="dark"] .bottom-nav button#nav-gen { background: rgba(56,189,248,.14); border-color: rgba(56,189,248,.28); }
+            html[data-theme="dark"] .bottom-nav button#nav-chart { background: rgba(168,85,247,.15); border-color: rgba(168,85,247,.28); }
+            html[data-theme="dark"] .bottom-nav button#nav-prog { background: rgba(52,211,153,.14); border-color: rgba(52,211,153,.28); }
             .sticky-scorebar { bottom: 80px !important; } 
         }
 
@@ -759,10 +786,6 @@
                 <button onclick="updateLocalProfile()" id="btn-save-profile" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
                 <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
             </div>
-            <!-- Added missing clear history button from 91.0 -->
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
-                <button onclick="clearMyHistory()" style="background: transparent; color: var(--danger-color); border: 1px dashed var(--danger-color); flex: 1; padding: 0.8rem; box-shadow: none; border-radius:12px; font-size:0.9rem;">🗑️ Clear Old Records (Before 13 Aug)</button>
-            </div>
         </div>
     </div>
 </div>
@@ -1091,17 +1114,16 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            let reloadWhenUpdated = false;
+            let shouldReloadOnControllerChange = !!navigator.serviceWorker.controller;
+            let reloadTriggered = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!reloadWhenUpdated) return;
-                reloadWhenUpdated = false;
+                if (!shouldReloadOnControllerChange || reloadTriggered) return;
+                reloadTriggered = true;
                 window.location.reload();
             });
             navigator.serviceWorker.register('sw.js').then(reg => {
-                const alreadyControlled = !!navigator.serviceWorker.controller;
-                if (alreadyControlled) reloadWhenUpdated = true;
                 reg.update().catch(() => {});
-                setInterval(() => reg.update().catch(() => {}), 10 * 60 * 1000);
+                setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
         });
     }
@@ -1110,7 +1132,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "96.0"; 
+    const APP_VERSION = "98.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1127,6 +1149,12 @@
     let activeQuestionIndex = 0; let focusedOptionIndex = -1;
     let isQuizActive = false; let canAnswerQuestion = false; let qLockInterval = null; let audioCtx = null;
     let abortController = null; let quizAutoSyncTimer = null; let quizSyncInProgress = false;
+    let quizIndexSyncInProgress = false; let lastQuizIndexSignature = '';
+    let activeStateSaveInFlight = false; let pendingActiveState = null; let activeStateSaveTimer = null;
+    let activeStateSeq = 0; let activeStateSaveRetryTimer = null;
+    let pendingResultSyncInProgress = false; let pendingChartSyncInProgress = false;
+    let myResultsSyncInProgress = false; let myChartsSyncInProgress = false;
+    let lastServerSyncAt = 0;
     
     let progressChartInstance = null; let chartAnalyticsInstance = null; let weeklyChartInstance = null;
     let monthlyChartInstance = null; let yearlyChartInstance = null;
@@ -1200,13 +1228,6 @@
     window.deleteAPIKey = function() { localStorage.removeItem('murali_gemini_key'); document.getElementById('api-key-input').value = ''; showToast("API Key Cleared!", "success"); checkApiStatus(); }
     window.updateLanguageUI = function() { lang = document.getElementById('lang-select').value; }
 
-    window.clearMyHistory = function() {
-        if(confirm("के तपाईं १३ अगस्ट २०२६ भन्दा अगाडिका पुराना रेकर्डहरू मात्र हटाउन चाहनुहुन्छ? (तपाईंको नयाँ डाटा सुरक्षित रहनेछ)")) {
-            let history = safeJSON('murali_progress', []); let cutoffDate = new Date(2026, 7, 13);
-            let newHistory = history.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getTime() >= cutoffDate.getTime(); });
-            localStorage.setItem('murali_progress', JSON.stringify(newHistory)); showToast("पुराना रेकर्डहरू हटाइए!", "success"); closeSettings(); renderDashboard();
-        }
-    }
 
     // TTS Logic
     function initVoices() {
@@ -1453,7 +1474,11 @@
         if(force || confirm("तपाईंको खाता लगआउट हुनेछ। के तपाईं पक्का हुनुहुन्छ?")) {
             localStorage.removeItem('murali_user_name'); localStorage.removeItem('murali_phone'); localStorage.removeItem('murali_address'); localStorage.removeItem('murali_month'); 
             localStorage.removeItem('murali_country'); localStorage.removeItem('murali_pin'); localStorage.removeItem('murali_role'); localStorage.removeItem('murali_active_quiz_state'); 
-            localStorage.removeItem('murali_lockout_time'); localStorage.removeItem('murali_progress'); window.location.reload();
+            localStorage.removeItem('murali_lockout_time'); localStorage.removeItem('murali_progress'); localStorage.removeItem('murali_server_quiz_index');
+            pendingActiveState = null; activeStateSeq = 0;
+            if (activeStateSaveTimer) clearTimeout(activeStateSaveTimer);
+            if (activeStateSaveRetryTimer) clearTimeout(activeStateSaveRetryTimer);
+            window.location.reload();
         }
     }
 
@@ -1467,7 +1492,13 @@
             document.getElementById('edit-first-name').value = editFirstName; document.getElementById('edit-last-name').value = editLastName;
             document.getElementById('edit-phone').value = userPhone; document.getElementById('edit-address').value = userAddress;
 
-            syncPendingResults(); syncPendingCharts(); syncMyResults(); startQuizAutoSync(); updateProfileBadgeUI(); backgroundProfileSync(); 
+            updateProfileBadgeUI();
+            startQuizAutoSync();
+            setTimeout(() => syncPendingResults(), 150);
+            setTimeout(() => syncPendingCharts(), 450);
+            setTimeout(() => syncMyResults(), 750);
+            setTimeout(() => syncMyChartsFromServer(), 1050);
+            setTimeout(() => backgroundProfileSync(), 1350); 
 
             let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student"; let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
             if (isPrivileged) document.getElementById('btn-toggle-view').style.display = 'block'; else { document.getElementById('btn-toggle-view').style.display = 'none'; isAdminViewActive = false; }
@@ -1508,90 +1539,196 @@
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC
+    // 5. DATA SYNCING LOGIC (98.0)
     // ==========================================
+    async function apiPostJSON(payload, options = {}) {
+        const retries = Number(options.retries ?? 2);
+        const timeoutMs = Number(options.timeoutMs ?? 12000);
+        let lastError = null;
+        for (let attempt = 0; attempt <= retries; attempt++) {
+            let controller = null, timer = null;
+            try {
+                controller = new AbortController();
+                timer = setTimeout(() => controller.abort(), timeoutMs);
+                const response = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), signal:controller.signal });
+                const text = await response.text();
+                let data; try { data = JSON.parse(text); } catch(e) { throw new Error('Invalid server response'); }
+                if (data && data.status === 'error' && data.retryable && attempt < retries) { await new Promise(r => setTimeout(r, 700 * (attempt + 1))); continue; }
+                return data;
+            } catch(e) {
+                lastError = e;
+                if (attempt < retries) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+            } finally { if (timer) clearTimeout(timer); }
+        }
+        throw lastError || new Error('Request failed');
+    }
+
+    function makeActiveStateObject(overrides = {}) {
+        return Object.assign({ date: currentMurliDate, qIndex: activeQuestionIndex, score: currentScore, time: totalTimeSec,
+            answeredCount: answeredCount, quizData: currentQuiz, quizRevision: currentQuizRevision, quizId: currentQuizId,
+            stateSeq: activeStateSeq, deviceId: getDeviceId() }, overrides || {});
+    }
+
+    async function flushActiveStateSave() {
+        if (activeStateSaveInFlight || !pendingActiveState || !navigator.onLine || !userPhone || userPhone === 'N/A') return false;
+        activeStateSaveInFlight = true;
+        const stateObj = pendingActiveState; pendingActiveState = null;
+        try {
+            const data = await apiPostJSON({ action:'saveActiveState', phone:userPhone, date:stateObj.date, stateData:stateObj,
+                quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
+                stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
+            if (!data || data.status !== 'success') { pendingActiveState = stateObj; scheduleActiveStateFlush(data && data.retryable ? 1200 : 1800); return false; }
+            localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj));
+            return true;
+        } catch(e) { pendingActiveState = stateObj; scheduleActiveStateFlush(1800); return false; }
+        finally { activeStateSaveInFlight = false; if (pendingActiveState && navigator.onLine) scheduleActiveStateFlush(250); }
+    }
+
+    function scheduleActiveStateFlush(delay = 250) {
+        if (activeStateSaveTimer) clearTimeout(activeStateSaveTimer);
+        activeStateSaveTimer = setTimeout(() => { activeStateSaveTimer = null; flushActiveStateSave(); }, delay);
+    }
+
     window.saveStateToCloud = function(stateObj) {
-        if(!navigator.onLine) return;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveActiveState", phone: userPhone, date: stateObj.date, stateData: stateObj, quizRevision: currentQuizRevision, quizId: currentQuizId, deviceId: getDeviceId() }) }).catch(e => console.log("Background state save failed"));
+        if (!stateObj) return Promise.resolve(false);
+        activeStateSeq = Math.max(activeStateSeq, Number(stateObj.stateSeq || 0));
+        const safeState = Object.assign({}, stateObj, {stateSeq:activeStateSeq, deviceId:getDeviceId()});
+        localStorage.setItem('murali_active_quiz_state', JSON.stringify(safeState));
+        pendingActiveState = safeState; scheduleActiveStateFlush(150);
+        return flushActiveStateSave();
+    };
+
+    async function syncPendingResults() {
+        if (!navigator.onLine || pendingResultSyncInProgress) return false;
+        let history = safeJSON('murali_progress', []); const pendingData = history.filter(item => item && item.synced !== true);
+        if (!pendingData.length) return false; pendingResultSyncInProgress = true;
+        try {
+            for (const data of pendingData) {
+                try {
+                    const result = await apiPostJSON({action:'saveResult', name:data.name, address:data.address, country:data.country, phone:data.phone,
+                        date:data.date, score:data.score, total:data.total, percent:data.percent, timeTaken:data.timeTaken, time:data.time,
+                        weakTags:data.weakTags, reviewData:data.quizData, quizRevision:data.quizRevision||1,
+                        quizId:data.quizId || (String(data.date)+'-R'+(data.quizRevision||1)), deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                    if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); }
+                } catch(e) {}
+            }
+            return true;
+        } finally { pendingResultSyncInProgress = false; }
     }
 
-    function syncServerQuizzes(refreshUI = false) {
-        if (!navigator.onLine || quizSyncInProgress || isQuizActive) return Promise.resolve(false);
-        quizSyncInProgress = true;
-        return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "fetchQuizzes" }) })
-        .then(res => res.json()).then(data => { 
-            if(data.status === "success" && Array.isArray(data.quizzes)) { 
-                const oldSerialized = localStorage.getItem('murali_server_quizzes') || ''; const newSerialized = JSON.stringify(data.quizzes); const changed = oldSerialized !== newSerialized;
-                localStorage.setItem('murali_server_quizzes', newSerialized); populateSavedQuizzes();
-                if (!isQuizActive && !isAdminViewActive && document.getElementById('view-generator')) loadStudentDashboard();
-                if (changed && oldSerialized) showToast("☁️ नयाँ/संशोधित क्वीज सर्भरबाट अपडेट भयो।", "info");
-                if(refreshUI) unlockApp(); return changed;
-            } return false;
-        }).catch(e => { return false; }).finally(() => { quizSyncInProgress = false; });
+    async function syncPendingCharts() {
+        if (!navigator.onLine || pendingChartSyncInProgress) return false;
+        let charts = safeJSON('murali_daily_charts', []); const pendingData = charts.filter(item => item && item.synced !== true);
+        if (!pendingData.length) return false; pendingChartSyncInProgress = true;
+        try {
+            for (const data of pendingData) {
+                try {
+                    const result = await apiPostJSON({action:'saveChart', chartVersion:3, name:data.name, address:data.address, phone:data.phone, date:data.date,
+                        totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, personalYogaStudy:data.personalYogaStudy,
+                        exercise:data.exercise, conduct:data.conduct, drill:data.drill, traffic:data.traffic, food:data.food,
+                        eveningYoga:data.eveningYoga, goodnight:data.goodnight, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                    if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); }
+                } catch(e) {}
+            }
+            return true;
+        } finally { pendingChartSyncInProgress = false; }
     }
 
-    function startQuizAutoSync() { if (quizAutoSyncTimer) { clearInterval(quizAutoSyncTimer); quizAutoSyncTimer = null; } if (!isQuizActive && !document.hidden) syncServerQuizzes(false); }
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && !isQuizActive) syncServerQuizzes(false); });
-
-    window.syncPendingResults = function() {
-        if (!navigator.onLine) return;
-        let history = safeJSON('murali_progress', []); let pendingData = history.filter(item => item.synced !== true); if (pendingData.length === 0) return;
-        pendingData.forEach(data => {
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveResult", name: data.name, address: data.address, country: data.country, phone: data.phone, date: data.date, score: data.score, total: data.total, percent: data.percent, timeTaken: data.timeTaken, time: data.time, weakTags: data.weakTags, reviewData: data.quizData, quizRevision: data.quizRevision || 1, quizId: data.quizId || (String(data.date) + "-R" + (data.quizRevision || 1)), deviceId: getDeviceId() }) })
-            .then(res => res.json()).then(result => { if(result.status === "success") { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); } });
-        });
+    async function syncMyResults() {
+        if (!navigator.onLine || !userPhone || userPhone === 'N/A' || myResultsSyncInProgress) return false;
+        const savedPin = localStorage.getItem('murali_pin') || ''; if (!savedPin) return false; myResultsSyncInProgress = true;
+        try {
+            const data = await apiPostJSON({action:'fetchMyResults', phone:userPhone, pin:savedPin, deviceId:getDeviceId()}, {retries:2, timeoutMs:12000});
+            if (data && data.status === 'success' && Array.isArray(data.results)) {
+                let localHistory = safeJSON('murali_progress', []), isUpdated = false;
+                data.results.forEach(sr => {
+                    let exists = localHistory.find(lh => getHistoryQuizKey(lh) === getHistoryQuizKey(sr));
+                    if (!exists) { localHistory.push({id:Date.now()+Math.random(), name:userName, phone:userPhone, date:sr.date, score:sr.score, percent:sr.percent, total:sr.total,
+                        timeTaken:sr.timeTaken, synced:true, quizData:sr.reviewData||null, quizRevision:getQuizRevisionValue(sr), quizId:sr.quizId || (String(sr.date)+'-R'+getQuizRevisionValue(sr))}); isUpdated=true; }
+                    else if (exists.synced !== false) {
+                        if (sr.reviewData && !exists.quizData) { exists.quizData=sr.reviewData; isUpdated=true; }
+                        if (String(exists.score)!==String(sr.score) || String(exists.percent)!==String(sr.percent)) { exists.score=sr.score; exists.percent=sr.percent; exists.total=sr.total; exists.timeTaken=sr.timeTaken; isUpdated=true; }
+                    }
+                });
+                localHistory = localHistory.filter(lh => lh.synced===false || data.results.some(sr => getHistoryQuizKey(sr) === getHistoryQuizKey(lh)));
+                if (isUpdated) { localHistory.sort((a,b)=>getValidDate(b).getTime()-getValidDate(a).getTime()); localStorage.setItem('murali_progress',JSON.stringify(localHistory)); if(document.getElementById('view-progress')?.style.display==='block') renderDashboard(); }
+                return isUpdated;
+            }
+        } catch(e) {} finally { myResultsSyncInProgress=false; }
+        return false;
     }
+
+    async function syncMyChartsFromServer() {
+        if (!navigator.onLine || !userPhone || userPhone === 'N/A' || myChartsSyncInProgress) return false;
+        myChartsSyncInProgress = true;
+        try {
+            const data = await apiPostJSON({action:'fetchMyCharts', phone:userPhone, deviceId:getDeviceId(), chartVersion:3}, {retries:2, timeoutMs:12000});
+            if (data && data.status === 'success' && Array.isArray(data.charts)) {
+                let localCharts = safeJSON('murali_daily_charts', []);
+                const otherUsers = localCharts.filter(c => c && c.phone && c.phone !== userPhone);
+                const minePending = localCharts.filter(c => c && c.phone === userPhone && c.synced !== true);
+                const serverMap = new Map(data.charts.map(c => [String(c.date), c]));
+                const mergedMine = Array.from(serverMap.values());
+                for (const pending of minePending) if (!serverMap.has(String(pending.date))) mergedMine.push(pending);
+                mergedMine.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+                localStorage.setItem('murali_daily_charts', JSON.stringify([...mergedMine, ...otherUsers]));
+                return true;
+            }
+        } catch(e) {} finally { myChartsSyncInProgress=false; }
+        return false;
+    }
+
+    async function backgroundProfileSync() {
+        if (!navigator.onLine) return false; const savedPhone=localStorage.getItem('murali_phone'), savedPin=localStorage.getItem('murali_pin');
+        if (!savedPhone || !savedPin) return false;
+        try {
+            const data=await apiPostJSON({action:'login',phone:savedPhone,pin:savedPin,deviceId:getDeviceId()},{retries:1,timeoutMs:10000});
+            if(data && data.status==='success') { let updated=false;
+                if(data.name!==userName){localStorage.setItem('murali_user_name',data.name);userName=data.name;updated=true;}
+                if(data.address!==userAddress){localStorage.setItem('murali_address',data.address);userAddress=data.address;updated=true;}
+                if(data.role!==userRole){localStorage.setItem('murali_role',data.role);userRole=data.role;updated=true;}
+                if(data.country!==userCountry){localStorage.setItem('murali_country',data.country);userCountry=data.country;updated=true;}
+                if(updated) updateProfileBadgeUI(); return true;
+            }
+        } catch(e) {} return false;
+    }
+
+    async function syncServerQuizzes(refreshUI=false, forceFull=false) {
+        if(!navigator.onLine || quizIndexSyncInProgress || isQuizActive) return false; quizIndexSyncInProgress=true;
+        try {
+            const idxData=await apiPostJSON({action:'fetchQuizIndex'},{retries:2,timeoutMs:12000});
+            if(!idxData || idxData.status!=='success' || !Array.isArray(idxData.quizzes)) return false;
+            const sig=JSON.stringify(idxData.quizzes), oldSig=localStorage.getItem('murali_server_quiz_index')||''; const changed=sig!==oldSig;
+            localStorage.setItem('murali_server_quiz_index',sig); lastQuizIndexSignature=sig;
+            const cached=safeJSON('murali_server_quizzes',null); const needFull=forceFull || changed || !Array.isArray(cached);
+            if(needFull){
+                const data=await apiPostJSON({action:'fetchQuizzes'},{retries:2,timeoutMs:15000});
+                if(!data || data.status!=='success' || !Array.isArray(data.quizzes)) return false;
+                const old=localStorage.getItem('murali_server_quizzes')||'', newSer=JSON.stringify(data.quizzes), dataChanged=old!==newSer;
+                localStorage.setItem('murali_server_quizzes',newSer); populateSavedQuizzes();
+                if(dataChanged && old) showToast('☁️ नयाँ/संशोधित क्वीज सर्भरबाट अपडेट भयो।','info');
+                if(!isAdminViewActive && document.getElementById('view-generator')) loadStudentDashboard(); lastServerSyncAt=Date.now();
+                return dataChanged || changed;
+            }
+            lastServerSyncAt=Date.now(); return changed;
+        } catch(e) { return false; } finally { quizIndexSyncInProgress=false; }
+    }
+
+    function startQuizAutoSync(){
+        if(quizAutoSyncTimer) clearInterval(quizAutoSyncTimer);
+        quizAutoSyncTimer=setInterval(()=>{ if(!isQuizActive && !document.hidden && navigator.onLine) syncServerQuizzes(false,false); },5*60*1000);
+        if(!isQuizActive && !document.hidden) syncServerQuizzes(false,false);
+    }
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !isQuizActive){syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
+    window.addEventListener('online',()=>{ if(!isQuizActive){flushActiveStateSave();syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
 
     function getQuizRevisionValue(item) { const rev = parseInt(item && (item.quizRevision || item.revision), 10); return (rev && rev > 0) ? rev : 1; }
     function getHistoryQuizKey(item) { return String(item && item.date || "") + "-R" + getQuizRevisionValue(item); }
 
-    window.syncMyResults = function() {
-        if (!navigator.onLine || !userPhone || userPhone === "N/A") return;
-        const savedPin = localStorage.getItem('murali_pin') || ''; if (!savedPin) return;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "fetchMyResults", phone: userPhone, pin: savedPin, deviceId: getDeviceId() }) })
-        .then(res => res.json()).then(data => {
-            if(data.status === "success" && data.results) {
-                let localHistory = safeJSON('murali_progress', []); let isUpdated = false;
-                data.results.forEach(sr => {
-                    let exists = localHistory.find(lh => getHistoryQuizKey(lh) === getHistoryQuizKey(sr));
-                    if(!exists) { 
-                        localHistory.push({ id: Date.now() + Math.random(), name: userName, phone: userPhone, date: sr.date, score: sr.score, percent: sr.percent, total: sr.total, timeTaken: sr.timeTaken, synced: true, quizData: sr.reviewData || null, quizRevision: getQuizRevisionValue(sr), quizId: sr.quizId || (String(sr.date) + "-R" + getQuizRevisionValue(sr)) }); 
-                        isUpdated = true;
-                    } else if (exists.synced !== false) {
-                        if (sr.reviewData && !exists.quizData) { exists.quizData = sr.reviewData; isUpdated = true; }
-                        if (String(exists.score) !== String(sr.score) || String(exists.percent) !== String(sr.percent)) { exists.score = sr.score; exists.percent = sr.percent; exists.total = sr.total; exists.timeTaken = sr.timeTaken; isUpdated = true; }
-                    }
-                });
-                let newLocalHistory = localHistory.filter(lh => { if (lh.synced === false) return true; let existsOnServer = data.results.find(sr => getHistoryQuizKey(sr) === getHistoryQuizKey(lh)); if (!existsOnServer) { isUpdated = true; return false; } return true; });
-                if(isUpdated) { newLocalHistory.sort((a,b) => getValidDate(b).getTime() - getValidDate(a).getTime()); localStorage.setItem('murali_progress', JSON.stringify(newLocalHistory)); if (document.getElementById('view-progress').style.display === 'block') renderDashboard(); const safeRole = (userRole || '').toString().trim().toLowerCase(); const isStudent = safeRole !== 'admin' && safeRole !== 'manager'; if (isStudent && !isQuizActive && typeof loadStudentDashboard === 'function') loadStudentDashboard(); }
-            }
-        }).catch(e => {});
-    }
-
-    window.syncPendingCharts = function() {
-        if (!navigator.onLine) return;
-        let charts = safeJSON('murali_daily_charts', []); let pendingData = charts.filter(item => item.synced !== true); if (pendingData.length === 0) return;
-        pendingData.forEach(data => {
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveChart", chartVersion: 3, name: data.name, address: data.address, phone: data.phone, date: data.date, totalScore: data.totalScore, stage: data.stage, amritvela: data.amritvela, murli: data.murli, personalYogaStudy: data.personalYogaStudy, exercise: data.exercise, conduct: data.conduct, drill: data.drill, traffic: data.traffic, food: data.food, eveningYoga: data.eveningYoga, goodnight: data.goodnight, deviceId: getDeviceId() }) })
-            .then(res => res.json()).then(result => { if(result.status === "success") { data.synced = true; localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); } });
-        });
-    }
-
-    window.backgroundProfileSync = function() {
-        if (!navigator.onLine) return;
-        let savedPhone = localStorage.getItem('murali_phone'); let savedPin = localStorage.getItem('murali_pin'); if (!savedPhone || !savedPin) return;
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "login", phone: savedPhone, pin: savedPin, deviceId: getDeviceId() }) })
-        .then(r => r.json()).then(data => {
-            if (data.status === "success") {
-                let updated = false;
-                if (data.name !== userName) { localStorage.setItem('murali_user_name', data.name); userName = data.name; updated = true; }
-                if (data.address !== userAddress) { localStorage.setItem('murali_address', data.address); userAddress = data.address; updated = true; }
-                if (data.role !== userRole) { localStorage.setItem('murali_role', data.role); userRole = data.role; updated = true; }
-                if (data.country !== userCountry) { localStorage.setItem('murali_country', data.country); userCountry = data.country; updated = true; }
-                if (updated) updateProfileBadgeUI();
-            }
-        }).catch(e => {});
-    }
+    window.syncMyResults = syncMyResults;
+    window.syncPendingCharts = syncPendingCharts;
+    window.syncMyChartsFromServer = syncMyChartsFromServer;
+    window.backgroundProfileSync = backgroundProfileSync;
 
     // ==========================================
     // 6. UI & DASHBOARD LOGIC
@@ -1602,7 +1739,7 @@
         document.getElementById('view-generator').style.display = tab === 'gen' ? 'block' : 'none'; document.getElementById('view-chart').style.display = tab === 'chart' ? 'block' : 'none'; document.getElementById('view-progress').style.display = tab === 'prog' ? 'block' : 'none';
         
         if (tab === 'prog') { document.getElementById('sticky-scorebar').style.display = 'none'; renderDashboard(); } 
-        else if (tab === 'chart') { document.getElementById('sticky-scorebar').style.display = 'none'; initChartV2Interactions(); let todayStr = getLocalDateISO(); document.getElementById('chart-date').value = todayStr; updateChartDateLabel(todayStr); loadChartDataForDate(todayStr); } 
+        else if (tab === 'chart') { document.getElementById('sticky-scorebar').style.display = 'none'; initChartV3Interactions(); let todayStr = getLocalDateISO(); document.getElementById('chart-date').value = todayStr; updateChartDateLabel(todayStr); loadChartDataForDate(todayStr); } 
         else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen') === null) { document.getElementById('sticky-scorebar').style.display = 'flex'; }
     }
 
@@ -1813,24 +1950,25 @@
     // 8. QUIZ EXECUTION
     // ==========================================
     window.startSpecificQuiz = async function(dateStr) {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); let targetQuiz = serverQuizzes.find(q => q.quizDate === dateStr);
-        const savedPin = localStorage.getItem('murali_pin') || '';
-        document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "परीक्षाको स्थिति जाँच हुँदैछ..."; document.getElementById('quiz-area').style.display = 'none';
-        let existingResult = document.getElementById('result-screen'); if(existingResult) existingResult.remove();
-
-        const attemptCheckPromise = (navigator.onLine && userPhone !== "N/A" && savedPin) ? fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "getQuizAttemptStatus", phone: userPhone, pin: savedPin, deviceId: getDeviceId(), quizDate: dateStr }) }).then(r => r.json()).catch(() => null) : Promise.resolve(null);
-        const attemptData = await attemptCheckPromise;
-
-        if(!targetQuiz || !targetQuiz.quizData) { document.getElementById('loading-box').style.display = 'none'; return showToast("क्वीज फेला परेन!", "error"); }
-
-        let cloudState = null;
-        if (attemptData && attemptData.status === "success") {
-            if(attemptData.attemptStatus === "completed") { document.getElementById('loading-box').style.display = 'none'; loadStudentDashboard(); return showToast("यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।", "warning", 4000); }
-            if(attemptData.attemptStatus === "in_progress" && attemptData.stateData) cloudState = attemptData.stateData;
+        let serverQuizzes=safeJSON('murali_server_quizzes',[]), targetQuiz=Array.isArray(serverQuizzes)?serverQuizzes.find(q=>q.quizDate===dateStr):null;
+        const savedPin=localStorage.getItem('murali_pin')||'';
+        document.getElementById('loading-box').style.display='block'; document.getElementById('loading-text').innerText='परीक्षाको स्थिति छिटो जाँच हुँदैछ...'; document.getElementById('quiz-area').style.display='none';
+        let existingResult=document.getElementById('result-screen'); if(existingResult) existingResult.remove();
+        if(navigator.onLine && userPhone!=='N/A' && savedPin){
+            try{
+                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:2,timeoutMs:15000});
+                if(data && data.status==='success' && data.quiz && data.quiz.quizData){
+                    targetQuiz=data.quiz; let cached=safeJSON('murali_server_quizzes',[]); if(!Array.isArray(cached)) cached=[];
+                    const idx=cached.findIndex(q=>q.quizDate===dateStr); if(idx>=0) cached[idx]=targetQuiz; else cached.push(targetQuiz); localStorage.setItem('murali_server_quizzes',JSON.stringify(cached)); populateSavedQuizzes();
+                    if(data.attemptStatus==='completed'){document.getElementById('loading-box').style.display='none';loadStudentDashboard();return showToast('यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।','warning',4000);}
+                    document.getElementById('loading-box').style.display='none'; window.tempCloudState=data.stateData||null; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex'; return;
+                }
+            }catch(e){}
         }
-
-        document.getElementById('loading-box').style.display = 'none'; window.tempCloudState = cloudState; window.tempTargetQuiz = targetQuiz; document.getElementById('pledge-modal').style.display = 'flex';
-    }
+        if(!targetQuiz || !targetQuiz.quizData){document.getElementById('loading-box').style.display='none';return showToast(navigator.onLine?'क्वीज फेला परेन वा सर्भर प्रतिक्रिया आएन।':'अफलाइन अवस्थामा यो क्वीज पहिले डाउनलोड भएको छैन।','error');}
+        let localState=safeJSON('murali_active_quiz_state',null); if(localState && (localState.date!==dateStr || Number(localState.quizRevision||1)!==Number(targetQuiz.revision||1))) localState=null;
+        document.getElementById('loading-box').style.display='none'; window.tempCloudState=localState; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex';
+    };
 
     window.closePledgeModal = function() { document.getElementById('pledge-modal').style.display = 'none'; resetToGenerator(); }
     window.acceptPledgeAndStart = function() { 
@@ -1852,15 +1990,18 @@
         else if (localState && localState.date === currentMurliDate && localRev === currentQuizRevision) { stateToUse = localState; }
 
         if (stateToUse) {
-            currentQuiz = stateToUse.quizData; currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0;
+            currentQuiz = stateToUse.quizData; currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0; activeStateSeq = Number(stateToUse.stateSeq || 0);
             showToast("तपाईंको रोकिएको परीक्षा पुनः सुरु भयो।", "info");
         } else {
-            currentScore = 0; answeredCount = 0; totalTimeSec = 0; activeQuestionIndex = 0;
-            currentQuiz = JSON.parse(JSON.stringify(originalQuizData)); 
+            currentScore = 0; answeredCount = 0; totalTimeSec = 0; activeQuestionIndex = 0; activeStateSeq = 0;
+            currentQuiz = JSON.parse(JSON.stringify(originalQuizData));
             currentQuiz.forEach(q => { delete q.userSelectedIndex; delete q.userCorrect; for (let i = q.options.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [q.options[i], q.options[j]] = [q.options[j], q.options[i]]; } });
         }
 
         focusedOptionIndex = -1; isTimerStarted = true; isQuizActive = true; startTimer();
+        activeStateSeq++; const initialState = makeActiveStateObject({qIndex:activeQuestionIndex});
+        localStorage.setItem('murali_active_quiz_state', JSON.stringify(initialState));
+        if(!stateToUse){pendingActiveState=initialState;flushActiveStateSave();}
         document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; 
         document.getElementById('main-header').style.display = 'none'; document.getElementById('main-tabs').style.display = 'none'; document.getElementById('toolbar-right-actions').style.display = 'none';
         let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); let s = (totalTimeSec % 60).toString().padStart(2, '0'); document.getElementById('timer-text').innerText = `${m}:${s}`;
@@ -1937,19 +2078,26 @@
         setTimeout(() => {
             if (qIndex < currentQuiz.length - 1) { 
                 document.getElementById(`qb-${qIndex}`).style.display = 'none'; activeQuestionIndex++; document.getElementById(`qb-${activeQuestionIndex}`).style.display = 'block'; window.scrollTo(0, 0); 
-                let stateObj = { date: currentMurliDate, qIndex: activeQuestionIndex, score: tempScore, time: totalTimeSec, answeredCount: answeredCount, quizData: currentQuiz, quizRevision: currentQuizRevision, quizId: currentQuizId };
+                currentScore = tempScore; activeStateSeq++;
+                let stateObj = makeActiveStateObject({qIndex:activeQuestionIndex, score:currentScore});
                 localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj)); if (typeof saveStateToCloud === 'function') saveStateToCloud(stateObj);
                 startQuestionLock(activeQuestionIndex);
-            } else { showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); submitQuiz(); }
+            } else {
+                currentScore = tempScore; activeStateSeq++;
+                const finalState = makeActiveStateObject({qIndex:qIndex, score:currentScore, answeredCount:answeredCount});
+                localStorage.setItem('murali_active_quiz_state', JSON.stringify(finalState)); if (typeof saveStateToCloud === 'function') saveStateToCloud(finalState);
+                showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); submitQuiz();
+            }
         }, 600); 
     }
 
-    window.submitQuiz = function() {
+    window.submitQuiz = async function() {
         if (document.getElementById('sb-submit-btn').disabled) return; 
         let untouched = currentQuiz.length - answeredCount; if (currentQuiz.length > 0 && answeredCount === 0) return showToast("कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
         if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) return;
         
-        document.getElementById('sb-submit-btn').disabled = true; stopTimer(); clearInterval(qLockInterval); isQuizActive = false;
+        document.getElementById('sb-submit-btn').disabled = true; stopTimer(); clearInterval(qLockInterval);
+        activeStateSeq++; pendingActiveState = makeActiveStateObject({qIndex:activeQuestionIndex}); await flushActiveStateSave(); isQuizActive = false;
         currentScore = 0; currentQuiz.forEach(q => {
             if (q.userSelectedIndex !== undefined) { let selectedText = String(q.options[q.userSelectedIndex]).trim(); let answerText = String(q.answer).trim(); if (selectedText === answerText) { currentScore++; q.userCorrect = true; } else { q.userCorrect = false; } } 
             else { q.userCorrect = false; }
@@ -1987,6 +2135,7 @@
 
     function saveOrReplaceProgress() {
         let history = safeJSON('murali_progress', []); let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
+        history = history.filter(item => !(item && item.phone === userPhone && item.date === currentMurliDate && Number(item.quizRevision || 1) === Number(currentQuizRevision)));
         history.unshift({ id: Date.now(), name: userName, address: userAddress, country: userCountry, phone: userPhone, date: currentMurliDate, score: currentScore, total: currentQuiz.length, percent: Math.round((currentScore / currentQuiz.length) * 100), timeTaken: document.getElementById('timer-text').innerText, time: new Date().toLocaleString('en-GB'), timestamp: Date.now(), weakTags: incorrectTags, quizData: currentQuiz, quizRevision: currentQuizRevision, quizId: currentQuizId, synced: false });
         localStorage.setItem('murali_progress', JSON.stringify(history)); syncPendingResults();
     }
@@ -2042,28 +2191,38 @@
         } else { showToast("यसको प्रश्नपत्र उपलब्ध छैन। (Synced from another device)", "info"); }
     };
 
+    window.openMegaArchive = function() {
+        const modal=document.getElementById('mega-archive-modal'), content=document.getElementById('mega-archive-content'); if(!modal||!content)return;
+        const quizzes=safeJSON('murali_server_quizzes',[]); const special=(Array.isArray(quizzes)?quizzes:[]).filter(q=>q&&q.isMegaQuiz);
+        if(!special.length){content.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted-text-color);">कुनै Mega Quiz भेटिएन।</div>';modal.style.display='flex';return;}
+        special.sort((a,b)=>getSortableTime(b)-getSortableTime(a)); const history=safeJSON('murali_progress',[]);
+        content.innerHTML=special.map(q=>{const date=String(q.quizDate||'').replace(/T.*/,''), key=String(q.quizDate||'')+'-R'+getQuizRevisionValue(q), done=history.some(h=>h.phone===userPhone&&getHistoryQuizKey(h)===key); const safeDate=JSON.stringify(String(q.quizDate||''));
+            return `<button ${done?'disabled':''} onclick="document.getElementById('mega-archive-modal').style.display='none';startSpecificQuiz(${safeDate})" style="width:100%;margin-bottom:8px;text-align:left;box-shadow:none;${done?'background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);':'background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);'}">${done?'✅':'▶️'} ${date} ${done?'(Completed)':''}</button>`;}).join('');
+        modal.style.display='flex';
+    };
+
     // ==========================================
     // 9. DAILY CHART LOGIC (V3)
     // ==========================================
-    const CHART_V2_GROUPS = ['chart_amritvela','chart_murli','chart_personal_yoga','chart_exercise','chart_conduct','chart_drill','chart_traffic','chart_food','chart_evening','chart_goodnight'];
+    const CHART_V3_GROUPS = ['chart_amritvela','chart_murli','chart_personal_yoga','chart_exercise','chart_conduct','chart_drill','chart_traffic','chart_food','chart_evening','chart_goodnight'];
     
-    function initChartV2Interactions() {
+    function initChartV3Interactions() {
         document.querySelectorAll('.chart-option-v2 input[type="checkbox"]').forEach(input => {
             let newInp = input.cloneNode(true); input.parentNode.replaceChild(newInp, input);
             newInp.addEventListener('change', function() {
                 let groupName = this.name;
                 if(this.checked) { document.querySelectorAll(`input[name="${groupName}"]`).forEach(other => { if(other !== this) { other.checked = false; let optV2 = other.closest('.chart-option-v2'); if(optV2) optV2.classList.remove('selected-v2'); } }); }
                 let myOptV2 = this.closest('.chart-option-v2'); if(myOptV2) myOptV2.classList.toggle('selected-v2', this.checked);
-                updateChartV2Total();
+                updateChartV3Total();
             });
         });
     }
 
     function getChartOptionValue(groupName) { let selected = Array.from(document.querySelectorAll(`#daily-chart-form input[name="${groupName}"]:checked`)); return selected.length ? Number(selected[0].value) : 0; }
-    function getChartV2Score() { return CHART_V2_GROUPS.reduce((sum, name) => sum + getChartOptionValue(name), 0); }
+    function getChartV3Score() { return CHART_V3_GROUPS.reduce((sum, name) => sum + getChartOptionValue(name), 0); }
 
-    function updateChartV2Total() {
-        let score = getChartV2Score(); let pct = Math.round((score / 100) * 100);
+    function updateChartV3Total() {
+        let score = getChartV3Score(); let pct = Math.round((score / 100) * 100);
         document.getElementById('chart-live-score').innerText = score; document.getElementById('chart-live-percent').innerText = pct + '%';
         document.getElementById('chart-live-progress').style.width = pct + '%'; document.getElementById('chart-submit-score').innerText = score;
     }
@@ -2077,17 +2236,17 @@
         if(dd.getTime() === today.getTime()) label = 'आज • ' + label; document.getElementById('chart-date-label').innerText = label;
     }
 
-    function clearChartV2Form() { let form = document.getElementById('daily-chart-form'); form.reset(); document.querySelectorAll('.chart-option-v2').forEach(el => el.classList.remove('selected-v2')); updateChartV2Total(); }
+    function clearChartV3Form() { let form = document.getElementById('daily-chart-form'); form.reset(); document.querySelectorAll('.chart-option-v2').forEach(el => el.classList.remove('selected-v2')); updateChartV3Total(); }
 
     function loadChartDataForDate(dateVal) {
-        clearChartV2Form(); let charts = safeJSON('murali_daily_charts', []); let existingChart = charts.find(c => c.date === dateVal && c.phone === userPhone); if(!existingChart) return;
+        clearChartV3Form(); let charts = safeJSON('murali_daily_charts', []); let existingChart = charts.find(c => c.date === dateVal && c.phone === userPhone); if(!existingChart) { if(navigator.onLine) syncMyChartsFromServer().then(()=>{ let fresh=safeJSON('murali_daily_charts',[]); if(fresh.find(c=>c.date===dateVal && c.phone===userPhone)) loadChartDataForDate(dateVal); }); return; }
         const keyMap = { chart_amritvela: 'amritvela', chart_murli: 'murli', chart_personal_yoga: 'personalYogaStudy', chart_exercise: 'exercise', chart_conduct: 'conduct', chart_drill: 'drill', chart_traffic: 'traffic', chart_food: 'food', chart_evening: 'eveningYoga', chart_goodnight: 'goodnight' };
-        CHART_V2_GROUPS.forEach(groupName => {
+        CHART_V3_GROUPS.forEach(groupName => {
             let key = keyMap[groupName]; let value = Number(existingChart[key] || 0);
             let match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${value}"]`);
             if(match) { match.checked = true; let optV2 = match.closest('.chart-option-v2'); if(optV2) optV2.classList.add('selected-v2'); }
         });
-        updateChartV2Total();
+        updateChartV3Total();
     }
 
     let chartDateEl = document.getElementById('chart-date');
@@ -2101,7 +2260,7 @@
 
     window.submitDailyChart = function() {
         let dateVal = document.getElementById('chart-date').value; if(!dateVal) return showToast('कृपया मिति छान्नुहोस्।', 'error');
-        let chartData = { id: Date.now(), schemaVersion: 3, date: dateVal, name: userName, address: userAddress, phone: userPhone, amritvela: getChartOptionValue('chart_amritvela'), murli: getChartOptionValue('chart_murli'), personalYogaStudy: getChartOptionValue('chart_personal_yoga'), exercise: getChartOptionValue('chart_exercise'), conduct: getChartOptionValue('chart_conduct'), drill: getChartOptionValue('chart_drill'), traffic: getChartOptionValue('chart_traffic'), food: getChartOptionValue('chart_food'), eveningYoga: getChartOptionValue('chart_evening'), goodnight: getChartOptionValue('chart_goodnight'), totalScore: getChartV2Score(), stage: '', synced: false };
+        let chartData = { id: Date.now(), schemaVersion: 3, chartVersion: 3, date: dateVal, name: userName, address: userAddress, phone: userPhone, amritvela: getChartOptionValue('chart_amritvela'), murli: getChartOptionValue('chart_murli'), personalYogaStudy: getChartOptionValue('chart_personal_yoga'), exercise: getChartOptionValue('chart_exercise'), conduct: getChartOptionValue('chart_conduct'), drill: getChartOptionValue('chart_drill'), traffic: getChartOptionValue('chart_traffic'), food: getChartOptionValue('chart_food'), eveningYoga: getChartOptionValue('chart_evening'), goodnight: getChartOptionValue('chart_goodnight'), totalScore: getChartV3Score(), stage: '', synced: false };
         if(chartData.totalScore >= 90) chartData.stage = 'उड्ती कला 🕊️'; else if(chartData.totalScore >= 70) chartData.stage = 'चढ्ती कला 🚶'; else if(chartData.totalScore >= 50) chartData.stage = 'पुरुषार्थी जीवन 🌱'; else chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
 
         let charts = safeJSON('murali_daily_charts', []); charts = charts.filter(c => c.date !== dateVal || c.phone !== userPhone);
@@ -2111,7 +2270,7 @@
         let resultHtml = `<div class="chart-result-title-v2" style="font-weight:900; color:var(--text-color); margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:3.2rem; font-weight:900; line-height:1; color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem; color:#94a3b8;">/100</small></div><div class="chart-result-stage-v2" style="margin-top:7px; font-weight:850; color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px; color:#64748b; font-size:.9rem; font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'अझै थोरै ध्यान दिँदा अझ राम्रो हुन्छ।'}</div><div class="chart-result-actions-v2" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent; color:var(--chart-color); border:1px solid var(--chart-color); border-radius:50px; padding:.62rem 1rem;">✏️ सच्याउनुहोस्</button></div>`;
         let resBox = document.getElementById('chart-result-box'); resBox.innerHTML = resultHtml; resBox.style.display = 'block'; resBox.style.textAlign = 'center'; resBox.style.padding = '1.4rem 1rem'; resBox.style.background = 'var(--card-bg)'; resBox.style.borderRadius = '20px'; resBox.style.border = '2px solid var(--border-color)';
 
-        updateChartV2Total(); if(chartData.totalScore >= 90) fireConfetti(); syncPendingCharts(); renderDashboard();
+        updateChartV3Total(); if(chartData.totalScore >= 90) fireConfetti(); syncPendingCharts(); renderDashboard();
     };
     window.editChartForm = function() { document.getElementById('chart-result-box').style.display = 'none'; document.getElementById('daily-chart-form').style.display = 'block'; window.scrollTo({ top:0, behavior:'smooth' }); }
 
@@ -2311,7 +2470,7 @@
         }).catch(e => { btn.innerText = "Generate Data"; btn.disabled = false; txtArea.value = "Network Error. Could not connect to server."; tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #dc2626;">Network Error.</td></tr>`; showToast("Network Error.", "error"); });
     }
     window.copyLeaderboard = function() { let txtArea = document.getElementById('lb-result-text'); if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to copy.", "error"); txtArea.select(); document.execCommand("copy"); showToast("Copied to Clipboard!", "success"); }
-    window.shareLeaderboardWA = function() { let txtArea = document.getElementById('lb-result-text'); if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to share.", "error"); let text = encodeURIComponent(txtArea.value); window.open(`[https://wa.me/?text=$](https://wa.me/?text=$){text}`, '_blank'); }
+    window.shareLeaderboardWA = function() { let txtArea = document.getElementById('lb-result-text'); if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to share.", "error"); let text = encodeURIComponent(txtArea.value); window.open('https://wa.me/?text=' + text, '_blank'); }
 
     // Student Leaderboard
     window.openStudentLeaderboardDatePicker = function() { const input = document.getElementById('sl-date-select'); if (!input) return; if (input.showPicker) input.showPicker(); else input.focus(); }
