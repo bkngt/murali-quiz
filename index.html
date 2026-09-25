@@ -2524,7 +2524,7 @@
         document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-content').style.display = 'none';
         if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
 
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone }) })
+        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }) })
         .then(r => r.json()).then(data => {
             document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block';
             if (data.status === "success") {
@@ -2577,7 +2577,7 @@
         const targetDateStr = document.getElementById('cl-date-select').value;
         document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none';
         if (!navigator.onLine) { document.getElementById('cl-loading').innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
-        fetch(API_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action:'getStudentChartLeaderboard',chartVersion:3,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone}) })
+        fetch(API_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action:'getStudentChartLeaderboard',chartVersion:3,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}) })
         .then(r => r.json()).then(data => {
             document.getElementById('cl-loading').style.display = 'none'; document.getElementById('cl-content').style.display = 'block';
             if (data.status !== 'success') { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-loading').innerHTML = '❌ डाटा ल्याउन समस्या भयो।'; return; }
