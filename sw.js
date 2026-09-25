@@ -1,18 +1,18 @@
 /*
- * BK MURALI QUIZ - SERVICE WORKER 98.0
+ * BK MURALI QUIZ - SERVICE WORKER 99.0
  *
- * 98.0
+ * 99.0
  * - New cache namespace
- * - Removes old Murali Quiz caches on activation
+ * - Removes older Murali Quiz caches on activation
  * - Network-first for HTML/navigation
  * - Network-first for manifest.json
  * - Never intercepts Google Apps Script API calls
  * - Cache-first only for known static assets
- * - Never returns index.html as a fallback for missing JS/CSS/assets
- * - Keeps app shell usable offline
+ * - Never returns index.html for missing JS/CSS/assets
+ * - Keeps the app shell usable offline
  */
 
-const APP_VERSION = '98.0';
+const APP_VERSION = '99.0';
 const CACHE_NAME = `murali-quiz-v${APP_VERSION.replace(/\./g, '-')}`;
 
 const APP_SHELL = [
@@ -83,17 +83,10 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
 
-      /*
-       * App shell is required for the new SW.
-       * If one shell file fails, installation fails intentionally,
-       * preventing a broken SW from taking control.
-       */
+      // App shell is required for the new Service Worker.
       await cache.addAll(APP_SHELL);
 
-      /*
-       * External CDN files are optional.
-       * Failure here must NOT block the new SW.
-       */
+      // External CDN files are optional.
       await Promise.all(
         STATIC_CDN.map(async url => {
           try {
@@ -108,7 +101,7 @@ self.addEventListener('install', event => {
               await cache.put(url, response);
             }
           } catch (error) {
-            // Network unavailable; CDN will be fetched later.
+            // CDN unavailable; it will be fetched later.
           }
         })
       );
@@ -202,11 +195,7 @@ async function cacheFirst(request) {
 
   } catch (error) {
 
-    /*
-     * IMPORTANT:
-     * Do NOT return index.html for failed JS/CSS/image requests.
-     * That can create misleading MIME/type errors.
-     */
+    // Never return index.html for missing JS/CSS/assets.
     return new Response('', {
       status: 504,
       statusText: 'Gateway Timeout'
@@ -222,12 +211,11 @@ self.addEventListener('fetch', event => {
 
   const request = event.request;
 
-  /* Only GET requests are cache-managed */
   if (request.method !== 'GET') {
     return;
   }
 
-  /* NEVER intercept Google Apps Script API */
+  // NEVER intercept Google Apps Script API.
   if (isAppsScriptRequest(request)) {
     return;
   }
@@ -254,7 +242,7 @@ self.addEventListener('fetch', event => {
 
     const url = new URL(request.url);
 
-    /* Manifest = Network First */
+    // Manifest = Network First
     if (url.pathname.endsWith('/manifest.json')) {
       event.respondWith(
         networkFirst(
@@ -265,7 +253,7 @@ self.addEventListener('fetch', event => {
       return;
     }
 
-    /* Known app/static assets */
+    // Known app/static assets
     if (isAllowedStaticRequest(request)) {
       event.respondWith(
         cacheFirst(request)
@@ -273,10 +261,7 @@ self.addEventListener('fetch', event => {
       return;
     }
 
-    /*
-     * Unknown same-origin GET requests
-     * remain untouched.
-     */
+    // Unknown same-origin requests remain untouched.
     return;
   }
 
