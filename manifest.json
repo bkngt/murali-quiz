@@ -2,7 +2,7 @@
   "id": "./",
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "version": "98.0",
+  "version": "99.0",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
