@@ -23,6 +23,71 @@
             }
         } catch (e) {}
     </script>
+    <script>
+        (function () {
+            // Lightweight compatibility helpers for older Safari/iPadOS builds.
+            if (!String.prototype.includes) {
+                String.prototype.includes = function (search, start) {
+                    return this.indexOf(search, start || 0) !== -1;
+                };
+            }
+            if (!Array.prototype.includes) {
+                Array.prototype.includes = function (value, fromIndex) {
+                    var i = fromIndex || 0;
+                    if (i < 0) i = Math.max(0, this.length + i);
+                    for (; i < this.length; i++) if (this[i] === value) return true;
+                    return false;
+                };
+            }
+            if (!Array.prototype.find) {
+                Array.prototype.find = function (predicate, thisArg) {
+                    for (var i = 0; i < this.length; i++) {
+                        if (predicate.call(thisArg, this[i], i, this)) return this[i];
+                    }
+                    return undefined;
+                };
+            }
+            function bindTouchFallbacks() {
+                var settings = document.getElementById('btn-toggle-settings');
+                if (settings && !settings.getAttribute('data-ios-touch-bound')) {
+                    settings.setAttribute('data-ios-touch-bound', '1');
+                    settings.addEventListener('touchend', function (e) {
+                        try { e.preventDefault(); } catch (_) {}
+                        try {
+                            if (typeof window.openSettings === 'function') window.openSettings();
+                            else {
+                                var modal = document.getElementById('settings-modal');
+                                if (modal) modal.style.display = 'flex';
+                            }
+                        } catch (_) {}
+                    }, false);
+                }
+
+                ['nav-gen', 'nav-chart', 'nav-prog'].forEach(function (id) {
+                    var btn = document.getElementById(id);
+                    if (!btn || btn.getAttribute('data-ios-touch-bound')) return;
+                    btn.setAttribute('data-ios-touch-bound', '1');
+                    btn.addEventListener('touchend', function (e) {
+                        try { e.preventDefault(); } catch (_) {}
+                        var tab = id === 'nav-chart' ? 'chart' : (id === 'nav-prog' ? 'prog' : 'gen');
+                        try {
+                            if (typeof window.switchTab === 'function') window.switchTab(tab);
+                            else {
+                                var vg = document.getElementById('view-generator');
+                                var vc = document.getElementById('view-chart');
+                                var vp = document.getElementById('view-progress');
+                                if (vg) vg.style.display = tab === 'gen' ? 'block' : 'none';
+                                if (vc) vc.style.display = tab === 'chart' ? 'block' : 'none';
+                                if (vp) vp.style.display = tab === 'prog' ? 'block' : 'none';
+                            }
+                        } catch (_) {}
+                    }, false);
+                });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindTouchFallbacks, false);
+            else bindTouchFallbacks();
+        }());
+    </script>
     <title>BK Murali Quiz</title>
     
     <link rel="manifest" href="manifest.json">
@@ -105,7 +170,7 @@
         .input-field, .select-field { width: 100%; padding: 0.8rem; margin: 0.4rem 0; font-size: 1.05rem; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-color); font-weight: 600; font-family: inherit; transition: all 0.2s; outline: none;}
         .input-field:focus, .select-field:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
         
-        button { background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.25);}
+        button { -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; background: var(--primary-gradient); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.95rem; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.25);}
         button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35); }
         button:disabled { opacity: 0.5; cursor: not-allowed; background: #64748b; transform: none; box-shadow: none;}
         .btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); width: auto; border-radius: 50px; box-shadow: none;}
@@ -268,8 +333,8 @@
         .radio-label input[type="radio"] { accent-color: var(--primary-color); transform: scale(1.2); }
 
         /* Modals & Toasts */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; box-shadow: var(--box-shadow-main); width: 100%; max-width: 440px; position: relative; max-height: 90vh; overflow-y: auto;}
+        .modal-overlay { display: none; position: fixed; -webkit-transform: translateZ(0); transform: translateZ(0); isolation: isolate; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { -webkit-overflow-scrolling: touch; -webkit-transform: translateZ(0); transform: translateZ(0); background: var(--card-bg); border: 1px solid var(--border-color); padding: 2rem; border-radius: 24px; box-shadow: var(--box-shadow-main); width: 100%; max-width: 440px; position: relative; max-height: 90vh; overflow-y: auto;}
         
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
         .toast { background: var(--card-bg); color: var(--text-color); padding: 14px 18px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); font-size: 1rem; font-weight: 700; opacity: 0; animation: slideDown 0.3s forwards; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color); pointer-events: auto; }
@@ -401,9 +466,9 @@
     
     <div class="toolbar-one-line" id="top-toolbar">
         <div class="nav-tabs" id="main-tabs" style="display: flex; gap: 2px; background: rgba(0,0,0,0.05); padding: 3px; border-radius: 50px; border: 1px solid var(--border-color); margin: 0;">
-            <button id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> <span id="tab-gen-txt">Exam</span></button>
-            <button id="tab-chart" onclick="switchTab('chart')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> <span>Chart</span></button>
-            <button id="tab-prog" onclick="switchTab('prog')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
+            <button type="button" id="tab-gen" class="active" onclick="switchTab('gen')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> <span id="tab-gen-txt">Exam</span></button>
+            <button type="button" id="tab-chart" onclick="switchTab('chart')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> <span>Chart</span></button>
+            <button type="button" id="tab-prog" onclick="switchTab('prog')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions">
@@ -411,7 +476,7 @@
                 <svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
             </a>
             
-            <button class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
+            <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
             </button>
         </div>
@@ -419,15 +484,15 @@
 
     <!-- Mobile Bottom Navigation -->
     <div class="bottom-nav" id="mobile-bottom-nav">
-        <button id="nav-gen" class="active" onclick="switchTab('gen')">
+        <button type="button" id="nav-gen" class="active" onclick="switchTab('gen')">
             <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             Exam
         </button>
-        <button id="nav-chart" onclick="switchTab('chart')">
+        <button type="button" id="nav-chart" onclick="switchTab('chart')">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             Chart
         </button>
-        <button id="nav-prog" onclick="switchTab('prog')">
+        <button type="button" id="nav-prog" onclick="switchTab('prog')">
             <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             Stats
         </button>
@@ -709,7 +774,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 100.0 (Optimized Core & Settings Restored)</div>
+        <div>Version: 101.0 (iOS Compatibility & Revision-Safe Rank)</div>
     </div>
 </div>
 
@@ -718,7 +783,7 @@
 <!-- ========================================== -->
 
 <!-- Settings Modal -->
-<div id="settings-modal" class="modal-overlay" onclick="closeSettingsOnOverlay(event)">
+<div id="settings-modal" class="modal-overlay" aria-hidden="true" onclick="closeSettingsOnOverlay(event)">
     <div class="modal-content">
         <button class="close-modal" onclick="closeSettings()" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
         <h3 style="margin-top:0; color: var(--primary-color); font-size: 1.4rem; font-weight: 800;">App Settings</h3>
@@ -1132,7 +1197,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "100.0"; 
+    const APP_VERSION = "101.1"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1153,6 +1218,7 @@
     let activeStateSaveInFlight = false; let pendingActiveState = null; let activeStateSaveTimer = null;
     let activeStateSeq = 0; let activeStateSaveRetryTimer = null;
     let pendingResultSyncInProgress = false; let pendingChartSyncInProgress = false;
+    let pendingResultRetryTimer = null;
     let myResultsSyncInProgress = false; let myChartsSyncInProgress = false;
     let lastServerSyncAt = 0;
     
@@ -1196,9 +1262,9 @@
     }
 
     // Settings Restored Logic
-    window.openSettings = function() { document.getElementById('settings-modal').style.display = 'flex'; checkApiStatus(); }
-    window.closeSettings = function() { document.getElementById('settings-modal').style.display = 'none'; }
-    window.closeSettingsOnOverlay = function(e) { if(e.target.id === 'settings-modal') closeSettings(); }
+    window.openSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); try { checkApiStatus(); } catch(e) {} }
+    window.closeSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
+    window.closeSettingsOnOverlay = function(e) { if(e && e.target && e.target.id === 'settings-modal') closeSettings(); }
     window.toggleDarkMode = function() { 
         let isDark = document.body.hasAttribute('data-theme'); let btn = document.getElementById('modal-dark-btn'); let meta = document.getElementById('theme-color-meta');
         if(isDark) {
@@ -1539,11 +1605,11 @@
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC (100.0)
+    // 5. DATA SYNCING LOGIC (101.0)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
-        const retries = Number(options.retries ?? 2);
-        const timeoutMs = Number(options.timeoutMs ?? 12000);
+        const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 2);
+        const timeoutMs = Number(typeof options.timeoutMs !== 'undefined' ? options.timeoutMs : 12000);
         let lastError = null;
         for (let attempt = 0; attempt <= retries; attempt++) {
             let controller = null, timer = null;
@@ -1599,9 +1665,19 @@
     };
 
     async function syncPendingResults() {
-        if (!navigator.onLine || pendingResultSyncInProgress) return false;
-        let history = safeJSON('murali_progress', []); const pendingData = history.filter(item => item && item.synced !== true);
-        if (!pendingData.length) return false; pendingResultSyncInProgress = true;
+        if (!navigator.onLine) return { ok:false, synced:0, remaining:0, lastError:'offline' };
+        if (pendingResultSyncInProgress) return { ok:false, synced:0, remaining:0, lastError:'sync-in-progress' };
+
+        let history = safeJSON('murali_progress', []);
+        const pendingData = history.filter(item => item && item.synced !== true);
+        if (!pendingData.length) {
+            if (pendingResultRetryTimer) { clearInterval(pendingResultRetryTimer); pendingResultRetryTimer = null; }
+            return { ok:true, synced:0, remaining:0, lastError:null };
+        }
+
+        pendingResultSyncInProgress = true;
+        let syncedCount = 0;
+        let lastError = null;
         try {
             for (const data of pendingData) {
                 try {
@@ -1609,11 +1685,35 @@
                         date:data.date, score:data.score, total:data.total, percent:data.percent, timeTaken:data.timeTaken, time:data.time,
                         weakTags:data.weakTags, reviewData:data.quizData, quizRevision:data.quizRevision||1,
                         quizId:data.quizId || (String(data.date)+'-R'+(data.quizRevision||1))}, {retries:3, timeoutMs:12000});
-                    if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_progress', JSON.stringify(history)); }
-                } catch(e) {}
+                    if (result && result.status === 'success') {
+                        data.synced = true;
+                        syncedCount++;
+                        localStorage.setItem('murali_progress', JSON.stringify(history));
+                    } else {
+                        lastError = (result && result.message) || 'Server did not confirm result save.';
+                    }
+                } catch(e) {
+                    lastError = e && e.message ? e.message : String(e || 'Result sync failed.');
+                }
             }
-            return true;
-        } finally { pendingResultSyncInProgress = false; }
+
+            const remaining = history.filter(item => item && item.synced !== true).length;
+            if (remaining === 0) {
+                if (pendingResultRetryTimer) { clearInterval(pendingResultRetryTimer); pendingResultRetryTimer = null; }
+            } else {
+                startPendingResultRetry();
+            }
+            return { ok: remaining === 0, synced:syncedCount, remaining:remaining, lastError:lastError };
+        } finally {
+            pendingResultSyncInProgress = false;
+        }
+    }
+
+    function startPendingResultRetry() {
+        if (pendingResultRetryTimer) return;
+        pendingResultRetryTimer = setInterval(() => {
+            if (navigator.onLine && !pendingResultSyncInProgress) syncPendingResults();
+        }, 60 * 1000);
     }
 
     async function syncPendingCharts() {
@@ -1651,7 +1751,7 @@
                     }
                 });
                 localHistory = localHistory.filter(lh => lh.synced===false || data.results.some(sr => getHistoryQuizKey(sr) === getHistoryQuizKey(lh)));
-                if (isUpdated) { localHistory.sort((a,b)=>getValidDate(b).getTime()-getValidDate(a).getTime()); localStorage.setItem('murali_progress',JSON.stringify(localHistory)); if(document.getElementById('view-progress')?.style.display==='block') renderDashboard(); }
+                if (isUpdated) { localHistory.sort((a,b)=>getValidDate(b).getTime()-getValidDate(a).getTime()); localStorage.setItem('murali_progress',JSON.stringify(localHistory)); if(document.getElementById('view-progress') && document.getElementById('view-progress').style.display==='block') renderDashboard(); }
                 return isUpdated;
             }
         } catch(e) {} finally { myResultsSyncInProgress=false; }
@@ -1697,13 +1797,19 @@
         if(!navigator.onLine || quizIndexSyncInProgress || isQuizActive) return false; quizIndexSyncInProgress=true;
         try {
             const idxData=await apiPostJSON({action:'fetchQuizIndex'},{retries:2,timeoutMs:12000});
-            if(!idxData || idxData.status!=='success' || !Array.isArray(idxData.quizzes)) return false;
+            if(!idxData || idxData.status!=='success' || !Array.isArray(idxData.quizzes)) {
+                if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
+                return false;
+            }
             const sig=JSON.stringify(idxData.quizzes), oldSig=localStorage.getItem('murali_server_quiz_index')||''; const changed=sig!==oldSig;
             localStorage.setItem('murali_server_quiz_index',sig); lastQuizIndexSignature=sig;
             const cached=safeJSON('murali_server_quizzes',null); const needFull=forceFull || changed || !Array.isArray(cached);
             if(needFull){
                 const data=await apiPostJSON({action:'fetchQuizzes'},{retries:2,timeoutMs:15000});
-                if(!data || data.status!=='success' || !Array.isArray(data.quizzes)) return false;
+                if(!data || data.status!=='success' || !Array.isArray(data.quizzes)) {
+                    if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
+                    return false;
+                }
                 const old=localStorage.getItem('murali_server_quizzes')||'', newSer=JSON.stringify(data.quizzes), dataChanged=old!==newSer;
                 localStorage.setItem('murali_server_quizzes',newSer); populateSavedQuizzes();
                 if(dataChanged && old) showToast('☁️ नयाँ/संशोधित क्वीज सर्भरबाट अपडेट भयो।','info');
@@ -1711,13 +1817,20 @@
                 return dataChanged || changed;
             }
             lastServerSyncAt=Date.now(); return changed;
-        } catch(e) { return false; } finally { quizIndexSyncInProgress=false; }
+        } catch(e) {
+            if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
+            return false;
+        } finally { quizIndexSyncInProgress=false; }
     }
 
     function startQuizAutoSync(){
         if(quizAutoSyncTimer) clearInterval(quizAutoSyncTimer);
-        quizAutoSyncTimer=setInterval(()=>{ if(!isQuizActive && !document.hidden && navigator.onLine) syncServerQuizzes(false,false); },5*60*1000);
+        quizAutoSyncTimer=setInterval(()=>{
+            if(!isQuizActive && !document.hidden && navigator.onLine) syncServerQuizzes(false,false);
+            if(navigator.onLine && !pendingResultSyncInProgress) syncPendingResults();
+        },5*60*1000);
         if(!isQuizActive && !document.hidden) syncServerQuizzes(false,false);
+        if(navigator.onLine) syncPendingResults();
     }
     document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !isQuizActive){syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
     window.addEventListener('online',()=>{ if(!isQuizActive){flushActiveStateSave();syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
@@ -1748,8 +1861,12 @@
             let qArea = document.getElementById('quiz-area'); let skeleton = document.getElementById('dashboard-skeleton');
             let serverQuizzes = safeJSON('murali_server_quizzes', []); let history = safeJSON('murali_progress', []);
             let existingResult = document.getElementById('result-screen'); if(existingResult) existingResult.remove();
-            if(serverQuizzes.length === 0 && navigator.onLine) { skeleton.style.display = 'block'; qArea.style.display = 'none'; return; }
-            skeleton.style.display = 'none'; 
+            if (skeleton) skeleton.style.display = 'none';
+            if (serverQuizzes.length === 0 && navigator.onLine) {
+                // Do not leave iPhone/iPad users on the endless skeleton while the first sync is pending.
+                // The calendar itself can render from local history immediately and will refresh after sync.
+                qArea.style.display = 'block';
+            } 
             
             let today = new Date(); let cy = today.getFullYear(); let cm = today.getMonth(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let firstDay = new Date(cy, cm, 1).getDay(); let launchDate = new Date(2026, 7, 13); 
             let quizMap = {}; serverQuizzes.forEach(sq => { let d = getValidDate({date: sq.quizDate}); if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) quizMap[d.getDate()] = sq; });
@@ -2116,7 +2233,8 @@
             else { q.userCorrect = false; }
         });
         
-        localStorage.removeItem('murali_active_quiz_state'); saveOrReplaceProgress(); 
+        localStorage.removeItem('murali_active_quiz_state');
+        const resultSync = await saveOrReplaceProgress();
         document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
         document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none'; 
         
@@ -2128,7 +2246,7 @@
         <div id="result-screen" style="text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem;">
             <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--exam-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--exam-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);">${currentScore}/${currentQuiz.length}</div>
             <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">${msg}</div>
-            <div style="margin-bottom: 20px; color: var(--muted-text-color); font-weight: 600;">तपाईंको नतिजा सुरक्षित भयो।</div>
+            <div id="result-sync-status" style="margin-bottom: 20px; color: var(--muted-text-color); font-weight: 600;">${resultSync && resultSync.ok ? 'तपाईंको नतिजा Google Sheet मा सुरक्षित भयो।' : 'नतिजा मोबाइलमा सुरक्षित छ; Google Sheet Sync बाँकी छ।'} </div>
             
             <!-- Share Result Restored -->
             <button onclick="shareMyResult()" style="background: #25D366; color: white; width:auto; border-radius:50px; box-shadow: none; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer; margin-bottom: 15px;">
@@ -2146,11 +2264,12 @@
         document.getElementById('view-generator').innerHTML += resultHtml; window.scrollTo(0, 0);
     }
 
-    function saveOrReplaceProgress() {
+    async function saveOrReplaceProgress() {
         let history = safeJSON('murali_progress', []); let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
         history = history.filter(item => !(item && item.phone === userPhone && item.date === currentMurliDate && Number(item.quizRevision || 1) === Number(currentQuizRevision)));
         history.unshift({ id: Date.now(), name: userName, address: userAddress, country: userCountry, phone: userPhone, date: currentMurliDate, score: currentScore, total: currentQuiz.length, percent: Math.round((currentScore / currentQuiz.length) * 100), timeTaken: document.getElementById('timer-text').innerText, time: new Date().toLocaleString('en-GB'), timestamp: Date.now(), weakTags: incorrectTags, quizData: currentQuiz, quizRevision: currentQuizRevision, quizId: currentQuizId, synced: false });
-        localStorage.setItem('murali_progress', JSON.stringify(history)); syncPendingResults();
+        localStorage.setItem('murali_progress', JSON.stringify(history));
+        return await syncPendingResults();
     }
 
     window.reviewQuiz = function() {
@@ -2224,7 +2343,7 @@
         if(next && next.classList.contains('chart-section-v2')) {
             document.querySelectorAll('.chart-section-v2').forEach(s => s.classList.remove('chart-section-active-v2'));
             next.classList.add('chart-section-active-v2');
-            setTimeout(() => next.scrollIntoView({behavior:'smooth', block:'center'}), 80);
+            setTimeout(() => { try { next.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e) { try { next.scrollIntoView(); } catch(e2) {} } }, 80);
         }
     }
 
