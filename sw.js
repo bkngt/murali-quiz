@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v100-0";
+const CACHE_NAME = "murali-quiz-v101-1";
 
 const APP_SHELL = [
     "./",
