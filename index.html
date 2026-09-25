@@ -23,71 +23,6 @@
             }
         } catch (e) {}
     </script>
-    <script>
-        (function () {
-            // Lightweight compatibility helpers for older Safari/iPadOS builds.
-            if (!String.prototype.includes) {
-                String.prototype.includes = function (search, start) {
-                    return this.indexOf(search, start || 0) !== -1;
-                };
-            }
-            if (!Array.prototype.includes) {
-                Array.prototype.includes = function (value, fromIndex) {
-                    var i = fromIndex || 0;
-                    if (i < 0) i = Math.max(0, this.length + i);
-                    for (; i < this.length; i++) if (this[i] === value) return true;
-                    return false;
-                };
-            }
-            if (!Array.prototype.find) {
-                Array.prototype.find = function (predicate, thisArg) {
-                    for (var i = 0; i < this.length; i++) {
-                        if (predicate.call(thisArg, this[i], i, this)) return this[i];
-                    }
-                    return undefined;
-                };
-            }
-            function bindTouchFallbacks() {
-                var settings = document.getElementById('btn-toggle-settings');
-                if (settings && !settings.getAttribute('data-ios-touch-bound')) {
-                    settings.setAttribute('data-ios-touch-bound', '1');
-                    settings.addEventListener('touchend', function (e) {
-                        try { e.preventDefault(); } catch (_) {}
-                        try {
-                            if (typeof window.openSettings === 'function') window.openSettings();
-                            else {
-                                var modal = document.getElementById('settings-modal');
-                                if (modal) modal.style.display = 'flex';
-                            }
-                        } catch (_) {}
-                    }, false);
-                }
-
-                ['nav-gen', 'nav-chart', 'nav-prog'].forEach(function (id) {
-                    var btn = document.getElementById(id);
-                    if (!btn || btn.getAttribute('data-ios-touch-bound')) return;
-                    btn.setAttribute('data-ios-touch-bound', '1');
-                    btn.addEventListener('touchend', function (e) {
-                        try { e.preventDefault(); } catch (_) {}
-                        var tab = id === 'nav-chart' ? 'chart' : (id === 'nav-prog' ? 'prog' : 'gen');
-                        try {
-                            if (typeof window.switchTab === 'function') window.switchTab(tab);
-                            else {
-                                var vg = document.getElementById('view-generator');
-                                var vc = document.getElementById('view-chart');
-                                var vp = document.getElementById('view-progress');
-                                if (vg) vg.style.display = tab === 'gen' ? 'block' : 'none';
-                                if (vc) vc.style.display = tab === 'chart' ? 'block' : 'none';
-                                if (vp) vp.style.display = tab === 'prog' ? 'block' : 'none';
-                            }
-                        } catch (_) {}
-                    }, false);
-                });
-            }
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindTouchFallbacks, false);
-            else bindTouchFallbacks();
-        }());
-    </script>
     <title>BK Murali Quiz</title>
     
     <link rel="manifest" href="manifest.json">
@@ -175,7 +110,7 @@
         button:disabled { opacity: 0.5; cursor: not-allowed; background: #64748b; transform: none; box-shadow: none;}
         .btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; background: transparent; border: 1px solid var(--border-color); color: var(--text-color); width: auto; border-radius: 50px; box-shadow: none;}
         
-        /* Top Tabs — distinct visual identity in both light & dark modes */
+        /* Top Tabs */
         .nav-tabs { --tabs-gap: 4px; }
         .nav-tabs button {
             color: var(--tab-text, var(--text-color));
@@ -254,7 +189,6 @@
             }
             .bottom-nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
             
-            /* Distinct Exam / Chart / Stats tiles on mobile */
             .bottom-nav button#nav-gen { color: var(--exam-color); background: rgba(2,132,199,.10); border: 1px solid rgba(2,132,199,.20); border-radius: 12px; }
             .bottom-nav button#nav-chart { color: var(--chart-color); background: rgba(139,92,246,.10); border: 1px solid rgba(139,92,246,.20); border-radius: 12px; }
             .bottom-nav button#nav-prog { color: var(--stats-color); background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.20); border-radius: 12px; }
@@ -266,7 +200,7 @@
             .sticky-scorebar { bottom: 80px !important; } 
         }
 
-        /* Chart V3 Styles (Checkboxes) */
+        /* Chart V3 Styles */
         .chart-topbar-v2 { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
         .chart-date-btn-v2 { flex:1; width:auto; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none; }
         .chart-hidden-date { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
@@ -293,7 +227,6 @@
         .chart-option-v2.selected-v2 .chart-score-v2 { background:var(--chart-color); color:#fff; border-color:var(--chart-color); }
         .chart-option-v2 input { position:absolute; opacity:0; pointer-events:none; }
         
-        /* Checkbox UI */
         .check-box-v2 { width:24px; height:24px; flex:0 0 24px; display:flex; align-items:center; justify-content:center; border:2px solid #94a3b8; border-radius:7px; font-size:15px; font-weight:900; color:transparent; background:var(--card-bg); transition: all 0.2s;}
         .chart-option-v2.selected-v2 .check-box-v2 { color:#fff; background:var(--chart-color); border-color:var(--chart-color); }
         
@@ -593,8 +526,7 @@
             <button onclick="cancelGeneration()" style="margin-top: 25px; background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); border-radius: 50px; padding: 0.5rem 1.4rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: none;">❌ Cancel Generation</button>
         </div>
     </div>
-
-    <!-- Daily Spiritual Chart v3 (Checkboxes) -->
+<!-- Daily Spiritual Chart v3 (Checkboxes) -->
     <div id="view-chart" style="display: none;">
         <div style="text-align:center; margin-bottom:14px;">
             <h2 style="color:var(--chart-color); margin:0; font-weight:800; font-size:1.4rem;">📊 मेरो आध्यात्मिक चार्ट</h2>
@@ -624,7 +556,7 @@
                 <div class="chart-subnote-v2">(नोट: यसमा बिहान २:०० देखि ५:०० बजेसम्मको योग र मुरली क्लास अघि वा पछि गरिएको योगको समयलाई पनि जोड्न सकिनेछ।)</div>
                 <div class="chart-options-v2">
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="20"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२ घण्टा वा सोभन्दा बढी</span><span class="chart-score-v2">२०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१.५ घण्टा (डेढ घण्टा)</span><span class="chart-score-v2">१५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१.५ घण्टा (डेढ घण्टा)</span><span class="chart-score-v2">१5</span></label>
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१ घण्टा</span><span class="chart-score-v2">१०</span></label>
                     <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आधा घण्टा</span><span class="chart-score-v2">५</span></label>
                 </div>
@@ -774,7 +706,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 101.0 (iOS Compatibility & Revision-Safe Rank)</div>
+        <div>Version: 102.0 (Smart Sync & Cache Clear)</div>
     </div>
 </div>
 
@@ -850,6 +782,9 @@
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button onclick="updateLocalProfile()" id="btn-save-profile" style="background: var(--success-color); flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Save Profile</button>
                 <button onclick="clearLocalDataAndReload()" style="background: #dc2626; flex: 1; padding: 1rem; box-shadow: none; border-radius:12px;">Log Out / Switch</button>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px;">
+                <button onclick="clearAppCacheOnly()" style="background: transparent; color: var(--warning-color); border: 1px dashed var(--warning-color); flex: 1; padding: 0.8rem; box-shadow: none; border-radius:12px; font-size:0.9rem;">🧹 Clear Cache (Fix Errors)</button>
             </div>
         </div>
     </div>
@@ -1197,7 +1132,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "101.1"; 
+    const APP_VERSION = "102.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1316,7 +1251,7 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // Share Result Logic (Restored)
+    // Share Result Logic
     window.shareMyResult = function() {
         const shareUrl = 'https://bkngt.github.io/murali-quiz/';
         if (navigator.share) {
@@ -1329,7 +1264,7 @@
         try { document.execCommand("copy"); showToast("क्लिपबोर्डमा कपी भयो!", "success"); } catch (err) { showToast("कपी गर्न सकिएन!", "error"); } document.body.removeChild(tempTextArea);
     }
 
-    // Keydown Listener for Quiz (Restored)
+    // Keydown Listener for Quiz
     document.addEventListener('keydown', function(e) {
         if (document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen') === null) {
             if(reviewSource === 'past') return; 
@@ -1357,11 +1292,24 @@
       var dmy = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/); if (dmy) { var y = parseInt(dmy[3]); if(y < 100) y += 2000; return new Date(y, parseInt(dmy[2])-1, parseInt(dmy[1])); }
       var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+(\d{2,4})/i);
       if (dMy) { var y = parseInt(dMy[3]); if(y < 100) y += 2000; var mStr = dMy[2].toLowerCase(); if(mStr === 'sept') mStr = 'sep'; var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mStr); return new Date(y, mIndex, parseInt(dMy[1])); }
-      var parsed = new Date(s.replace(/-/g, '/')); if (!isNaN(parsed.getTime())) return parsed;
+      
+      // Safari fix: Ensure valid format before fallback
+      var parsed = new Date(s.replace(/-/g, '/')); 
+      if (!isNaN(parsed.getTime())) return parsed;
       return new Date();
     }
     function getValidDate(h) { if (!h) return new Date(); if (h.date) { let d = parseDateString(h.date); if (!isNaN(d.getTime())) return d; } if (h.timestamp) return new Date(h.timestamp); return new Date(); }
-    function getSortableTime(sq) { if (sq.createdAt) return sq.createdAt; let parsed = parseDateString(sq.quizDate); if (parsed && !isNaN(parsed.getTime())) return parsed.getTime(); return 0; }
+    function getSortableTime(sq) { 
+        if (sq.createdAt) return sq.createdAt; 
+        let parsed = parseDateString(sq.quizDate); 
+        if (parsed && !isNaN(parsed.getTime())) return parsed.getTime(); 
+        let match = String(sq.quizDate).match(/\d{2}-\d{2}-\d{4}/);
+        if (match) {
+            let parts = match[0].split('-');
+            return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+        }
+        return 0; 
+    }
     function getDeviceId() { let deviceId = localStorage.getItem('murali_device_id'); if (!deviceId) { deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now(); localStorage.setItem('murali_device_id', deviceId); } return deviceId; }
     function getLocalDateISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function enforceEnglish(input) { let nepaliRegex = /[\u0900-\u097F]/g; if(nepaliRegex.test(input.value)) { showToast("कृपया अंग्रेजी (English) अक्षरहरू मात्र प्रयोग गर्नुहोस्।", "error"); input.value = input.value.replace(nepaliRegex, ''); } }
@@ -1372,7 +1320,6 @@
     // 4. AUTHENTICATION & PROFILE
     // ==========================================
     function init() {
-        if (localStorage.getItem('murali_app_version') !== APP_VERSION) localStorage.setItem('murali_app_version', APP_VERSION);
         getDeviceId(); initVoices();
         
         let meta = document.getElementById('theme-color-meta'); let btn = document.getElementById('modal-dark-btn');
@@ -1393,7 +1340,6 @@
                 document.getElementById('pin-msg').innerText = `Welcome back, ${savedName}`; document.getElementById('forgot-btn').style.display = 'block'; document.getElementById('direct-login-btn').style.display = 'none';
             }
         }
-        syncServerQuizzes(); 
     }
 
     function startLockoutTimer(unlockTime) {
@@ -1548,43 +1494,107 @@
         }
     }
 
+    window.clearAppCacheOnly = function() {
+        if(confirm("यसले एपको पुरानो डाटा (Cache) सफा गर्नेछ तर तपाईं लगआउट हुनुहुने छैन। के तपाईं पक्का हुनुहुन्छ?")) {
+            localStorage.removeItem('murali_server_quizzes');
+            localStorage.removeItem('murali_server_quiz_index');
+            localStorage.removeItem('murali_active_quiz_state');
+            localStorage.removeItem('murali_progress');
+            localStorage.removeItem('murali_daily_charts');
+            
+            showToast("Cache Cleared! Reloading...", "success");
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    }
+
     function unlockApp() { 
         try {
-            userName = localStorage.getItem('murali_user_name') || "Student"; userPhone = localStorage.getItem('murali_phone') || "N/A"; 
-            userAddress = localStorage.getItem('murali_address') || "N/A"; userCountry = localStorage.getItem('murali_country') || "N/A"; userRole = localStorage.getItem('murali_role') || "Student";
+            userName = localStorage.getItem('murali_user_name') || "Student"; 
+            userPhone = localStorage.getItem('murali_phone') || "N/A"; 
+            userAddress = localStorage.getItem('murali_address') || "N/A"; 
+            userCountry = localStorage.getItem('murali_country') || "N/A"; 
+            userRole = localStorage.getItem('murali_role') || "Student";
             
-            document.getElementById('lock-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; 
-            let nameParts = userName.split(" "); let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; let editFirstName = nameParts.join(" ");
-            document.getElementById('edit-first-name').value = editFirstName; document.getElementById('edit-last-name').value = editLastName;
-            document.getElementById('edit-phone').value = userPhone; document.getElementById('edit-address').value = userAddress;
+            // --- SMART CACHE CLEAR ---
+            let isNewVersion = false;
+            let savedVersion = localStorage.getItem('murali_app_version');
+            if(savedVersion !== APP_VERSION) {
+                localStorage.removeItem('murali_server_quizzes');
+                localStorage.removeItem('murali_server_quiz_index');
+                localStorage.setItem('murali_app_version', APP_VERSION);
+                isNewVersion = true; 
+            }
+            // -------------------------
+
+            document.getElementById('lock-screen').style.display = 'none'; 
+            document.getElementById('main-app').style.display = 'block'; 
+            
+            let nameParts = userName.split(" "); 
+            let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; 
+            let editFirstName = nameParts.join(" ");
+            
+            document.getElementById('edit-first-name').value = editFirstName; 
+            document.getElementById('edit-last-name').value = editLastName;
+            document.getElementById('edit-phone').value = userPhone; 
+            document.getElementById('edit-address').value = userAddress;
 
             updateProfileBadgeUI();
-            startQuizAutoSync();
+            
+            // --- SMART SYNC ---
+            if(navigator.onLine) {
+                syncServerQuizzes(true, isNewVersion); 
+            } else {
+                startQuizAutoSync();
+            }
+
             setTimeout(() => syncPendingResults(), 150);
             setTimeout(() => syncPendingCharts(), 450);
             setTimeout(() => syncMyResults(), 750);
             setTimeout(() => syncMyChartsFromServer(), 1050);
             setTimeout(() => backgroundProfileSync(), 1350); 
 
-            let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student"; let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
-            if (isPrivileged) document.getElementById('btn-toggle-view').style.display = 'block'; else { document.getElementById('btn-toggle-view').style.display = 'none'; isAdminViewActive = false; }
+            let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student"; 
+            let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
+            
+            if (isPrivileged) {
+                document.getElementById('btn-toggle-view').style.display = 'block'; 
+            } else { 
+                document.getElementById('btn-toggle-view').style.display = 'none'; 
+                isAdminViewActive = false; 
+            }
 
             if (isPrivileged && isAdminViewActive) {
-                document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; 
-                document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('btn-monthly-mega').style.display = 'block'; 
-                document.getElementById('btn-custom-mega').style.display = 'block'; document.getElementById('quiz-config-tools').style.display = 'flex'; 
-                document.getElementById('exam-config-section').style.display = 'block'; document.getElementById('api-config-section').style.display = 'block';
-                document.getElementById('quiz-area').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'block';
-                document.getElementById('dashboard-skeleton').style.display = 'none'; populateSavedQuizzes();
+                document.getElementById('murali-text').style.display = 'block'; 
+                document.getElementById('generator-actions').style.display = 'flex'; 
+                document.getElementById('custom-import-section').style.display = 'block'; 
+                document.getElementById('btn-monthly-mega').style.display = 'block'; 
+                document.getElementById('btn-custom-mega').style.display = 'block'; 
+                document.getElementById('quiz-config-tools').style.display = 'flex'; 
+                document.getElementById('exam-config-section').style.display = 'block'; 
+                document.getElementById('api-config-section').style.display = 'block';
+                document.getElementById('quiz-area').style.display = 'none'; 
+                document.getElementById('export-saved-section').style.display = 'block';
+                document.getElementById('dashboard-skeleton').style.display = 'none'; 
+                populateSavedQuizzes();
             } else {
-                document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; 
-                document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('btn-monthly-mega').style.display = 'none';
-                document.getElementById('btn-custom-mega').style.display = 'none'; document.getElementById('quiz-config-tools').style.display = 'none'; 
-                document.getElementById('exam-config-section').style.display = 'none'; document.getElementById('api-config-section').style.display = 'none';
-                document.getElementById('export-saved-section').style.display = 'none'; loadStudentDashboard();
+                document.getElementById('murali-text').style.display = 'none'; 
+                document.getElementById('generator-actions').style.display = 'none'; 
+                document.getElementById('custom-import-section').style.display = 'none'; 
+                document.getElementById('btn-monthly-mega').style.display = 'none';
+                document.getElementById('btn-custom-mega').style.display = 'none'; 
+                document.getElementById('quiz-config-tools').style.display = 'none'; 
+                document.getElementById('exam-config-section').style.display = 'none'; 
+                document.getElementById('api-config-section').style.display = 'none';
+                document.getElementById('export-saved-section').style.display = 'none'; 
+                loadStudentDashboard();
             }
             switchTab('gen');
-        } catch(e) { showToast("Error loading UI", "error"); }
+        } catch(e) { 
+            showToast("Error loading UI", "error"); 
+        }
     }
 
     function updateProfileBadgeUI() {
@@ -1605,7 +1615,7 @@
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC (101.0)
+    // 5. DATA SYNCING LOGIC (102.0)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
         const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 2);
@@ -1863,8 +1873,6 @@
             let existingResult = document.getElementById('result-screen'); if(existingResult) existingResult.remove();
             if (skeleton) skeleton.style.display = 'none';
             if (serverQuizzes.length === 0 && navigator.onLine) {
-                // Do not leave iPhone/iPad users on the endless skeleton while the first sync is pending.
-                // The calendar itself can render from local history immediately and will refresh after sync.
                 qArea.style.display = 'block';
             } 
             
@@ -2473,7 +2481,7 @@
         }
         document.getElementById('cal-grid-days').innerHTML = calHtml;
 
-        let currentMonthHistory = standardHistory.filter(h => { let d = getValidDate(h); return d && d.getMonth() === cm && d.getFullYear() === cy; });
+        let currentMonthHistory = standardHistory.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getMonth() === cm && dObj.getFullYear() === cy; });
         drawCharts(currentMonthHistory); drawChartAnalytics(cm, cy);
 
         let megaContainer = document.getElementById('mega-quiz-results-container'); let detailedProgBtn = document.querySelector('button[onclick="openDetailedProgress()"]'); let calToggleBtn = document.querySelector('button[onclick="toggleCalendar()"]');
@@ -2661,13 +2669,13 @@
         else { document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-my-rank-box').style.display = 'none'; }
     };
 
-    window.fetchStudentLeaderboardData = function() {
+    window.fetchStudentLeaderboardData = async function() {
         const pickerDate = document.getElementById('sl-date-select').value; const matchingQuiz = getExamQuizForPickerDate(pickerDate); const targetDateStr = matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate;
         document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-content').style.display = 'none';
         if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
 
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }) })
-        .then(r => r.json()).then(data => {
+        try {
+            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 2, timeoutMs: 15000});
             document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block';
             if (data.status === "success") {
                 let tbody = document.getElementById('sl-table-body');
@@ -2694,7 +2702,7 @@
                     document.getElementById('sl-my-score-text').innerText = `तपाईंले यो परीक्षा दिनुभएको छैन।`;
                 }
             } else { document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-loading').innerHTML = "❌ डाटा ल्याउन समस्या भयो।"; }
-        }).catch(err => { document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-loading').innerHTML = "❌ नेटवर्क समस्या!"; });
+        } catch(err) { document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-loading').innerHTML = "❌ नेटवर्क समस्या!"; }
     }
 
     // Chart Leaderboard
@@ -2715,12 +2723,13 @@
     };
     window.closeChartAdminDetail = function() { document.getElementById('chart-admin-detail-modal').style.display = 'none'; };
 
-    window.fetchChartLeaderboardData = function() {
+    window.fetchChartLeaderboardData = async function() {
         const targetDateStr = document.getElementById('cl-date-select').value;
         document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none';
         if (!navigator.onLine) { document.getElementById('cl-loading').innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
-        fetch(API_URL, { method: 'POST', headers: {'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action:'getStudentChartLeaderboard',chartVersion:3,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}) })
-        .then(r => r.json()).then(data => {
+        
+        try {
+            const data = await apiPostJSON({action:'getStudentChartLeaderboard',chartVersion:3,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries: 2, timeoutMs: 15000});
             document.getElementById('cl-loading').style.display = 'none'; document.getElementById('cl-content').style.display = 'block';
             if (data.status !== 'success') { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-loading').innerHTML = '❌ डाटा ल्याउन समस्या भयो।'; return; }
             const tbody = document.getElementById('cl-table-body'); const isPrivilegedViewer = ['admin','manager'].includes(String(userRole||'').toLowerCase());
@@ -2745,7 +2754,7 @@
                 document.getElementById('cl-my-rank-number').innerText = `- / ${data.total}`; document.getElementById('cl-my-rank-number').style.color = 'var(--danger-color)';
                 document.getElementById('cl-my-score-text').innerText = 'तपाईंले यो दिनको चार्ट भर्नुभएको छैन।';
             }
-        }).catch(() => { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none'; document.getElementById('cl-loading').innerHTML = '❌ नेटवर्क समस्या!'; });
+        } catch(err) { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none'; document.getElementById('cl-loading').innerHTML = '❌ नेटवर्क समस्या!'; }
     };
 
     // Exporting Tools
@@ -2757,7 +2766,7 @@
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 100.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 102.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
