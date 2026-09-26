@@ -493,7 +493,7 @@
             </p>
             <textarea id="custom-json-input" placeholder="AI Studio बाट प्राप्त JSON कोड यहाँ पेस्ट गर्नुहोस्..." style="height: 120px; min-height: 100px; font-family: monospace; font-size: 13px;"></textarea>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <input type="date" id="custom-quiz-date" class="input-field" style="margin: 0; flex: 1; font-size: 0.9rem; cursor: pointer;">
+                <input type="date" id="custom-quiz-date" class="input-field" style="margin: 0; flex: 1; font-size: 0.9rem; cursor: pointer;" onclick="if(this.showPicker) this.showPicker();">
                 <button onclick="saveCustomQuiz()" style="background: var(--success-color); flex: 1; padding: 0.6rem;">☁️ Save to Server</button>
             </div>
         </div>
