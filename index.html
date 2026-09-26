@@ -190,7 +190,7 @@
             .bottom-nav button svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
             
             .bottom-nav button#nav-gen { color: var(--exam-color); background: rgba(2,132,199,.10); border: 1px solid rgba(2,132,199,.20); border-radius: 12px; }
-            .bottom-nav button#nav-chart { color: var(--chart-color); background: rgba(139,92,246,.10); border: 1px solid rgba(139,92,246,.20); border-radius: 12px; }
+            .bottom-nav button#nav-chart { color: var(--chart-color); background: rgba(139,92,246,.10); border: 1px solid rgba(16,185,129,.20); border-radius: 12px; }
             .bottom-nav button#nav-prog { color: var(--stats-color); background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.20); border-radius: 12px; }
             .bottom-nav button.active { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,.14); filter: saturate(1.12); }
             .bottom-nav button.active svg { stroke-width: 2.7; }
@@ -526,7 +526,8 @@
             <button onclick="cancelGeneration()" style="margin-top: 25px; background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); border-radius: 50px; padding: 0.5rem 1.4rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: none;">❌ Cancel Generation</button>
         </div>
     </div>
-<!-- Daily Spiritual Chart v3 (Checkboxes) -->
+
+    <!-- Daily Spiritual Chart v3 (Checkboxes) -->
     <div id="view-chart" style="display: none;">
         <div style="text-align:center; margin-bottom:14px;">
             <h2 style="color:var(--chart-color); margin:0; font-weight:800; font-size:1.4rem;">📊 मेरो आध्यात्मिक चार्ट</h2>
@@ -552,13 +553,12 @@
         <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
 
             <div class="chart-section-v2" data-chart-section="1">
-                <div class="chart-title-v2"><span>१. 🌅 अमृतवेला तथा बिहानको योग</span><b>२०</b></div>
-                <div class="chart-subnote-v2">(नोट: यसमा बिहान २:०० देखि ५:०० बजेसम्मको योग र मुरली क्लास अघि वा पछि गरिएको योगको समयलाई पनि जोड्न सकिनेछ।)</div>
+                <div class="chart-title-v2"><span>१. 🌅 अमृतवेला तथा बिहानको योग</span><b>१५</b></div>
                 <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="20"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२ घण्टा वा सोभन्दा बढी</span><span class="chart-score-v2">२०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१.५ घण्टा (डेढ घण्टा)</span><span class="chart-score-v2">१5</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१ घण्टा</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आधा घण्टा</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२ घण्टा वा सोभन्दा बढी</span><span class="chart-score-v2">१५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="12"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१.५ घण्टा (डेढ घण्टा)</span><span class="chart-score-v2">१२</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="8"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१ घण्टा</span><span class="chart-score-v2">८</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="4"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आधा घण्टा</span><span class="chart-score-v2">४</span></label>
                 </div>
             </div>
 
@@ -566,71 +566,86 @@
                 <div class="chart-title-v2"><span>२. 📖 मुरली अध्ययन</span><b>१०</b></div>
                 <div class="chart-options-v2">
                     <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सेन्टरमा गएर पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="7"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">घरमै/अनलाइन पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">७</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सार वा मुख्य कुरा मात्र पढेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">घरमै/अनलाइन पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सार वा मुख्य कुरा मात्र पढेँ</span><span class="chart-score-v2">२</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="3">
-                <div class="chart-title-v2"><span>३. 🧘‍♂️ व्यक्तिगत योग / स्व-अध्ययन</span><b>१०</b></div>
+                <div class="chart-title-v2"><span>३. 🧠 मुरली मन्थन तथा स्व-अध्ययन</span><b>५</b></div>
                 <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_personal_yoga" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेटभन्दा बढी</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_personal_yoga" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–३० मिनेट</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli_manthan" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी चिन्तन/स्व-अध्ययन गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli_manthan" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–३० मिनेट मात्र गरेँ</span><span class="chart-score-v2">३</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="4">
-                <div class="chart-title-v2"><span>४. 🏃 व्यायाम / शारीरिक स्वास्थ्य</span><b>५</b></div>
+                <div class="chart-title-v2"><span>४. 🧘‍♂️ ५ स्वरूप र स्वमान अभ्यास</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_swaman_drill" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभर कम्तीमा ५ पटक ड्रिल र बीच-बीचमा स्वमानको अभ्यास भयो</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_swaman_drill" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२-३ पटक मात्र अभ्यास भयो</span><span class="chart-score-v2">५</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="5">
+                <div class="chart-title-v2"><span>५. 🚦 ट्राफिक कन्ट्रोल</span><b>५</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">५ पटक नै नियमपूर्वक गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३–४ पटक गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="1"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१–२ पटक मात्र भयो</span><span class="chart-score-v2">१</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="6">
+                <div class="chart-title-v2"><span>६. 🌸 धारणा र आत्मिक स्थिति</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सन्तुष्ट, शान्त, हल्का र सबैप्रति शुभ भावना रह्यो</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सामान्य हलचल भयो तर तुरुन्तै सम्हालेँ</span><span class="chart-score-v2">५</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="7">
+                <div class="chart-title-v2"><span>७. 🤲 ईश्वरीय सेवा (कर्मणा)</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_sewa" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ईश्वरीय कार्य वा कर्मणा सेवामा कम्तीमा ३० मिनेट समय दिएँ</span><span class="chart-score-v2">१०</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="8">
+                <div class="chart-title-v2"><span>८. 🍚 ब्रह्माभोजन</span><b>५</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">पूर्ण मौन र बाबाको यादमा भोजन गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सुरुमा याद थियो, पछि साधारण भयो वा बोलियो</span><span class="chart-score-v2">२</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="9">
+                <div class="chart-title-v2"><span>९. 🏃 व्यायाम / शारीरिक स्वास्थ्य</span><b>५</b></div>
                 <div class="chart-options-v2">
                     <label class="chart-option-v2"><input type="checkbox" name="chart_exercise" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आफ्नो अनुकूलताअनुसार व्यायाम/योगासन गरेँ</span><span class="chart-score-v2">५</span></label>
                 </div>
             </div>
 
-            <div class="chart-section-v2" data-chart-section="5">
-                <div class="chart-title-v2"><span>५. 🌸 धारणा तथा चालचलन</span><b>१०</b></div>
+            <div class="chart-section-v2" data-chart-section="10">
+                <div class="chart-title-v2"><span>१०. 🌇 साँझको योग</span><b>१०</b></div>
                 <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभरि खुशी, शान्त र सम्मानजनक व्यवहार रह्यो</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सामान्य हलचल भयो तर सम्हालेर सुधारें</span><span class="chart-score-v2">५</span></label>
-                </div>
-            </div>
-
-            <div class="chart-section-v2" data-chart-section="6">
-                <div class="chart-title-v2"><span>६. 🔄 स्वमान / अभ्यास</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_drill" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">हरेक घन्टा स्वमानको अभ्यास गरेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_drill" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही पटक मात्र अभ्यास गरेँ</span><span class="chart-score-v2">५</span></label>
-                </div>
-            </div>
-
-            <div class="chart-section-v2" data-chart-section="7">
-                <div class="chart-title-v2"><span>७. 🚦 ट्राफिक कन्ट्रोल</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">५ पटक नै नियमपूर्वक गरेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="7"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३-४ पटक गरेँ</span><span class="chart-score-v2">७</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="4"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१-२ पटक मात्र भयो</span><span class="chart-score-v2">४</span></label>
-                </div>
-            </div>
-
-            <div class="chart-section-v2" data-chart-section="8">
-                <div class="chart-title-v2"><span>८. 🍚 ब्रह्माभोजन</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">पूर्ण रूपमा बाबाको यादमा भोजन गरेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सुरुमा याद थियो, पछि साधारण भयो</span><span class="chart-score-v2">५</span></label>
-                </div>
-            </div>
-
-            <div class="chart-section-v2" data-chart-section="9">
-                <div class="chart-title-v2"><span>९. 🌇 साँझको योग (नुमासाम)</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी बाबाको यादमा बसेँ</span><span class="chart-score-v2">१०</span></label>
                     <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–३० मिनेट</span><span class="chart-score-v2">५</span></label>
                 </div>
             </div>
 
-            <div class="chart-section-v2" data-chart-section="10">
-                <div class="chart-title-v2"><span>१०. 🌙 गुडनाइट एवं दैनिक समीक्षा</span><b>५</b></div>
+            <div class="chart-section-v2" data-chart-section="11">
+                <div class="chart-title-v2"><span>११. 🌙 गुडनाइट योग एवं चार्ट</span><b>५</b></div>
                 <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_goodnight" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभरिको समीक्षा गरी, बाबालाई चार्ट दिएर सुतेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_goodnight" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभरिको चार्ट बाबालाई दिएर सुतेँ</span><span class="chart-score-v2">५</span></label>
+                </div>
+            </div>
+
+            <div class="chart-section-v2" data-chart-section="12">
+                <div class="chart-title-v2"><span>१२. 📵 सूचना उपवास (Digital Detox)</span><b>१०</b></div>
+                <div class="chart-options-v2">
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_digital_detox" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभर अनावश्यक युट्युब, फेसबुक, टिकटक हेरिनँ, कामको लागि मात्र चलाएँ</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input type="checkbox" name="chart_digital_detox" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही समय यताउति गयो तर धेरै खेर फालिनँ र तुरुन्तै सम्हालेँ</span><span class="chart-score-v2">५</span></label>
                 </div>
             </div>
 
@@ -642,8 +657,7 @@
 
         <div id="chart-result-box" class="chart-result-v2" style="display:none;"></div>
     </div>
-
-    <!-- Progress View -->
+<!-- Progress View -->
     <div id="view-progress" style="display: none;">
         <div id="baba-message-container"></div>
         <div class="dashboard-stats" id="dash-stats"></div>
@@ -706,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 102.0 (Smart Sync & Cache Clear)</div>
+        <div>Version: 103.0 (Smart Sync & Cache Clear)</div>
     </div>
 </div>
 
@@ -1132,7 +1146,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbyJaXxkvUn_Axl04MZNQp8pb2l3uXCHYStcpFyCkfeP5DpxOzdwQP5e1WuAO1q0grY6bA/exec";
-    const APP_VERSION = "102.0"; 
+    const APP_VERSION = "103.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1195,7 +1209,6 @@
         function animate() { if(particles.length === 0) return; requestAnimationFrame(animate); ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); p.y += p.dy; p.x += p.dx; }); } 
         animate(); setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
     }
-
     // Settings Restored Logic
     window.openSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); try { checkApiStatus(); } catch(e) {} }
     window.closeSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
@@ -1623,7 +1636,7 @@
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC (102.0)
+    // 5. DATA SYNCING LOGIC (103.0)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
         const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 2);
@@ -1742,9 +1755,7 @@
             for (const data of pendingData) {
                 try {
                     const result = await apiPostJSON({action:'saveChart', chartVersion:3, name:data.name, address:data.address, phone:data.phone, pin:(localStorage.getItem('murali_pin') || ''), date:data.date,
-                        totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, personalYogaStudy:data.personalYogaStudy,
-                        exercise:data.exercise, conduct:data.conduct, drill:data.drill, traffic:data.traffic, food:data.food,
-                        eveningYoga:data.eveningYoga, goodnight:data.goodnight, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                        totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, murliManthan:data.murliManthan, swamanDrill:data.swamanDrill, traffic:data.traffic, conduct:data.conduct, sewa:data.sewa, food:data.food, exercise:data.exercise, eveningYoga:data.eveningYoga, goodnight:data.goodnight, digitalDetox:data.digitalDetox, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
                     if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); }
                 } catch(e) {}
             }
@@ -2381,9 +2392,9 @@
     };
 
     // ==========================================
-    // 9. DAILY CHART LOGIC (V3)
+    // 9. DAILY CHART LOGIC (V3 - 12 Points)
     // ==========================================
-    const CHART_V3_GROUPS = ['chart_amritvela','chart_murli','chart_personal_yoga','chart_exercise','chart_conduct','chart_drill','chart_traffic','chart_food','chart_evening','chart_goodnight'];
+    const CHART_V3_GROUPS = ['chart_amritvela','chart_murli','chart_murli_manthan','chart_swaman_drill','chart_traffic','chart_conduct','chart_sewa','chart_food','chart_exercise','chart_evening','chart_goodnight','chart_digital_detox'];
     
     function activateNextChartSection(currentSection) {
         let next = currentSection ? currentSection.nextElementSibling : null;
@@ -2429,7 +2440,7 @@
 
     function loadChartDataForDate(dateVal) {
         clearChartV3Form(); let charts = safeJSON('murali_daily_charts', []); let existingChart = charts.find(c => c.date === dateVal && c.phone === userPhone); if(!existingChart) { if(navigator.onLine) syncMyChartsFromServer().then(()=>{ let fresh=safeJSON('murali_daily_charts',[]); if(fresh.find(c=>c.date===dateVal && c.phone===userPhone)) loadChartDataForDate(dateVal); }); return; }
-        const keyMap = { chart_amritvela: 'amritvela', chart_murli: 'murli', chart_personal_yoga: 'personalYogaStudy', chart_exercise: 'exercise', chart_conduct: 'conduct', chart_drill: 'drill', chart_traffic: 'traffic', chart_food: 'food', chart_evening: 'eveningYoga', chart_goodnight: 'goodnight' };
+        const keyMap = { chart_amritvela: 'amritvela', chart_murli: 'murli', chart_murli_manthan: 'murliManthan', chart_swaman_drill: 'swamanDrill', chart_traffic: 'traffic', chart_conduct: 'conduct', chart_sewa: 'sewa', chart_food: 'food', chart_exercise: 'exercise', chart_evening: 'eveningYoga', chart_goodnight: 'goodnight', chart_digital_detox: 'digitalDetox' };
         CHART_V3_GROUPS.forEach(groupName => {
             let key = keyMap[groupName]; let value = Number(existingChart[key] || 0);
             let match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${value}"]`);
@@ -2449,7 +2460,7 @@
 
     window.submitDailyChart = function() {
         let dateVal = document.getElementById('chart-date').value; if(!dateVal) return showToast('कृपया मिति छान्नुहोस्।', 'error');
-        let chartData = { id: Date.now(), schemaVersion: 3, chartVersion: 3, date: dateVal, name: userName, address: userAddress, phone: userPhone, amritvela: getChartOptionValue('chart_amritvela'), murli: getChartOptionValue('chart_murli'), personalYogaStudy: getChartOptionValue('chart_personal_yoga'), exercise: getChartOptionValue('chart_exercise'), conduct: getChartOptionValue('chart_conduct'), drill: getChartOptionValue('chart_drill'), traffic: getChartOptionValue('chart_traffic'), food: getChartOptionValue('chart_food'), eveningYoga: getChartOptionValue('chart_evening'), goodnight: getChartOptionValue('chart_goodnight'), totalScore: getChartV3Score(), stage: '', synced: false };
+        let chartData = { id: Date.now(), schemaVersion: 3, chartVersion: 3, date: dateVal, name: userName, address: userAddress, phone: userPhone, amritvela: getChartOptionValue('chart_amritvela'), murli: getChartOptionValue('chart_murli'), murliManthan: getChartOptionValue('chart_murli_manthan'), swamanDrill: getChartOptionValue('chart_swaman_drill'), traffic: getChartOptionValue('chart_traffic'), conduct: getChartOptionValue('chart_conduct'), sewa: getChartOptionValue('chart_sewa'), food: getChartOptionValue('chart_food'), exercise: getChartOptionValue('chart_exercise'), eveningYoga: getChartOptionValue('chart_evening'), goodnight: getChartOptionValue('chart_goodnight'), digitalDetox: getChartOptionValue('chart_digital_detox'), totalScore: getChartV3Score(), stage: '', synced: false };
         if(chartData.totalScore >= 90) chartData.stage = 'उड्ती कला 🕊️'; else if(chartData.totalScore >= 70) chartData.stage = 'चढ्ती कला 🚶'; else if(chartData.totalScore >= 50) chartData.stage = 'पुरुषार्थी जीवन 🌱'; else chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
 
         let charts = safeJSON('murali_daily_charts', []); charts = charts.filter(c => c.date !== dateVal || c.phone !== userPhone);
@@ -2753,8 +2764,8 @@
 
     window.openChartAdminDetail = function(index) {
         const user = window._chartAdminRecords[index]; if (!user) return;
-        const maxByKey = {amritvela:20,murli:10,personalYogaStudy:10,exercise:5,conduct:10,drill:10,traffic:10,food:10,eveningYoga:10,goodnight:5};
-        const labels = [['🌅 अमृतवेला + जागृति','amritvela'],['📖 मुरली अध्ययन','murli'],['🧘‍♂️ व्यक्तिगत योग / स्व-अध्ययन','personalYogaStudy'],['🏃 व्यायाम','exercise'],['🌸 धारणा तथा चालचलन','conduct'],['🔄 स्वमान / ड्रिल','drill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🍚 ब्रह्माभोजन / भोजन अनुशासन','food'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट एवं दैनिक समीक्षा','goodnight']];
+        const maxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,sewa:10,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
+        const labels = [['🌅 अमृतवेला','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘‍♂️ ५ स्वरूप/स्वमान','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/स्थिति','conduct'],['🤲 ईश्वरीय सेवा','sewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट चार्ट','goodnight'],['📵 सूचना उपवास','digitalDetox']];
         document.getElementById('cad-name').textContent = user.name || '—'; document.getElementById('cad-address').textContent = user.address || '—';
         document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--chart-color);">${Number(user.totalScore || 0)}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${user.stage || ''}</span>`;
         document.getElementById('cad-details').innerHTML = labels.map(function(item){ const score = Number(user[item[1]] || 0); const max = maxByKey[item[1]]; return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span>${item[0]}</span><b style="min-width:52px;text-align:center;color:var(--chart-color);">${score}/${max}</b></div>`; }).join('');
@@ -2805,7 +2816,7 @@
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 102.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 103.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
