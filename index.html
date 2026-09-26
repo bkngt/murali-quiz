@@ -2066,28 +2066,73 @@
         document.getElementById('monthly-mega-modal').style.display = 'none'; executeMegaQuiz(startDateStr, endDateStr, true, startDate);
     }
     window.executeMegaQuiz = function(startDateStr, endDateStr, isMonthly = false, startDateObj = null) {
-        let sDateStr = startDateStr || document.getElementById('mq-start-date').value; let eDateStr = endDateStr || document.getElementById('mq-end-date').value;
+        let sDateStr = startDateStr || document.getElementById('mq-start-date').value; 
+        let eDateStr = endDateStr || document.getElementById('mq-end-date').value;
         if(!sDateStr || !eDateStr) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error");
-        let sDate = new Date(sDateStr.replace(/-/g, '/')); sDate.setHours(0, 0, 0, 0); let eDate = new Date(eDateStr.replace(/-/g, '/')); eDate.setHours(23, 59, 59, 999);
+        
+        let sDate = new Date(sDateStr.replace(/-/g, '/')); sDate.setHours(0, 0, 0, 0); 
+        let eDate = new Date(eDateStr.replace(/-/g, '/')); eDate.setHours(23, 59, 59, 999);
         if(sDate > eDate) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error");
 
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); let allQuestions = []; 
-        serverQuizzes.forEach(sq => { if(sq.quizData && Array.isArray(sq.quizData) && !sq.isMegaQuiz) { let qDateObj = parseDateString(sq.quizDate); if(qDateObj && qDateObj >= sDate && qDateObj <= eDate) allQuestions = allQuestions.concat(sq.quizData); } });
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); 
+        let allQuestions = []; 
+        serverQuizzes.forEach(sq => { 
+            if(sq.quizData && Array.isArray(sq.quizData) && !sq.isMegaQuiz) { 
+                let qDateObj = parseDateString(sq.quizDate); 
+                if(qDateObj && qDateObj >= sDate && qDateObj <= eDate) allQuestions = allQuestions.concat(sq.quizData); 
+            } 
+        });
+        
         if(allQuestions.length < 5) return showToast("यो मिति भित्र पर्याप्त प्रश्नहरू छैनन्!", "error");
         
-        let filteredQuestions = []; allQuestions.forEach(q => { let qText = (q.q || "").toLowerCase(); let qTag = (q.tag || "").toLowerCase(); let hasAaja = qText.includes("आज") || qText.includes("आजको"); let isExcludedTag = qTag.includes("वरदान") || qTag.includes("स्लोगन") || qTag.includes("अव्यक्त इसारा") || qTag.includes("इसारा"); if (!hasAaja && !isExcludedTag) filteredQuestions.push(q); });
-        if(filteredQuestions.length < 5) return showToast("फिल्टर गरेपछि पर्याप्त प्रश्नहरू बाँकी रहेनन्!", "error");
-
-        let uniqueQ = []; let qTextSet = new Set(); filteredQuestions.forEach(q => { if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); } });
-        for (let i = uniqueQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [uniqueQ[i], uniqueQ[j]] = [uniqueQ[j], uniqueQ[i]]; }
+        // नयाँ लजिक: is_mega_eligible: true भएकालाई प्राथमिकता दिने
+        let filteredQuestions = []; 
+        let backupQuestions = []; // यदि True पुगेन भने ब्याकअपको लागि
         
+        allQuestions.forEach(q => { 
+            let qText = (q.q || "").toLowerCase(); 
+            let qTag = (q.tag || "").toLowerCase(); 
+            let hasAaja = qText.includes("आज") || qText.includes("आजको"); 
+            let isExcludedTag = qTag.includes("वरदान") || qTag.includes("स्लोगन") || qTag.includes("अव्यक्त इसारा") || qTag.includes("इसारा"); 
+            
+            if (!hasAaja && !isExcludedTag) {
+                if (q.is_mega_eligible === true) {
+                    filteredQuestions.push(q);
+                } else {
+                    backupQuestions.push(q);
+                }
+            } 
+        });
+
         let qCount = parseInt(document.getElementById('q-count').value); 
         if (qCount >= 50) { if(!confirm(`तपाईं ${qCount} प्रश्नको मेगा क्वीज सुरु गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return; }
-        qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
-        currentQuiz = uniqueQ.slice(0, qCount); currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
+
+        // यदि True भएका प्रश्नहरू मागिएको संख्या भन्दा कम भएमा, ब्याकअपबाट थप्ने
+        if (filteredQuestions.length < qCount) {
+            let needed = qCount - filteredQuestions.length;
+            // ब्याकअप प्रश्नहरूलाई मिक्स गर्ने
+            for (let i = backupQuestions.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [backupQuestions[i], backupQuestions[j]] = [backupQuestions[j], backupQuestions[i]]; }
+            filteredQuestions = filteredQuestions.concat(backupQuestions.slice(0, needed));
+        }
+
+        if(filteredQuestions.length < 5) return showToast("फिल्टर गरेपछि पर्याप्त प्रश्नहरू बाँकी रहेनन्!", "error");
+
+        // डुप्लिकेट हटाउने
+        let uniqueQ = []; let qTextSet = new Set(); 
+        filteredQuestions.forEach(q => { if(!qTextSet.has(q.q)) { qTextSet.add(q.q); uniqueQ.push(q); } });
         
-        if (isMonthly) { let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-'); currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; } 
-        else { let displayStart = sDateStr.split('-').reverse().join('-'); let displayEnd = eDateStr.split('-').reverse().join('-'); currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`; }
+        // अन्तिम पटक मिक्स गर्ने
+        for (let i = uniqueQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [uniqueQ[i], uniqueQ[j]] = [uniqueQ[j], uniqueQ[i]]; }
+        
+        qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
+        currentQuiz = uniqueQ.slice(0, qCount); 
+        currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
+        
+        if (isMonthly) { 
+            let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-'); currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; 
+        } else { 
+            let displayStart = sDateStr.split('-').reverse().join('-'); let displayEnd = eDateStr.split('-').reverse().join('-'); currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`; 
+        }
         
         document.getElementById('mega-quiz-modal').style.display = 'none'; document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
         renderQuizArea(); document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; document.getElementById('btn-cancel-top').style.display = 'inline-block';
