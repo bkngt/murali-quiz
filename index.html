@@ -2151,8 +2151,7 @@
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
         if (isMonthly) { 
-            let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('
-default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-'); currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; 
+            let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-'); currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; 
         } else { 
             let displayStart = sDateStr.split('-').reverse().join('-'); let displayEnd = eDateStr.split('-').reverse().join('-'); currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`; 
         }
