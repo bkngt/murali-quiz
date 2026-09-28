@@ -2177,21 +2177,18 @@
                     const idx=cached.findIndex(q=>q.quizDate===dateStr); if(idx>=0) cached[idx]=targetQuiz; else cached.push(targetQuiz); localStorage.setItem('murali_server_quizzes',JSON.stringify(cached)); populateSavedQuizzes();
                     
                     // --- PATCHED: Fix 3 (Update Local History if Completed) ---
-                    if(data.attemptStatus==='completed'){
-                        let history = safeJSON('murali_progress', []);
-                        let exists = history.find(h => h.date === dateStr);
-                        if(!exists) {
-                            history.push({
-                                id: Date.now(), name: userName, phone: userPhone, date: dateStr,
-                                score: data.previousScore || 0, total: data.previousTotal || targetQuiz.quizData.length, 
-                                percent: data.previousPercent || 100, synced: true, quizRevision: targetQuiz.revision || 1
-                            });
-                            localStorage.setItem('murali_progress', JSON.stringify(history));
-                        }
-                        document.getElementById('loading-box').style.display='none';
-                        loadStudentDashboard(); // Refresh UI to show ✅
-                        return showToast('यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।','warning',4000);
-                    }
+                    if(data.attemptStatus === 'completed'){
+    await syncMyResults();
+
+    document.getElementById('loading-box').style.display = 'none';
+    loadStudentDashboard();
+
+    return showToast(
+        'यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।',
+        'warning',
+        4000
+    );
+}
                     // ----------------------------------------------------------
 
                     document.getElementById('loading-box').style.display='none'; window.tempCloudState=data.stateData||null; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex'; return;
