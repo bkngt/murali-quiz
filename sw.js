@@ -11,6 +11,10 @@ const STATIC_ASSETS = [
     "https://cdn.jsdelivr.net/npm/chart.js"
 ];
 
+/* ==========================================================
+   INSTALL
+   ========================================================== */
+
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -20,7 +24,9 @@ self.addEventListener("install", event => {
                     for (const url of STATIC_ASSETS) {
                         try {
                             await cache.add(url);
-                        } catch (e) {}
+                        } catch (e) {
+                            // CDN unavailable: app can still work.
+                        }
                     }
                 });
             })
@@ -28,40 +34,57 @@ self.addEventListener("install", event => {
     );
 });
 
+
+/* ==========================================================
+   ACTIVATE
+   ========================================================== */
+
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-            .then(cacheNames => Promise.all(
-                cacheNames.map(cacheName => {
-                    if (
-                        cacheName.startsWith("murali-quiz-v") &&
-                        cacheName !== CACHE_NAME
-                    ) {
-                        return caches.delete(cacheName);
-                    }
-                    return undefined;
-                })
-            ))
+            .then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (
+                            cacheName.startsWith("murali-quiz-v") &&
+                            cacheName !== CACHE_NAME
+                        ) {
+                            return caches.delete(cacheName);
+                        }
+
+                        return undefined;
+                    })
+                );
+            })
             .then(() => self.clients.claim())
     );
 });
+
+
+/* ==========================================================
+   FETCH
+   ========================================================== */
 
 self.addEventListener("fetch", event => {
     const request = event.request;
     const url = new URL(request.url);
 
-    /*
-     * ==========================================================
-     * GOOGLE APPS SCRIPT / BACKEND
-     * ==========================================================
-     * Backend requests MUST NEVER be cached or intercepted.
-     * This is important for:
-     * - Exam security checks
-     * - Exam session status
-     * - Result submission
-     * - Student Rank
-     * - Admin Rank
-     */
+
+    /* ------------------------------------------------------
+       1. GOOGLE APPS SCRIPT / BACKEND
+
+       NEVER intercept or cache backend requests.
+
+       Important for:
+       - Login
+       - Exam Security
+       - Exam Session
+       - Result Save
+       - Student Rank
+       - Admin Rank
+       - Chart Sync
+       ------------------------------------------------------ */
+
     if (
         url.hostname.includes("script.google.com") ||
         url.hostname.includes("googleusercontent.com")
@@ -69,44 +92,76 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    /*
-     * ==========================================================
-     * PAGE / NAVIGATION
-     * ==========================================================
-     * Network first:
-     * Always try to obtain the newest index.html.
-     * If offline, use cached version.
-     */
+
+    /* ------------------------------------------------------
+       2. EXTERNAL NAVIGATION
+
+       IMPORTANT FIX FOR iPhone / iPad.
+
+       Links such as:
+       https://www.madhubanmurli.org/#ne
+
+       must be handled directly by Safari/Chrome,
+       not by this Service Worker.
+       ------------------------------------------------------ */
+
+    if (
+        request.mode === "navigate" &&
+        url.origin !== self.location.origin
+    ) {
+        return;
+    }
+
+
+    /* ------------------------------------------------------
+       3. SAME-ORIGIN PAGE NAVIGATION
+
+       Network first:
+       - gets newest index.html
+       - falls back to cache when offline
+       ------------------------------------------------------ */
+
     if (request.mode === "navigate") {
         event.respondWith(
             fetch(request)
                 .then(response => {
+
                     if (response && response.ok) {
                         const clone = response.clone();
 
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, clone);
-                        });
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(request, clone);
+                            })
+                            .catch(() => {});
                     }
 
                     return response;
                 })
                 .catch(() => {
-                    return caches.match(request).then(cached => {
-                        return cached || caches.match("./index.html");
-                    });
+
+                    return caches.match(request)
+                        .then(cached => {
+
+                            if (cached) {
+                                return cached;
+                            }
+
+                            return caches.match("./index.html");
+                        });
                 })
         );
 
         return;
     }
 
-    /*
-     * ==========================================================
-     * MANIFEST
-     * ==========================================================
-     * Network first so that manifest changes are detected quickly.
-     */
+
+    /* ------------------------------------------------------
+       4. MANIFEST
+
+       Network first so updated manifest is picked up.
+       ------------------------------------------------------ */
+
     if (
         url.pathname.endsWith("/manifest.json") ||
         url.pathname.endsWith("manifest.json")
@@ -114,11 +169,16 @@ self.addEventListener("fetch", event => {
         event.respondWith(
             fetch(request)
                 .then(response => {
-                    const clone = response.clone();
 
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, clone);
-                    });
+                    if (response && response.ok) {
+                        const clone = response.clone();
+
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(request, clone);
+                            })
+                            .catch(() => {});
+                    }
 
                     return response;
                 })
@@ -130,12 +190,13 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    /*
-     * ==========================================================
-     * STATIC CDN ASSETS
-     * ==========================================================
-     * JSZip + Chart.js are cache-first.
-     */
+
+    /* ------------------------------------------------------
+       5. KNOWN CDN ASSETS
+
+       JSZip + Chart.js
+       ------------------------------------------------------ */
+
     const isStaticAsset =
         request.url ===
             "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
@@ -144,43 +205,54 @@ self.addEventListener("fetch", event => {
 
     if (isStaticAsset) {
         event.respondWith(
-            caches.match(request).then(cached => {
-                if (cached) {
-                    return cached;
-                }
+            caches.match(request)
+                .then(cached => {
 
-                return fetch(request).then(response => {
-                    const clone = response.clone();
+                    if (cached) {
+                        return cached;
+                    }
 
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, clone);
-                    });
+                    return fetch(request)
+                        .then(response => {
 
-                    return response;
-                });
-            })
+                            if (response && response.ok) {
+                                const clone = response.clone();
+
+                                caches.open(CACHE_NAME)
+                                    .then(cache => {
+                                        cache.put(request, clone);
+                                    })
+                                    .catch(() => {});
+                            }
+
+                            return response;
+                        });
+                })
         );
 
         return;
     }
 
-    /*
-     * ==========================================================
-     * SAME-ORIGIN FILES
-     * ==========================================================
-     * Network first for HTML/CSS/JS/images/etc.
-     * Cached version is used only when network fails.
-     */
+
+    /* ------------------------------------------------------
+       6. OTHER SAME-ORIGIN FILES
+
+       Network first, cache fallback.
+       ------------------------------------------------------ */
+
     if (url.origin === self.location.origin) {
         event.respondWith(
             fetch(request)
                 .then(response => {
+
                     if (response && response.ok) {
                         const clone = response.clone();
 
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, clone);
-                        });
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(request, clone);
+                            })
+                            .catch(() => {});
                     }
 
                     return response;
@@ -190,4 +262,5 @@ self.addEventListener("fetch", event => {
                 })
         );
     }
+
 });
