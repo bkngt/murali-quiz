@@ -1538,7 +1538,7 @@
             userCountry = localStorage.getItem('murali_country') || "N/A";
             userRole = localStorage.getItem('murali_role') || "Student";
 
-            // 104.0: पुरानो quiz cache तुरुन्त नमेट्ने; code update पछि background मा refresh हुन्छ।
+            // 104.0: cache तुरुन्त नमेट्ने; background बाट refresh हुन्छ।
             let isNewVersion = false;
             let savedVersion = localStorage.getItem('murali_app_version');
             if(savedVersion !== APP_VERSION) {
@@ -1556,15 +1556,21 @@
             document.getElementById('edit-last-name').value = editLastName;
             document.getElementById('edit-phone').value = userPhone;
             document.getElementById('edit-address').value = userAddress;
+
             updateProfileBadgeUI();
 
-            // Fast UI first; background sync अब user-facing request सँग प्रतिस्पर्धा गर्दैन।
+            // Fast UI first; background sync पछि हुन्छ।
             startQuizAutoSync(isNewVersion);
 
             let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
             let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
-            if (isPrivileged) document.getElementById('btn-toggle-view').style.display = 'block';
-            else { document.getElementById('btn-toggle-view').style.display = 'none'; isAdminViewActive = false; }
+
+            if (isPrivileged) {
+                document.getElementById('btn-toggle-view').style.display = 'block';
+            } else {
+                document.getElementById('btn-toggle-view').style.display = 'none';
+                isAdminViewActive = false;
+            }
 
             if (isPrivileged && isAdminViewActive) {
                 document.getElementById('murali-text').style.display = 'block';
@@ -1577,11 +1583,63 @@
                 document.getElementById('api-config-section').style.display = 'block';
                 document.getElementById('quiz-area').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'block';
+                document.getElementById('dashboard-skeleton').style.display = 'none';
+                populateSavedQuizzes();
+            } else {
+                document.getElementById('murali-text').style.display = 'none';
+                document.getElementById('generator-actions').style.display = 'none';
+                document.getElementById('custom-import-section').style.display = 'none';
+                document.getElementById('btn-monthly-mega').style.display = 'none';
+                document.getElementById('btn-custom-mega').style.display = 'none';
+                document.getElementById('quiz-config-tools').style.display = 'none';
+                document.getElementById('exam-config-section').style.display = 'none';
+                document.getElementById('api-config-section').style.display = 'none';
+                document.getElementById('export-saved-section').style.display = 'none';
+                loadStudentDashboard();
             }
-            loadStudentDashboard();
-            renderDashboard();
-        } catch(e) { console.error('unlockApp:', e); }
+
+            // यो आवश्यक छ: Generator/Student view तुरुन्तै visible बनाउन।
+            switchTab('gen');
+        } catch(e) {
+            console.error("unlockApp:", e);
+            showToast("Error loading UI", "error");
+        }
     }
+
+    function updateProfileBadgeUI() {
+        let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
+        let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
+        let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)';
+        let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
+        let nameParts = userName.split(" ");
+        let editLastName = nameParts.length > 1 ? nameParts.pop() : "";
+        let editFirstName = nameParts.join(" ");
+        let displayName = userName;
+        if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") {
+            displayName = editFirstName + " " + editLastName;
+        } else {
+            displayName = editFirstName.split(" ")[0];
+            if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) {
+                displayName = editFirstName;
+            }
+        }
+        let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
+        document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
+    }
+
+    window.toggleAdminStudentView = function() {
+        isAdminViewActive = !isAdminViewActive;
+        let btn = document.getElementById('btn-toggle-view');
+        if(isAdminViewActive) {
+            btn.innerHTML = '👁️ Student View';
+            showToast("Switched to Admin View", "info");
+        } else {
+            btn.innerHTML = '👑 Admin View';
+            showToast("Switched to Student View", "info");
+        }
+        closeSettings();
+        unlockApp();
+    };
 
     // ==========================================
     // 5. DATA SYNCING LOGIC (104.0 FAST)
