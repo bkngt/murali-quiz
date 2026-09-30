@@ -720,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 104.0 – Fast Security & Rank</div>
+        <div>Version: 105.0 – Auto Sync, Fast Security & Rank</div>
     </div>
 </div>
 
@@ -1146,7 +1146,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "104.0"; 
+    const APP_VERSION = "105.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1559,8 +1559,8 @@
 
             updateProfileBadgeUI();
 
-            // Fast UI first; background sync पछि हुन्छ।
-            startQuizAutoSync(isNewVersion);
+            // Online हुँदा Dashboard अघि Server Quiz Sync पूरा गरिन्छ।
+            const startupSyncPromise = startQuizAutoSync(isNewVersion);
 
             let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
             let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
@@ -1595,7 +1595,16 @@
                 document.getElementById('exam-config-section').style.display = 'none';
                 document.getElementById('api-config-section').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'none';
-                loadStudentDashboard();
+
+                // Online हुँदा पुरानो cached Dashboard पहिले नदेखाउने।
+                // पहिले Server Quiz Sync पूरा हुन्छ।
+                document.getElementById('dashboard-skeleton').style.display = 'block';
+
+                startupSyncPromise.finally(() => {
+                    if (!isAdminViewActive) {
+                        loadStudentDashboard();
+                    }
+                });
             }
 
             // यो आवश्यक छ: Generator/Student view तुरुन्तै visible बनाउन।
@@ -1904,19 +1913,30 @@
         } catch(e) {} return false;
     }
 
-    // --- PATCHED: forceFullSync ---
+    // --- PATCHED: forceFullSync (Quiz + Results + Charts) ---
     window.forceFullSync = async function() {
         if(!navigator.onLine) return showToast("इन्टरनेट कनेक्सन छैन!", "error");
-        showToast("🔄 सर्भरबाट पुरानो नतिजा पुनःस्थापना हुँदैछ...", "info");
+        if(isQuizActive || isExamSecurityCheckInProgress) return showToast("अहिले परीक्षा चलिरहेको छ। परीक्षा सकिएपछि Sync गर्नुहोस्।", "warning");
+
+        showToast("🔄 सर्भरबाट Quiz, Results र Charts Sync हुँदैछ...", "info");
         try {
+            // Force full Quiz refresh — पुरानो local cache मा भर नपर्ने।
+            await syncServerQuizzes(false, true);
             await syncMyResults(true);
             await syncMyChartsFromServer();
-            if(document.getElementById('view-progress').style.display === 'block') renderDashboard();
-            if(!isAdminViewActive && document.getElementById('view-generator').style.display === 'block') loadStudentDashboard();
-            showToast("✅ पुराना परीक्षा नतिजा सर्भरबाट पुनःस्थापित भयो!", "success");
+
+            if(document.getElementById('view-progress').style.display === 'block') {
+                renderDashboard();
+            }
+
+            if(!isAdminViewActive && document.getElementById('view-generator').style.display === 'block') {
+                loadStudentDashboard();
+            }
+
+            showToast("✅ Quiz, Results र Charts सर्भरसँग Sync भयो!", "success");
         } catch(e) {
             console.error(e);
-            showToast("❌ नतिजा पुनःस्थापना गर्न समस्या भयो।", "error");
+            showToast("❌ Server Sync गर्न समस्या भयो।", "error");
         }
     };
 
@@ -1981,22 +2001,44 @@
         }
     }
 
-    function startQuizAutoSync(isNewVersion = false){
-        if (window.quizAutoSyncTimer) clearInterval(window.quizAutoSyncTimer);
+    async function startQuizAutoSync(isNewVersion = false){
+    // =========================================================
+    // 105.0 STARTUP SYNC
+    // Online: Server Quiz Index/Quiz Data पहिले जाँच हुन्छ।
+    // New Version: पहिलो पटक full quiz refresh हुन्छ।
+    // Offline: Local cache बाट Dashboard चलिरहन्छ।
+    // =========================================================
 
-        // Returning users: local cache बाट तुरुन्त UI; background पछि refresh।
-        // First install / empty cache: quiz list छिटो ल्याउन छोटो delay।
-        let cached = safeJSON('murali_server_quizzes', []);
-        let hasQuizCache = Array.isArray(cached) && cached.length > 0;
-        let firstDelay = hasQuizCache ? 6000 : 600;
-        scheduleQuietBackgroundSync(firstDelay, !!isNewVersion && !hasQuizCache);
-
-        window.quizAutoSyncTimer = setInterval(() => {
-            if (!document.hidden && navigator.onLine && !isQuizActive && !isExamSecurityCheckInProgress) runQuietBackgroundSync(false);
-        }, 5 * 60 * 1000);
-
-        if (isNewVersion && hasQuizCache) scheduleQuietBackgroundSync(6500, true);
+    if (window.quizAutoSyncTimer) {
+        clearInterval(window.quizAutoSyncTimer);
     }
+
+    // App खुलेको बेला Online भए Server लाई पहिलो priority।
+    // 105.0 मा update भएका/संशोधित quiz पुरानो cache माथि राखिन्छ।
+    if (navigator.onLine && !isQuizActive && !isExamSecurityCheckInProgress) {
+        try {
+            await syncServerQuizzes(false, !!isNewVersion);
+        } catch (e) {
+            console.warn("Startup quiz sync failed:", e);
+        }
+    }
+
+    // Quiz + Results + Charts + Profile को background sync।
+    // Startup quiz sync पछि एउटा हल्का sync cycle चल्छ।
+    scheduleQuietBackgroundSync(3000, false);
+
+    // त्यसपछि हरेक 5 मिनेटमा automatic sync।
+    window.quizAutoSyncTimer = setInterval(() => {
+        if (
+            !document.hidden &&
+            navigator.onLine &&
+            !isQuizActive &&
+            !isExamSecurityCheckInProgress
+        ) {
+            runQuietBackgroundSync(false);
+        }
+    }, 5 * 60 * 1000);
+}
 
     document.addEventListener('visibilitychange',()=>{
         if(!document.hidden && !isQuizActive && !isExamSecurityCheckInProgress) scheduleQuietBackgroundSync(2500, false);
@@ -2287,44 +2329,157 @@
     // 8. QUIZ EXECUTION
     // ==========================================
     window.startSpecificQuiz = async function(dateStr) {
-        let serverQuizzes=safeJSON('murali_server_quizzes',[]), targetQuiz=Array.isArray(serverQuizzes)?serverQuizzes.find(q=>q.quizDate===dateStr):null;
-        const savedPin=localStorage.getItem('murali_pin')||'';
-        document.getElementById('loading-box').style.display='block'; document.getElementById('loading-text').innerText='परीक्षा स्थिति जाँच हुँदैछ...'; document.getElementById('quiz-area').style.display='none';
-        let existingResult=document.getElementById('result-screen'); if(existingResult) existingResult.remove();
+    // =========================================================
+    // EXAM START POLICY:
+    // Dashboard can work from local cache,
+    // BUT starting an exam ALWAYS requires Internet + Server verification.
+    // Never allow cached quiz to start when server check fails.
+    // =========================================================
 
-        if(navigator.onLine && userPhone!=='N/A' && savedPin){
-            isExamSecurityCheckInProgress = true;
-            try{
-                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:2,timeoutMs:15000});
-                if(data && data.status==='success' && data.quiz && data.quiz.quizData){
-                    targetQuiz=data.quiz;
-                    let cached=safeJSON('murali_server_quizzes',[]); if(!Array.isArray(cached)) cached=[];
-                    const idx=cached.findIndex(q=>q.quizDate===dateStr); if(idx>=0) cached[idx]=targetQuiz; else cached.push(targetQuiz); localStorage.setItem('murali_server_quizzes',JSON.stringify(cached)); populateSavedQuizzes();
+    const savedPin = localStorage.getItem('murali_pin') || '';
 
-                    if(data.attemptStatus === 'completed'){
-                        upsertLocalCompletedResultFromServer_(dateStr, targetQuiz, Object.assign({}, data.result || {}, {quizRevision:data.quizRevision || data.revision || targetQuiz.revision, timeTaken:(data.result && data.result.timeTaken) || ''}));
-                        document.getElementById('loading-box').style.display = 'none';
-                        loadStudentDashboard();
-                        return showToast('यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।','warning',4000);
-                    }
+    // 1. Internet is mandatory to START an exam.
+    if (!navigator.onLine) {
+        return showToast(
+            '🌐 परीक्षा सुरु गर्न इन्टरनेट अनिवार्य छ। कृपया Internet जोडेर पुनः प्रयास गर्नुहोस्।',
+            'error',
+            5000
+        );
+    }
 
-                    document.getElementById('loading-box').style.display='none'; window.tempCloudState=data.stateData||null; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex'; return;
-                }
-                document.getElementById('loading-box').style.display='none';
-                return showToast((data && data.message) ? data.message : 'सर्भरबाट परीक्षा स्थिति जाँच हुन सकेन। कृपया पुनः प्रयास गर्नुहोस्।','error',5000);
-            }catch(e){
-                document.getElementById('loading-box').style.display='none';
-                return showToast('सर्भरबाट परीक्षा स्थिति जाँच हुन सकेन। इन्टरनेट/सर्भर जाँच गरेर पुनः प्रयास गर्नुहोस्।','error',5000);
-            } finally {
-                isExamSecurityCheckInProgress = false;
+    // 2. Login credentials must exist.
+    if (userPhone === 'N/A' || !savedPin) {
+        return showToast(
+            '🔐 तपाईंको Login जानकारी उपलब्ध छैन। कृपया फेरि Login गर्नुहोस्।',
+            'error',
+            5000
+        );
+    }
+
+    const loadingBox = document.getElementById('loading-box');
+    const loadingText = document.getElementById('loading-text');
+    const quizArea = document.getElementById('quiz-area');
+
+    if (loadingBox) loadingBox.style.display = 'block';
+    if (loadingText) loadingText.innerText = 'परीक्षा स्थिति र नयाँ प्रश्नपत्र जाँच हुँदैछ...';
+    if (quizArea) quizArea.style.display = 'none';
+
+    let existingResult = document.getElementById('result-screen');
+    if (existingResult) existingResult.remove();
+
+    isExamSecurityCheckInProgress = true;
+
+    try {
+        // 3. SERVER IS THE FINAL AUTHORITY.
+        //    Cached quiz is NOT used to start the exam.
+        const data = await apiPostJSON(
+            {
+                action: 'startQuizSession',
+                phone: userPhone,
+                pin: savedPin,
+                deviceId: getDeviceId(),
+                quizDate: dateStr
+            },
+            {
+                retries: 2,
+                timeoutMs: 15000
             }
+        );
+
+        // 4. Server must return a valid current quiz.
+        if (!(data && data.status === 'success' && data.quiz && data.quiz.quizData)) {
+            if (loadingBox) loadingBox.style.display = 'none';
+
+            return showToast(
+                (data && data.message)
+                    ? data.message
+                    : 'सर्भरबाट परीक्षा स्थिति जाँच हुन सकेन। कृपया पुनः प्रयास गर्नुहोस्।',
+                'error',
+                5000
+            );
         }
 
-        // Offline mode: पहिले डाउनलोड भएको quiz मात्र प्रयोग गर्न मिल्छ।
-        if(!targetQuiz || !targetQuiz.quizData){document.getElementById('loading-box').style.display='none';return showToast('अफलाइन अवस्थामा यो क्वीज पहिले डाउनलोड भएको छैन।','error');}
-        let localState=safeJSON('murali_active_quiz_state',null); if(localState && (localState.date!==dateStr || Number(localState.quizRevision||1)!==Number(targetQuiz.revision||1))) localState=null;
-        document.getElementById('loading-box').style.display='none'; window.tempCloudState=localState; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex';
-    };
+        // 5. IMPORTANT:
+        //    Always use the quiz returned by the SERVER,
+        //    not the quiz stored in localStorage.
+        let targetQuiz = data.quiz;
+
+        // 6. Update local cache with the server-authoritative quiz.
+        //    This keeps the device cache aligned for future dashboard use.
+        let cached = safeJSON('murali_server_quizzes', []);
+        if (!Array.isArray(cached)) cached = [];
+
+        const idx = cached.findIndex(q => q && q.quizDate === dateStr);
+
+        if (idx >= 0) {
+            cached[idx] = targetQuiz;
+        } else {
+            cached.push(targetQuiz);
+        }
+
+        localStorage.setItem(
+            'murali_server_quizzes',
+            JSON.stringify(cached)
+        );
+
+        populateSavedQuizzes();
+
+        // 7. Already completed?
+        if (data.attemptStatus === 'completed') {
+            upsertLocalCompletedResultFromServer_(
+                dateStr,
+                targetQuiz,
+                Object.assign(
+                    {},
+                    data.result || {},
+                    {
+                        quizRevision:
+                            data.quizRevision ||
+                            data.revision ||
+                            targetQuiz.revision,
+
+                        timeTaken:
+                            (data.result && data.result.timeTaken) || ''
+                    }
+                )
+            );
+
+            if (loadingBox) loadingBox.style.display = 'none';
+
+            loadStudentDashboard();
+
+            return showToast(
+                'यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।',
+                'warning',
+                4000
+            );
+        }
+
+        // 8. Server verified successfully.
+        if (loadingBox) loadingBox.style.display = 'none';
+
+        window.tempCloudState = data.stateData || null;
+        window.tempTargetQuiz = targetQuiz;
+
+        document.getElementById('pledge-modal').style.display = 'flex';
+
+    } catch (e) {
+        console.error('startSpecificQuiz:', e);
+
+        if (loadingBox) loadingBox.style.display = 'none';
+
+        // IMPORTANT:
+        // Do NOT fall back to local cached quiz.
+        return showToast(
+            '🌐 परीक्षा सुरु गर्न सर्भर जडान आवश्यक छ। Internet/Server जाँच गरेर पुनः प्रयास गर्नुहोस्।',
+            'error',
+            5000
+        );
+
+    } finally {
+        isExamSecurityCheckInProgress = false;
+    }
+};
 
     window.closePledgeModal = function() { document.getElementById('pledge-modal').style.display = 'none'; resetToGenerator(); }
     window.acceptPledgeAndStart = function() { 
