@@ -2295,7 +2295,7 @@
         if(navigator.onLine && userPhone!=='N/A' && savedPin){
             isExamSecurityCheckInProgress = true;
             try{
-                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:0,timeoutMs:7000});
+                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:2,timeoutMs:15000});
                 if(data && data.status==='success' && data.quiz && data.quiz.quizData){
                     targetQuiz=data.quiz;
                     let cached=safeJSON('murali_server_quizzes',[]); if(!Array.isArray(cached)) cached=[];
@@ -3017,7 +3017,7 @@
         if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
 
         try {
-            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 0, timeoutMs: 7000});
+            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 2, timeoutMs: 15000});
             document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block';
             if (data.status === "success") {
                 let tbody = document.getElementById('sl-table-body');
