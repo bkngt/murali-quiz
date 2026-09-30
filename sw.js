@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v103-0";
+const CACHE_NAME = "murali-quiz-v104-0";
 
 const APP_SHELL = [
     "./",
@@ -20,9 +20,7 @@ self.addEventListener("install", event => {
                     for (const url of STATIC_ASSETS) {
                         try {
                             await cache.add(url);
-                        } catch (e) {
-                            // CDN asset failed; app can fetch it from network later.
-                        }
+                        } catch (e) {}
                     }
                 });
             })
@@ -33,18 +31,17 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-            .then(cacheNames => {
-                return Promise.all(
-                    cacheNames.map(cacheName => {
-                        if (
-                            cacheName.startsWith("murali-quiz-v") &&
-                            cacheName !== CACHE_NAME
-                        ) {
-                            return caches.delete(cacheName);
-                        }
-                    })
-                );
-            })
+            .then(cacheNames => Promise.all(
+                cacheNames.map(cacheName => {
+                    if (
+                        cacheName.startsWith("murali-quiz-v") &&
+                        cacheName !== CACHE_NAME
+                    ) {
+                        return caches.delete(cacheName);
+                    }
+                    return undefined;
+                })
+            ))
             .then(() => self.clients.claim())
     );
 });
@@ -53,7 +50,18 @@ self.addEventListener("fetch", event => {
     const request = event.request;
     const url = new URL(request.url);
 
-    // Never intercept Google Apps Script / backend requests.
+    /*
+     * ==========================================================
+     * GOOGLE APPS SCRIPT / BACKEND
+     * ==========================================================
+     * Backend requests MUST NEVER be cached or intercepted.
+     * This is important for:
+     * - Exam security checks
+     * - Exam session status
+     * - Result submission
+     * - Student Rank
+     * - Admin Rank
+     */
     if (
         url.hostname.includes("script.google.com") ||
         url.hostname.includes("googleusercontent.com")
@@ -61,87 +69,125 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Navigation requests: Network First, then cached index.
+    /*
+     * ==========================================================
+     * PAGE / NAVIGATION
+     * ==========================================================
+     * Network first:
+     * Always try to obtain the newest index.html.
+     * If offline, use cached version.
+     */
     if (request.mode === "navigate") {
         event.respondWith(
             fetch(request)
                 .then(response => {
-                    const responseClone = response.clone();
-
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, responseClone);
-                    });
-
-                    return response;
-                })
-                .catch(() => {
-                    return caches.match(request)
-                        .then(cached => cached || caches.match("./index.html"));
-                })
-        );
-        return;
-    }
-
-    // Manifest: Network First.
-    if (url.pathname.endsWith("/manifest.json") || url.pathname.endsWith("manifest.json")) {
-        event.respondWith(
-            fetch(request)
-                .then(response => {
-                    const responseClone = response.clone();
-
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, responseClone);
-                    });
-
-                    return response;
-                })
-                .catch(() => caches.match(request))
-        );
-        return;
-    }
-
-    // Known static assets: Cache First.
-    const isStaticAsset =
-        request.url === "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
-        request.url === "https://cdn.jsdelivr.net/npm/chart.js";
-
-    if (isStaticAsset) {
-        event.respondWith(
-            caches.match(request)
-                .then(cached => {
-                    if (cached) return cached;
-
-                    return fetch(request).then(response => {
-                        const responseClone = response.clone();
-
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, responseClone);
-                        });
-
-                        return response;
-                    });
-                })
-        );
-
-        return;
-    }
-
-    // Other same-origin files: Network First, then cache.
-    if (url.origin === self.location.origin) {
-        event.respondWith(
-            fetch(request)
-                .then(response => {
                     if (response && response.ok) {
-                        const responseClone = response.clone();
+                        const clone = response.clone();
 
                         caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, responseClone);
+                            cache.put(request, clone);
                         });
                     }
 
                     return response;
                 })
-                .catch(() => caches.match(request))
+                .catch(() => {
+                    return caches.match(request).then(cached => {
+                        return cached || caches.match("./index.html");
+                    });
+                })
+        );
+
+        return;
+    }
+
+    /*
+     * ==========================================================
+     * MANIFEST
+     * ==========================================================
+     * Network first so that manifest changes are detected quickly.
+     */
+    if (
+        url.pathname.endsWith("/manifest.json") ||
+        url.pathname.endsWith("manifest.json")
+    ) {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    const clone = response.clone();
+
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(request, clone);
+                    });
+
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(request);
+                })
+        );
+
+        return;
+    }
+
+    /*
+     * ==========================================================
+     * STATIC CDN ASSETS
+     * ==========================================================
+     * JSZip + Chart.js are cache-first.
+     */
+    const isStaticAsset =
+        request.url ===
+            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
+        request.url ===
+            "https://cdn.jsdelivr.net/npm/chart.js";
+
+    if (isStaticAsset) {
+        event.respondWith(
+            caches.match(request).then(cached => {
+                if (cached) {
+                    return cached;
+                }
+
+                return fetch(request).then(response => {
+                    const clone = response.clone();
+
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(request, clone);
+                    });
+
+                    return response;
+                });
+            })
+        );
+
+        return;
+    }
+
+    /*
+     * ==========================================================
+     * SAME-ORIGIN FILES
+     * ==========================================================
+     * Network first for HTML/CSS/JS/images/etc.
+     * Cached version is used only when network fails.
+     */
+    if (url.origin === self.location.origin) {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    if (response && response.ok) {
+                        const clone = response.clone();
+
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(request, clone);
+                        });
+                    }
+
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(request);
+                })
         );
     }
 });
