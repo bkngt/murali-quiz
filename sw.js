@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v104-0";
+const CACHE_NAME = "murali-quiz-v105-0";
 
 const APP_SHELL = [
     "./",
@@ -18,17 +18,19 @@ const STATIC_ASSETS = [
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(APP_SHELL))
-            .then(() => {
-                return caches.open(CACHE_NAME).then(async cache => {
-                    for (const url of STATIC_ASSETS) {
-                        try {
-                            await cache.add(url);
-                        } catch (e) {
-                            // CDN unavailable: app can still work.
-                        }
+            .then(async cache => {
+
+                // App shell
+                await cache.addAll(APP_SHELL);
+
+                // CDN assets
+                for (const url of STATIC_ASSETS) {
+                    try {
+                        await cache.add(url);
+                    } catch (e) {
+                        // CDN unavailable हुँदा app installation fail नगराउने।
                     }
-                });
+                }
             })
             .then(() => self.skipWaiting())
     );
@@ -43,8 +45,11 @@ self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
             .then(cacheNames => {
+
                 return Promise.all(
                     cacheNames.map(cacheName => {
+
+                        // पुराना Murali Quiz caches हटाउने।
                         if (
                             cacheName.startsWith("murali-quiz-v") &&
                             cacheName !== CACHE_NAME
@@ -66,16 +71,17 @@ self.addEventListener("activate", event => {
    ========================================================== */
 
 self.addEventListener("fetch", event => {
+
     const request = event.request;
     const url = new URL(request.url);
 
 
-    /* ------------------------------------------------------
+    /* ======================================================
        1. GOOGLE APPS SCRIPT / BACKEND
 
-       NEVER intercept or cache backend requests.
+       Backend request NEVER cache/intercept गर्ने।
 
-       Important for:
+       Includes:
        - Login
        - Exam Security
        - Exam Session
@@ -83,7 +89,8 @@ self.addEventListener("fetch", event => {
        - Student Rank
        - Admin Rank
        - Chart Sync
-       ------------------------------------------------------ */
+       - Quiz Sync
+       ====================================================== */
 
     if (
         url.hostname.includes("script.google.com") ||
@@ -93,17 +100,14 @@ self.addEventListener("fetch", event => {
     }
 
 
-    /* ------------------------------------------------------
+    /* ======================================================
        2. EXTERNAL NAVIGATION
 
-       IMPORTANT FIX FOR iPhone / iPad.
+       External websites Safari/Chrome ले direct handle गर्ने।
 
-       Links such as:
+       Example:
        https://www.madhubanmurli.org/#ne
-
-       must be handled directly by Safari/Chrome,
-       not by this Service Worker.
-       ------------------------------------------------------ */
+       ====================================================== */
 
     if (
         request.mode === "navigate" &&
@@ -113,31 +117,43 @@ self.addEventListener("fetch", event => {
     }
 
 
-    /* ------------------------------------------------------
-       3. SAME-ORIGIN PAGE NAVIGATION
+    /* ======================================================
+       3. SAME-ORIGIN NAVIGATION
 
-       Network first:
-       - gets newest index.html
-       - falls back to cache when offline
-       ------------------------------------------------------ */
+       NETWORK FIRST
+
+       Online:
+       → नवीन index.html
+       → cache update
+
+       Offline:
+       → cached index.html
+       ====================================================== */
 
     if (request.mode === "navigate") {
+
         event.respondWith(
+
             fetch(request)
                 .then(response => {
 
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
                             .then(cache => {
-                                cache.put(request, clone);
+
+                                cache.put(request, clone)
+                                    .catch(() => {});
+
                             })
                             .catch(() => {});
                     }
 
                     return response;
                 })
+
                 .catch(() => {
 
                     return caches.match(request)
@@ -156,32 +172,39 @@ self.addEventListener("fetch", event => {
     }
 
 
-    /* ------------------------------------------------------
+    /* ======================================================
        4. MANIFEST
 
-       Network first so updated manifest is picked up.
-       ------------------------------------------------------ */
+       Network first so new manifest तुरुन्त लिन सकियोस्।
+       ====================================================== */
 
     if (
         url.pathname.endsWith("/manifest.json") ||
         url.pathname.endsWith("manifest.json")
     ) {
+
         event.respondWith(
+
             fetch(request)
                 .then(response => {
 
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
                             .then(cache => {
-                                cache.put(request, clone);
+
+                                cache.put(request, clone)
+                                    .catch(() => {});
+
                             })
                             .catch(() => {});
                     }
 
                     return response;
                 })
+
                 .catch(() => {
                     return caches.match(request);
                 })
@@ -191,20 +214,28 @@ self.addEventListener("fetch", event => {
     }
 
 
-    /* ------------------------------------------------------
+    /* ======================================================
        5. KNOWN CDN ASSETS
 
        JSZip + Chart.js
-       ------------------------------------------------------ */
+
+       Cache first:
+       - पहिले cache
+       - cache नभए network
+       ====================================================== */
 
     const isStaticAsset =
         request.url ===
             "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
+
         request.url ===
             "https://cdn.jsdelivr.net/npm/chart.js";
 
+
     if (isStaticAsset) {
+
         event.respondWith(
+
             caches.match(request)
                 .then(cached => {
 
@@ -216,11 +247,15 @@ self.addEventListener("fetch", event => {
                         .then(response => {
 
                             if (response && response.ok) {
+
                                 const clone = response.clone();
 
                                 caches.open(CACHE_NAME)
                                     .then(cache => {
-                                        cache.put(request, clone);
+
+                                        cache.put(request, clone)
+                                            .catch(() => {});
+
                                     })
                                     .catch(() => {});
                             }
@@ -234,33 +269,43 @@ self.addEventListener("fetch", event => {
     }
 
 
-    /* ------------------------------------------------------
-       6. OTHER SAME-ORIGIN FILES
+    /* ======================================================
+       6. OTHER SAME-ORIGIN REQUESTS
 
-       Network first, cache fallback.
-       ------------------------------------------------------ */
+       Network first + cache fallback.
+       ====================================================== */
 
     if (url.origin === self.location.origin) {
+
         event.respondWith(
+
             fetch(request)
                 .then(response => {
 
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
                             .then(cache => {
-                                cache.put(request, clone);
+
+                                cache.put(request, clone)
+                                    .catch(() => {});
+
                             })
                             .catch(() => {});
                     }
 
                     return response;
                 })
+
                 .catch(() => {
+
                     return caches.match(request);
                 })
         );
+
+        return;
     }
 
 });
