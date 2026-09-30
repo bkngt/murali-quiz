@@ -720,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 103.0 – Auto Sync Safe</div>
+        <div>Version: 104.0 – Fast Security & Rank</div>
     </div>
 </div>
 
@@ -1146,7 +1146,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "103.0"; 
+    const APP_VERSION = "104.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1155,6 +1155,7 @@
     let userCountry = "N/A"; let userRole = "Student"; let isAdminViewActive = true; 
     
     let timerInterval = null; let totalTimeSec = 0; let isTimerStarted = false;
+    let isExamSecurityCheckInProgress = false; let quietBackgroundSyncTimer = null;
     let currentCalDate = new Date(); let progressModalDate = new Date(); let reviewSource = 'current';
     
     let failedAttempts = 0; let isLockedOut = false; let lockoutInterval = null; 
@@ -1529,133 +1530,102 @@
         }
     }
 
-    function unlockApp() { 
+    function unlockApp() {
         try {
-            userName = localStorage.getItem('murali_user_name') || "Student"; 
-            userPhone = localStorage.getItem('murali_phone') || "N/A"; 
-            userAddress = localStorage.getItem('murali_address') || "N/A"; 
-            userCountry = localStorage.getItem('murali_country') || "N/A"; 
+            userName = localStorage.getItem('murali_user_name') || "Student";
+            userPhone = localStorage.getItem('murali_phone') || "N/A";
+            userAddress = localStorage.getItem('murali_address') || "N/A";
+            userCountry = localStorage.getItem('murali_country') || "N/A";
             userRole = localStorage.getItem('murali_role') || "Student";
-            
-            // --- SMART CACHE CLEAR ---
+
+            // 104.0: पुरानो quiz cache तुरुन्त नमेट्ने; code update पछि background मा refresh हुन्छ।
             let isNewVersion = false;
             let savedVersion = localStorage.getItem('murali_app_version');
             if(savedVersion !== APP_VERSION) {
-                localStorage.removeItem('murali_server_quizzes');
-                localStorage.removeItem('murali_server_quiz_index');
                 localStorage.setItem('murali_app_version', APP_VERSION);
-                isNewVersion = true; 
+                isNewVersion = true;
             }
-            // -------------------------
 
-            document.getElementById('lock-screen').style.display = 'none'; 
-            document.getElementById('main-app').style.display = 'block'; 
-            
-            let nameParts = userName.split(" "); 
-            let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; 
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+
+            let nameParts = userName.split(" ");
+            let editLastName = nameParts.length > 1 ? nameParts.pop() : "";
             let editFirstName = nameParts.join(" ");
-            
-            document.getElementById('edit-first-name').value = editFirstName; 
+            document.getElementById('edit-first-name').value = editFirstName;
             document.getElementById('edit-last-name').value = editLastName;
-            document.getElementById('edit-phone').value = userPhone; 
+            document.getElementById('edit-phone').value = userPhone;
             document.getElementById('edit-address').value = userAddress;
-
             updateProfileBadgeUI();
-            
-            // --- SMART SYNC + BACKGROUND AUTO-SYNC ---
-            // Auto-sync timer सधैं सुरु हुन्छ; online नभए पछि Internet फर्किँदा event ले पनि sync गर्छ।
-            startQuizAutoSync();
-            if(navigator.onLine) {
-                syncServerQuizzes(true, isNewVersion);
-            }
 
-            setTimeout(() => syncPendingResults(), 150);
-            setTimeout(() => syncPendingCharts(), 450);
-            setTimeout(() => syncMyResults(), 750);
-            setTimeout(() => syncMyChartsFromServer(), 1050);
-            setTimeout(() => backgroundProfileSync(), 1350); 
+            // Fast UI first; background sync अब user-facing request सँग प्रतिस्पर्धा गर्दैन।
+            startQuizAutoSync(isNewVersion);
 
-            let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student"; 
+            let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student";
             let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
-            
-            if (isPrivileged) {
-                document.getElementById('btn-toggle-view').style.display = 'block'; 
-            } else { 
-                document.getElementById('btn-toggle-view').style.display = 'none'; 
-                isAdminViewActive = false; 
-            }
+            if (isPrivileged) document.getElementById('btn-toggle-view').style.display = 'block';
+            else { document.getElementById('btn-toggle-view').style.display = 'none'; isAdminViewActive = false; }
 
             if (isPrivileged && isAdminViewActive) {
-                document.getElementById('murali-text').style.display = 'block'; 
-                document.getElementById('generator-actions').style.display = 'flex'; 
-                document.getElementById('custom-import-section').style.display = 'block'; 
-                document.getElementById('btn-monthly-mega').style.display = 'block'; 
-                document.getElementById('btn-custom-mega').style.display = 'block'; 
-                document.getElementById('quiz-config-tools').style.display = 'flex'; 
-                document.getElementById('exam-config-section').style.display = 'block'; 
+                document.getElementById('murali-text').style.display = 'block';
+                document.getElementById('generator-actions').style.display = 'flex';
+                document.getElementById('custom-import-section').style.display = 'block';
+                document.getElementById('btn-monthly-mega').style.display = 'block';
+                document.getElementById('btn-custom-mega').style.display = 'block';
+                document.getElementById('quiz-config-tools').style.display = 'flex';
+                document.getElementById('exam-config-section').style.display = 'block';
                 document.getElementById('api-config-section').style.display = 'block';
-                document.getElementById('quiz-area').style.display = 'none'; 
+                document.getElementById('quiz-area').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'block';
-                document.getElementById('dashboard-skeleton').style.display = 'none'; 
-                populateSavedQuizzes();
-            } else {
-                document.getElementById('murali-text').style.display = 'none'; 
-                document.getElementById('generator-actions').style.display = 'none'; 
-                document.getElementById('custom-import-section').style.display = 'none'; 
-                document.getElementById('btn-monthly-mega').style.display = 'none';
-                document.getElementById('btn-custom-mega').style.display = 'none'; 
-                document.getElementById('quiz-config-tools').style.display = 'none'; 
-                document.getElementById('exam-config-section').style.display = 'none'; 
-                document.getElementById('api-config-section').style.display = 'none';
-                document.getElementById('export-saved-section').style.display = 'none'; 
-                loadStudentDashboard();
             }
-            switchTab('gen');
-        } catch(e) { 
-            showToast("Error loading UI", "error"); 
-        }
-    }
-
-    function updateProfileBadgeUI() {
-        let safeRole = userRole ? userRole.toString().trim().toLowerCase() : "student"; let displayRole = safeRole === 'admin' ? 'Admin' : (safeRole === 'manager' ? 'Manager' : 'Godly Student');
-        let badgeBg = (safeRole === 'admin' || safeRole === 'manager') ? 'var(--danger-color)' : 'var(--success-color)'; let badgeIcon = (safeRole === 'admin' || safeRole === 'manager') ? '👑' : '✨';
-        let nameParts = userName.split(" "); let editLastName = nameParts.length > 1 ? nameParts.pop() : ""; let editFirstName = nameParts.join(" "); let displayName = userName;
-        if(editFirstName.toUpperCase() === "BK" || editFirstName === "बी के" || editFirstName === "बी.के.") { displayName = editFirstName + " " + editLastName; } 
-        else { displayName = editFirstName.split(" ")[0]; if(editFirstName.includes("BK ") || editFirstName.includes("बी.के. ") || editFirstName.includes("बी के ")) { displayName = editFirstName; } }
-        let profileBadgeHtml = `<span style="font-size:0.95rem; background:${badgeBg}; color:white; padding:6px 16px; border-radius:50px; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(0,0,0,0.15); white-space:nowrap; font-weight:800;">${badgeIcon} ${displayName} <span style="opacity:0.85; font-weight:600; font-size:0.8rem;">(${displayRole})</span></span>`;
-        document.getElementById('profile-badge-container').innerHTML = profileBadgeHtml;
-    }
-
-    window.toggleAdminStudentView = function() {
-        isAdminViewActive = !isAdminViewActive; let btn = document.getElementById('btn-toggle-view');
-        if(isAdminViewActive) { btn.innerHTML = '👁️ Student View'; showToast("Switched to Admin View", "info"); } 
-        else { btn.innerHTML = '👑 Admin View'; showToast("Switched to Student View", "info"); }
-        closeSettings(); unlockApp();
+            loadStudentDashboard();
+            renderDashboard();
+        } catch(e) { console.error('unlockApp:', e); }
     }
 
     // ==========================================
-    // 5. DATA SYNCING LOGIC (103.0)
+    // 5. DATA SYNCING LOGIC (104.0 FAST)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
-        const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 2);
-        const timeoutMs = Number(typeof options.timeoutMs !== 'undefined' ? options.timeoutMs : 12000);
+        const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 1);
+        const timeoutMs = Number(typeof options.timeoutMs !== 'undefined' ? options.timeoutMs : 9000);
         let lastError = null;
         for (let attempt = 0; attempt <= retries; attempt++) {
             let controller = null, timer = null;
             try {
                 controller = new AbortController();
                 timer = setTimeout(() => controller.abort(), timeoutMs);
-                const response = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), signal:controller.signal });
+                const response = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), signal:controller.signal, cache:'no-store' });
                 const text = await response.text();
                 let data; try { data = JSON.parse(text); } catch(e) { throw new Error('Invalid server response'); }
-                if (data && data.status === 'error' && data.retryable && attempt < retries) { await new Promise(r => setTimeout(r, 700 * (attempt + 1))); continue; }
+                if (data && data.status === 'error' && data.retryable && attempt < retries) { await new Promise(r => setTimeout(r, 350)); continue; }
                 return data;
             } catch(e) {
                 lastError = e;
-                if (attempt < retries) await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+                if (attempt < retries) await new Promise(r => setTimeout(r, 350));
             } finally { if (timer) clearTimeout(timer); }
         }
         throw lastError || new Error('Request failed');
+    }
+
+    function upsertLocalCompletedResultFromServer_(dateStr, quiz, resultData) {
+        try {
+            const history = safeJSON('murali_progress', []);
+            const arr = Array.isArray(history) ? history : [];
+            const rev = Number(quiz && (quiz.revision || resultData.quizRevision) || 1) || 1;
+            const quizId = (quiz && quiz.quizId) || (dateStr + '-R' + rev);
+            const item = {
+                id: Date.now() + Math.random(), name:userName, phone:userPhone, date:dateStr,
+                score:Number(resultData.score || 0), percent:Number(resultData.percent || 0), total:Number(resultData.total || 0),
+                timeTaken: resultData.timeTaken || '', synced:true, quizData:(quiz && quiz.quizData) || null,
+                quizRevision:rev, quizId:quizId
+            };
+            const filtered = arr.filter(h => !(h && h.phone === userPhone && String(h.date) === String(dateStr) && Number(h.quizRevision || 1) === rev));
+            filtered.push(item);
+            filtered.sort((a,b) => String(b.date).localeCompare(String(a.date)));
+            localStorage.setItem('murali_progress', JSON.stringify(filtered));
+            return item;
+        } catch(e) { return null; }
     }
 
     function makeActiveStateObject(overrides = {}) {
@@ -1925,29 +1895,60 @@
     // --- PATCHED: Full background auto-sync ---
     // हरेक 5 मिनेटमा Quiz + Results + Charts + Pending data sync हुन्छ।
     // Quiz चलिरहेको बेला वा tab hidden हुँदा heavy sync रोक्छ; visible/online हुँदा पुनः चल्छ।
-    function startQuizAutoSync(){
-        if(quizAutoSyncTimer) clearInterval(quizAutoSyncTimer);
+    function scheduleQuietBackgroundSync(delay = 4500, forceFull = false) {
+        if (quietBackgroundSyncTimer) clearTimeout(quietBackgroundSyncTimer);
+        quietBackgroundSyncTimer = setTimeout(() => runQuietBackgroundSync(forceFull), delay);
+    }
 
-        const runBackgroundSync = () => {
-            if(!navigator.onLine || document.hidden || isQuizActive) return;
-            syncServerQuizzes(false,false);
-            syncMyResults();
-            syncMyChartsFromServer();
-            if(!pendingResultSyncInProgress) syncPendingResults();
-            if(!pendingChartSyncInProgress) syncPendingCharts();
-        };
-
-        quizAutoSyncTimer=setInterval(runBackgroundSync,5*60*1000);
-
-        // App खुल्दा एकपटक तुरुन्तै।
-        if(!document.hidden && navigator.onLine) runBackgroundSync();
-        if(navigator.onLine) {
-            syncPendingResults();
-            syncPendingCharts();
+    async function runQuietBackgroundSync(forceFull = false) {
+        quietBackgroundSyncTimer = null;
+        if (!navigator.onLine || document.hidden || isQuizActive || isExamSecurityCheckInProgress) return;
+        try {
+            // Sequential sync: एकैचोटि धेरै Google Sheet request नगर्ने।
+            await syncServerQuizzes(false, !!forceFull);
+            if (isQuizActive || isExamSecurityCheckInProgress) return;
+            if (!pendingResultSyncInProgress) await syncPendingResults();
+            if (isQuizActive || isExamSecurityCheckInProgress) return;
+            if (!pendingChartSyncInProgress) await syncPendingCharts();
+            if (isQuizActive || isExamSecurityCheckInProgress) return;
+            await syncMyResults();
+            if (isQuizActive || isExamSecurityCheckInProgress) return;
+            await syncMyChartsFromServer();
+            if (isQuizActive || isExamSecurityCheckInProgress) return;
+            await backgroundProfileSync();
+        } catch(e) {} finally {
+            if (!document.hidden && navigator.onLine) {
+                // अर्को नियमित cycle startQuizAutoSync को interval ले गर्नेछ।
+            }
         }
     }
-    document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !isQuizActive){syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
-    window.addEventListener('online',()=>{ if(!isQuizActive){flushActiveStateSave();syncServerQuizzes(false,false);syncMyResults();syncMyChartsFromServer();syncPendingResults();syncPendingCharts();} });
+
+    function startQuizAutoSync(isNewVersion = false){
+        if (window.quizAutoSyncTimer) clearInterval(window.quizAutoSyncTimer);
+
+        // Returning users: local cache बाट तुरुन्त UI; background पछि refresh।
+        // First install / empty cache: quiz list छिटो ल्याउन छोटो delay।
+        let cached = safeJSON('murali_server_quizzes', []);
+        let hasQuizCache = Array.isArray(cached) && cached.length > 0;
+        let firstDelay = hasQuizCache ? 6000 : 600;
+        scheduleQuietBackgroundSync(firstDelay, !!isNewVersion && !hasQuizCache);
+
+        window.quizAutoSyncTimer = setInterval(() => {
+            if (!document.hidden && navigator.onLine && !isQuizActive && !isExamSecurityCheckInProgress) runQuietBackgroundSync(false);
+        }, 5 * 60 * 1000);
+
+        if (isNewVersion && hasQuizCache) scheduleQuietBackgroundSync(6500, true);
+    }
+
+    document.addEventListener('visibilitychange',()=>{
+        if(!document.hidden && !isQuizActive && !isExamSecurityCheckInProgress) scheduleQuietBackgroundSync(2500, false);
+    });
+    window.addEventListener('online',()=>{
+        if(isQuizActive || isExamSecurityCheckInProgress) return;
+        flushActiveStateSave();
+        scheduleQuietBackgroundSync(2500, false);
+    });
+
 
     function getQuizRevisionValue(item) { const rev = parseInt(item && (item.quizRevision || item.revision), 10); return (rev && rev > 0) ? rev : 1; }
     function getHistoryQuizKey(item) { return String(item && item.date || "") + "-R" + getQuizRevisionValue(item); }
@@ -2230,35 +2231,39 @@
     window.startSpecificQuiz = async function(dateStr) {
         let serverQuizzes=safeJSON('murali_server_quizzes',[]), targetQuiz=Array.isArray(serverQuizzes)?serverQuizzes.find(q=>q.quizDate===dateStr):null;
         const savedPin=localStorage.getItem('murali_pin')||'';
-        document.getElementById('loading-box').style.display='block'; document.getElementById('loading-text').innerText='परीक्षाको स्थिति छिटो जाँच हुँदैछ...'; document.getElementById('quiz-area').style.display='none';
+        document.getElementById('loading-box').style.display='block'; document.getElementById('loading-text').innerText='परीक्षा स्थिति जाँच हुँदैछ...'; document.getElementById('quiz-area').style.display='none';
         let existingResult=document.getElementById('result-screen'); if(existingResult) existingResult.remove();
+
         if(navigator.onLine && userPhone!=='N/A' && savedPin){
+            isExamSecurityCheckInProgress = true;
             try{
-                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:2,timeoutMs:15000});
+                const data=await apiPostJSON({action:'startQuizSession',phone:userPhone,pin:savedPin,deviceId:getDeviceId(),quizDate:dateStr},{retries:0,timeoutMs:7000});
                 if(data && data.status==='success' && data.quiz && data.quiz.quizData){
-                    targetQuiz=data.quiz; let cached=safeJSON('murali_server_quizzes',[]); if(!Array.isArray(cached)) cached=[];
+                    targetQuiz=data.quiz;
+                    let cached=safeJSON('murali_server_quizzes',[]); if(!Array.isArray(cached)) cached=[];
                     const idx=cached.findIndex(q=>q.quizDate===dateStr); if(idx>=0) cached[idx]=targetQuiz; else cached.push(targetQuiz); localStorage.setItem('murali_server_quizzes',JSON.stringify(cached)); populateSavedQuizzes();
-                    
-                    // --- PATCHED: Fix 3 (Update Local History if Completed) ---
+
                     if(data.attemptStatus === 'completed'){
-    await syncMyResults();
-
-    document.getElementById('loading-box').style.display = 'none';
-    loadStudentDashboard();
-
-    return showToast(
-        'यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।',
-        'warning',
-        4000
-    );
-}
-                    // ----------------------------------------------------------
+                        upsertLocalCompletedResultFromServer_(dateStr, targetQuiz, Object.assign({}, data.result || {}, {quizRevision:data.quizRevision || data.revision || targetQuiz.revision, timeTaken:(data.result && data.result.timeTaken) || ''}));
+                        document.getElementById('loading-box').style.display = 'none';
+                        loadStudentDashboard();
+                        return showToast('यो क्वीज तपाईंले पहिले नै पूरा गरिसक्नुभएको छ। नयाँ attempt गर्न मिल्दैन।','warning',4000);
+                    }
 
                     document.getElementById('loading-box').style.display='none'; window.tempCloudState=data.stateData||null; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex'; return;
                 }
-            }catch(e){}
+                document.getElementById('loading-box').style.display='none';
+                return showToast((data && data.message) ? data.message : 'सर्भरबाट परीक्षा स्थिति जाँच हुन सकेन। कृपया पुनः प्रयास गर्नुहोस्।','error',5000);
+            }catch(e){
+                document.getElementById('loading-box').style.display='none';
+                return showToast('सर्भरबाट परीक्षा स्थिति जाँच हुन सकेन। इन्टरनेट/सर्भर जाँच गरेर पुनः प्रयास गर्नुहोस्।','error',5000);
+            } finally {
+                isExamSecurityCheckInProgress = false;
+            }
         }
-        if(!targetQuiz || !targetQuiz.quizData){document.getElementById('loading-box').style.display='none';return showToast(navigator.onLine?'क्वीज फेला परेन वा सर्भर प्रतिक्रिया आएन।':'अफलाइन अवस्थामा यो क्वीज पहिले डाउनलोड भएको छैन।','error');}
+
+        // Offline mode: पहिले डाउनलोड भएको quiz मात्र प्रयोग गर्न मिल्छ।
+        if(!targetQuiz || !targetQuiz.quizData){document.getElementById('loading-box').style.display='none';return showToast('अफलाइन अवस्थामा यो क्वीज पहिले डाउनलोड भएको छैन।','error');}
         let localState=safeJSON('murali_active_quiz_state',null); if(localState && (localState.date!==dateStr || Number(localState.quizRevision||1)!==Number(targetQuiz.revision||1))) localState=null;
         document.getElementById('loading-box').style.display='none'; window.tempCloudState=localState; window.tempTargetQuiz=targetQuiz; document.getElementById('pledge-modal').style.display='flex';
     };
@@ -2882,8 +2887,7 @@
         let btn = document.getElementById('btn-fetch-lb'); let txtArea = document.getElementById('lb-result-text'); let tableBody = document.getElementById('lb-table-body'); let tableHead = document.getElementById('lb-table-head');
         btn.innerText = "Fetching from Server..."; btn.disabled = true; txtArea.value = "Loading data from Google Sheets... Please wait."; tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: var(--muted-text-color);">⏳ Loading data...</td></tr>`;
         
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-        .then(r => r.json()).then(data => {
+        apiPostJSON(payload, {retries:0, timeoutMs:7000}).then(data => {
             btn.innerText = "Generate Data"; btn.disabled = false;
             if(data.status === "success") {
                 txtArea.value = data.report;
@@ -2955,7 +2959,7 @@
         if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
 
         try {
-            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 2, timeoutMs: 15000});
+            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 0, timeoutMs: 7000});
             document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block';
             if (data.status === "success") {
                 let tbody = document.getElementById('sl-table-body');
@@ -3046,7 +3050,7 @@
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 103.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 104.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
