@@ -720,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 103.0 – AUTO SYNC SAFE</div>
+        <div>Version: 103.0 – Auto Sync Safe</div>
     </div>
 </div>
 
@@ -2389,83 +2389,168 @@
                 localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj)); if (typeof saveStateToCloud === 'function') saveStateToCloud(stateObj);
                 startQuestionLock(activeQuestionIndex);
             } else {
-                currentScore = tempScore; activeStateSeq++;
-                const finalState = makeActiveStateObject({qIndex:qIndex, score:currentScore, answeredCount:answeredCount});
-                localStorage.setItem('murali_active_quiz_state', JSON.stringify(finalState)); if (typeof saveStateToCloud === 'function') saveStateToCloud(finalState);
-                showToast("सबै प्रश्न सकियो! नतिजा तयार हुँदैछ...", "success"); submitQuiz();
-            }
+    currentScore = tempScore;
+    activeStateSeq++;
+    showToast("✅ परीक्षा पूरा भयो!", "success");
+    submitQuiz();
+}
         }, 600); 
     }
 
     window.submitQuiz = async function() {
-        if (document.getElementById('sb-submit-btn').disabled) return; 
-        let untouched = currentQuiz.length - answeredCount; 
-        if (currentQuiz.length > 0 && answeredCount === 0) return showToast("कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
-        if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) return;
-        
-        document.getElementById('sb-submit-btn').disabled = true; 
-        stopTimer(); 
-        clearInterval(qLockInterval);
-        activeStateSeq++; 
-        pendingActiveState = makeActiveStateObject({qIndex:activeQuestionIndex}); 
-        await flushActiveStateSave(); 
-        isQuizActive = false;
-        
-        currentScore = 0; 
-        currentQuiz.forEach(q => {
-            if (q.userSelectedIndex !== undefined) { 
-                let selectedText = String(q.options[q.userSelectedIndex]).trim(); 
-                let answerText = String(q.answer).trim(); 
-                if (selectedText === answerText) { currentScore++; q.userCorrect = true; } 
-                else { q.userCorrect = false; } 
-            } else { q.userCorrect = false; }
-        });
-        
-        localStorage.removeItem('murali_active_quiz_state');
-        const resultSync = await saveOrReplaceProgress();
-        
-        // UI Updates - परीक्षा सकिएपछि माथिको Cancel बटन लुकाउने
-        document.getElementById('main-header').style.display = 'flex'; 
-        document.getElementById('main-tabs').style.display = 'flex'; 
-        document.getElementById('toolbar-right-actions').style.display = 'flex';
-        document.getElementById('quiz-area').style.display = 'none'; 
-        document.getElementById('sticky-scorebar').style.display = 'none'; 
-        document.getElementById('online-quiz-actions').style.display = 'none'; 
-        
-        let percent = Math.round((currentScore / currentQuiz.length) * 100); 
-        let msg = percent === 100 ? "अद्भुत!" : (percent >= 80 ? "धेरै राम्रो!" : (percent >= 60 ? "राम्रो!" : (percent >= 40 ? "राम्रो प्रयास!" : "अभ्यास बढाउनुहोस्!")));
-        if(percent === 100) fireConfetti(); 
-        
-        // पुरानो नतिजा स्क्रिन भए हटाउने
-        let oldRes = document.getElementById('result-screen');
-        if(oldRes) oldRes.remove();
+    if (document.getElementById('sb-submit-btn').disabled) return;
 
-        let resultHtml = `
-        <div id="result-screen" style="text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem;">
-            <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--exam-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--exam-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);">${currentScore}/${currentQuiz.length}</div>
-            <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">${msg}</div>
-            <div id="result-sync-status" style="margin-bottom: 20px; color: var(--muted-text-color); font-weight: 600;">${resultSync && resultSync.ok ? 'तपाईंको नतिजा Google Sheet मा सुरक्षित भयो।' : 'नतिजा मोबाइलमा सुरक्षित छ; Google Sheet Sync बाँकी छ।'} </div>
-            
-            <button onclick="shareMyResult()" style="background: #25D366; color: white; width:auto; border-radius:50px; box-shadow: none; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer; margin-bottom: 15px;">
-                <svg class="icon" viewBox="0 0 24 24" style="margin-right: 6px; width: 18px; height: 18px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> 🔗 लिंक सेयर गर्नुहोस्
-            </button><br>
+    let untouched = currentQuiz.length - answeredCount;
 
-            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                <button onclick="switchTab('prog')" style="background: var(--stats-color); color: white; width:auto; border-radius:50px; box-shadow: none; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer;">
-                    📊 प्रगति विवरण
-                </button>
-                <button onclick="reviewQuiz()" style="background: transparent; color: var(--exam-color); border: 2px solid var(--exam-color); width:auto; border-radius:50px; box-shadow: none; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; cursor: pointer;">
-                    🔎 उत्तर रिभ्यु
-                </button>
-                <button onclick="resetToGenerator()" style="background: #64748b; color: white; width:auto; border-radius:50px; box-shadow: none; font-size: 1.05rem; padding: 0.7rem 1.5rem; font-weight: 800; border: none; cursor: pointer;">
-                    🏠 गृहपृष्ठ
-                </button>
-            </div>
-        </div>`;
-        
-        document.getElementById('view-generator').insertAdjacentHTML('beforeend', resultHtml); 
-        window.scrollTo(0, 0);
+    if (currentQuiz.length > 0 && answeredCount === 0) {
+        return showToast("कृपया कम्तीमा एउटा प्रश्न हल गर्नुहोस्।", "error");
     }
+
+    if (untouched > 0 && !confirm(`तपाईंले ${untouched} वटा प्रश्न छोड्नुभएको छ। के साँच्चै सबमिट गर्ने हो?`)) {
+        return;
+    }
+
+    // ==========================================
+    // 1. परीक्षा तुरुन्त समाप्त गर्ने
+    // ==========================================
+    document.getElementById('sb-submit-btn').disabled = true;
+    stopTimer();
+    clearInterval(qLockInterval);
+    isQuizActive = false;
+
+    // ==========================================
+    // 2. अन्तिम Score calculate गर्ने
+    // ==========================================
+    currentScore = 0;
+
+    currentQuiz.forEach(q => {
+        if (q.userSelectedIndex !== undefined) {
+            let selectedText = String(q.options[q.userSelectedIndex]).trim();
+            let answerText = String(q.answer).trim();
+
+            if (selectedText === answerText) {
+                currentScore++;
+                q.userCorrect = true;
+            } else {
+                q.userCorrect = false;
+            }
+        } else {
+            q.userCorrect = false;
+        }
+    });
+
+    // ==========================================
+    // 3. Active Quiz हटाउने
+    // ==========================================
+    localStorage.removeItem('murali_active_quiz_state');
+
+    // ==========================================
+    // 4. Result UI तुरुन्त देखाउने
+    //    अब Google Sheet को प्रतीक्षा हुँदैन
+    // ==========================================
+    document.getElementById('main-header').style.display = 'flex';
+    document.getElementById('main-tabs').style.display = 'flex';
+    document.getElementById('toolbar-right-actions').style.display = 'flex';
+    document.getElementById('quiz-area').style.display = 'none';
+    document.getElementById('sticky-scorebar').style.display = 'none';
+    document.getElementById('online-quiz-actions').style.display = 'none';
+
+    let percent = Math.round((currentScore / currentQuiz.length) * 100);
+
+    let msg =
+        percent === 100 ? "अद्भुत!" :
+        percent >= 80 ? "धेरै राम्रो!" :
+        percent >= 60 ? "राम्रो!" :
+        percent >= 40 ? "राम्रो प्रयास!" :
+        "अभ्यास बढाउनुहोस्!";
+
+    if (percent === 100) fireConfetti();
+
+    // पुरानो Result हटाउने
+    let oldRes = document.getElementById('result-screen');
+    if (oldRes) oldRes.remove();
+
+    // ==========================================
+    // 5. नयाँ Result Screen
+    // ==========================================
+    let resultHtml = `
+    <div id="result-screen" style="text-align: center; padding: 3rem 1rem; background: var(--card-bg); border-radius: 20px; border: 2px solid var(--border-color); box-shadow: var(--box-shadow-main); margin-top: 0.5rem;">
+
+        <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--glass-bg); border: 8px solid var(--exam-color); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--exam-color); margin: 0 auto 1.5rem auto; box-shadow: 0 8px 25px rgba(2, 132, 199, 0.25);">
+            ${currentScore}/${currentQuiz.length}
+        </div>
+
+        <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">
+            ${msg}
+        </div>
+
+        <div id="result-sync-status" style="margin-bottom: 20px; color: var(--muted-text-color); font-weight: 600;">
+            📱 नतिजा सुरक्षित भयो। सर्भरमा पठाउँदैछ...
+        </div>
+
+        <button onclick="shareMyResult()" style="background: #25D366; color: white; width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; border:none; cursor:pointer; margin-bottom:15px;">
+            <svg class="icon" viewBox="0 0 24 24" style="margin-right:6px; width:18px; height:18px;">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            🔗 लिंक सेयर गर्नुहोस्
+        </button><br>
+
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+
+            <button onclick="switchTab('prog')" style="background: var(--stats-color); color: white; width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; border:none; cursor:pointer;">
+                📊 प्रगति विवरण
+            </button>
+
+            <button onclick="reviewQuiz()" style="background: transparent; color: var(--exam-color); border:2px solid var(--exam-color); width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; cursor:pointer;">
+                🔎 उत्तर रिभ्यु
+            </button>
+
+            <button onclick="resetToGenerator()" style="background:#64748b; color:white; width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; border:none; cursor:pointer;">
+                🏠 गृहपृष्ठ
+            </button>
+
+        </div>
+    </div>`;
+
+    document.getElementById('view-generator').insertAdjacentHTML('beforeend', resultHtml);
+    window.scrollTo(0, 0);
+
+    // ==========================================
+    // 6. Google Sheet Sync background मा
+    //    Result देखाउन यसको प्रतीक्षा हुँदैन
+    // ==========================================
+    saveOrReplaceProgress()
+        .then(resultSync => {
+
+            const statusEl = document.getElementById('result-sync-status');
+            if (!statusEl) return;
+
+            if (resultSync && resultSync.ok) {
+                statusEl.innerHTML = '☁️ तपाईंको नतिजा Google Sheet मा सुरक्षित भयो।';
+                statusEl.style.color = 'var(--success-color)';
+            } else {
+                statusEl.innerHTML = '📱 नतिजा मोबाइलमा सुरक्षित छ; Google Sheet Sync बाँकी छ।';
+                statusEl.style.color = 'var(--warning-color)';
+            }
+
+        })
+        .catch(error => {
+
+            console.error('Background result sync failed:', error);
+
+            const statusEl = document.getElementById('result-sync-status');
+
+            if (statusEl) {
+                statusEl.innerHTML = '📱 नतिजा मोबाइलमा सुरक्षित छ; Google Sheet Sync पछि हुनेछ।';
+                statusEl.style.color = 'var(--warning-color)';
+            }
+
+        });
+}
 
     async function saveOrReplaceProgress() {
         let history = safeJSON('murali_progress', []); let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
