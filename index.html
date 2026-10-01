@@ -33,6 +33,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
+
+        #progress-year-grid > div, #progress-month-calendar > div { min-width: 0; }
+        @media (max-width: 520px) {
+            #progress-year-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            #progress-month-calendar > div { font-size: .68rem; }
+        }
         
         :root {
             --bg-color: linear-gradient(135deg, #f6f4ee, #eef4f5);
@@ -720,7 +726,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 105.0 – Auto Sync, Fast Security & Rank</div>
+        <div>Version: 106.0 – Safe Sync, 48H Exam/Mega, Stats</div>
     </div>
 </div>
 
@@ -969,10 +975,11 @@
             मेरो विस्तृत प्रगति
         </h3>
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--bg-color); padding: 8px; border-radius: 8px;">
-            <button onclick="navigateProgressMonth(-1)" style="background: transparent; color: var(--stats-color); box-shadow: none; width: auto; padding: 5px 10px;">&lt; अघिल्लो</button>
-            <span id="progress-month-year" style="font-weight: 800; color: var(--stats-color);"></span>
-            <button onclick="navigateProgressMonth(1)" style="background: transparent; color: var(--stats-color); box-shadow: none; width: auto; padding: 5px 10px;">अर्को &gt;</button>
+        <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;margin-bottom:15px;background:var(--bg-color);padding:8px;border-radius:8px;">
+            <button onclick="navigateProgressMonth(-1)" style="background:transparent;color:var(--stats-color);box-shadow:none;width:auto;padding:5px 8px;">&lt;</button>
+            <span id="progress-month-year" style="font-weight:800;color:var(--stats-color);text-align:center;"></span>
+            <select id="progress-year-select" onchange="changeProgressYear(this.value)" style="margin:0;width:auto;min-width:82px;padding:5px 8px;"></select>
+            <button onclick="navigateProgressMonth(1)" style="background:transparent;color:var(--stats-color);box-shadow:none;width:auto;padding:5px 8px;">&gt;</button>
         </div>
 
         <div class="progress-tabs">
@@ -986,10 +993,12 @@
         </div>
         <div id="progress-monthly-section" style="display:none;">
             <div class="chart-container" style="height: 220px;"><canvas id="monthlyLineChart"></canvas></div>
-            <div style="margin-top: 20px; max-height: 250px; overflow-y: auto;" id="progress-list"></div>
+            <div id="progress-month-calendar" style="margin-top:14px;"></div>
+            <div style="margin-top: 15px; max-height: 250px; overflow-y: auto;" id="progress-list"></div>
         </div>
         <div id="progress-yearly-section" style="display:none;">
             <div class="chart-container" style="height: 220px;"><canvas id="yearlyBarChart"></canvas></div>
+            <div id="progress-year-grid" style="margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;"></div>
         </div>
     </div>
 </div>
@@ -1126,15 +1135,10 @@
         });
     }
 
+    // 106.0 SAFE SERVICE WORKER UPDATE
+    // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            let shouldReloadOnControllerChange = !!navigator.serviceWorker.controller;
-            let reloadTriggered = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!shouldReloadOnControllerChange || reloadTriggered) return;
-                reloadTriggered = true;
-                window.location.reload();
-            });
             navigator.serviceWorker.register('sw.js').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
@@ -1146,7 +1150,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "105.0"; 
+    const APP_VERSION = "106.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1321,16 +1325,134 @@
         return null; 
     }
     
-    function getSortableTime(sq) { 
-        if (sq.createdAt) return sq.createdAt; 
-        let parsed = parseDateString(sq.quizDate); 
-        if (parsed && !isNaN(parsed.getTime())) return parsed.getTime(); 
-        let match = String(sq.quizDate).match(/\d{2}-\d{2}-\d{4}/);
-        if (match) {
-            let parts = match[0].split('-');
-            return new Date(parts[2], parts[1]-1, parts[0]).getTime();
+    function getMegaActivationDateUI(quizDate) {
+        const s = String(quizDate || '').replace(/^'/, '').trim();
+        if (!s) return null;
+        // Monthly Mega labels normally begin with the fixed activation date, e.g. 01-10-2026.
+        const explicit = s.match(/(?:^|[^0-9])(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})(?:[^0-9]|$)/);
+        if (explicit) {
+            let y = parseInt(explicit[3], 10); if (y < 100) y += 2000;
+            const d = new Date(y, parseInt(explicit[2], 10) - 1, parseInt(explicit[1], 10));
+            return isNaN(d.getTime()) ? null : d;
         }
-        return 0; 
+        const named = s.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b[^0-9]{0,18}(20\d{2})\b/i);
+        if (named) {
+            const names = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+            const mi = names.indexOf(named[1].slice(0,3).toLowerCase());
+            if (mi >= 0) return new Date(parseInt(named[2], 10), mi, 1);
+        }
+        return null;
+    }
+
+    function getSortableTime(sq) {
+        if (sq && sq.isMegaQuiz) {
+            const md = getMegaActivationDateUI(sq.quizDate);
+            if (md && !isNaN(md.getTime())) return md.getTime();
+        }
+        if (sq && sq.createdAt) return Number(sq.createdAt) || 0;
+        let parsed = parseDateString(sq && sq.quizDate);
+        if (parsed && !isNaN(parsed.getTime())) return parsed.getTime();
+        return 0;
+    }
+
+    function dateOnlyLocal_(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function dateKeyLocal_(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function sameLocalDate_(a,b) { return !!a && !!b && dateKeyLocal_(a) === dateKeyLocal_(b); }
+    function isWithin48HoursFromDate_(dateObj, now = new Date()) {
+        if (!dateObj || isNaN(dateObj.getTime())) return false;
+        const start = dateOnlyLocal_(dateObj).getTime();
+        const end = start + 48 * 60 * 60 * 1000;
+        const t = now.getTime();
+        return t >= start && t < end;
+    }
+    function formatTimeTakenForUI(value) {
+        const s = String(value == null ? '' : value).trim();
+        if (!s) return '';
+        let m = s.match(/^(\d+)\s*:\s*(\d{1,2})(?::\s*(\d{1,2}))?$/);
+        if (!m) return s;
+        if (m[3] !== undefined) {
+            // Legacy sheet may contain HH:MM:SS where the intended display was MM:SS.
+            const a = parseInt(m[1],10), b = parseInt(m[2],10), c = parseInt(m[3],10);
+            if (b <= 59 && c <= 59) return `${String(a).padStart(2,'0')}:${String(b).padStart(2,'0')}`;
+        }
+        return `${String(parseInt(m[1],10)).padStart(2,'0')}:${String(parseInt(m[2],10)).padStart(2,'0')}`;
+    }
+
+    function normalizeExamHistoryForStats_(history) {
+        const map = new Map();
+        (Array.isArray(history) ? history : []).forEach((h, idx) => {
+            const d = getValidDate(h);
+            const score = Number(h && h.score);
+            const total = Number(h && h.total);
+            let percent = Number(h && h.percent);
+            if (!d || isNaN(d.getTime()) || !isFinite(score) || !isFinite(total) || total <= 0 || score < 0 || score > total) return;
+            if (!isFinite(percent) || percent < 0 || percent > 100) percent = (score / total) * 100;
+            const rev = parseInt(String(h.quizRevision || h.revision || 1),10) || 1;
+            const key = `${dateKeyLocal_(d)}-R${rev}`;
+            const item = Object.assign({}, h, {__date:d, percent:Number(percent), score, total, quizRevision:rev, timeTaken:formatTimeTakenForUI(h.timeTaken)});
+            const prev = map.get(key);
+            // Keep the better valid result for duplicated date/revision records.
+            if (!prev || item.percent > prev.percent || (item.percent === prev.percent && Number(item.id||idx) > Number(prev.id||0))) map.set(key,item);
+        });
+        return Array.from(map.values()).sort((a,b)=>a.__date.getTime()-b.__date.getTime());
+    }
+
+    function currentStreak_(items) {
+        const keys = new Set((items||[]).map(x=>dateKeyLocal_(x.__date || getValidDate(x))).filter(Boolean));
+        if (!keys.size) return 0;
+        let d = dateOnlyLocal_(new Date());
+        if (!keys.has(dateKeyLocal_(d))) d.setDate(d.getDate()-1);
+        let run = 0;
+        while (keys.has(dateKeyLocal_(d))) { run++; d.setDate(d.getDate()-1); }
+        return run;
+    }
+
+    function validChartHistoryForStats_(charts) {
+        const map = new Map();
+        (Array.isArray(charts)?charts:[]).forEach(c=>{
+            const d = getValidDate(c); const score = Number(c && c.totalScore);
+            if (!d || isNaN(d.getTime()) || !isFinite(score) || score < 0 || score > 100) return;
+            const key=dateKeyLocal_(d); const item=Object.assign({},c,{__date:d,totalScore:score});
+            const prev=map.get(key); if(!prev || item.totalScore>prev.totalScore) map.set(key,item);
+        });
+        return Array.from(map.values()).sort((a,b)=>a.__date-b.__date);
+    }
+
+    function localStatsMonthly_(items, cy, cm) {
+        const days = new Date(cy, cm + 1, 0).getDate();
+        const map = {}; (items||[]).forEach(h=>{if(h.__date.getFullYear()===cy && h.__date.getMonth()===cm) map[h.__date.getDate()]=h;});
+        const arr=[]; for(let day=1;day<=days;day++){ const h=map[day]; arr.push({day,date:dateKeyLocal_(new Date(cy,cm,day)),data:h?{score:h.score,total:h.total,percent:Math.round(h.percent),timeTaken:h.timeTaken}:null}); }
+        return arr;
+    }
+
+    function localStatsWeekly_(items, endDate) {
+        const map={}; (items||[]).forEach(h=>map[dateKeyLocal_(h.__date)]=h); const end=dateOnlyLocal_(endDate), out=[];
+        for(let i=6;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);const h=map[dateKeyLocal_(d)];out.push({date:dateKeyLocal_(d),label:`${d.getDate()}/${d.getMonth()+1}`,data:h?{score:h.score,total:h.total,percent:Math.round(h.percent),timeTaken:h.timeTaken}:null});}
+        return out;
+    }
+
+    function localStatsYearly_(items, year) {
+        const months=[];
+        for(let m=0;m<12;m++){
+            const a=(items||[]).filter(h=>h.__date.getFullYear()===year&&h.__date.getMonth()===m);
+            months.push({month:m+1,label:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m],count:a.length,average:a.length?Math.round(a.reduce((s,x)=>s+x.percent,0)/a.length):0});
+        }
+        return months;
+    }
+
+    let authoritativeStatsCache = {};
+    let authoritativeStatsInFlight = {};
+    async function fetchAuthoritativeStats_(year, month, endDateStr) {
+        if (!navigator.onLine || !userPhone || userPhone === 'N/A') return null;
+        const key = `${year}-${month}-${endDateStr || ''}`;
+        if (authoritativeStatsCache[key]) return authoritativeStatsCache[key];
+        if (authoritativeStatsInFlight[key]) return authoritativeStatsInFlight[key];
+        const pin = localStorage.getItem('murali_pin') || '';
+        const p = apiPostJSON({action:'getMyStats', phone:userPhone, pin, deviceId:getDeviceId(), year, month, endDate:endDateStr || ''}, {retries:1, timeoutMs:12000})
+            .then(data=>{ if(data && data.status==='success'){ authoritativeStatsCache[key]=data; return data; } return null; })
+            .catch(()=>null)
+            .finally(()=>{ delete authoritativeStatsInFlight[key]; });
+        authoritativeStatsInFlight[key]=p; return p;
     }
     function getDeviceId() { let deviceId = localStorage.getItem('murali_device_id'); if (!deviceId) { deviceId = 'DEV-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now(); localStorage.setItem('murali_device_id', deviceId); } return deviceId; }
     function getLocalDateISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
@@ -2113,23 +2235,56 @@
             
             html += `</div></div><div style="margin-top:15px; background:var(--card-bg); padding:12px; border-radius:16px; border:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;"><div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div><div style="white-space: nowrap;">✅ : सम्पन्न भएको</div><div style="white-space: nowrap;">❌ : छुटेको (Locked)</div><div><button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 परीक्षा र्‍याङ्क</button></div></div></div>`;
 
-            let nowMs = Date.now(); let todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            let specialQuizzes = serverQuizzes.filter(sq => {
-                if (!(sq.isMegaQuiz || !getValidDate({date: sq.quizDate}))) return false;
-                let d = parseDateString(String(sq.quizDate)); let future = d && !isNaN(d.getTime()) && new Date(d.getFullYear(), d.getMonth(), d.getDate()) > todayStart;
-                let createdTime = getSortableTime(sq); let recent = createdTime > 0 ? Math.abs(nowMs - createdTime) <= (48 * 60 * 60 * 1000) : false;
-                return recent || future;
-            });
-            
-            if (specialQuizzes.length > 0 || serverQuizzes.some(q => q.isMegaQuiz)) {
-                specialQuizzes.sort((a, b) => getSortableTime(b) - getSortableTime(a)); let activeMegaHtml = '';
-                specialQuizzes.forEach(sq => {
-                    let isCompleted = history.some(h => String(h.date).trim() === String(sq.quizDate).trim()); let createdTime = getSortableTime(sq); let isExpired = createdTime > 0 && (Date.now() - createdTime) > (48 * 60 * 60 * 1000);
-                    if (isCompleted) { activeMegaHtml += `<button disabled style="background:var(--success-bg); color:var(--success-color); border:2px solid var(--success-border); box-shadow:none; justify-content:flex-start; font-size:1.05rem;">✅ ${sq.quizDate} (Completed)</button>`; } 
-                    else if (!isExpired) { activeMegaHtml += `<button onclick="startSpecificQuiz('${sq.quizDate}')" style="background:linear-gradient(135deg, #f59e0b, #ea580c); justify-content:flex-start; font-size:1.05rem; padding:1rem;">▶️ Play ${sq.quizDate}</button>`; }
-                }); 
-                if(activeMegaHtml !== '') { html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><h4 style="margin:0 0 12px 0; color:var(--primary-color); font-weight:800; display:flex; align-items:center; gap:8px;"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Special Exams</h4><div style="display:flex; flex-direction:column; gap:10px;">${activeMegaHtml}<button onclick="openMegaArchive()" class="btn-small" style="margin-top:4px; width:100%; background:var(--bg-color); color:var(--primary-color); border:1px solid var(--primary-color); font-weight:800;">📚 सबै Mega Quiz Archive हेर्नुहोस्</button></div></div>`; } 
-                else if (serverQuizzes.some(q => q.isMegaQuiz)) { html += `<div style="margin-top:20px; padding-top:15px; border-top:2px dashed var(--border-color);"><button onclick="openMegaArchive()" class="btn-small" style="width:100%; background:var(--bg-color); color:var(--primary-color); border:1px solid var(--primary-color); font-weight:800;">🏆 Mega Quiz Archive</button></div>`; }
+            const now = new Date();
+            const todayStart = dateOnlyLocal_(now);
+            const currentMonthViewing = (cy === now.getFullYear() && cm === now.getMonth());
+
+            // 48-hour carry-over: yesterday's normal quiz remains playable across month boundary.
+            if (currentMonthViewing) {
+                const yesterday = new Date(todayStart); yesterday.setDate(yesterday.getDate() - 1);
+                const yKey = dateKeyLocal_(yesterday);
+                const carryQuiz = serverQuizzes.find(sq => {
+                    const d = parseDateString(sq && sq.quizDate);
+                    return sq && !sq.isMegaQuiz && d && dateKeyLocal_(d) === yKey;
+                });
+                if (carryQuiz) {
+                    const completed = history.some(h => {
+                        const d = getValidDate(h); return d && dateKeyLocal_(d) === yKey && !String(h.date||'').match(/mega|मेगा|review/i);
+                    });
+                    const expires = new Date(yesterday.getTime() + 48*60*60*1000);
+                    html += `<div style="margin-top:15px;padding:12px 14px;border-radius:14px;border:1px dashed var(--exam-color);background:rgba(2,132,199,.06);">
+                        <div style="font-weight:900;color:var(--exam-color);margin-bottom:5px;">🕘 हिजोको बाँकी परीक्षा</div>
+                        <div style="font-size:.82rem;color:var(--muted-text-color);margin-bottom:8px;">${yesterday.toLocaleDateString('en-GB')} • ४८ घण्टे सुविधा • ${expires.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'})} सम्म</div>
+                        ${completed
+                            ? `<button disabled style="width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);">✅ पूरा भइसकेको</button>`
+                            : `<button onclick="startSpecificQuiz('${String(carryQuiz.quizDate).replace(/'/g,"\\'")}')" style="width:100%;background:var(--primary-gradient);color:white;">▶️ हिजोको परीक्षा दिनुहोस्</button>`}
+                    </div>`;
+                }
+            }
+
+            // Monthly Mega Quiz: activation is always the first day 00:00 and lasts 48 hours.
+            const monthlyMegas = serverQuizzes.filter(sq => sq && sq.isMegaQuiz === true);
+            const activeMegas = monthlyMegas.filter(sq => {
+                const md = getMegaActivationDateUI(sq.quizDate);
+                return md && isWithin48HoursFromDate_(md, now);
+            }).sort((a,b)=>getSortableTime(b)-getSortableTime(a));
+            const upcomingMega = monthlyMegas.filter(sq => {
+                const md=getMegaActivationDateUI(sq.quizDate); return md && md.getTime() > todayStart.getTime();
+            }).sort((a,b)=>getSortableTime(a)-getSortableTime(b))[0];
+            if (activeMegas.length > 0) {
+                let activeMegaHtml = '';
+                activeMegas.forEach(sq => {
+                    const done = history.some(h => String(h.date||'').trim() === String(sq.quizDate||'').trim());
+                    const md = getMegaActivationDateUI(sq.quizDate);
+                    const end = md ? new Date(dateOnlyLocal_(md).getTime()+48*60*60*1000) : null;
+                    activeMegaHtml += done
+                        ? `<button disabled style="background:var(--success-bg);color:var(--success-color);border:2px solid var(--success-border);justify-content:flex-start;font-size:1rem;">✅ ${sq.quizDate} (Completed)</button>`
+                        : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="background:linear-gradient(135deg,#f59e0b,#ea580c);justify-content:flex-start;font-size:1rem;padding:.9rem;">🏆 ${sq.quizDate}<div style="font-size:.72rem;margin-top:3px;opacity:.9;">४८ घण्टे • ${end ? end.toLocaleString('en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : ''} सम्म</div></button>`;
+                });
+                html += `<div style="margin-top:15px;padding:14px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,.07);"><h4 style="margin:0 0 10px;color:#b45309;font-weight:900;">🏆 मासिक मेगा क्वीज</h4><div style="display:flex;flex-direction:column;gap:8px;">${activeMegaHtml}<button onclick="openMegaArchive()" class="btn-small" style="margin-top:2px;width:100%;background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);font-weight:800;">📚 सबै Mega Quiz Archive</button></div></div>`;
+            } else if (upcomingMega) {
+                const md=getMegaActivationDateUI(upcomingMega.quizDate);
+                if (md) html += `<div style="margin-top:15px;padding:11px 13px;border-radius:14px;border:1px dashed var(--primary-color);background:rgba(2,132,199,.04);font-size:.84rem;"><b style="color:var(--primary-color);">🏆 मासिक मेगा क्वीज</b><br><span style="color:var(--muted-text-color);">${md.toLocaleDateString('en-GB')} बिहान १२:०० बजेबाट ४८ घण्टा सक्रिय हुनेछ।</span></div>`;
             }
             // --- PATCHED: Refresh Sync Button calls forceFullSync() ---
             html += `<div style="text-align:center; margin-top:20px;"><button class="btn-small" onclick="forceFullSync()" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button></div>`;
@@ -2942,108 +3097,169 @@
     window.jumpToDate = function() { let m = parseInt(document.getElementById('cal-month-select').value); let y = parseInt(document.getElementById('cal-year-select').value); currentCalDate = new Date(y, m, 1); renderDashboard(); }
     window.switchStatTab = function(tab) { document.getElementById('tab-stat-quiz').classList.toggle('active', tab === 'quiz'); document.getElementById('tab-stat-chart').classList.toggle('active', tab === 'chart'); document.getElementById('stat-quiz-section').style.display = tab === 'quiz' ? 'block' : 'none'; document.getElementById('stat-chart-section').style.display = tab === 'chart' ? 'block' : 'none'; renderDashboard(); }
 
+    window.jumpToDate = function() { let m=parseInt(document.getElementById('cal-month-select').value), y=parseInt(document.getElementById('cal-year-select').value); currentCalDate=new Date(y,m,1); renderDashboard(); };
+    window.switchStatTab = function(tab) { document.getElementById('tab-stat-quiz').classList.toggle('active',tab==='quiz'); document.getElementById('tab-stat-chart').classList.toggle('active',tab==='chart'); document.getElementById('stat-quiz-section').style.display=tab==='quiz'?'block':'none'; document.getElementById('stat-chart-section').style.display=tab==='chart'?'block':'none'; renderDashboard(); };
+
     window.renderDashboard = function() {
-        let isChartTab = document.getElementById('tab-stat-chart').classList.contains('active');
-        let history = safeJSON('murali_progress', []); let standardHistory = history.filter(h => { let dStr = String(h.date || ""); return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review"); });
-        let charts = safeJSON('murali_daily_charts', []); let statsHtml = ''; let msgContainer = document.getElementById('baba-message-container');
+        if (isQuizActive) return; // Never redraw the dashboard while an exam is running.
+        const isChartTab=document.getElementById('tab-stat-chart').classList.contains('active');
+        const history=safeJSON('murali_progress',[]);
+        const charts=safeJSON('murali_daily_charts',[]);
+        const exams=normalizeExamHistoryForStats_(history);
+        const chartItems=validChartHistoryForStats_(charts);
+        const cy=currentCalDate.getFullYear(), cm=currentCalDate.getMonth();
+        const now=new Date();
+        const currentMonth=(cy===now.getFullYear()&&cm===now.getMonth());
+        const theme=makeChartTheme_();
+        const d=dict[lang];
 
-        if (!isChartTab) {
-            let totalExams = standardHistory.length; let avgScore = 0; if (totalExams > 0) { let totalObtained = 0; let totalMax = 0; standardHistory.forEach(h => { totalObtained += (h.score || 0); totalMax += (h.total || 0); }); avgScore = totalMax > 0 ? Math.round((totalObtained / totalMax) * 100) : 0; }
-            let streak = calculateStreak(standardHistory);
-            statsHtml = `<div class="stat-card"><h3>${totalExams}</h3><p>Total Exams</p></div><div class="stat-card"><h3>${avgScore}%</h3><p>Avg Score</p></div><div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>`;
-            if (totalExams > 0) { let msg = avgScore >= 80 ? "✨ मीठे बच्चे, तिम्रो चार्ट धेरै राम्रो छ। यसरी नै अगाडि बढ।" : (avgScore >= 50 ? "🌟 मीठे बच्चे, अभ्यास राम्रो छ तर अझै ध्यान देऊ।" : "🌱 मीठे बच्चे, ज्ञानको मनन-चिन्तन अझै बढाउनुपर्छ।"); msgContainer.innerHTML = `<div style="background: rgba(2, 132, 199, 0.1); border: 1px dashed var(--exam-color); padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; color: var(--exam-color); margin-bottom: 15px;">${msg}</div>`; } else { msgContainer.innerHTML = ''; }
-        } else {
-            let totalCharts = charts.length; let avgChartScore = 0; if (totalCharts > 0) { let totalObtained = 0; charts.forEach(c => { totalObtained += (c.totalScore || 0); }); avgChartScore = Math.round(totalObtained / totalCharts); }
-            let chartStreak = calculateStreak(charts.map(c => ({date: c.date}))); 
-            statsHtml = `<div class="stat-card"><h3>${totalCharts}</h3><p>Total Charts</p></div><div class="stat-card"><h3>${avgChartScore}</h3><p>Avg Score</p></div><div class="stat-card"><h3>${chartStreak} 🔥</h3><p>Day Streak</p></div>`;
-            if (totalCharts > 0) { let msg = avgChartScore >= 90 ? "✨ मीठे बच्चे, तिम्रो उड्ती कलाको स्थिति धेरै राम्रो छ।" : (avgChartScore >= 70 ? "🌟 मीठे बच्चे, चढ्ती कला छ, अझै अटेन्सन देऊ।" : "🌱 मीठे बच्चे, योग र धारणामा विशेष ध्यान दिनुपर्छ।"); msgContainer.innerHTML = `<div style="background: rgba(139, 92, 246, 0.1); border: 1px dashed var(--chart-color); padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; color: var(--chart-color); margin-bottom: 15px;">${msg}</div>`; } else { msgContainer.innerHTML = ''; }
+        const sourceStats=authoritativeStatsCache[`${cy}-${cm+1}-${dateKeyLocal_(currentMonth?now:new Date(cy,cm+1,0))}`] || null;
+        let examTotal=exams.length, examAvg=exams.length?Math.round(exams.reduce((s,x)=>s+x.percent,0)/exams.length):0;
+        let chartTotal=chartItems.length, chartAvg=chartItems.length?Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length):0;
+        if(sourceStats&&sourceStats.status==='success'){
+            if(!isChartTab){ examTotal=Number(sourceStats.exam.totalExams||examTotal); examAvg=Number(sourceStats.exam.averageScore||0); }
+            else { chartTotal=Number(sourceStats.chart.totalCharts||chartTotal); chartAvg=Number(sourceStats.chart.averageScore||0); }
         }
-        document.getElementById('dash-stats').innerHTML = statsHtml;
+        const streak=isChartTab?currentStreak_(chartItems):currentStreak_(exams);
+        document.getElementById('dash-stats').innerHTML=isChartTab
+            ? `<div class="stat-card"><h3>${chartTotal}</h3><p>Total Charts</p></div><div class="stat-card"><h3>${chartAvg}</h3><p>Avg Score</p></div><div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>`
+            : `<div class="stat-card"><h3>${examTotal}</h3><p>Total Exams</p></div><div class="stat-card"><h3>${examAvg}%</h3><p>Avg Score</p></div><div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>`;
+        const msg= isChartTab ? (chartAvg>=90?"✨ मीठे बच्चे, तिम्रो उड्ती कलाको स्थिति धेरै राम्रो छ।":(chartAvg>=70?"🌟 मीठे बच्चे, चढ्ती कला छ, अझै अटेन्सन देऊ।":"🌱 मीठे बच्चे, योग र धारणामा विशेष ध्यान दिनुपर्छ।")) : (examAvg>=80?"✨ मीठे बच्चे, तिम्रो परीक्षा प्रगति धेरै राम्रो छ।":(examAvg>=50?"🌟 मीठे बच्चे, अभ्यास राम्रो छ तर अझै ध्यान देऊ।":"🌱 मीठे बच्चे, ज्ञानको मनन-चिन्तन अझै बढाउनुपर्छ।"));
+        document.getElementById('baba-message-container').innerHTML=((isChartTab?chartTotal:examTotal)>0)?`<div style="background:rgba(2,132,199,.1);border:1px dashed ${isChartTab?'var(--chart-color)':'var(--exam-color)'};padding:10px;border-radius:10px;text-align:center;font-weight:700;color:${isChartTab?'var(--chart-color)':'var(--exam-color)'};margin-bottom:15px;">${msg}</div>`:'';
 
-        let cy = currentCalDate.getFullYear(); let cm = currentCalDate.getMonth(); populateCalendarPickers(cy, cm); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let firstDay = new Date(cy, cm, 1).getDay(); let calHtml = ''; for (let i = 0; i < firstDay; i++) calHtml += `<div class="cal-day empty"></div>`; let today = new Date();
+        populateCalendarPickers(cy,cm);
+        const daysInMonth=new Date(cy,cm+1,0).getDate(), firstDay=new Date(cy,cm,1).getDay();
+        let calHtml=''; for(let i=0;i<firstDay;i++) calHtml+='<div class="cal-day empty"></div>';
+        const examMap={}; exams.forEach(h=>{if(h.__date.getFullYear()===cy&&h.__date.getMonth()===cm) examMap[h.__date.getDate()]=h;});
+        const chartMap={}; chartItems.forEach(c=>{if(c.__date.getFullYear()===cy&&c.__date.getMonth()===cm) chartMap[c.__date.getDate()]=c;});
+        for(let day=1;day<=daysInMonth;day++){
+            const dt=new Date(cy,cm,day), isToday=sameLocalDate_(dt,now); const border=isToday?(isChartTab?'border:2px dashed var(--chart-color);':'border:2px dashed var(--exam-color);'):'';
+            if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+=`<div class="cal-day has-data ${pct>=80?'excellent':pct>=50?'good':'poor'}" style="${border}" onclick="showCalendarDetail(${h.id})"><span>${day}</span><span style="font-size:.65rem;">${pct}%</span></div>`;}
+            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore);calHtml+=`<div class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'}" style="${border}" onclick="showChartCalendarDetail(${c.id})"><span>${day}</span><span style="font-size:.65rem;">${score}</span></div>`;}
+            else {const past=dt<dateOnlyLocal_(now); calHtml+=`<div class="cal-day" style="${border}${past?'opacity:.5;':''}"><span>${day}</span></div>`;}
+        }
+        document.getElementById('cal-grid-days').innerHTML=calHtml;
 
-        if (!isChartTab) {
-            let historyMap = {}; standardHistory.forEach(h => { let d = getValidDate(h); if (d && d.getMonth() === cm && d.getFullYear() === cy) { if (!historyMap[d.getDate()] || historyMap[d.getDate()].percent < h.percent) { historyMap[d.getDate()] = h; } } });
-            for (let i = 1; i <= daysInMonth; i++) {
-                let isToday = (today.getDate() === i && today.getMonth() === cm && today.getFullYear() === cy); let borderStyle = isToday ? 'border: 2px dashed var(--exam-color);' : '';
-                if (historyMap[i]) { let h = historyMap[i]; let rClass = h.percent >= 80 ? 'excellent' : (h.percent >= 50 ? 'good' : 'poor'); calHtml += `<div class="cal-day has-data ${rClass}" style="${borderStyle}" onclick="showCalendarDetail(${h.id})"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">${h.percent}%</span></div>`; } 
-                else { let isPast = new Date(cy, cm, i) < new Date(today.getFullYear(), today.getMonth(), today.getDate()); let opacity = isPast ? 'opacity: 0.5;' : ''; calHtml += `<div class="cal-day" style="${borderStyle} ${opacity}"><span>${i}</span></div>`; }
-            }
-        } else {
-            let chartMap = {}; charts.forEach(c => { let d = new Date(c.date.replace(/-/g, '/')); if (d && d.getMonth() === cm && d.getFullYear() === cy) { chartMap[d.getDate()] = c; } });
-            for (let i = 1; i <= daysInMonth; i++) {
-                let isToday = (today.getDate() === i && today.getMonth() === cm && today.getFullYear() === cy); let borderStyle = isToday ? 'border: 2px dashed var(--chart-color);' : '';
-                if (chartMap[i]) { let c = chartMap[i]; let rClass = c.totalScore >= 90 ? 'excellent' : (c.totalScore >= 70 ? 'good' : 'poor'); calHtml += `<div class="cal-day has-data ${rClass}" style="${borderStyle}" onclick="showChartCalendarDetail(${c.id})"><span>${i}</span><span style="font-size:0.65rem; margin-top:2px;">${c.totalScore}</span></div>`; } 
-                else { let isPast = new Date(cy, cm, i) < new Date(today.getFullYear(), today.getMonth(), today.getDate()); let opacity = isPast ? 'opacity: 0.5;' : ''; calHtml += `<div class="cal-day" style="${borderStyle} ${opacity}"><span>${i}</span></div>`; }
+        // Main monthly chart, with continuous days and safe gaps.
+        const monthly=sourceStats&&sourceStats.status==='success' ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : (isChartTab?localStatsMonthly_(chartItems,cy,cm):localStatsMonthly_(exams,cy,cm));
+        const labels=monthly.map(x=>x.day), points=monthly.map(x=>x.data?(isChartTab?x.data.score:x.data.percent):null);
+        let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
+        if(isChartTab){ if(chartAnalyticsInstance) chartAnalyticsInstance.destroy(); chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Chart Score',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Chart Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}}); }
+        else { if(progressChartInstance) progressChartInstance.destroy(); progressChartInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Score (%)',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Quiz Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}}); }
+
+        // Detailed progress button remains available in Exam mode.
+        const detailedProgBtn=document.querySelector('button[onclick="openDetailedProgress()"]'); if(detailedProgBtn) detailedProgBtn.style.display=isChartTab?'none':'flex';
+        const calToggleBtn=document.querySelector('button[onclick="toggleCalendar()"]'); if(calToggleBtn) calToggleBtn.style.gridColumn='auto';
+
+        // Ask the 104.7+ backend for authoritative stats when available; 104.6 safely falls back to local data.
+        if(navigator.onLine && !isExamSecurityCheckInProgress){
+            const end=currentMonth?now:new Date(cy,cm+1,0), key=`${cy}-${cm+1}-${dateKeyLocal_(end)}`;
+            if(!authoritativeStatsCache[key] && !authoritativeStatsInFlight[key]){
+                fetchAuthoritativeStats_(cy,cm+1,dateKeyLocal_(end)).then(s=>{ if(s && !isQuizActive && currentCalDate.getFullYear()===cy && currentCalDate.getMonth()===cm) renderDashboard(); });
             }
         }
-        document.getElementById('cal-grid-days').innerHTML = calHtml;
+    };
 
-        let currentMonthHistory = standardHistory.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getMonth() === cm && dObj.getFullYear() === cy; });
-        drawCharts(currentMonthHistory); drawChartAnalytics(cm, cy);
+    window.openDetailedProgress = function() {
+        progressModalDate = new Date(currentCalDate);
+        document.getElementById('detailed-progress-modal').style.display = 'flex';
+        fillProgressYearSelect_();
+        renderDetailedProgressCharts();
+        switchProgressTab('weekly');
+    };
 
-        let megaContainer = document.getElementById('mega-quiz-results-container'); let detailedProgBtn = document.querySelector('button[onclick="openDetailedProgress()"]'); let calToggleBtn = document.querySelector('button[onclick="toggleCalendar()"]');
-        if (!isChartTab) {
-            if (detailedProgBtn) detailedProgBtn.style.display = 'flex'; if (calToggleBtn) calToggleBtn.style.gridColumn = 'auto';
-            let megaHistory = history.filter(h => { let dStr = String(h.date || ""); return dStr.includes("Mega") || dStr.includes("मेगा") || dStr.includes("Review"); });
-            if (megaHistory.length > 0) {
-                let megaHtml = `<h4 style="margin: 20px 0 10px 0; color: var(--exam-color); font-weight: 800;">🏆 Special/Mega Exams</h4>`;
-                megaHistory.forEach(h => { let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor'); let rText = h.percent >= 80 ? 'Excellent' : (h.percent >= 50 ? 'Good' : 'Needs Practice'); megaHtml += `<div class="progress-item"><div style="flex-grow: 1;"><div style="font-weight:800; font-size:1rem; color:var(--exam-color);">${h.date}</div><div class="prog-remark ${rClass}">${rText}</div><div style="margin-top: 5px;"><button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button></div></div><div style="text-align: right;"><div class="prog-percent">${h.percent}%</div><div style="font-size:0.85rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div></div></div>`; });
-                megaContainer.innerHTML = megaHtml;
-            } else { megaContainer.innerHTML = ''; }
-        } else { if (detailedProgBtn) detailedProgBtn.style.display = 'none'; if (calToggleBtn) calToggleBtn.style.gridColumn = '1 / -1'; megaContainer.innerHTML = ''; }
+    window.changeProgressYear = function(year) {
+        const y = parseInt(year,10); if (!isFinite(y)) return;
+        progressModalDate = new Date(y, progressModalDate.getMonth(), 1);
+        renderDetailedProgressCharts();
+    };
+
+    window.navigateProgressMonth = function(direction) {
+        progressModalDate.setMonth(progressModalDate.getMonth() + direction);
+        fillProgressYearSelect_();
+        renderDetailedProgressCharts();
+    };
+
+    function fillProgressYearSelect_() {
+        const sel=document.getElementById('progress-year-select'); if(!sel) return;
+        const currentYear=new Date().getFullYear(); const selected=progressModalDate.getFullYear();
+        const years=[]; for(let y=2026;y<=currentYear+1;y++) years.push(y);
+        sel.innerHTML=years.map(y=>`<option value="${y}" ${y===selected?'selected':''}>${y}</option>`).join('');
     }
 
-    function drawCharts(filteredHistory) {
-        let isDark = document.body.hasAttribute('data-theme'); let textColor = isDark ? '#f8fafc' : '#1e293b'; let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-        let ctxLine = document.getElementById('progressLineChart').getContext('2d'); if(progressChartInstance) progressChartInstance.destroy();
-        let sortedHistory = [...filteredHistory].sort((a,b) => getValidDate(a).getTime() - getValidDate(b).getTime());
-        let labels = sortedHistory.map(h => { let d = getValidDate(h); return d ? d.getDate() : ''; }); let dataPoints = sortedHistory.map(h => h.percent);
-        progressChartInstance = new Chart(ctxLine, { type: 'line', data: { labels: labels, datasets: [{ label: 'Quiz Score (%)', data: dataPoints, borderColor: '#0284c7', backgroundColor: 'rgba(2, 132, 199, 0.2)', borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: '#16a34a' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Daily Quiz Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } } });
+    window.switchProgressTab = function(tab) {
+        document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
+        document.getElementById('tab-monthly').classList.toggle('active', tab === 'monthly');
+        document.getElementById('tab-yearly').classList.toggle('active', tab === 'yearly');
+        document.getElementById('progress-weekly-section').style.display = tab === 'weekly' ? 'block' : 'none';
+        document.getElementById('progress-monthly-section').style.display = tab === 'monthly' ? 'block' : 'none';
+        document.getElementById('progress-yearly-section').style.display = tab === 'yearly' ? 'block' : 'none';
+        renderDetailedProgressCharts();
+    };
+
+    function makeChartTheme_() {
+        const isDark=document.body.hasAttribute('data-theme');
+        return {text:isDark?'#f8fafc':'#1e293b',grid:isDark?'rgba(255,255,255,.10)':'rgba(0,0,0,.10)'};
     }
 
-    function drawChartAnalytics(cm, cy) {
-        let isDark = document.body.hasAttribute('data-theme'); let textColor = isDark ? '#f8fafc' : '#1e293b'; let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
-        let charts = safeJSON('murali_daily_charts', []); let currentMonthCharts = charts.filter(c => { let d = new Date(c.date.replace(/-/g, '/')); return d && d.getMonth() === cm && d.getFullYear() === cy; });
-        let sortedCharts = [...currentMonthCharts].sort((a,b) => new Date(a.date.replace(/-/g, '/')).getTime() - new Date(b.date.replace(/-/g, '/')).getTime());
-        let labels = sortedCharts.map(c => new Date(c.date.replace(/-/g, '/')).getDate()); let dataPoints = sortedCharts.map(c => c.totalScore);
-        let ctxLine = document.getElementById('chartAnalyticsLine').getContext('2d'); if(chartAnalyticsInstance) chartAnalyticsInstance.destroy();
-        chartAnalyticsInstance = new Chart(ctxLine, { type: 'line', data: { labels: labels, datasets: [{ label: 'Chart Score', data: dataPoints, borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.2)', borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: '#f59e0b' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Daily Chart Progress (This Month)', color: textColor, font: {size: 14, family: 'Poppins'} } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } } });
+    function renderMiniMonthCalendar_(items, cy, cm, targetEl, chartMode=false) {
+        const days=new Date(cy,cm+1,0).getDate(), first=new Date(cy,cm,1).getDay();
+        const map={}; (items||[]).forEach(x=>{const d=x.__date; if(d&&d.getFullYear()===cy&&d.getMonth()===cm) map[d.getDate()]=x;});
+        let h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:.72rem;text-align:center;font-weight:800;color:var(--muted-text-color);">';
+        ['आइत','सोम','मंगल','बुध','बिहि','शुक्र','शनि'].forEach((n,i)=>{h+=`<div>${n}</div>`;});
+        for(let i=0;i<first;i++) h+='<div></div>';
+        for(let day=1;day<=days;day++){
+            const x=map[day], v=x ? (chartMode?Math.round(x.totalScore):Math.round(x.percent)) : null;
+            const cls=v===null?'':(v>=80?'excellent':v>=50?'good':'poor');
+            h+=`<div style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span>${day}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
+        }
+        h+='</div>'; targetEl.innerHTML=h;
     }
 
-    window.openDetailedProgress = function() { progressModalDate = new Date(currentCalDate); document.getElementById('detailed-progress-modal').style.display = 'flex'; renderDetailedProgressCharts(); switchProgressTab('weekly'); }
-    window.navigateProgressMonth = function(direction) { progressModalDate.setMonth(progressModalDate.getMonth() + direction); renderDetailedProgressCharts(); }
-    window.switchProgressTab = function(tab) { document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly'); document.getElementById('tab-monthly').classList.toggle('active', tab === 'monthly'); document.getElementById('tab-yearly').classList.toggle('active', tab === 'yearly'); document.getElementById('progress-weekly-section').style.display = tab === 'weekly' ? 'block' : 'none'; document.getElementById('progress-monthly-section').style.display = tab === 'monthly' ? 'block' : 'none'; document.getElementById('progress-yearly-section').style.display = tab === 'yearly' ? 'block' : 'none'; }
+    async function renderDetailedProgressCharts() {
+        const history=safeJSON('murali_progress', []);
+        const charts=safeJSON('murali_daily_charts', []);
+        const exams=normalizeExamHistoryForStats_(history);
+        const chartItems=validChartHistoryForStats_(charts);
+        const cy=progressModalDate.getFullYear(), cm=progressModalDate.getMonth();
+        const now=new Date();
+        const targetEnd=(cy===now.getFullYear()&&cm===now.getMonth())?now:new Date(cy,cm+1,0);
+        const endKey=dateKeyLocal_(targetEnd);
+        fillProgressYearSelect_();
+        document.getElementById('progress-month-year').innerText=progressModalDate.toLocaleString('default',{month:'long',year:'numeric'});
 
-    function renderDetailedProgressCharts() {
-        let history = safeJSON('murali_progress', []); let standardHistory = history.filter(h => { let dStr = String(h.date || ""); return !dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review"); });
-        let isDark = document.body.hasAttribute('data-theme'); let textColor = isDark ? '#f8fafc' : '#1e293b'; let gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'; const d = dict[lang];
-        document.getElementById('progress-month-year').innerText = progressModalDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        let server=await fetchAuthoritativeStats_(cy,cm+1,endKey);
+        const theme=makeChartTheme_();
+        const weekly=server&&server.status==='success' ? server.exam.weekly : localStatsWeekly_(exams,targetEnd);
+        const monthly=server&&server.status==='success' ? server.exam.monthly : localStatsMonthly_(exams,cy,cm);
+        const yearly=server&&server.status==='success' ? server.exam.yearly : localStatsYearly_(exams,cy);
+        const chartWeekly=server&&server.status==='success' ? server.chart.weekly : localStatsWeekly_(chartItems,targetEnd);
+        const chartMonthly=server&&server.status==='success' ? server.chart.monthly : localStatsMonthly_(chartItems,cy,cm);
+        const chartYearly=server&&server.status==='success' ? server.chart.yearly : localStatsYearly_(chartItems,cy).map(x=>({month:x.month,label:x.label,count:x.count,average:x.average}));
 
-        let now = new Date(); let targetDate = new Date(progressModalDate.getFullYear(), progressModalDate.getMonth() + 1, 0); if (progressModalDate.getMonth() === now.getMonth() && progressModalDate.getFullYear() === now.getFullYear()) targetDate = now; 
-        let last7Days = new Date(targetDate); last7Days.setDate(targetDate.getDate() - 6); last7Days.setHours(0,0,0,0);
-        let weeklyHistory = standardHistory.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getTime() >= last7Days.getTime() && dObj.getTime() <= targetDate.getTime(); }).slice(0, 7).reverse();
-        let weeklyLabels = weeklyHistory.map(h => { let d = getValidDate(h); return d ? `${d.getDate()}/${d.getMonth()+1}` : ''; }); let weeklyData = weeklyHistory.map(h => h.percent);
+        const isChartTab=document.getElementById('tab-stat-chart').classList.contains('active');
+        const w=isChartTab?chartWeekly:weekly;
+        const m=isChartTab?chartMonthly:monthly;
+        const y=isChartTab?chartYearly:yearly;
 
-        let ctxWeekly = document.getElementById('weeklyBarChart').getContext('2d'); if(weeklyChartInstance) weeklyChartInstance.destroy();
-        weeklyChartInstance = new Chart(ctxWeekly, { type: 'bar', data: { labels: weeklyLabels, datasets: [{ label: 'Score (%)', data: weeklyData, backgroundColor: 'rgba(2, 132, 199, 0.6)', borderColor: 'rgba(2, 132, 199, 1)', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'पछिल्लो ७ दिनको प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } } });
+        let labels=w.map(x=>x.label), data=w.map(x=>x.data ? (isChartTab?x.data.score:x.data.percent) : null);
+        let ctx=document.getElementById('weeklyBarChart').getContext('2d'); if(weeklyChartInstance) weeklyChartInstance.destroy();
+        weeklyChartInstance=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Score (%)',data}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'पछिल्लो ७ दिनको प्रगति',color:theme.text}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
 
-        let currentMonthHistory = standardHistory.filter(h => { let dObj = getValidDate(h); return dObj && dObj.getMonth() === progressModalDate.getMonth() && dObj.getFullYear() === progressModalDate.getFullYear(); }).reverse();
-        let monthlyLabels = currentMonthHistory.map(h => { let d = getValidDate(h); return d ? d.getDate() : ''; }); let monthlyData = currentMonthHistory.map(h => h.percent);
+        const ml=m.map(x=>x.day), md=m.map(x=>x.data ? (isChartTab?x.data.score:x.data.percent) : null);
+        ctx=document.getElementById('monthlyLineChart').getContext('2d'); if(monthlyChartInstance) monthlyChartInstance.destroy();
+        monthlyChartInstance=new Chart(ctx,{type:'line',data:{labels:ml,datasets:[{label:'Score (%)',data:md,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:isChartTab?'मासिक चार्ट प्रगति':'मासिक परीक्षा प्रगति',color:theme.text}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
 
-        let ctxMonthly = document.getElementById('monthlyLineChart').getContext('2d'); if(monthlyChartInstance) monthlyChartInstance.destroy();
-        monthlyChartInstance = new Chart(ctxMonthly, { type: 'line', data: { labels: monthlyLabels, datasets: [{ label: 'Score (%)', data: monthlyData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'मासिक प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } } });
+        const list=document.getElementById('progress-list');
+        const monthItems=exams.filter(x=>x.__date.getFullYear()===cy&&x.__date.getMonth()===cm).sort((a,b)=>b.__date-a.__date);
+        list.innerHTML=monthItems.length?monthItems.map(h=>`<div class="progress-item"><div style="flex-grow:1;"><div style="font-weight:800;font-size:1rem;color:var(--exam-color);">📅 ${h.date}</div><div style="font-size:.82rem;color:var(--muted-text-color);">${formatTimeTakenForUI(h.timeTaken)||'—'}</div></div><div style="text-align:right;"><div class="prog-percent">${Math.round(h.percent)}%</div><div style="font-size:.85rem;color:var(--text-color);font-weight:800;">${h.score}/${h.total}</div></div></div>`).join(''):`<div style="text-align:center;padding:1rem;color:#94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`;
 
-        const list = document.getElementById('progress-list');
-        if (currentMonthHistory.length > 0) { list.innerHTML = currentMonthHistory.reverse().map(h => { let rText = h.percent >= 80 ? d.remarkExc : (h.percent >= 50 ? d.remarkGood : d.remarkPoor); let rClass = h.percent >= 80 ? 'remark-excellent' : (h.percent >= 50 ? 'remark-good' : 'remark-poor'); let reviewBtn = h.quizData ? `<button class="btn-small" onclick="reviewPastQuiz(${h.id})">Review</button>` : ''; return `<div class="progress-item"><div style="flex-grow: 1;"><div style="font-weight:800; font-size:1.1rem; color:var(--exam-color);">📅 ${h.date}</div><div class="prog-remark ${rClass}">${rText}</div><div>${reviewBtn}</div></div><div style="text-align: right;"><div class="prog-percent">${h.percent}%</div><div style="font-size:0.9rem; color:var(--text-color); font-weight:800;">${h.score}/${h.total}</div></div></div>`; }).join(''); } else { list.innerHTML = `<div style="text-align:center; padding: 1rem; color: #94a3b8;">यो महिनाको रेकर्ड खाली छ।</div>`; }
+        renderMiniMonthCalendar_(isChartTab?chartItems:exams,cy,cm,document.getElementById('progress-month-calendar'),isChartTab);
 
-        let yearlyData = {}; let currentYear = new Date().getFullYear();
-        standardHistory.forEach(h => { let dObj = getValidDate(h); if (dObj && dObj.getFullYear() === currentYear) { let month = dObj.getMonth(); if (!yearlyData[month]) yearlyData[month] = { totalScore: 0, totalMax: 0, count: 0 }; yearlyData[month].totalScore += (h.score || 0); yearlyData[month].totalMax += (h.total || 0); yearlyData[month].count++; } });
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; let yearlyLabels = []; let yearlyAvgData = [];
-        for (let i = 0; i < 12; i++) { if (yearlyData[i]) { yearlyLabels.push(monthNames[i]); let mAvg = yearlyData[i].totalMax > 0 ? Math.round((yearlyData[i].totalScore / yearlyData[i].totalMax) * 100) : 0; yearlyAvgData.push(mAvg); } }
-
-        let ctxYearly = document.getElementById('yearlyBarChart').getContext('2d'); if(yearlyChartInstance) yearlyChartInstance.destroy();
-        yearlyChartInstance = new Chart(ctxYearly, { type: 'bar', data: { labels: yearlyLabels, datasets: [{ label: 'Average Score (%)', data: yearlyAvgData, backgroundColor: 'rgba(22, 163, 74, 0.6)', borderColor: 'rgba(22, 163, 74, 1)', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'यो वर्षको मासिक औसत प्रगति', color: textColor } }, scales: { y: { beginAtZero: true, max: 100, ticks: { color: textColor }, grid: { color: gridColor } }, x: { ticks: { color: textColor }, grid: { display: false } } } } });
+        ctx=document.getElementById('yearlyBarChart').getContext('2d'); if(yearlyChartInstance) yearlyChartInstance.destroy();
+        const yl=y.map(x=>x.label), yd=y.map(x=>x.average);
+        yearlyChartInstance=new Chart(ctx,{type:'bar',data:{labels:yl,datasets:[{label:'Average Score (%)',data:yd}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:`${cy} — वार्षिक मासिक औसत`,color:theme.text}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
+        document.getElementById('progress-year-grid').innerHTML=y.map(x=>`<div style="border:1px solid var(--border-color);border-radius:10px;padding:8px;text-align:center;background:var(--card-bg);"><b>${x.label}</b><div style="font-size:.8rem;color:var(--muted-text-color);">${x.count||0} दिन</div><strong style="color:var(--stats-color);">${x.average||0}%</strong></div>`).join('');
     }
 
     window.showCalendarDetail = function(id) {
@@ -3263,7 +3479,7 @@
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 104.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 106.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
