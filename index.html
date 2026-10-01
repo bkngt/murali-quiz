@@ -726,7 +726,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.1 – Safe Sync, 48H Exam/Mega, Stats</div>
+        <div>Version: 106.2 – Safe Sync, Auto Quiz Sync, 48H Exam/Mega, Stats</div>
     </div>
 </div>
 
@@ -1135,7 +1135,7 @@
         });
     }
 
-    // 106.1 CHART DETAILED STATS UPDATE
+    // 106.2 AUTO SYNC + WAIT FIX
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1150,7 +1150,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.1"; 
+    const APP_VERSION = "106.2"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1169,6 +1169,8 @@
     let isQuizActive = false; let canAnswerQuestion = false; let qLockInterval = null; let audioCtx = null;
     let abortController = null; let quizAutoSyncTimer = null; let quizSyncInProgress = false;
     let quizIndexSyncInProgress = false; let lastQuizIndexSignature = '';
+    // 106.2: calendar must distinguish “server checking” from “manager has not uploaded”.
+    let quizCalendarSyncState = 'idle'; // idle | checking | ready | error
     let activeStateSaveInFlight = false; let pendingActiveState = null; let activeStateSaveTimer = null;
     let activeStateSeq = 0; let activeStateSaveRetryTimer = null;
     let pendingResultSyncInProgress = false; let pendingChartSyncInProgress = false;
@@ -1718,14 +1720,15 @@
                 document.getElementById('api-config-section').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'none';
 
-                // Online हुँदा पुरानो cached Dashboard पहिले नदेखाउने।
-                // पहिले Server Quiz Sync पूरा हुन्छ।
-                document.getElementById('dashboard-skeleton').style.display = 'block';
-
+                // 106.2: Dashboard लाई server sync को कारण block नगर्ने।
+                // Local cache भए तुरुन्तै देखाऊ; आज/हिजोको cache missing भए Calendar मा
+                // अस्थायी “Syncing…” देखाऊ, “Wait” होइन। Server sync पूरा भएपछि re-render हुन्छ।
+                document.getElementById('dashboard-skeleton').style.display = 'none';
+                if (!isAdminViewActive) {
+                    loadStudentDashboard();
+                }
                 startupSyncPromise.finally(() => {
-                    if (!isAdminViewActive) {
-                        loadStudentDashboard();
-                    }
+                    if (!isAdminViewActive) loadStudentDashboard();
                 });
             }
 
@@ -2063,33 +2066,105 @@
     };
 
     async function syncServerQuizzes(refreshUI=false, forceFull=false) {
-        if(!navigator.onLine || quizIndexSyncInProgress || isQuizActive) return false; quizIndexSyncInProgress=true;
+        if(!navigator.onLine || quizIndexSyncInProgress || isQuizActive) return false;
+        quizIndexSyncInProgress=true;
+        quizCalendarSyncState='checking';
         try {
             const idxData=await apiPostJSON({action:'fetchQuizIndex'},{retries:2,timeoutMs:12000});
             if(!idxData || idxData.status!=='success' || !Array.isArray(idxData.quizzes)) {
+                quizCalendarSyncState='error';
                 if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
                 return false;
             }
-            const sig=JSON.stringify(idxData.quizzes), oldSig=localStorage.getItem('murali_server_quiz_index')||''; const changed=sig!==oldSig;
-            localStorage.setItem('murali_server_quiz_index',sig); lastQuizIndexSignature=sig;
-            const cached=safeJSON('murali_server_quizzes',null); const needFull=forceFull || changed || !Array.isArray(cached);
+
+            const sig=JSON.stringify(idxData.quizzes), oldSig=localStorage.getItem('murali_server_quiz_index')||'';
+            const changed=sig!==oldSig;
+            localStorage.setItem('murali_server_quiz_index',sig);
+            lastQuizIndexSignature=sig;
+
+            const cached=safeJSON('murali_server_quizzes',null);
+            const relevantCacheMissing = quizIndexNeedsRelevantCacheRefresh_(idxData.quizzes,cached);
+            const needFull=forceFull || changed || !Array.isArray(cached) || relevantCacheMissing;
+
             if(needFull){
                 const data=await apiPostJSON({action:'fetchQuizzes'},{retries:2,timeoutMs:15000});
                 if(!data || data.status!=='success' || !Array.isArray(data.quizzes)) {
+                    quizCalendarSyncState='error';
                     if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
                     return false;
                 }
-                const old=localStorage.getItem('murali_server_quizzes')||'', newSer=JSON.stringify(data.quizzes), dataChanged=old!==newSer;
-                localStorage.setItem('murali_server_quizzes',newSer); populateSavedQuizzes();
+                const old=localStorage.getItem('murali_server_quizzes')||'';
+                const newSer=JSON.stringify(data.quizzes), dataChanged=old!==newSer;
+                localStorage.setItem('murali_server_quizzes',newSer);
+                populateSavedQuizzes();
                 if(dataChanged && old) showToast('☁️ नयाँ/संशोधित क्वीज सर्भरबाट अपडेट भयो।','info');
-                if(!isAdminViewActive && document.getElementById('view-generator')) loadStudentDashboard(); lastServerSyncAt=Date.now();
-                return dataChanged || changed;
+                quizCalendarSyncState='ready';
+                if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') loadStudentDashboard();
+                lastServerSyncAt=Date.now();
+                return dataChanged || changed || relevantCacheMissing;
             }
-            lastServerSyncAt=Date.now(); return changed;
+
+            quizCalendarSyncState='ready';
+            if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') loadStudentDashboard();
+            lastServerSyncAt=Date.now();
+            return changed;
         } catch(e) {
+            console.warn('syncServerQuizzes:', e);
+            quizCalendarSyncState='error';
             if(!isAdminViewActive && typeof window.loadStudentDashboard === 'function') window.loadStudentDashboard();
             return false;
-        } finally { quizIndexSyncInProgress=false; }
+        } finally {
+            quizIndexSyncInProgress=false;
+        }
+    }
+
+    // 106.2: detect the exact stale-cache case that caused one profile to show
+    // “Wait” while another profile already showed “Play”.
+    // We only require a full quiz refresh when the server index says a relevant
+    // today/yesterday quiz exists but the local quiz cache does not have it.
+    function quizIndexNeedsRelevantCacheRefresh_(serverIndex, cachedQuizzes) {
+        if(!Array.isArray(serverIndex)) return false;
+        if(!Array.isArray(cachedQuizzes)) return true;
+
+        const now=new Date();
+        const todayKey=dateKeyLocal_(now);
+        const yesterday=new Date(dateOnlyLocal_(now));
+        yesterday.setDate(yesterday.getDate()-1);
+        const yesterdayKey=dateKeyLocal_(yesterday);
+
+        function hasCachedNormalForKey_(key, meta) {
+            const metaRev=getQuizRevisionValue(meta);
+            return cachedQuizzes.some(q=>{
+                if(!q || q.isMegaQuiz) return false;
+                const d=parseDateString(q.quizDate);
+                if(!d || dateKeyLocal_(d)!==key) return false;
+                return getQuizRevisionValue(q) >= metaRev;
+            });
+        }
+
+        function hasCachedMega_(meta) {
+            const md=getMegaActivationDateUI(meta.quizDate);
+            if(!md || !isWithin48HoursFromDate_(md,now)) return true;
+            const targetDate=String(meta.quizDate||'').trim();
+            const targetRevision=getQuizRevisionValue(meta);
+            return cachedQuizzes.some(q=>{
+                if(!q || !q.isMegaQuiz || String(q.quizDate||'').trim()!==targetDate) return false;
+                return getQuizRevisionValue(q) >= targetRevision;
+            });
+        }
+
+        for(const meta of serverIndex){
+            if(!meta) continue;
+            if(meta.isMegaQuiz===true){
+                if(!hasCachedMega_(meta)) return true;
+                continue;
+            }
+            const d=parseDateString(meta.quizDate);
+            if(!d) continue;
+            const key=dateKeyLocal_(d);
+            if((key===todayKey || key===yesterdayKey) && !hasCachedNormalForKey_(key,meta)) return true;
+        }
+        return false;
     }
 
     // --- PATCHED: Full background auto-sync ---
@@ -2135,14 +2210,13 @@
         clearInterval(window.quizAutoSyncTimer);
     }
 
-    // App खुलेको बेला Online भए Server लाई पहिलो priority।
-    // 105.0 मा update भएका/संशोधित quiz पुरानो cache माथि राखिन्छ।
+    // 106.2: startup sync अब non-blocking छ। Dashboard तुरुन्त खुल्छ;
+    // server index/full quiz refresh background मा चल्छ।
     if (navigator.onLine && !isQuizActive && !isExamSecurityCheckInProgress) {
-        try {
-            await syncServerQuizzes(false, !!isNewVersion);
-        } catch (e) {
-            console.warn("Startup quiz sync failed:", e);
-        }
+        quizCalendarSyncState='checking';
+        syncServerQuizzes(false, !!isNewVersion).catch(e => console.warn("Startup quiz sync failed:", e));
+    } else {
+        quizCalendarSyncState='ready';
     }
 
     // Quiz + Results + Charts + Profile को background sync।
@@ -2220,6 +2294,7 @@
                 else if (isToday || isYesterday) {
                     if (isCompleted) { boxStyle += `background: var(--success-bg); border-color: var(--success-color); color: var(--success-color);`; statusIcon = `✅`; cursor = `cursor:pointer; opacity:1; box-shadow: 0 4px 10px rgba(22,163,74,0.2);`; clickAction = `onclick="showToast('तपाईंले यो परीक्षा दिइसक्नुभएको छ।', 'success')"`; } 
                     else if (hasQuiz) { boxStyle += `background: var(--primary-gradient); border-color: var(--primary-color); color: white; box-shadow: 0 6px 15px rgba(2, 132, 199, 0.4); transform: scale(1.08); z-index:10;`; statusIcon = `▶️ Play`; cursor = `cursor:pointer; opacity:1;`; clickAction = `onclick="startSpecificQuiz('${quizMap[i].quizDate}')"`; } 
+                    else if (quizCalendarSyncState === 'checking') { boxStyle += `background: var(--bg-color); border-color: var(--warning-color); color: var(--warning-color);`; statusIcon = `🔄 Syncing`; cursor = `cursor:not-allowed; opacity:1;`; clickAction = `onclick="showToast('सर्भरबाट आज/हिजोको क्वीज स्थिति जाँच हुँदैछ...', 'info')"`; }
                     else { if (isToday) { boxStyle += `background: var(--warning-bg); border-color: var(--warning-color); color: var(--warning-color);`; statusIcon = `⏳ Wait`; cursor = `cursor:not-allowed; opacity:1;`; clickAction = `onclick="showToast('आजको क्वीज म्यानेजरले राख्न बाँकी छ।', 'info')"`; } else { boxStyle += `background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-color); opacity:0.6;`; statusIcon = `❌ Miss`; clickAction = `onclick="showToast('यस दिनको क्वीज उपलब्ध छैन।', 'error')"`; cursor = `cursor:pointer;`; } }
                 } else if (isPast) {
                     if (quizMap[i]) {
