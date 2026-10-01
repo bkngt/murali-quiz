@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v106-0";
+const CACHE_NAME = "murali-quiz-v106-1";
 
 const APP_SHELL = [
     "./",
@@ -37,10 +37,8 @@ self.addEventListener("install", event => {
                     }
                 }
             })
-
-            // IMPORTANT:
-            // skipWaiting() deliberately omitted.
-            // यसले चलिरहेको exam/page लाई नयाँ SW ले तुरुन्त takeover गर्न दिँदैन।
+            // IMPORTANT: no skipWaiting().
+            // नयाँ SW तुरुन्त active हुँदैन; यसले चलिरहेको exam page लाई disturb गर्दैन।
     );
 });
 
@@ -54,20 +52,17 @@ self.addEventListener("activate", event => {
         caches.keys()
             .then(cacheNames => Promise.all(
                 cacheNames.map(cacheName => {
-
                     if (
                         cacheName.startsWith("murali-quiz-v") &&
                         cacheName !== CACHE_NAME
                     ) {
                         return caches.delete(cacheName);
                     }
-
                     return undefined;
                 })
             ))
-
-            // New worker activates only after the old worker is no longer
-            // controlling the previous page/session.
+            // New worker activates only after the old worker is no longer controlling
+            // active pages, so claiming here does not force a live exam to reload.
             .then(() => self.clients.claim())
     );
 });
@@ -78,16 +73,13 @@ self.addEventListener("activate", event => {
    ========================================================== */
 
 self.addEventListener("fetch", event => {
-
     const request = event.request;
     const url = new URL(request.url);
-
 
     /* ======================================================
        1. GOOGLE APPS SCRIPT / BACKEND
 
        NEVER cache/intercept backend requests.
-
        Includes:
        - Login
        - Exam Security
@@ -99,7 +91,6 @@ self.addEventListener("fetch", event => {
        - Quiz Sync
        - Stats Sync
        ====================================================== */
-
     if (
         url.hostname.includes("script.google.com") ||
         url.hostname.includes("googleusercontent.com")
@@ -107,11 +98,9 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-
     /* ======================================================
        2. EXTERNAL NAVIGATION
        ====================================================== */
-
     if (
         request.mode === "navigate" &&
         url.origin !== self.location.origin
@@ -119,183 +108,106 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-
     /* ======================================================
        3. SAME-ORIGIN NAVIGATION
 
        NETWORK FIRST
+       Online  -> newest index.html, then cache update
+       Offline -> cached index.html
 
-       Online:
-       → नवीन index.html
-       → cache update
-
-       Offline:
-       → cached index.html
-
-       IMPORTANT:
-       कुनै forced reload छैन।
+       No forced reload is triggered by the SW.
        ====================================================== */
-
     if (request.mode === "navigate") {
-
         event.respondWith(
-
             fetch(request)
                 .then(response => {
-
                     if (response && response.ok) {
-
                         const clone = response.clone();
-
                         caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
+                            .then(cache => cache.put(request, clone).catch(() => {}))
                             .catch(() => {});
                     }
-
                     return response;
                 })
-
                 .catch(() => {
-
-                    return caches.match(request)
-                        .then(cached => {
-
-                            if (cached) {
-                                return cached;
-                            }
-
-                            return caches.match("./index.html");
-                        });
+                    return caches.match(request).then(cached => {
+                        if (cached) return cached;
+                        return caches.match("./index.html");
+                    });
                 })
         );
-
         return;
     }
 
-
     /* ======================================================
        4. MANIFEST
-
-       Network first so newest manifest is preferred.
+       Network first so the newest manifest is preferred.
        ====================================================== */
-
     if (
         url.pathname.endsWith("/manifest.json") ||
         url.pathname.endsWith("manifest.json")
     ) {
-
         event.respondWith(
-
             fetch(request)
                 .then(response => {
-
                     if (response && response.ok) {
-
                         const clone = response.clone();
-
                         caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
+                            .then(cache => cache.put(request, clone).catch(() => {}))
                             .catch(() => {});
                     }
-
                     return response;
                 })
-
-                .catch(() =>
-                    caches.match(request)
-                )
+                .catch(() => caches.match(request))
         );
-
         return;
     }
-
 
     /* ======================================================
        5. KNOWN CDN ASSETS
 
-       Cache first:
-       - JSZip
-       - Chart.js
+       Cache first for JSZip + Chart.js.
        ====================================================== */
-
     const isStaticAsset =
-        request.url ===
-            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-        ||
-
-        request.url ===
-            "https://cdn.jsdelivr.net/npm/chart.js";
-
+        request.url === "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
+        request.url === "https://cdn.jsdelivr.net/npm/chart.js";
 
     if (isStaticAsset) {
-
         event.respondWith(
-
             caches.match(request)
                 .then(cached => {
-
-                    if (cached) {
-                        return cached;
-                    }
-
-                    return fetch(request)
-                        .then(response => {
-
-                            if (response && response.ok) {
-
-                                const clone = response.clone();
-
-                                caches.open(CACHE_NAME)
-                                    .then(cache =>
-                                        cache.put(request, clone).catch(() => {})
-                                    )
-                                    .catch(() => {});
-                            }
-
-                            return response;
-                        });
+                    if (cached) return cached;
+                    return fetch(request).then(response => {
+                        if (response && response.ok) {
+                            const clone = response.clone();
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.put(request, clone).catch(() => {}))
+                                .catch(() => {});
+                        }
+                        return response;
+                    });
                 })
         );
-
         return;
     }
 
-
     /* ======================================================
        6. OTHER SAME-ORIGIN REQUESTS
-
        Network first + cache fallback.
        ====================================================== */
-
     if (url.origin === self.location.origin) {
-
         event.respondWith(
-
             fetch(request)
                 .then(response => {
-
                     if (response && response.ok) {
-
                         const clone = response.clone();
-
                         caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
+                            .then(cache => cache.put(request, clone).catch(() => {}))
                             .catch(() => {});
                     }
-
                     return response;
                 })
-
-                .catch(() =>
-                    caches.match(request)
-                )
+                .catch(() => caches.match(request))
         );
     }
-
 });
