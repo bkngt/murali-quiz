@@ -726,7 +726,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.3 – Safe Sync, Auto Quiz Sync, Monthly Mega, 48H Exam/Mega, Stats</div>
+        <div>Version: 106.3.1 – Safe Sync, Mega Resume, Monthly Mega Rank, 48H Exam/Mega, Stats</div>
     </div>
 </div>
 
@@ -1150,7 +1150,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.3"; 
+    const APP_VERSION = "106.3.1"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2391,7 +2391,8 @@ function getMegaActivationDateUI(quizDate) {
                             </div>
                             ${done
                                 ? `<button disabled style="margin-top:9px;width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);font-weight:800;">✅ तपाईंले पूरा गरिसक्नुभयो</button>`
-                                : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:9px;width:100%;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;border:none;font-weight:900;padding:.8rem;border-radius:10px;">▶️ मेगा क्वीज सुरु गर्नुहोस्</button>`}
+                                : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:9px;width:100%;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;border:none;font-weight:900;padding:.8rem;border-radius:10px;">▶️ मेगा क्वीज सुरु गर्नुहोस्</button>
+                                 <button onclick="openMegaLeaderboard('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:7px;width:100%;background:var(--bg-color);color:var(--exam-color);border:2px solid var(--exam-color);font-weight:900;padding:.7rem;border-radius:10px;">🏆 मेगा क्वीज र्‍याङ्क</button>`}
                         </div>`;
                 });
             } else if (upcomingMega) {
@@ -2796,10 +2797,23 @@ function getMegaActivationDateUI(quizDate) {
     function startQuizSession(cloudState, originalQuizData) {
         stopTimer(); document.getElementById('sb-submit-btn').disabled = false;
         let localStateStr = localStorage.getItem('murali_active_quiz_state'); let localState = localStateStr ? JSON.parse(localStateStr) : null; let stateToUse = null;
-        const cloudRev = cloudState ? (parseInt(cloudState.quizRevision || cloudState.revision || 1, 10) || 1) : 1; const localRev = localState ? (parseInt(localState.quizRevision || localState.revision || 1, 10) || 1) : 1;
-        
-        if (cloudState && cloudState.date === currentMurliDate && cloudRev === currentQuizRevision) { stateToUse = cloudState; } 
-        else if (localState && localState.date === currentMurliDate && localRev === currentQuizRevision) { stateToUse = localState; }
+        const cloudRev = cloudState ? (parseInt(cloudState.quizRevision || cloudState.revision || 1, 10) || 1) : 1;
+        const localRev = localState ? (parseInt(localState.quizRevision || localState.revision || 1, 10) || 1) : 1;
+        const cloudQuizId = cloudState ? String(cloudState.quizId || "").trim() : "";
+        const localQuizId = localState ? String(localState.quizId || "").trim() : "";
+
+        const isSameCloudQuiz = !!cloudState && cloudRev === currentQuizRevision &&
+            ((cloudQuizId && cloudQuizId === currentQuizId) ||
+             (!cloudQuizId && cloudState.date === currentMurliDate));
+
+        const isSameLocalQuiz = !!localState && localRev === currentQuizRevision &&
+            ((localQuizId && localQuizId === currentQuizId) ||
+             (!localQuizId && localState.date === currentMurliDate));
+
+        // Mega Quiz may cross a calendar-month boundary. Quiz ID + Revision
+        // is therefore the stronger identity than the display date.
+        if (isSameCloudQuiz) { stateToUse = cloudState; }
+        else if (isSameLocalQuiz) { stateToUse = localState; }
 
         if (stateToUse) {
             currentQuiz = stateToUse.quizData; currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0; activeStateSeq = Number(stateToUse.stateSeq || 0);
@@ -2818,7 +2832,11 @@ function getMegaActivationDateUI(quizDate) {
         focusedOptionIndex = -1; isTimerStarted = true; isQuizActive = true; startTimer();
         activeStateSeq++; const initialState = makeActiveStateObject({qIndex:activeQuestionIndex});
         localStorage.setItem('murali_active_quiz_state', JSON.stringify(initialState));
-        if(!stateToUse){pendingActiveState=initialState;flushActiveStateSave();}
+        // Always flush the canonical resumed state. For an old Mega state
+        // stored under a month-boundary date, Backend 104.9.1 migrates it to
+        // the quiz's canonical date using Quiz ID + Revision.
+        pendingActiveState = initialState;
+        flushActiveStateSave();
         document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; 
         document.getElementById('main-header').style.display = 'none'; document.getElementById('main-tabs').style.display = 'none'; document.getElementById('toolbar-right-actions').style.display = 'none';
         let m = Math.floor(totalTimeSec / 60).toString().padStart(2, '0'); let s = (totalTimeSec % 60).toString().padStart(2, '0'); document.getElementById('timer-text').innerText = `${m}:${s}`;
@@ -3493,6 +3511,28 @@ function getMegaActivationDateUI(quizDate) {
     let slDateSelectEl = document.getElementById('sl-date-select');
     if(slDateSelectEl) { slDateSelectEl.addEventListener('change', function() { updateStudentLeaderboardDateLabel(this.value); fetchStudentLeaderboardData(); }); }
 
+    // Mega Quiz Rank: uses the exact Mega Quiz ID/date label.
+    // The normal student leaderboard picker intentionally excludes Mega quizzes,
+    // so Mega gets its own entry point while sharing the same server leaderboard API.
+    window.openMegaLeaderboard = function(targetDateStr = "") {
+        const modal = document.getElementById('student-leaderboard-modal');
+        const dateInput = document.getElementById('sl-date-select');
+        if (!modal || !dateInput || !targetDateStr) return;
+
+        const d = parseDateString(targetDateStr);
+        if (!d || isNaN(d.getTime())) {
+            return showToast("मेगा क्वीजको मिति मिलेन।", "error");
+        }
+
+        const pickerDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        dateInput.disabled = false;
+        dateInput.value = pickerDate;
+        updateStudentLeaderboardDateLabel(pickerDate);
+
+        modal.style.display = 'flex';
+        fetchStudentLeaderboardData(targetDateStr);
+    };
+
     window.openStudentLeaderboard = function(targetDateStr = "") {
         let serverQuizzes = safeJSON('murali_server_quizzes', []); let dateInput = document.getElementById('sl-date-select');
         let availableQuizzes = serverQuizzes.filter(sq => {
@@ -3520,8 +3560,8 @@ function getMegaActivationDateUI(quizDate) {
         else { document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-my-rank-box').style.display = 'none'; }
     };
 
-    window.fetchStudentLeaderboardData = async function() {
-        const pickerDate = document.getElementById('sl-date-select').value; const matchingQuiz = getExamQuizForPickerDate(pickerDate); const targetDateStr = matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate;
+    window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
+        const pickerDate = document.getElementById('sl-date-select').value; const matchingQuiz = getExamQuizForPickerDate(pickerDate); const targetDateStr = String(overrideTargetDate || (matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate)).trim();
         document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-content').style.display = 'none';
         if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
 
