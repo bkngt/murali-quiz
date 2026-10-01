@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v105-0";
+const CACHE_NAME = "murali-quiz-v106-0";
 
 const APP_SHELL = [
     "./",
@@ -19,9 +19,14 @@ self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(async cache => {
-
                 // App shell
-                await cache.addAll(APP_SHELL);
+                for (const url of APP_SHELL) {
+                    try {
+                        await cache.add(url);
+                    } catch (e) {
+                        // One failed shell resource should not abort the whole SW install.
+                    }
+                }
 
                 // CDN assets
                 for (const url of STATIC_ASSETS) {
@@ -32,7 +37,10 @@ self.addEventListener("install", event => {
                     }
                 }
             })
-            .then(() => self.skipWaiting())
+
+            // IMPORTANT:
+            // skipWaiting() deliberately omitted.
+            // यसले चलिरहेको exam/page लाई नयाँ SW ले तुरुन्त takeover गर्न दिँदैन।
     );
 });
 
@@ -44,23 +52,22 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-            .then(cacheNames => {
+            .then(cacheNames => Promise.all(
+                cacheNames.map(cacheName => {
 
-                return Promise.all(
-                    cacheNames.map(cacheName => {
+                    if (
+                        cacheName.startsWith("murali-quiz-v") &&
+                        cacheName !== CACHE_NAME
+                    ) {
+                        return caches.delete(cacheName);
+                    }
 
-                        // पुराना Murali Quiz caches हटाउने।
-                        if (
-                            cacheName.startsWith("murali-quiz-v") &&
-                            cacheName !== CACHE_NAME
-                        ) {
-                            return caches.delete(cacheName);
-                        }
+                    return undefined;
+                })
+            ))
 
-                        return undefined;
-                    })
-                );
-            })
+            // New worker activates only after the old worker is no longer
+            // controlling the previous page/session.
             .then(() => self.clients.claim())
     );
 });
@@ -79,17 +86,18 @@ self.addEventListener("fetch", event => {
     /* ======================================================
        1. GOOGLE APPS SCRIPT / BACKEND
 
-       Backend request NEVER cache/intercept गर्ने।
+       NEVER cache/intercept backend requests.
 
        Includes:
        - Login
        - Exam Security
-       - Exam Session
+       - Exam Session / 48H check
        - Result Save
        - Student Rank
        - Admin Rank
        - Chart Sync
        - Quiz Sync
+       - Stats Sync
        ====================================================== */
 
     if (
@@ -102,11 +110,6 @@ self.addEventListener("fetch", event => {
 
     /* ======================================================
        2. EXTERNAL NAVIGATION
-
-       External websites Safari/Chrome ले direct handle गर्ने।
-
-       Example:
-       https://www.madhubanmurli.org/#ne
        ====================================================== */
 
     if (
@@ -128,6 +131,9 @@ self.addEventListener("fetch", event => {
 
        Offline:
        → cached index.html
+
+       IMPORTANT:
+       कुनै forced reload छैन।
        ====================================================== */
 
     if (request.mode === "navigate") {
@@ -142,12 +148,9 @@ self.addEventListener("fetch", event => {
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
-                            .then(cache => {
-
-                                cache.put(request, clone)
-                                    .catch(() => {});
-
-                            })
+                            .then(cache =>
+                                cache.put(request, clone).catch(() => {})
+                            )
                             .catch(() => {});
                     }
 
@@ -175,7 +178,7 @@ self.addEventListener("fetch", event => {
     /* ======================================================
        4. MANIFEST
 
-       Network first so new manifest तुरुन्त लिन सकियोस्।
+       Network first so newest manifest is preferred.
        ====================================================== */
 
     if (
@@ -193,21 +196,18 @@ self.addEventListener("fetch", event => {
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
-                            .then(cache => {
-
-                                cache.put(request, clone)
-                                    .catch(() => {});
-
-                            })
+                            .then(cache =>
+                                cache.put(request, clone).catch(() => {})
+                            )
                             .catch(() => {});
                     }
 
                     return response;
                 })
 
-                .catch(() => {
-                    return caches.match(request);
-                })
+                .catch(() =>
+                    caches.match(request)
+                )
         );
 
         return;
@@ -217,16 +217,15 @@ self.addEventListener("fetch", event => {
     /* ======================================================
        5. KNOWN CDN ASSETS
 
-       JSZip + Chart.js
-
        Cache first:
-       - पहिले cache
-       - cache नभए network
+       - JSZip
+       - Chart.js
        ====================================================== */
 
     const isStaticAsset =
         request.url ===
-            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
+            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        ||
 
         request.url ===
             "https://cdn.jsdelivr.net/npm/chart.js";
@@ -251,12 +250,9 @@ self.addEventListener("fetch", event => {
                                 const clone = response.clone();
 
                                 caches.open(CACHE_NAME)
-                                    .then(cache => {
-
-                                        cache.put(request, clone)
-                                            .catch(() => {});
-
-                                    })
+                                    .then(cache =>
+                                        cache.put(request, clone).catch(() => {})
+                                    )
                                     .catch(() => {});
                             }
 
@@ -287,25 +283,19 @@ self.addEventListener("fetch", event => {
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
-                            .then(cache => {
-
-                                cache.put(request, clone)
-                                    .catch(() => {});
-
-                            })
+                            .then(cache =>
+                                cache.put(request, clone).catch(() => {})
+                            )
                             .catch(() => {});
                     }
 
                     return response;
                 })
 
-                .catch(() => {
-
-                    return caches.match(request);
-                })
+                .catch(() =>
+                    caches.match(request)
+                )
         );
-
-        return;
     }
 
 });
