@@ -726,7 +726,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.2 – Safe Sync, Auto Quiz Sync, 48H Exam/Mega, Stats</div>
+        <div>Version: 106.3 – Safe Sync, Auto Quiz Sync, Monthly Mega, 48H Exam/Mega, Stats</div>
     </div>
 </div>
 
@@ -1135,7 +1135,7 @@
         });
     }
 
-    // 106.2 AUTO SYNC + WAIT FIX
+    // 106.3 AUTO SYNC + WAIT FIX + MONTHLY MEGA
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1150,7 +1150,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.2"; 
+    const APP_VERSION = "106.3"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1169,7 +1169,7 @@
     let isQuizActive = false; let canAnswerQuestion = false; let qLockInterval = null; let audioCtx = null;
     let abortController = null; let quizAutoSyncTimer = null; let quizSyncInProgress = false;
     let quizIndexSyncInProgress = false; let lastQuizIndexSignature = '';
-    // 106.2: calendar must distinguish “server checking” from “manager has not uploaded”.
+    // 106.3: calendar must distinguish “server checking” from “manager has not uploaded”.
     let quizCalendarSyncState = 'idle'; // idle | checking | ready | error
     let activeStateSaveInFlight = false; let pendingActiveState = null; let activeStateSaveTimer = null;
     let activeStateSeq = 0; let activeStateSaveRetryTimer = null;
@@ -1327,21 +1327,36 @@
         return null; 
     }
     
-    function getMegaActivationDateUI(quizDate) {
+function getMegaActivationDateUI(quizDate) {
         const s = String(quizDate || '').replace(/^'/, '').trim();
         if (!s) return null;
-        // Monthly Mega labels normally begin with the fixed activation date, e.g. 01-10-2026.
+
+        // MONTHLY MEGA POLICY:
+        // A Mega Quiz for a given month opens on the 1st of the following month
+        // at 00:00 local time and remains active for 48 hours.
+        const monthly = s.match(/\bMega\s+Quiz\s+(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(20\d{2})\b/i);
+        if (monthly) {
+            const names = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+            const mi = names.indexOf(monthly[1].slice(0,3).toLowerCase());
+            if (mi >= 0) {
+                const y = parseInt(monthly[2], 10);
+                return new Date(y, mi + 1, 1);
+            }
+        }
+
+        const named = s.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(20\d{2})\b/i);
+        if (named && /mega|मेगा/i.test(s)) {
+            const names2 = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+            const mi2 = names2.indexOf(named[1].slice(0,3).toLowerCase());
+            if (mi2 >= 0) return new Date(parseInt(named[2],10), mi2 + 1, 1);
+        }
+
+        // Legacy/custom Mega labels without a named month retain explicit-date fallback.
         const explicit = s.match(/(?:^|[^0-9])(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})(?:[^0-9]|$)/);
         if (explicit) {
             let y = parseInt(explicit[3], 10); if (y < 100) y += 2000;
             const d = new Date(y, parseInt(explicit[2], 10) - 1, parseInt(explicit[1], 10));
             return isNaN(d.getTime()) ? null : d;
-        }
-        const named = s.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b[^0-9]{0,18}(20\d{2})\b/i);
-        if (named) {
-            const names = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-            const mi = names.indexOf(named[1].slice(0,3).toLowerCase());
-            if (mi >= 0) return new Date(parseInt(named[2], 10), mi, 1);
         }
         return null;
     }
@@ -1720,7 +1735,7 @@
                 document.getElementById('api-config-section').style.display = 'none';
                 document.getElementById('export-saved-section').style.display = 'none';
 
-                // 106.2: Dashboard लाई server sync को कारण block नगर्ने।
+                // 106.3: Dashboard लाई server sync को कारण block नगर्ने।
                 // Local cache भए तुरुन्तै देखाऊ; आज/हिजोको cache missing भए Calendar मा
                 // अस्थायी “Syncing…” देखाऊ, “Wait” होइन। Server sync पूरा भएपछि re-render हुन्छ।
                 document.getElementById('dashboard-skeleton').style.display = 'none';
@@ -2118,7 +2133,7 @@
         }
     }
 
-    // 106.2: detect the exact stale-cache case that caused one profile to show
+    // 106.3: detect the exact stale-cache case that caused one profile to show
     // “Wait” while another profile already showed “Play”.
     // We only require a full quiz refresh when the server index says a relevant
     // today/yesterday quiz exists but the local quiz cache does not have it.
@@ -2210,7 +2225,7 @@
         clearInterval(window.quizAutoSyncTimer);
     }
 
-    // 106.2: startup sync अब non-blocking छ। Dashboard तुरुन्त खुल्छ;
+    // 106.3: startup sync अब non-blocking छ। Dashboard तुरुन्त खुल्छ;
     // server index/full quiz refresh background मा चल्छ।
     if (navigator.onLine && !isQuizActive && !isExamSecurityCheckInProgress) {
         quizCalendarSyncState='checking';
@@ -2266,6 +2281,15 @@
         else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen') === null) { document.getElementById('sticky-scorebar').style.display = 'flex'; }
     }
 
+    window.toggleMonthlyMegaInfo = function() {
+        const panel = document.getElementById('monthly-mega-info');
+        const arrow = document.getElementById('monthly-mega-arrow');
+        if (!panel) return;
+        const open = panel.style.display !== 'none';
+        panel.style.display = open ? 'none' : 'block';
+        if (arrow) arrow.textContent = open ? '▼' : '▲';
+    };
+
     window.loadStudentDashboard = function() {
         try {
             let qArea = document.getElementById('quiz-area'); let skeleton = document.getElementById('dashboard-skeleton');
@@ -2308,7 +2332,7 @@
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
             
-            html += `</div></div><div style="margin-top:15px; background:var(--card-bg); padding:12px; border-radius:16px; border:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;"><div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div><div style="white-space: nowrap;">✅ : सम्पन्न भएको</div><div style="white-space: nowrap;">❌ : छुटेको (Locked)</div><div><button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 परीक्षा र्‍याङ्क</button></div></div></div>`;
+            html += `</div></div><div style="margin-top:15px; background:var(--card-bg); padding:12px; border-radius:16px; border:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;"><div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div><div style="white-space: nowrap;">✅ : सम्पन्न भएको</div><div style="white-space: nowrap;">❌ : छुटेको (Locked)</div><div><button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 परीक्षा र्‍याङ्क</button></div></div></div><div id="monthly-mega-slot"></div>`;
 
             const now = new Date();
             const todayStart = dateOnlyLocal_(now);
@@ -2337,30 +2361,69 @@
                 }
             }
 
-            // Monthly Mega Quiz: activation is always the first day 00:00 and lasts 48 hours.
+            // Monthly Mega Quiz: always shown directly below the Rank button.
+            // The panel is collapsed by default; all Mega details live inside it.
             const monthlyMegas = serverQuizzes.filter(sq => sq && sq.isMegaQuiz === true);
             const activeMegas = monthlyMegas.filter(sq => {
                 const md = getMegaActivationDateUI(sq.quizDate);
                 return md && isWithin48HoursFromDate_(md, now);
             }).sort((a,b)=>getSortableTime(b)-getSortableTime(a));
             const upcomingMega = monthlyMegas.filter(sq => {
-                const md=getMegaActivationDateUI(sq.quizDate); return md && md.getTime() > todayStart.getTime();
+                const md = getMegaActivationDateUI(sq.quizDate);
+                return md && md.getTime() > todayStart.getTime();
             }).sort((a,b)=>getSortableTime(a)-getSortableTime(b))[0];
+
+            let megaStatusText = activeMegas.length > 0 ? '🟢 अहिले सक्रिय' : (upcomingMega ? '🕐 आगामी' : '📚 जानकारी');
+            let megaPanelBody = '';
+
             if (activeMegas.length > 0) {
-                let activeMegaHtml = '';
                 activeMegas.forEach(sq => {
                     const done = history.some(h => String(h.date||'').trim() === String(sq.quizDate||'').trim());
                     const md = getMegaActivationDateUI(sq.quizDate);
                     const end = md ? new Date(dateOnlyLocal_(md).getTime()+48*60*60*1000) : null;
-                    activeMegaHtml += done
-                        ? `<button disabled style="background:var(--success-bg);color:var(--success-color);border:2px solid var(--success-border);justify-content:flex-start;font-size:1rem;">✅ ${sq.quizDate} (Completed)</button>`
-                        : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="background:linear-gradient(135deg,#f59e0b,#ea580c);justify-content:flex-start;font-size:1rem;padding:.9rem;">🏆 ${sq.quizDate}<div style="font-size:.72rem;margin-top:3px;opacity:.9;">४८ घण्टे • ${end ? end.toLocaleString('en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : ''} सम्म</div></button>`;
+                    const cleanLabel = String(sq.quizDate || '').replace(/^\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}\s*/, '').trim();
+                    megaPanelBody += `
+                        <div style="padding:12px;border-radius:12px;border:1px solid #f59e0b;background:rgba(245,158,11,.08);margin-bottom:8px;">
+                            <div style="font-weight:900;color:#b45309;margin-bottom:5px;">🏆 ${cleanLabel || sq.quizDate}</div>
+                            <div style="font-size:.8rem;color:var(--muted-text-color);line-height:1.5;">
+                                📚 ५० प्रश्न • सम्बन्धित महिनाभरिका दैनिक क्वीजबाट छनोट<br>
+                                ⏰ ४८ घण्टा • ${end ? end.toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : ''} सम्म
+                            </div>
+                            ${done
+                                ? `<button disabled style="margin-top:9px;width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);font-weight:800;">✅ तपाईंले पूरा गरिसक्नुभयो</button>`
+                                : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:9px;width:100%;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;border:none;font-weight:900;padding:.8rem;border-radius:10px;">▶️ मेगा क्वीज सुरु गर्नुहोस्</button>`}
+                        </div>`;
                 });
-                html += `<div style="margin-top:15px;padding:14px;border-radius:16px;border:1px solid #f59e0b;background:rgba(245,158,11,.07);"><h4 style="margin:0 0 10px;color:#b45309;font-weight:900;">🏆 मासिक मेगा क्वीज</h4><div style="display:flex;flex-direction:column;gap:8px;">${activeMegaHtml}<button onclick="openMegaArchive()" class="btn-small" style="margin-top:2px;width:100%;background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);font-weight:800;">📚 सबै Mega Quiz Archive</button></div></div>`;
             } else if (upcomingMega) {
-                const md=getMegaActivationDateUI(upcomingMega.quizDate);
-                if (md) html += `<div style="margin-top:15px;padding:11px 13px;border-radius:14px;border:1px dashed var(--primary-color);background:rgba(2,132,199,.04);font-size:.84rem;"><b style="color:var(--primary-color);">🏆 मासिक मेगा क्वीज</b><br><span style="color:var(--muted-text-color);">${md.toLocaleDateString('en-GB')} बिहान १२:०० बजेबाट ४८ घण्टा सक्रिय हुनेछ।</span></div>`;
+                const md = getMegaActivationDateUI(upcomingMega.quizDate);
+                const cleanLabel = String(upcomingMega.quizDate || '').replace(/^\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}\s*/, '').trim();
+                megaPanelBody = `
+                    <div style="padding:12px;border-radius:12px;border:1px dashed var(--primary-color);background:rgba(2,132,199,.04);">
+                        <div style="font-weight:900;color:var(--primary-color);margin-bottom:5px;">🏆 ${cleanLabel || upcomingMega.quizDate}</div>
+                        <div style="font-size:.82rem;color:var(--muted-text-color);line-height:1.5;">
+                            📚 ५० प्रश्न • सम्बन्धित महिनाभरिका दैनिक क्वीजबाट छनोट<br>
+                            ⏰ ${md ? md.toLocaleDateString('en-GB') : ''} बिहान १२:०० बजेबाट ४८ घण्टा
+                        </div>
+                    </div>`;
+            } else {
+                megaPanelBody = `
+                    <div style="padding:12px;border-radius:12px;border:1px dashed var(--border-color);background:var(--bg-color);font-size:.82rem;color:var(--muted-text-color);line-height:1.5;">
+                        🏆 मासिक मेगा क्वीज प्रत्येक महिनाको १ गतेबाट ४८ घण्टाका लागि उपलब्ध हुन्छ।<br>
+                        📚 अघिल्लो महिनाभरिका दैनिक क्वीजबाट छनोट गरिएका ५० प्रश्न समावेश गरिनेछन्।
+                    </div>`;
             }
+
+            const megaEntryHtml = `
+                <div style="margin-top:12px;border:1px solid #f59e0b;border-radius:16px;overflow:hidden;background:rgba(245,158,11,.05);">
+                    <button onclick="toggleMonthlyMegaInfo()" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border:none;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;font-weight:900;font-size:.96rem;cursor:pointer;">
+                        <span>🏆 मासिक मेगा क्वीज</span><span style="font-size:.78rem;opacity:.95;">${megaStatusText} &nbsp;<span id="monthly-mega-arrow">▼</span></span>
+                    </button>
+                    <div id="monthly-mega-info" style="display:none;padding:10px 11px;">
+                        ${megaPanelBody}
+                        <button onclick="openMegaArchive()" class="btn-small" style="margin-top:4px;width:100%;background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);font-weight:800;">📚 सबै Mega Quiz Archive</button>
+                    </div>
+                </div>`;
+            html = html.replace('<div id="monthly-mega-slot"></div>', megaEntryHtml);
             // --- PATCHED: Refresh Sync Button calls forceFullSync() ---
             html += `<div style="text-align:center; margin-top:20px;"><button class="btn-small" onclick="forceFullSync()" style="background:transparent; color:var(--text-color); border:1px solid var(--border-color);">🔄 Refresh Sync</button></div>`;
             qArea.innerHTML = html; qArea.style.display = 'block';
@@ -2545,7 +2608,7 @@
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
         if (isMonthly) { 
-            let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = nextMonth.toISOString().split('T')[0].split('-').reverse().join('-'); currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; 
+            let targetDate = startDateObj || sDate; let monthName = targetDate.toLocaleString('default', { month: 'long' }); let year = targetDate.getFullYear(); let nextMonth = new Date(year, targetDate.getMonth() + 1, 1); let nextMonthStr = `${String(nextMonth.getDate()).padStart(2,'0')}-${String(nextMonth.getMonth()+1).padStart(2,'0')}-${nextMonth.getFullYear()}`; currentMurliDate = `${nextMonthStr} 🏆 Mega Quiz ${monthName} ${year}`; 
         } else { 
             let displayStart = sDateStr.split('-').reverse().join('-'); let displayEnd = eDateStr.split('-').reverse().join('-'); currentMurliDate = `🏆 Mega Quiz (${displayStart} to ${displayEnd})`; 
         }
