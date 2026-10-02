@@ -6,10 +6,13 @@
     <meta name="theme-color" id="theme-color-meta" content="#f8fafc">
     <meta name="color-scheme" content="light dark">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
+    <meta name="application-name" content="BK Murali Quiz">
+    <meta name="format-detection" content="telephone=no">
     
-    <script type="text/javascript" nonce="7d683431820f409dbc37c608c34" src="//local.adguard.org?ts=1790905019198&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000f6848208808c0ccdf7658bea%26ts%3D497473%26p%3Dfs%26cid%3D1%26sig%3De1ab546ca3612f82733095d0db457ac8aee52fcd322b05ad0425a2fa7b3314b5%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="7d683431820f409dbc37c608c34" src="//local.adguard.org?ts=1790905019198&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
+    <script>
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
             if (savedTheme === 'dark') {
@@ -25,7 +28,9 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json?v=106.4.3">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -111,6 +116,7 @@
         .baba-jyoti-core { position:absolute; inset:34%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fff59d 46%, #ffca28 72%, rgba(255,170,0,0) 100%); box-shadow:0 0 8px rgba(255,255,255,.95); }
         .murali-link { min-width:72px; height:32px; width:auto; padding:0 9px; gap:5px; border:1px solid var(--primary-color); border-radius:999px; background:rgba(2,132,199,.10); color:var(--primary-color); text-decoration:none; box-shadow:0 2px 5px rgba(0,0,0,.10); display:inline-flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:800; line-height:1; white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
         .murali-link:hover { background:var(--primary-color); color:#fff; }
+        #install-pwa-btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         html[data-theme="dark"] .murali-link { background:rgba(56,189,248,.12); color:var(--primary-color); border-color:var(--primary-color); }
         html[data-theme="dark"] .murali-link:hover { background:var(--primary-color); color:#062033; }
 
@@ -401,7 +407,7 @@
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions">
-            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali">📖 <span>Murali</span></a>
+            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali" target="_blank" rel="noopener noreferrer">📖 <span>Murali</span></a>
             
             <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
@@ -714,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.0 – iOS Logo, Murali Link, Mega Rank, Gemini Diagnostics, Safe Sync</div>
+        <div>Version: 106.4.2 – iOS 12 Fix, PWA Install, Mega Rank, Murali, Mega Window, Gemini Diagnostics</div>
     </div>
 </div>
 
@@ -734,7 +740,7 @@
                 <button onclick="toggleDarkMode()" id="modal-dark-btn" style="flex:1; background: var(--bg-color); color: var(--text-color); border: 2px solid var(--border-color); box-shadow: none;">🌙 Dark Mode: OFF</button>
                 <button onclick="toggleAdminStudentView()" id="btn-toggle-view" style="display:none; flex:1; background: var(--bg-color); color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none;">👁️ Student View</button>
             </div>
-            <button id="install-pwa-btn" style="display:block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">📱 Install App to Home Screen</button>
+            <button id="install-pwa-btn" style="display:block; width: 100%; margin-top: 10px; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">📱 एप/होम स्क्रिनमा राख्नुहोस्</button>
         </div>
 
         <div id="api-config-section">
@@ -1099,26 +1105,68 @@
     // ==========================================
     // 1. PWA INSTALLATION & SERVICE WORKER
     // ==========================================
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
+    let deferredPrompt = null;
+
+    function isIOSDevice_() {
+        const ua = navigator.userAgent || '';
+        return /iPad|iPhone|iPod/.test(ua) ||
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    function isStandaloneApp_() {
+        let standalone = false;
+        try {
+            standalone = !!window.navigator.standalone;
+        } catch (e) {}
+        try {
+            if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+                standalone = true;
+            }
+        } catch (e) {}
+        return standalone;
+    }
+
+    window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
         deferredPrompt = e;
     });
 
+    function showInstallHelp_() {
+        if (isStandaloneApp_()) {
+            alert('✅ यो एप पहिले नै Home Screen बाट App Mode मा चलिरहेको छ।');
+            return;
+        }
+
+        if (isIOSDevice_()) {
+            alert(
+                "🍎 iPhone / iPad\n\n" +
+                "1. यो साइट Safari मा खोल्नुहोस्।\n" +
+                "2. तल/माथि रहेको Share (□↑) बटन थिच्नुहोस्।\n" +
+                "3. 'Add to Home Screen' छान्नुहोस्।\n" +
+                "4. नाम 'BK Murali Quiz' राखेर Add थिच्नुहोस्।\n\n" +
+                "iOS 12 मा browser बाट automatic Install prompt हुँदैन; Home Screen बाट web app/shortcut थपिन्छ।"
+            );
+            return;
+        }
+
+        alert(
+            "📱 Android\n\n" +
+            "यदि Install App विकल्प नआएमा Chrome को ⋮ menu खोल्नुहोस् → 'Add to Home screen' वा 'Install app' छान्नुहोस्।\n\n" +
+            "Manifest समर्थन भएको browser मा app अलग window (standalone mode) मा खुल्नेछ।"
+        );
+    }
+
     const installBtn = document.getElementById('install-pwa-btn');
-    if(installBtn) {
-        installBtn.addEventListener('click', async () => {
+    if (installBtn) {
+        installBtn.addEventListener('click', async function() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                try {
+                    await deferredPrompt.userChoice;
+                } catch (e) {}
                 deferredPrompt = null;
             } else {
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                if (isIOS) {
-                    alert("🍎 Apple को नियम अनुसार:\nकृपया तल रहेको 'Share' (शेयर) बटन थिच्नुहोस् र अलि तल सारेर 'Add to Home Screen' छान्नुहोस्।");
-                } else {
-                    alert("⚙️ जानकारी:\nतपाईंको मोबाइलमा यो एप पहिले नै इन्स्टल भइसकेको हुन सक्छ, वा ब्राउजरले सपोर्ट गरेन।\nकृपया माथि दायाँपट्टि रहेको तीनवटा थोप्ला (⋮) थिचेर 'Add to Home Screen' छान्नुहोस्।");
-                }
+                showInstallHelp_();
             }
         });
     }
@@ -1138,7 +1186,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.3.1"; 
+    const APP_VERSION = "106.4.3"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1347,6 +1395,19 @@ function getMegaActivationDateUI(quizDate) {
             return isNaN(d.getTime()) ? null : d;
         }
         return null;
+    }
+
+    function formatMegaWindowTextUI_(startDate) {
+        if (!startDate || isNaN(startDate.getTime())) return '';
+        const s = dateOnlyLocal_(startDate);
+        const displayEnd = new Date(s.getFullYear(), s.getMonth(), s.getDate() + 1);
+        const day = String(s.getDate()).padStart(2, '0');
+        const month = String(s.getMonth() + 1).padStart(2, '0');
+        const year = s.getFullYear();
+        const endDay = String(displayEnd.getDate()).padStart(2, '0');
+        const endMonth = String(displayEnd.getMonth() + 1).padStart(2, '0');
+        const endYear = displayEnd.getFullYear();
+        return `${day}-${month}-${year} 00:00 → ${endDay}-${endMonth}-${endYear} 24:00`;
     }
 
     function getSortableTime(sq) {
@@ -2375,7 +2436,7 @@ function getMegaActivationDateUI(quizDate) {
                             <div style="font-weight:900;color:#b45309;margin-bottom:5px;">🏆 ${cleanLabel || sq.quizDate}</div>
                             <div style="font-size:.8rem;color:var(--muted-text-color);line-height:1.5;">
                                 📚 ५० प्रश्न • सम्बन्धित महिनाभरिका दैनिक क्वीजबाट छनोट<br>
-                                ⏰ ४८ घण्टा • ${end ? end.toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : ''} सम्म
+                                ⏰ ${md ? formatMegaWindowTextUI_(md) : '१ गते 00:00 → २ गते 24:00'}
                             </div>
                             ${done
                                 ? `<button disabled style="margin-top:9px;width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);font-weight:800;">✅ तपाईंले पूरा गरिसक्नुभयो</button>
@@ -2391,13 +2452,13 @@ function getMegaActivationDateUI(quizDate) {
                         <div style="font-weight:900;color:var(--primary-color);margin-bottom:5px;">🏆 ${cleanLabel || upcomingMega.quizDate}</div>
                         <div style="font-size:.82rem;color:var(--muted-text-color);line-height:1.5;">
                             📚 ५० प्रश्न • सम्बन्धित महिनाभरिका दैनिक क्वीजबाट छनोट<br>
-                            ⏰ ${md ? md.toLocaleDateString('en-GB') : ''} बिहान १२:०० बजेबाट ४८ घण्टा
+                            ⏰ ${md ? formatMegaWindowTextUI_(md) : '१ गते 00:00 → २ गते 24:00'}
                         </div>
                     </div>`;
             } else {
                 megaPanelBody = `
                     <div style="padding:12px;border-radius:12px;border:1px dashed var(--border-color);background:var(--bg-color);font-size:.82rem;color:var(--muted-text-color);line-height:1.5;">
-                        🏆 मासिक मेगा क्वीज प्रत्येक महिनाको १ गतेबाट ४८ घण्टाका लागि उपलब्ध हुन्छ।<br>
+                        🏆 मासिक मेगा क्वीज प्रत्येक महिनाको १ गते 00:00 देखि २ गते 24:00 बजेसम्म उपलब्ध हुन्छ।<br>
                         📚 अघिल्लो महिनाभरिका दैनिक क्वीजबाट छनोट गरिएका ५० प्रश्न समावेश गरिनेछन्।
                     </div>`;
             }
@@ -2478,7 +2539,7 @@ function getMegaActivationDateUI(quizDate) {
 
                     if (!response.ok) {
                         let detail = '';
-                        try { const body = JSON.parse(responseText); detail = body?.error?.message || body?.error?.status || ''; } catch (_) { detail = responseText.slice(0, 500); }
+                        try { const body = JSON.parse(responseText); detail = (body && body.error && (body.error.message || body.error.status)) || ''; } catch (_) { detail = responseText.slice(0, 500); }
                         const error = new Error(`HTTP ${response.status}${detail ? ` — ${detail}` : ''}`);
                         error.status = response.status;
                         error.model = model;
@@ -2495,7 +2556,7 @@ function getMegaActivationDateUI(quizDate) {
 
                     let parsedData; try { parsedData = JSON.parse(rText); } catch (e) { lastError = e; break; }
                     if (!parsedData || !Array.isArray(parsedData.quiz) || parsedData.quiz.length !== Number(qCount)) {
-                        const got = Array.isArray(parsedData?.quiz) ? parsedData.quiz.length : 0;
+                        const got = (parsedData && Array.isArray(parsedData.quiz)) ? parsedData.quiz.length : 0;
                         lastError = new Error(`Question count mismatch (expected ${Number(qCount)}, got ${got})`);
                         break;
                     }
