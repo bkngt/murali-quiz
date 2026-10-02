@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v106-4-0";
+const CACHE_NAME = "murali-quiz-v106-4-3";
 
 const APP_SHELL = [
     "./",
@@ -19,6 +19,7 @@ self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(async cache => {
+
                 for (const url of APP_SHELL) {
                     try {
                         await cache.add(url);
@@ -35,8 +36,10 @@ self.addEventListener("install", event => {
                     }
                 }
             })
-            // IMPORTANT: no skipWaiting().
-            // नयाँ SW ले चलिरहेको exam page लाई जबर्जस्ती takeover/reload गर्दैन।
+
+            // IMPORTANT:
+            // skipWaiting() जानाजानी प्रयोग गरिएको छैन।
+            // यसले चलिरहेको exam लाई जबर्जस्ती reload गर्दैन।
     );
 });
 
@@ -49,7 +52,9 @@ self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
             .then(cacheNames => Promise.all(
+
                 cacheNames.map(cacheName => {
+
                     if (
                         cacheName.startsWith("murali-quiz-v") &&
                         cacheName !== CACHE_NAME
@@ -59,6 +64,7 @@ self.addEventListener("activate", event => {
 
                     return undefined;
                 })
+
             ))
             .then(() => self.clients.claim())
     );
@@ -70,8 +76,10 @@ self.addEventListener("activate", event => {
    ========================================================== */
 
 self.addEventListener("fetch", event => {
+
     const request = event.request;
     const url = new URL(request.url);
+
 
     /* ======================================================
        1. GOOGLE APPS SCRIPT / BACKEND
@@ -106,10 +114,15 @@ self.addEventListener("fetch", event => {
        ====================================================== */
 
     if (request.mode === "navigate") {
+
         event.respondWith(
+
             fetch(request)
+
                 .then(response => {
+
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
@@ -121,10 +134,16 @@ self.addEventListener("fetch", event => {
 
                     return response;
                 })
+
                 .catch(() => {
+
                     return caches.match(request)
+
                         .then(cached => {
-                            if (cached) return cached;
+
+                            if (cached) {
+                                return cached;
+                            }
 
                             return caches.match("./index.html");
                         });
@@ -143,10 +162,15 @@ self.addEventListener("fetch", event => {
         url.pathname.endsWith("/manifest.json") ||
         url.pathname.endsWith("manifest.json")
     ) {
+
         event.respondWith(
+
             fetch(request)
+
                 .then(response => {
+
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
@@ -158,6 +182,7 @@ self.addEventListener("fetch", event => {
 
                     return response;
                 })
+
                 .catch(() => caches.match(request))
         );
 
@@ -173,18 +198,29 @@ self.addEventListener("fetch", event => {
     const isStaticAsset =
         request.url ===
             "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
+
         request.url ===
             "https://cdn.jsdelivr.net/npm/chart.js";
 
+
     if (isStaticAsset) {
+
         event.respondWith(
+
             caches.match(request)
+
                 .then(cached => {
-                    if (cached) return cached;
+
+                    if (cached) {
+                        return cached;
+                    }
 
                     return fetch(request)
+
                         .then(response => {
+
                             if (response && response.ok) {
+
                                 const clone = response.clone();
 
                                 caches.open(CACHE_NAME)
@@ -210,10 +246,15 @@ self.addEventListener("fetch", event => {
        ====================================================== */
 
     if (url.origin === self.location.origin) {
+
         event.respondWith(
+
             fetch(request)
+
                 .then(response => {
+
                     if (response && response.ok) {
+
                         const clone = response.clone();
 
                         caches.open(CACHE_NAME)
@@ -225,7 +266,9 @@ self.addEventListener("fetch", event => {
 
                     return response;
                 })
+
                 .catch(() => caches.match(request))
         );
     }
+
 });
