@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.3">
+    <link rel="manifest" href="manifest.json?v=106.4.4">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -407,7 +407,7 @@
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions">
-            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali" target="_blank" rel="noopener noreferrer">📖 <span>Murali</span></a>
+            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali">📖 <span>Murali</span></a>
             
             <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
@@ -720,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.3 – iOS 12 Fix, PWA Install, Mega Rank, Murali, Mega Window, Gemini Diagnostics, Mega Stats</div>
+        <div>Version: 106.4.4 – iOS 12 Fix, PWA Install, Mega Rank, Murali Language, Mega Window, Gemini Diagnostics, Mega Stats</div>
     </div>
 </div>
 
@@ -1186,7 +1186,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.3"; 
+    const APP_VERSION = "106.4.4"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1219,9 +1219,24 @@
     let nepaliVoice = null;
 
     const dict = {
-        ne: { placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...", feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
-        hi: { placeholder: "आज की मुरली यहाँ पेस्ट करें...", feedbackWrongTitle: "गलत", feedbackRightTitle: "सही जवाब", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" },
-        en: { placeholder: "Paste today's complete Murli text here...", feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice" }
+        ne: {
+            linkUrl: "https://www.madhubanmurli.org/#ne",
+            linkText: "मुरली",
+            placeholder: "आजको मुरलीको मुख्य बुँदाहरू वा सम्पूर्ण पाठ (मितिसहित) यहाँ कपी-पेस्ट गर्नुहोस्...",
+            feedbackWrongTitle: "मिलेन", feedbackRightTitle: "सही उत्तर", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice"
+        },
+        hi: {
+            linkUrl: "https://www.madhubanmurli.org/#hi",
+            linkText: "मुरली",
+            placeholder: "आज की मुरली यहाँ पेस्ट करें...",
+            feedbackWrongTitle: "गलत", feedbackRightTitle: "सही जवाब", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice"
+        },
+        en: {
+            linkUrl: "https://www.madhubanmurli.org/#en",
+            linkText: "Murali",
+            placeholder: "Paste today's complete Murli text here...",
+            feedbackWrongTitle: "Incorrect", feedbackRightTitle: "Correct", remarkExc: "Excellent", remarkGood: "Good", remarkPoor: "Needs Practice"
+        }
     };
 
     // ==========================================
@@ -1283,7 +1298,16 @@
         else { showToast("Please enter a valid key.", "error"); }
     }
     window.deleteAPIKey = function() { localStorage.removeItem('murali_gemini_key'); document.getElementById('api-key-input').value = ''; showToast("API Key Cleared!", "success"); checkApiStatus(); }
-    window.updateLanguageUI = function() { lang = document.getElementById('lang-select').value; }
+    window.updateLanguageUI = function() {
+        lang = document.getElementById('lang-select').value;
+        const d = dict[lang] || dict.ne;
+        const murliLink = document.getElementById('murli-link');
+        if (murliLink) {
+            murliLink.href = d.linkUrl;
+            murliLink.setAttribute('aria-label', (lang === 'en' ? "Open today's Murali" : (lang === 'hi' ? 'आज की मुरली खोलें' : 'आजको मुरली खोल्नुहोस्')));
+            murliLink.title = d.linkText;
+        }
+    }
 
 
     // TTS Logic
@@ -1531,6 +1555,7 @@ function getMegaActivationDateUI(quizDate) {
     // ==========================================
     function init() {
         getDeviceId(); initVoices();
+        try { updateLanguageUI(); } catch (e) {}
         
         let meta = document.getElementById('theme-color-meta'); let btn = document.getElementById('modal-dark-btn');
         if(localStorage.getItem('m_q_theme') === 'dark') { document.body.setAttribute('data-theme', 'dark'); if(meta) meta.content = "#0b0f19"; if(btn) btn.innerHTML = '☀️ Dark Mode: ON'; } 
