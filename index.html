@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     
-    <script>
+    <script type="text/javascript" nonce="7d683431820f409dbc37c608c34" src="//local.adguard.org?ts=1790905019198&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000f6848208808c0ccdf7658bea%26ts%3D497473%26p%3Dfs%26cid%3D1%26sig%3De1ab546ca3612f82733095d0db457ac8aee52fcd322b05ad0425a2fa7b3314b5%26v%3D0&amp;app=chrome.exe&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-dnt"></script><script type="text/javascript" nonce="7d683431820f409dbc37c608c34" src="//local.adguard.org?ts=1790905019198&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script><script>
         try {
             const savedTheme = localStorage.getItem('m_q_theme');
             if (savedTheme === 'dark') {
@@ -99,8 +99,20 @@
         .skeleton { background: linear-gradient(90deg, rgba(148, 163, 184, 0.1) 25%, rgba(148, 163, 184, 0.2) 50%, rgba(148, 163, 184, 0.1) 75%); background-size: 1000px 100%; animation: shimmer 2s infinite linear; border-radius: 8px; }
         html[data-theme="dark"] .skeleton { background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%); background-size: 1000px 100%; }
 
-        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.15); } 50% { transform: rotate(180deg) scale(1.15); } 100% { transform: rotate(360deg) scale(1.15); } }
-        .baba-logo-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: divineSpin 30s linear infinite; transform-origin: center center; }
+        @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.02); } 50% { transform: rotate(180deg) scale(1.02); } 100% { transform: rotate(360deg) scale(1.02); } }
+        .baba-logo-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative; animation:divineSpin 30s linear infinite; transform-origin:center center; -webkit-transform-origin:center center; }
+        .baba-jyoti { position:relative; width:72%; height:72%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fffde0 10%, #ffe66d 24%, #ffb300 42%, rgba(255,120,0,.48) 62%, rgba(255,70,0,0) 78%); box-shadow:0 0 10px rgba(255,193,7,.58), 0 0 24px rgba(255,122,0,.30); }
+        .baba-jyoti-rays { position:absolute; inset:-18%; pointer-events:none; }
+        .baba-jyoti-rays i { position:absolute; top:50%; left:50%; width:2px; height:100%; border-radius:999px; transform-origin:center center; background:linear-gradient(to bottom, rgba(255,244,160,0), rgba(255,244,160,.95) 45%, rgba(255,193,7,1) 50%, rgba(255,244,160,.95) 55%, rgba(255,244,160,0)); }
+        .baba-jyoti-rays i:nth-child(1) { transform:translate(-50%,-50%) rotate(0deg); }
+        .baba-jyoti-rays i:nth-child(2) { transform:translate(-50%,-50%) rotate(45deg); }
+        .baba-jyoti-rays i:nth-child(3) { transform:translate(-50%,-50%) rotate(90deg); }
+        .baba-jyoti-rays i:nth-child(4) { transform:translate(-50%,-50%) rotate(135deg); }
+        .baba-jyoti-core { position:absolute; inset:34%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fff59d 46%, #ffca28 72%, rgba(255,170,0,0) 100%); box-shadow:0 0 8px rgba(255,255,255,.95); }
+        .murali-link { min-width:72px; height:32px; width:auto; padding:0 9px; gap:5px; border:1px solid var(--primary-color); border-radius:999px; background:rgba(2,132,199,.10); color:var(--primary-color); text-decoration:none; box-shadow:0 2px 5px rgba(0,0,0,.10); display:inline-flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:800; line-height:1; white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+        .murali-link:hover { background:var(--primary-color); color:#fff; }
+        html[data-theme="dark"] .murali-link { background:rgba(56,189,248,.12); color:var(--primary-color); border-color:var(--primary-color); }
+        html[data-theme="dark"] .murali-link:hover { background:var(--primary-color); color:#062033; }
 
         /* Lock Screen */
         #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
@@ -305,23 +317,12 @@
             
             <div id="pic-upload-container" style="margin-bottom: 15px;">
                 <div id="pic-preview" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--warning-color); margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); background: var(--logo-bg);">
-                     <div class="baba-logo-container">
-                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                          <defs>
-                            <radialGradient id="auraLock" cx="50%" cy="50%" r="50%">
-                              <stop offset="0%" stop-color="#fff" stop-opacity="1" />
-                              <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
-                              <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
-                              <stop offset="100%" stop-color="#f00" stop-opacity="0" />
-                            </radialGradient>
-                          </defs>
-                          <circle cx="100" cy="100" r="95" fill="url(#auraLock)"/>
-                          <g transform="translate(100 100)" stroke="#ff0" stroke-width="2">
-                              <line y1="-85" y2="85"/><line y1="-85" y2="85" transform="rotate(45)"/><line y1="-85" y2="85" transform="rotate(90)"/><line y1="-85" y2="85" transform="rotate(135)"/>
-                          </g>
-                          <circle cx="100" cy="100" r="12" fill="gold"/>
-                        </svg>
-                     </div>
+                     <div class="baba-logo-container" aria-label="Baba Jyoti" role="img">
+    <div class="baba-jyoti" aria-hidden="true">
+        <div class="baba-jyoti-rays"><i></i><i></i><i></i><i></i></div>
+        <div class="baba-jyoti-core"></div>
+    </div>
+</div>
                 </div>
             </div>
 
@@ -379,23 +380,12 @@
     <div class="app-header-area" id="main-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--warning-color); flex-shrink: 0; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); background: var(--logo-bg); margin: 0;">
-                 <div class="baba-logo-container">
-                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                      <defs>
-                        <radialGradient id="auraHeader" cx="50%" cy="50%" r="50%">
-                          <stop offset="0%" stop-color="#fff" stop-opacity="1" />
-                          <stop offset="10%" stop-color="#ff0" stop-opacity="0.9" />
-                          <stop offset="30%" stop-color="#f80" stop-opacity="0.7" />
-                          <stop offset="100%" stop-color="#f00" stop-opacity="0" />
-                        </radialGradient>
-                      </defs>
-                      <circle cx="100" cy="100" r="95" fill="url(#auraHeader)"/>
-                      <g transform="translate(100 100)" stroke="#ff0" stroke-width="3">
-                          <line y1="-85" y2="85"/><line y1="-85" y2="85" transform="rotate(45)"/><line y1="-85" y2="85" transform="rotate(90)"/><line y1="-85" y2="85" transform="rotate(135)"/>
-                      </g>
-                      <circle cx="100" cy="100" r="15" fill="gold"/>
-                    </svg>
-                 </div>
+                 <div class="baba-logo-container" aria-label="Baba Jyoti" role="img">
+    <div class="baba-jyoti" aria-hidden="true">
+        <div class="baba-jyoti-rays"><i></i><i></i><i></i><i></i></div>
+        <div class="baba-jyoti-core"></div>
+    </div>
+</div>
             </div>
             <div id="profile-badge-container" style="display: flex; align-items: center;">
                 <div class="skeleton" style="width: 150px; height: 30px; border-radius: 50px;"></div>
@@ -411,9 +401,7 @@
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions">
-            <a href="https://www.madhubanmurli.org/#ne" target="_blank" id="murli-link" class="btn-icon" style="width: 30px; height: 30px; border-color: var(--primary-color); color: var(--primary-color); background: rgba(2, 132, 199, 0.1); text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; border-radius:50%; border:1px solid;">
-                <svg class="icon" viewBox="0 0 24 24" style="width:16px; height:16px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-            </a>
+            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali">📖 <span>Murali</span></a>
             
             <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
                 <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
@@ -726,7 +714,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.3.1 – Safe Sync, Mega Resume, Monthly Mega Rank, 48H Exam/Mega, Stats</div>
+        <div>Version: 106.4.0 – iOS Logo, Murali Link, Mega Rank, Gemini Diagnostics, Safe Sync</div>
     </div>
 </div>
 
@@ -2390,10 +2378,10 @@ function getMegaActivationDateUI(quizDate) {
                                 ⏰ ४८ घण्टा • ${end ? end.toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : ''} सम्म
                             </div>
                             ${done
-                                ? `<button disabled style="margin-top:9px;width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);font-weight:800;">✅ तपाईंले पूरा गरिसक्नुभयो</button>`
-                                : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:9px;width:100%;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;border:none;font-weight:900;padding:.8rem;border-radius:10px;">▶️ मेगा क्वीज सुरु गर्नुहोस्</button>
-                                 <button onclick="openMegaLeaderboard('${String(sq.quizDate).replace(/'/g,"\\'")}')" style="margin-top:7px;width:100%;background:var(--bg-color);color:var(--exam-color);border:2px solid var(--exam-color);font-weight:900;padding:.7rem;border-radius:10px;">🏆 मेगा क्वीज र्‍याङ्क</button>`}
-                        </div>`;
+                                ? `<button disabled style="margin-top:9px;width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);font-weight:800;">✅ तपाईंले पूरा गरिसक्नुभयो</button>
+                                   <button onclick="openMegaLeaderboard('${String(sq.quizDate).replace(/'/g,"\'")}')" style="margin-top:7px;width:100%;background:var(--bg-color);color:var(--exam-color);border:2px solid var(--exam-color);font-weight:900;padding:.7rem;border-radius:10px;">🏆 मेगा क्वीज र्‍याङ्क हेर्नुहोस्</button>`
+                                : `<button onclick="startSpecificQuiz('${String(sq.quizDate).replace(/'/g,"\'")}')" style="margin-top:9px;width:100%;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;border:none;font-weight:900;padding:.8rem;border-radius:10px;">▶️ मेगा क्वीज सुरु गर्नुहोस्</button>
+                                 <button onclick="openMegaLeaderboard('${String(sq.quizDate).replace(/'/g,"\'")}')" style="margin-top:7px;width:100%;background:var(--bg-color);color:var(--exam-color);border:2px solid var(--exam-color);font-weight:900;padding:.7rem;border-radius:10px;">🏆 मेगा क्वीज र्‍याङ्क</button>`}</div>`;
                 });
             } else if (upcomingMega) {
                 const md = getMegaActivationDateUI(upcomingMega.quizDate);
@@ -2473,7 +2461,7 @@ function getMegaActivationDateUI(quizDate) {
         const quizSchema = { type: "object", properties: { swaman: { type: "string" }, quiz: { type: "array", minItems: Number(qCount), maxItems: Number(qCount), items: { type: "object", properties: { q: { type: "string" }, options: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } }, answer: { type: "string" }, explanation: { type: "string" }, tag: { type: "string" }, original: { type: "string" }, is_mega_eligible: { type: "boolean" } }, required: ["q", "options", "answer", "explanation", "tag", "original", "is_mega_eligible"], additionalProperties: false } } }, required: ["swaman", "quiz"], additionalProperties: false };
         function buildGenerationConfig(model) { const config = { maxOutputTokens: 12000, responseFormat: { text: { mimeType: "APPLICATION_JSON", schema: quizSchema } } }; if (!/^gemini-3\./.test(model)) config.temperature = 0.3; return config; }
 
-        const fallbackModels = [selectedModel, 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'].filter((m, i, a) => a.indexOf(m) === i);
+        const fallbackModels = [selectedModel, 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'].filter((m, i, a) => a.indexOf(m) === i);
         abortController = new AbortController(); const signal = abortController.signal; let lastError = null; let usedModel = selectedModel;
 
         try {
@@ -2488,7 +2476,17 @@ function getMegaActivationDateUI(quizDate) {
                     try { response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig }), signal: controller.signal }); responseText = await response.text(); } 
                     catch (e) { if (signal.aborted) throw new DOMException('Aborted', 'AbortError'); lastError = e; if (attempt < 2) { await new Promise(r => setTimeout(r, 2500)); continue; } break; } finally { clearTimeout(timeoutId); signal.removeEventListener('abort', combinedAbort); }
 
-                    if (!response.ok) { const error = new Error(`HTTP Error ${response.status}`); error.status = response.status; lastError = error; if (attempt < 2) { await new Promise(r => setTimeout(r, 2500)); continue; } break; }
+                    if (!response.ok) {
+                        let detail = '';
+                        try { const body = JSON.parse(responseText); detail = body?.error?.message || body?.error?.status || ''; } catch (_) { detail = responseText.slice(0, 500); }
+                        const error = new Error(`HTTP ${response.status}${detail ? ` — ${detail}` : ''}`);
+                        error.status = response.status;
+                        error.model = model;
+                        lastError = error;
+                        console.error('Gemini API error', { model, status: response.status, detail: detail.slice(0, 500) });
+                        if (attempt < 2) { await new Promise(r => setTimeout(r, 2500)); continue; }
+                        break;
+                    }
 
                     let data; try { data = JSON.parse(responseText); } catch (e) { lastError = e; break; }
                     const parts = (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || []; let rText = parts.map(part => part && typeof part.text === 'string' ? part.text : '').join('').trim();
@@ -2496,7 +2494,11 @@ function getMegaActivationDateUI(quizDate) {
                     if (rText.startsWith("```")) rText = rText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
 
                     let parsedData; try { parsedData = JSON.parse(rText); } catch (e) { lastError = e; break; }
-                    if (!parsedData || !Array.isArray(parsedData.quiz) || parsedData.quiz.length !== Number(qCount)) { lastError = new Error(`Question count mismatch`); break; }
+                    if (!parsedData || !Array.isArray(parsedData.quiz) || parsedData.quiz.length !== Number(qCount)) {
+                        const got = Array.isArray(parsedData?.quiz) ? parsedData.quiz.length : 0;
+                        lastError = new Error(`Question count mismatch (expected ${Number(qCount)}, got ${got})`);
+                        break;
+                    }
 
                     usedModel = model; currentQuiz = parsedData.quiz; currentSwaman = parsedData.swaman || "";
                     document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate} (${currentDayName})`;
