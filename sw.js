@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v106-4-3";
+const CACHE_NAME = "murali-quiz-v106-4-4";
 
 const APP_SHELL = [
     "./",
@@ -24,7 +24,7 @@ self.addEventListener("install", event => {
                     try {
                         await cache.add(url);
                     } catch (e) {
-                        // एउटा shell resource fail भए पनि SW install रोकिँदैन।
+                        // Shell resource fail भए पनि SW install रोकिँदैन।
                     }
                 }
 
@@ -37,9 +37,8 @@ self.addEventListener("install", event => {
                 }
             })
 
-            // IMPORTANT:
             // skipWaiting() जानाजानी प्रयोग गरिएको छैन।
-            // यसले चलिरहेको exam लाई जबर्जस्ती reload गर्दैन।
+            // चलिरहेको exam लाई जबर्जस्ती reload गराउँदैन।
     );
 });
 
