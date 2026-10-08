@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.4">
+    <link rel="manifest" href="manifest.json?v=106.4.6">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -720,7 +720,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.4 – iOS 12 Fix, PWA Install, Mega Rank, Murali Language, Mega Window, Gemini Diagnostics, Mega Stats</div>
+        <div>Version: 106.4.6 – iOS 12 Fix, PWA Install, Mega Rank, Murali Language, Mega Window, Gemini Diagnostics, Mega Stats, Split Dashboard</div>
     </div>
 </div>
 
@@ -1186,7 +1186,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.4"; 
+    const APP_VERSION = "106.4.6"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2413,6 +2413,7 @@ function getMegaActivationDateUI(quizDate) {
             const currentMonthViewing = (cy === now.getFullYear() && cm === now.getMonth());
 
             // 48-hour carry-over: yesterday's normal quiz remains playable across month boundary.
+            let carryOverHtml = '';
             if (currentMonthViewing) {
                 const yesterday = new Date(todayStart); yesterday.setDate(yesterday.getDate() - 1);
                 const yKey = dateKeyLocal_(yesterday);
@@ -2425,13 +2426,14 @@ function getMegaActivationDateUI(quizDate) {
                         const d = getValidDate(h); return d && dateKeyLocal_(d) === yKey && !String(h.date||'').match(/mega|मेगा|review/i);
                     });
                     const expires = new Date(yesterday.getTime() + 48*60*60*1000);
-                    html += `<div style="margin-top:15px;padding:12px 14px;border-radius:14px;border:1px dashed var(--exam-color);background:rgba(2,132,199,.06);">
-                        <div style="font-weight:900;color:var(--exam-color);margin-bottom:5px;">🕘 हिजोको बाँकी परीक्षा</div>
-                        <div style="font-size:.82rem;color:var(--muted-text-color);margin-bottom:8px;">${yesterday.toLocaleDateString('en-GB')} • ४८ घण्टे सुविधा • ${expires.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'})} सम्म</div>
-                        ${completed
-                            ? `<button disabled style="width:100%;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);">✅ पूरा भइसकेको</button>`
-                            : `<button onclick="startSpecificQuiz('${String(carryQuiz.quizDate).replace(/'/g,"\\'")}')" style="width:100%;background:var(--primary-gradient);color:white;">▶️ हिजोको परीक्षा दिनुहोस्</button>`}
-                    </div>`;
+                    carryOverHtml = `
+                        <div style="padding:10px;border-radius:14px;border:1px dashed var(--exam-color);background:rgba(2,132,199,.06);height:100%;">
+                            <div style="font-weight:800;color:var(--exam-color);margin-bottom:4px;font-size:.88rem;">🕘 हिजोको बाँकी परीक्षा</div>
+                            <div style="font-size:.72rem;color:var(--muted-text-color);line-height:1.35;margin-bottom:7px;">${yesterday.toLocaleDateString('en-GB')} • ४८ घण्टे • ${expires.toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit'})} सम्म</div>
+                            ${completed
+                                ? `<button disabled style="width:100%;padding:.5rem .4rem;font-size:.78rem;background:var(--success-bg);color:var(--success-color);border:1px solid var(--success-border);border-radius:9px;">✅ पूरा भइसकेको</button>`
+                                : `<button onclick="startSpecificQuiz('${String(carryQuiz.quizDate).replace(/'/g,"\'")}')" style="width:100%;padding:.5rem .4rem;font-size:.78rem;background:var(--primary-gradient);color:white;border-radius:9px;">▶️ परीक्षा दिनुहोस्</button>`}
+                        </div>`;
                 }
             }
 
@@ -2489,13 +2491,17 @@ function getMegaActivationDateUI(quizDate) {
             }
 
             const megaEntryHtml = `
-                <div style="margin-top:12px;border:1px solid #f59e0b;border-radius:16px;overflow:hidden;background:rgba(245,158,11,.05);">
-                    <button onclick="toggleMonthlyMegaInfo()" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border:none;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;font-weight:900;font-size:.96rem;cursor:pointer;">
-                        <span>🏆 मासिक मेगा क्वीज</span><span style="font-size:.78rem;opacity:.95;">${megaStatusText} &nbsp;<span id="monthly-mega-arrow">▼</span></span>
-                    </button>
-                    <div id="monthly-mega-info" style="display:none;padding:10px 11px;">
-                        ${megaPanelBody}
-                        <button onclick="openMegaArchive()" class="btn-small" style="margin-top:4px;width:100%;background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);font-weight:800;">📚 सबै Mega Quiz Archive</button>
+                <div style="margin-top:12px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:stretch;">
+                    <div>${carryOverHtml || `
+                        <div style="height:100%;padding:10px;border-radius:14px;border:1px dashed var(--border-color);background:var(--bg-color);font-size:.76rem;color:var(--muted-text-color);line-height:1.4;display:flex;align-items:center;justify-content:center;text-align:center;">🕘 हिजोको बाँकी परीक्षा छैन</div>`}</div>
+                    <div style="border:1px solid #f59e0b;border-radius:14px;overflow:hidden;background:rgba(245,158,11,.05);">
+                        <button onclick="toggleMonthlyMegaInfo()" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 10px;border:none;background:linear-gradient(135deg,#f59e0b,#ea580c);color:white;font-weight:800;font-size:.86rem;cursor:pointer;">
+                            <span>🏆 मासिक मेगा क्वीज</span><span style="font-size:.70rem;opacity:.95;white-space:nowrap;">${megaStatusText} <span id="monthly-mega-arrow">▼</span></span>
+                        </button>
+                        <div id="monthly-mega-info" style="display:none;padding:8px;">
+                            ${megaPanelBody}
+                            <button onclick="openMegaArchive()" class="btn-small" style="margin-top:4px;width:100%;background:var(--bg-color);color:var(--primary-color);border:1px solid var(--primary-color);font-weight:800;padding:.45rem;font-size:.76rem;">📚 Mega Archive</button>
+                        </div>
                     </div>
                 </div>`;
             html = html.replace('<div id="monthly-mega-slot"></div>', megaEntryHtml);
