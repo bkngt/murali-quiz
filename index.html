@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.6">
+    <link rel="manifest" href="manifest.json?v=106.4.8">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -743,7 +743,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.7 – iOS 12 Fix, PWA Install, Mega Rank, Murali Language, Mega Window, Gemini Diagnostics, Mega Stats, Compact Dashboard</div>
+        <div>Version: 106.4.8</div>
     </div>
 </div>
 
@@ -1209,7 +1209,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.7"; 
+    const APP_VERSION = "106.4.8"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -3116,6 +3116,9 @@ function getMegaActivationDateUI(quizDate) {
 
     if (percent === 100) fireConfetti();
 
+    // Result Sync promise: Rank खोल्दा server result save पूरा भएको सुनिश्चित गर्छ।
+    window._lastResultSyncPromise = Promise.resolve();
+
     // पुरानो Result हटाउने
     let oldRes = document.getElementById('result-screen');
     if (oldRes) oldRes.remove();
@@ -3155,6 +3158,10 @@ function getMegaActivationDateUI(quizDate) {
                 📊 प्रगति विवरण
             </button>
 
+            <button onclick="openResultRank()" style="background:var(--primary-gradient); color:white; width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; border:none; cursor:pointer;">
+                🏆 परीक्षा र्‍याङ्क
+            </button>
+
             <button onclick="reviewQuiz()" style="background: transparent; color: var(--exam-color); border:2px solid var(--exam-color); width:auto; border-radius:50px; box-shadow:none; font-size:1.05rem; padding:0.7rem 1.5rem; font-weight:800; cursor:pointer;">
                 🔎 उत्तर रिभ्यु
             </button>
@@ -3173,7 +3180,8 @@ function getMegaActivationDateUI(quizDate) {
     // 6. Google Sheet Sync background मा
     //    Result देखाउन यसको प्रतीक्षा हुँदैन
     // ==========================================
-    saveOrReplaceProgress()
+    window._lastResultSyncPromise = saveOrReplaceProgress();
+    window._lastResultSyncPromise
         .then(resultSync => {
 
             const statusEl = document.getElementById('result-sync-status');
@@ -3201,6 +3209,19 @@ function getMegaActivationDateUI(quizDate) {
 
         });
 }
+
+    window.openResultRank = async function() {
+        try {
+            if (window._lastResultSyncPromise) await window._lastResultSyncPromise;
+        } catch (e) {}
+
+        const isMegaResult = /mega|मेगा|review/i.test(String(currentMuraliDate || ''));
+        if (isMegaResult) {
+            openMegaLeaderboard(currentMuraliDate);
+        } else {
+            openStudentLeaderboard(currentMuraliDate);
+        }
+    };
 
     async function saveOrReplaceProgress() {
         let history = safeJSON('murali_progress', []); let incorrectTags = currentQuiz.filter(q => !q.userCorrect && q.tag).map(q => q.tag);
