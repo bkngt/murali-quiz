@@ -1,4 +1,4 @@
-const CACHE_NAME = "murali-quiz-v106-4-14-fix2";
+const CACHE_NAME = "murali-quiz-v106-4-16";
 const SHELL_TIMEOUT_MS = 5000;
 const NETWORK_TIMEOUT_MS = 6000;
 
