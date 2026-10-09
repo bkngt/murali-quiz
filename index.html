@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.10">
+    <link rel="manifest" href="manifest.json?v=106.4.11">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -324,8 +324,13 @@
         /* Toolbar */
         .toolbar-one-line { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem; background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 4px;}
         .toolbar-one-line::-webkit-scrollbar { display: none; }
-        .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
-        .btn-mega-quick { flex:0 0 auto; white-space:nowrap; border:1px solid #d97706; color:#9a3412; background:linear-gradient(135deg,#fff7ed,#ffedd5); border-radius:50px; font-weight:800; font-size:.86rem; padding:.36rem .68rem; cursor:pointer; box-shadow:0 2px 7px rgba(217,119,6,.12); }
+        .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; min-width: 0; }
+        /* Global button width:100% was making Mega stretch across the toolbar
+           and push Settings out of view on mobile. Keep all toolbar actions compact. */
+        #toolbar-right-actions { flex: 0 0 auto; width: auto; min-width: 0; gap: 6px; }
+        #toolbar-right-actions > .murali-link { flex: 0 0 auto; width: auto; }
+        .btn-mega-quick { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; border:1px solid #d97706; color:#9a3412; background:linear-gradient(135deg,#fff7ed,#ffedd5); border-radius:50px; font-weight:800; font-size:.86rem; padding:.36rem .68rem; cursor:pointer; box-shadow:0 2px 7px rgba(217,119,6,.12); }
+        #btn-toggle-settings { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; }
         .mega-modal-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
         .mega-modal-card { width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
         .mega-modal-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -1218,7 +1223,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.10"; 
+    const APP_VERSION = "106.4.11"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
