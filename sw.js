@@ -1,9 +1,9 @@
-const CACHE_NAME = "murali-quiz-v106-4-10";
+const CACHE_NAME = "murali-quiz-v106-4-11";
 
 const APP_SHELL = [
     "./",
     "./index.html",
-    "./manifest.json"
+    "./manifest.json?v=106.4.11"
 ];
 
 const STATIC_ASSETS = [
