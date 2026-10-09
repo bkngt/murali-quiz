@@ -1,45 +1,62 @@
-const CACHE_NAME = "murali-quiz-v106-4-13";
+const CACHE_NAME = "murali-quiz-v106-4-14-fix2";
+const SHELL_TIMEOUT_MS = 5000;
+const NETWORK_TIMEOUT_MS = 6000;
 
-const APP_SHELL = [
-    "./",
-    "./index.html",
-    "./manifest.json?v=106.4.13"
-];
+const APP_SHELL = ["./index.html"];
 
 const STATIC_ASSETS = [
     "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
     "https://cdn.jsdelivr.net/npm/chart.js"
 ];
 
+async function fetchWithTimeout(request, timeoutMs = NETWORK_TIMEOUT_MS) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        return await fetch(request, {
+            signal: controller.signal
+        });
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+
 /* ==========================================================
    INSTALL
+   Manifest/CDN लाई Install को समयमा डाउनलोड गरिँदैन।
    ========================================================== */
 
 self.addEventListener("install", event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(async cache => {
+    event.waitUntil((async () => {
+        try {
+            const cache = await caches.open(CACHE_NAME);
 
-                for (const url of APP_SHELL) {
+            await Promise.all(
+                APP_SHELL.map(async url => {
                     try {
-                        await cache.add(url);
-                    } catch (e) {
-                        // Shell resource fail भए पनि SW install रोकिँदैन।
-                    }
-                }
+                        const response = await fetchWithTimeout(
+                            url,
+                            SHELL_TIMEOUT_MS
+                        );
 
-                for (const url of STATIC_ASSETS) {
-                    try {
-                        await cache.add(url);
-                    } catch (e) {
-                        // CDN unavailable हुँदा SW install fail नगराउने।
+                        if (response && response.ok) {
+                            await cache.put(url, response);
+                        }
+                    } catch (error) {
+                        // Network/timeout failure ले स्थापना रोकिन दिँदैन।
                     }
-                }
-            })
+                })
+            );
 
-            // skipWaiting() जानाजानी प्रयोग गरिएको छैन।
-            // चलिरहेको exam लाई जबर्जस्ती reload गराउँदैन।
-    );
+        } catch (error) {
+            console.warn("SW install warning:", error);
+        }
+
+        // skipWaiting() प्रयोग गरिएको छैन।
+        // चलिरहेको परीक्षालाई जबर्जस्ती Reload गर्दैन।
+    })());
 });
 
 
@@ -48,25 +65,35 @@ self.addEventListener("install", event => {
    ========================================================== */
 
 self.addEventListener("activate", event => {
-    event.waitUntil(
-        caches.keys()
-            .then(cacheNames => Promise.all(
+    event.waitUntil((async () => {
+        try {
+            const cacheNames = await caches.keys();
 
-                cacheNames.map(cacheName => {
-
+            await Promise.all(
+                cacheNames.map(async cacheName => {
                     if (
                         cacheName.startsWith("murali-quiz-v") &&
                         cacheName !== CACHE_NAME
                     ) {
-                        return caches.delete(cacheName);
+                        try {
+                            await caches.delete(cacheName);
+                        } catch (error) {
+                            console.warn(
+                                "Old cache cleanup warning:",
+                                cacheName,
+                                error
+                            );
+                        }
                     }
-
-                    return undefined;
                 })
+            );
 
-            ))
-            .then(() => self.clients.claim())
-    );
+        } catch (error) {
+            console.warn("SW activate warning:", error);
+        }
+
+        await self.clients.claim();
+    })());
 });
 
 
@@ -75,16 +102,15 @@ self.addEventListener("activate", event => {
    ========================================================== */
 
 self.addEventListener("fetch", event => {
-
     const request = event.request;
     const url = new URL(request.url);
 
+    // GET बाहेकका अनुरोधमा हस्तक्षेप नगर्ने।
+    if (request.method !== "GET") {
+        return;
+    }
 
-    /* ======================================================
-       1. GOOGLE APPS SCRIPT / BACKEND
-       NEVER cache/intercept backend requests.
-       ====================================================== */
-
+    // Google Apps Script / Backend अनुरोध क्यास नगर्ने।
     if (
         url.hostname.includes("script.google.com") ||
         url.hostname.includes("googleusercontent.com")
@@ -92,11 +118,16 @@ self.addEventListener("fetch", event => {
         return;
     }
 
+    // Manifest अनुरोध ब्राउजरलाई सीधै गर्न दिने।
+    if (
+        url.pathname.endsWith("/manifest.json") ||
+        url.pathname === "/manifest.json" ||
+        url.pathname.endsWith("manifest.json")
+    ) {
+        return;
+    }
 
-    /* ======================================================
-       2. EXTERNAL NAVIGATION
-       ====================================================== */
-
+    // बाह्य वेबसाइटको Navigation मा हस्तक्षेप नगर्ने।
     if (
         request.mode === "navigate" &&
         url.origin !== self.location.origin
@@ -106,168 +137,136 @@ self.addEventListener("fetch", event => {
 
 
     /* ======================================================
-       3. SAME-ORIGIN NAVIGATION
-
-       Online  -> newest page first
-       Offline -> cached page fallback
+       1. PAGE NAVIGATION
+       Online: Network first
+       Offline: Cached page fallback
        ====================================================== */
 
     if (request.mode === "navigate") {
+        event.respondWith((async () => {
+            try {
+                const response = await fetchWithTimeout(
+                    request,
+                    NETWORK_TIMEOUT_MS
+                );
 
-        event.respondWith(
-
-            fetch(request)
-
-                .then(response => {
-
-                    if (response && response.ok) {
-
-                        const clone = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
-                            .catch(() => {});
+                if (response && response.ok) {
+                    try {
+                        const cache = await caches.open(CACHE_NAME);
+                        await cache.put(request, response.clone());
+                    } catch (error) {
+                        // Cache असफल भए पनि Network response प्रयोग गर्ने।
                     }
+                }
 
-                    return response;
-                })
+                return response;
 
-                .catch(() => {
+            } catch (error) {
+                const cached = await caches.match(request);
 
-                    return caches.match(request)
+                if (cached) {
+                    return cached;
+                }
 
-                        .then(cached => {
+                const fallback = await caches.match("./index.html");
 
-                            if (cached) {
-                                return cached;
-                            }
+                if (fallback) {
+                    return fallback;
+                }
 
-                            return caches.match("./index.html");
-                        });
-                })
-        );
+                return new Response(
+                    "इन्टरनेट उपलब्ध छैन। पुनः प्रयास गर्नुहोस्।",
+                    {
+                        status: 503,
+                        headers: {
+                            "Content-Type": "text/plain; charset=utf-8"
+                        }
+                    }
+                );
+            }
+        })());
 
         return;
     }
 
 
     /* ======================================================
-       4. MANIFEST
+       2. CDN ASSETS
+       Cache first; पहिलो पटक आवश्यक हुँदा मात्र डाउनलोड।
        ====================================================== */
 
-    if (
-        url.pathname.endsWith("/manifest.json") ||
-        url.pathname.endsWith("manifest.json")
-    ) {
+    if (STATIC_ASSETS.includes(request.url)) {
+        event.respondWith((async () => {
+            const cached = await caches.match(request);
 
-        event.respondWith(
+            if (cached) {
+                return cached;
+            }
 
-            fetch(request)
+            const response = await fetchWithTimeout(
+                request,
+                NETWORK_TIMEOUT_MS
+            );
 
-                .then(response => {
+            if (response && response.ok) {
+                try {
+                    const cache = await caches.open(CACHE_NAME);
 
-                    if (response && response.ok) {
+                    await cache.put(
+                        request,
+                        response.clone()
+                    );
+                } catch (error) {
+                    // Cache असफल भए पनि Asset response प्रयोग गर्ने।
+                }
+            }
 
-                        const clone = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
-                            .catch(() => {});
-                    }
-
-                    return response;
-                })
-
-                .catch(() => caches.match(request))
-        );
-
-        return;
-    }
-
-
-    /* ======================================================
-       5. KNOWN CDN ASSETS
-       Cache first for JSZip + Chart.js
-       ====================================================== */
-
-    const isStaticAsset =
-        request.url ===
-            "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" ||
-
-        request.url ===
-            "https://cdn.jsdelivr.net/npm/chart.js";
-
-
-    if (isStaticAsset) {
-
-        event.respondWith(
-
-            caches.match(request)
-
-                .then(cached => {
-
-                    if (cached) {
-                        return cached;
-                    }
-
-                    return fetch(request)
-
-                        .then(response => {
-
-                            if (response && response.ok) {
-
-                                const clone = response.clone();
-
-                                caches.open(CACHE_NAME)
-                                    .then(cache =>
-                                        cache.put(request, clone)
-                                            .catch(() => {})
-                                    )
-                                    .catch(() => {});
-                            }
-
-                            return response;
-                        });
-                })
-        );
+            return response;
+        })());
 
         return;
     }
 
 
     /* ======================================================
-       6. OTHER SAME-ORIGIN REQUESTS
-       Network first + cache fallback
+       3. OTHER SAME-ORIGIN GET REQUESTS
+       Network first; offline मा Cache fallback।
        ====================================================== */
 
     if (url.origin === self.location.origin) {
+        event.respondWith((async () => {
+            try {
+                const response = await fetchWithTimeout(
+                    request,
+                    NETWORK_TIMEOUT_MS
+                );
 
-        event.respondWith(
+                if (response && response.ok) {
+                    try {
+                        const cache = await caches.open(CACHE_NAME);
 
-            fetch(request)
-
-                .then(response => {
-
-                    if (response && response.ok) {
-
-                        const clone = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache =>
-                                cache.put(request, clone).catch(() => {})
-                            )
-                            .catch(() => {});
+                        await cache.put(
+                            request,
+                            response.clone()
+                        );
+                    } catch (error) {
+                        // Cache असफल भए पनि अनुरोधको response कायम राख्ने।
                     }
+                }
 
-                    return response;
-                })
+                return response;
 
-                .catch(() => caches.match(request))
-        );
+            } catch (error) {
+                const cached = await caches.match(request);
+
+                if (cached) {
+                    return cached;
+                }
+
+                return new Response("", {
+                    status: 503
+                });
+            }
+        })());
     }
-
 });
