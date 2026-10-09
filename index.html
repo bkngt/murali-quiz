@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.11">
+    <link rel="manifest" href="manifest.json?v=106.4.13">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -330,12 +330,15 @@
         #toolbar-right-actions { flex: 0 0 auto; width: auto; min-width: 0; gap: 6px; }
         #toolbar-right-actions > .murali-link { flex: 0 0 auto; width: auto; }
         .btn-mega-quick { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; border:1px solid #d97706; color:#9a3412; background:linear-gradient(135deg,#fff7ed,#ffedd5); border-radius:50px; font-weight:800; font-size:.86rem; padding:.36rem .68rem; cursor:pointer; box-shadow:0 2px 7px rgba(217,119,6,.12); }
+        .btn-rank-quick { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; border:1px solid var(--primary-color); color:#fff; background:var(--primary-gradient); border-radius:50px; font-weight:800; font-size:.78rem; padding:.36rem .55rem; cursor:pointer; box-shadow:0 2px 7px rgba(2,132,199,.15); }
         #btn-toggle-settings { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; }
         .mega-modal-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
         .mega-modal-card { width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
         .mega-modal-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
         .mega-modal-title { font-size:1.08rem; font-weight:900; color:#b45309; }
         .mega-modal-close { flex:0 0 auto; border:0; border-radius:50%; width:36px; height:36px; font-size:1.2rem; font-weight:900; background:var(--bg-color); color:var(--text-color); cursor:pointer; }
+        @media (max-width:600px) { #toolbar-right-actions { flex:1 1 auto; width:100%; justify-content:space-between; gap:6px; }
+        #toolbar-right-actions > .murali-link, #toolbar-right-actions > #btn-toggle-settings, #toolbar-right-actions > #btn-rank-quick { flex:0 1 auto; } .btn-rank-quick { font-size:.70rem; padding:.34rem .42rem; } }
         @media (max-width:520px) { .btn-mega-quick { font-size:.75rem; padding:.34rem .5rem; } #toolbar-right-actions { gap:5px; } .mega-modal-overlay { padding:10px; } .mega-modal-card { padding:13px; } }
 
         .btn-settings-clear { background: transparent; color: var(--text-color); border: 1px solid var(--border-color); border-radius: 50px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s;}
@@ -444,11 +447,12 @@
         
         <div class="toolbar-group" id="toolbar-right-actions">
             <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali">📖 <span>Murali</span></a>
-            
-            <button type="button" class="btn-mega-quick" id="btn-mega-quick" onclick="openMonthlyMegaModal()" aria-label="Mega Quiz खोल्नुहोस्">🏆 Mega</button>
+
             <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
-                <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Settings
+                <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 1 1.51-1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Setting
             </button>
+
+            <button type="button" class="btn-rank-quick" id="btn-rank-quick" onclick="openStudentLeaderboard()" aria-label="Open Exam Rank" title="Exam Rank">🏆 Exam Rank</button>
         </div>
     </div>
 
@@ -1223,7 +1227,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.11"; 
+    const APP_VERSION = "106.4.13"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2399,20 +2403,20 @@ function getMegaActivationDateUI(quizDate) {
         panel.style.display = open ? 'none' : 'block';
         if (arrow) arrow.textContent = open ? '▼' : '▲';
     };
-    window.openMonthlyMegaModal = function() {
+    window.openMonthlyMegaQuickModal = function() {
         const modal = document.getElementById('mega-quick-modal');
         if (!modal) { showToast('Mega Quiz विवरण लोड हुँदैछ। एकछिनपछि फेरि प्रयास गर्नुहोस्।', 'info'); return; }
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden','false');
         document.body.style.overflow = 'hidden';
     };
-    window.closeMonthlyMegaModal = function() {
+    window.closeMonthlyMegaQuickModal = function() {
         const modal = document.getElementById('mega-quick-modal');
         if (modal) { modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
         document.body.style.overflow = '';
     };
-    window.closeMonthlyMegaModalOnOverlay = function(e) {
-        if (e && e.target && e.target.id === 'mega-quick-modal') closeMonthlyMegaModal();
+    window.closeMonthlyMegaQuickModalOnOverlay = function(e) {
+        if (e && e.target && e.target.id === 'mega-quick-modal') closeMonthlyMegaQuickModal();
     };
 
     window.loadStudentDashboard = function() {
@@ -2457,7 +2461,7 @@ function getMegaActivationDateUI(quizDate) {
                 html += `<div style="${boxStyle} ${cursor}" ${clickAction} title="Date: ${i}"><span>${i}</span><span style="${extraTextSize} margin-top:2px;">${statusIcon}</span></div>`;
             }
             
-            html += `</div></div><div style="margin-top:8px; background:var(--card-bg); padding:10px; border-radius:16px; border:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;"><div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div><div style="white-space: nowrap;">✅ : सम्पन्न भएको</div><div><button class="btn-small" onclick="forceFullSync()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🔄 Refresh</button></div><div><button class="btn-small" onclick="openStudentLeaderboard()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🏆 परीक्षा र्‍याङ्क</button></div></div></div><div id="monthly-mega-slot"></div>`;
+            html += `</div></div><div style="margin-top:8px; background:var(--card-bg); padding:10px; border-radius:16px; border:1px solid var(--border-color);"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#94a3b8; font-weight:700; align-items: center;"><div style="white-space: nowrap;">▶️ : आजको (खेल्न बाँकी)</div><div style="white-space: nowrap;">✅ : सम्पन्न भएको</div><div><button class="btn-small" onclick="forceFullSync()" style="width: 100%; background:var(--primary-gradient); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); padding: 6px 2px; font-size: 0.8rem;">🔄 Refresh</button></div><div><button class="btn-small" onclick="openMonthlyMegaQuickModal()" style="width: 100%; background:linear-gradient(135deg,#f59e0b,#ea580c); color:white; border:none; font-weight:bold; box-shadow: 0 4px 10px rgba(217,119,6,0.25); padding: 6px 2px; font-size: 0.8rem;">🏆 Mega Quiz</button></div></div></div><div id="monthly-mega-slot"></div>`;
 
             const now = new Date();
             const todayStart = dateOnlyLocal_(now);
@@ -2544,11 +2548,11 @@ function getMegaActivationDateUI(quizDate) {
             }
 
             const megaEntryHtml = `
-                <div id="mega-quick-modal" class="mega-modal-overlay" style="display:none" aria-hidden="true" onclick="closeMonthlyMegaModalOnOverlay(event)">
+                <div id="mega-quick-modal" class="mega-modal-overlay" style="display:none" aria-hidden="true" onclick="closeMonthlyMegaQuickModalOnOverlay(event)">
                     <div class="mega-modal-card" role="dialog" aria-modal="true" aria-labelledby="mega-modal-heading">
                         <div class="mega-modal-top">
                             <div class="mega-modal-title" id="mega-modal-heading">🏆 मासिक Mega Quiz</div>
-                            <button type="button" class="mega-modal-close" onclick="closeMonthlyMegaModal()" aria-label="बन्द गर्नुहोस्">✕</button>
+                            <button type="button" class="mega-modal-close" onclick="closeMonthlyMegaQuickModal()" aria-label="बन्द गर्नुहोस्">✕</button>
                         </div>
                         <div class="dashboard-mega-summary" style="padding:0 0 12px;font-size:.82rem;">
                             <div class="mega-status-line">${megaStatusText}</div>
