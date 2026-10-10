@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.16">
+    <link rel="manifest" href="manifest.json?v=106.4.17">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -258,6 +258,37 @@
         .chart-final-score-v2 { text-align:center; font-size:.95rem; font-weight:800; color:var(--text-color); margin-bottom:7px; }
         .chart-final-score-v2 strong { color:var(--chart-color); font-size:1.25rem; }
         
+        /* Chart V4: compact time entry, reflection and service controls */
+        .chart-title-v2 > span { flex:1; min-width:0; overflow-wrap:anywhere; }
+        .chart-time-list-v4 { display:flex; flex-direction:column; gap:7px; margin-top:8px; }
+        .chart-time-row-v4 { display:grid; grid-template-columns:minmax(0,1fr) 100px; gap:9px; align-items:center; padding:8px 9px; border:1px solid var(--border-color); border-radius:11px; background:var(--bg-color); min-width:0; }
+        .chart-time-row-v4 label { min-width:0; font-size:.86rem; line-height:1.3; font-weight:750; overflow-wrap:anywhere; }
+        .chart-time-input-v4 { width:100%; min-width:0; height:40px; padding:5px 7px; border:1px solid var(--border-color); border-radius:9px; background:var(--card-bg); color:var(--text-color); font:inherit; font-size:1rem; font-weight:850; text-align:center; outline:none; }
+        .chart-time-input-v4:focus, .chart-reflection-input-v4:focus { border-color:var(--chart-color); box-shadow:0 0 0 3px rgba(139,92,246,.14); }
+        .chart-time-note-v4 { margin-top:8px; color:var(--muted-text-color); font-size:.74rem; font-weight:650; line-height:1.4; }
+        .chart-subhead-v4 { margin:10px 0 5px; color:var(--muted-text-color); font-size:.78rem; font-weight:850; }
+        .chart-reflection-field-v4 { display:block; margin-top:9px; }
+        .chart-reflection-field-v4 > span { display:block; margin-bottom:5px; font-size:.8rem; font-weight:800; }
+        .chart-reflection-input-v4 { display:block; width:100%; min-height:42px; padding:9px 10px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font:inherit; font-size:.88rem; outline:none; resize:vertical; }
+        .chart-service-grid-v4 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }
+        .chart-service-chip-v4 { display:flex; align-items:flex-start; gap:7px; padding:9px 8px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font-size:.79rem; font-weight:700; line-height:1.3; min-width:0; cursor:pointer; }
+        .chart-service-chip-v4 input { margin:2px 0 0; flex:0 0 auto; accent-color:var(--chart-color); }
+        .chart-service-chip-v4.selected-service-v4 { border-color:var(--chart-color); background:rgba(139,92,246,.08); }
+        .chart-baba-time-v4 { display:block; margin-top:4px; color:var(--muted-text-color); font-size:.78rem; font-weight:800; }
+        .chart-baba-time-v4 strong { color:var(--chart-color); font-size:.94rem; }
+        .chart-final-time-v4 { text-align:center; margin:0 0 8px; font-weight:850; color:var(--text-color); font-size:.88rem; }
+        .chart-final-time-v4 strong { color:var(--chart-color); }
+        .chart-pledge-modal-content-v4 { max-width:440px; padding:clamp(1rem,4vw,1.5rem); }
+        .chart-pledge-text-v4 { margin:12px 0 18px; padding:13px; border:1.5px dashed var(--chart-color); border-radius:14px; background:rgba(139,92,246,.08); font-size:.97rem; font-weight:750; line-height:1.6; color:var(--text-color); }
+        @media (max-width:380px) {
+            .chart-section-v2 { padding:.68rem; }
+            .chart-time-row-v4 { grid-template-columns:minmax(0,1fr) 86px; gap:6px; padding:7px; }
+            .chart-time-row-v4 label { font-size:.8rem; }
+            .chart-service-grid-v4 { gap:5px; }
+            .chart-service-chip-v4 { padding:8px 6px; font-size:.73rem; }
+            .chart-total-v2 { font-size:1.8rem; }
+        }
+
         /* Stats & Calendar */
         .dashboard-stats { display: flex; gap: 0.45rem; margin-bottom: 0.75rem; flex-wrap: nowrap; width:100%; }
         .stat-card { flex: 1 1 0; min-width: 0; background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.6rem 0.2rem; border-radius: 12px; text-align: center; overflow:hidden;}
@@ -338,7 +369,9 @@
         #toolbar-right-actions > .murali-link { flex: 0 0 auto; width: auto; }
         .btn-mega-quick { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; border:1px solid #d97706; color:#9a3412; background:linear-gradient(135deg,#fff7ed,#ffedd5); border-radius:50px; font-weight:800; font-size:.86rem; padding:.36rem .68rem; cursor:pointer; box-shadow:0 2px 7px rgba(217,119,6,.12); }
         .btn-rank-quick { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; border:1px solid var(--primary-color); color:#fff; background:var(--primary-gradient); border-radius:50px; font-weight:800; font-size:.78rem; padding:.36rem .55rem; cursor:pointer; box-shadow:0 2px 7px rgba(2,132,199,.15); }
-        #btn-toggle-settings { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; }
+        #btn-toggle-settings { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; height:32px; min-height:32px; box-sizing:border-box; border:1px solid var(--border-color); border-radius:999px; padding:0 .6rem !important; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+        #toolbar-right-actions > .murali-link { height:32px; min-height:32px; box-sizing:border-box; }
+        #toolbar-right-actions > #btn-rank-quick { height:32px; min-height:32px; box-sizing:border-box; border-width:1px; border-style:solid; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
         .mega-modal-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
         .mega-modal-card { width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
         .mega-modal-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -589,9 +622,10 @@
         </div>
 
         <div class="chart-progress-head-v2">
-            <div>
-                <div class="chart-progress-label-v2">आजको कुल अंक</div>
+            <div style="min-width:0;">
+                <div class="chart-progress-label-v2">आजको कुल अङ्क</div>
                 <div class="chart-total-v2"><span id="chart-live-score">0</span><span class="chart-total-max-v2">/100</span></div>
+                <span class="chart-baba-time-v4">🕊️ आज बाबाको याद: <strong id="chart-live-baba-time">0 मिनेट</strong></span>
             </div>
             <div class="chart-progress-ring-v2" id="chart-progress-ring"><span id="chart-live-percent">0%</span></div>
         </div>
@@ -599,107 +633,141 @@
         <div class="chart-progress-track-v2"><div id="chart-live-progress" class="chart-progress-fill-v2" style="width:0%"></div></div>
 
         <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
-
             <div class="chart-section-v2" data-chart-section="1">
-                <div class="chart-title-v2"><span>१. 🌅 अमृतवेला तथा बिहानको योग</span><b>१५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="15"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२ घण्टा वा सोभन्दा बढी</span><span class="chart-score-v2">१५</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="12"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१.५ घण्टा (डेढ घण्टा)</span><span class="chart-score-v2">१२</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="8"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१ घण्टा</span><span class="chart-score-v2">८</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_amritvela" value="4"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आधा घण्टा</span><span class="chart-score-v2">४</span></label>
+                <div class="chart-title-v2"><span>१. 🌅 अमृतवेला तथा मुरली क्लासअघिपछिको बाबाको याद</span><b>१५</b></div>
+                <div class="chart-time-list-v4">
+                    <div class="chart-time-row-v4"><label for="chart-time-amritvela">अमृतवेला</label><input id="chart-time-amritvela" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="अमृतवेलाको बाबाको याद, मिनेट"></div>
+                    <div class="chart-time-row-v4"><label for="chart-time-murli-before">मुरली क्लासअघि</label><input id="chart-time-murli-before" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="मुरली क्लासअघि बाबाको याद, मिनेट"></div>
+                    <div class="chart-time-row-v4"><label for="chart-time-murli-after">मुरली क्लासपछि</label><input id="chart-time-murli-after" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="मुरली क्लासपछि बाबाको याद, मिनेट"></div>
                 </div>
+                <div class="chart-time-note-v4">समय मिनेटमा लेख्नुहोस् (१ घण्टा = ६० मिनेट)। तीनै समय जोडेर अङ्क स्वतः निर्धारण हुन्छ। अन्तिम फिल्ड पूरा गरेपछि अर्को बुँदामा अटो-स्क्रोल हुन्छ।</div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="2">
-                <div class="chart-title-v2"><span>२. 📖 मुरली अध्ययन</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सेन्टरमा गएर पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">घरमै/अनलाइन पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">५</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सार वा मुख्य कुरा मात्र पढेँ</span><span class="chart-score-v2">२</span></label>
+                <div class="chart-title-v2"><span>२. 📖 मुरली अध्ययन, मन्थन तथा स्व-अध्ययन</span><b>१५</b></div>
+                <div class="chart-subhead-v4">क. मुरली अध्ययन — १० अङ्क</div>
+                <div class="chart-options-v2" data-single-group="chart_murli">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सेन्टरमा गएर पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">घरमै वा अनलाइन पूरा सुनेँ/पढेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सार वा मुख्य कुरा मात्र पढेँ</span><span class="chart-score-v2">२</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज अध्ययन गर्न सकिनँ</span><span class="chart-score-v2">०</span></label>
+                </div>
+                <div class="chart-subhead-v4">ख. मुरली मन्थन तथा स्व-अध्ययन — ५ अङ्क</div>
+                <div class="chart-options-v2" data-single-group="chart_murli_manthan">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli_manthan" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी चिन्तन/स्व-अध्ययन गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli_manthan" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–२९ मिनेट गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_murli_manthan" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज मन्थन गर्न सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="3">
-                <div class="chart-title-v2"><span>३. 🧠 मुरली मन्थन तथा स्व-अध्ययन</span><b>५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli_manthan" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी चिन्तन/स्व-अध्ययन गरेँ</span><span class="chart-score-v2">५</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_murli_manthan" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–३० मिनेट मात्र गरेँ</span><span class="chart-score-v2">३</span></label>
+                <div class="chart-title-v2"><span>३. 🧘 पाँच स्वरूप तथा स्वमानको ड्रिल</span><b>१०</b></div>
+                <div class="chart-options-v2" data-single-group="chart_swaman_drill">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_swaman_drill" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभर कम्तीमा ५ पटक ड्रिल र बीचबीचमा स्वमानको अभ्यास गरेँ</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_swaman_drill" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२–४ पटक अभ्यास गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_swaman_drill" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">०–१ पटक मात्र अभ्यास गरेँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="4">
-                <div class="chart-title-v2"><span>४. 🧘‍♂️ ५ स्वरूप र स्वमान अभ्यास</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_swaman_drill" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभर कम्तीमा ५ पटक ड्रिल र बीच-बीचमा स्वमानको अभ्यास भयो</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_swaman_drill" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">२-३ पटक मात्र अभ्यास भयो</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-title-v2"><span>४. 🚦 ट्राफिक कन्ट्रोल</span><b>५</b></div>
+                <div class="chart-options-v2" data-single-group="chart_traffic">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_traffic" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">५ पटक नै नियमपूर्वक गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_traffic" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३–४ पटक गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_traffic" value="1"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१–२ पटक मात्र गरेँ</span><span class="chart-score-v2">१</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_traffic" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज गर्न सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="5">
-                <div class="chart-title-v2"><span>५. 🚦 ट्राफिक कन्ट्रोल</span><b>५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">५ पटक नै नियमपूर्वक गरेँ</span><span class="chart-score-v2">५</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३–४ पटक गरेँ</span><span class="chart-score-v2">३</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_traffic" value="1"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१–२ पटक मात्र भयो</span><span class="chart-score-v2">१</span></label>
+                <div class="chart-title-v2"><span>५. 🌸 धारणा, चालचलन तथा सम्बन्ध-सम्पर्क</span><b>१०</b></div>
+                <div class="chart-options-v2" data-single-group="chart_conduct">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_conduct" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">मनसा, वाचा, कर्मणामा मर्यादा, शुभभावना र सम्मान कायम राखेँ; त्रुटि भए सच्याएँ</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही हलचल वा कमजोरी भयो, तर पहिचान गरेर सम्हाल्ने प्रयास गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_conduct" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज आफ्नो चालचलनप्रति सचेत रहन सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
+                <label class="chart-reflection-field-v4"><span>🔍 आजको एउटा मुख्य कमजोरी (ऐच्छिक)</span><textarea id="chart-daily-weakness" class="chart-reflection-input-v4" rows="2" maxlength="240" placeholder="जस्तै: वाणीमा हतार भयो…"></textarea></label>
+                <label class="chart-reflection-field-v4"><span>🌱 भोलि सुधार गर्ने सङ्कल्प (ऐच्छिक)</span><textarea id="chart-tomorrow-resolution" class="chart-reflection-input-v4" rows="2" maxlength="240" placeholder="भोलि बोल्नुअघि एकछिन सोच्नेछु…"></textarea></label>
             </div>
 
             <div class="chart-section-v2" data-chart-section="6">
-                <div class="chart-title-v2"><span>६. 🌸 धारणा र आत्मिक स्थिति</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सन्तुष्ट, शान्त, हल्का र सबैप्रति शुभ भावना रह्यो</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सामान्य हलचल भयो तर तुरुन्तै सम्हालेँ</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-title-v2"><span>६. 📚 ईश्वरीय ज्ञान सेवा</span><b>५</b></div>
+                <div class="chart-options-v2" data-single-group="chart_knowledge_sewa">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">लेक्चर, क्लास वा प्रत्यक्ष ज्ञान सेवा गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ज्ञान सामग्री तयार वा ज्ञान सेवामा सहयोग गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज ज्ञान सेवा गरिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="7">
-                <div class="chart-title-v2"><span>७. 🤲 ईश्वरीय सेवा (कर्मणा)</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_sewa" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ईश्वरीय कार्य वा कर्मणा सेवामा कम्तीमा ३० मिनेट समय दिएँ</span><span class="chart-score-v2">१०</span></label>
+                <div class="chart-title-v2"><span>७. 🪷 यज्ञको स्थूल सेवा</span><b>५</b></div>
+                <div class="chart-time-list-v4">
+                    <div class="chart-time-row-v4"><label for="chart-time-sthool-sewa">स्थूल सेवाको समय</label><input id="chart-time-sthool-sewa" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="यज्ञको स्थूल सेवाको अवधि मिनेटमा"></div>
+                </div>
+                <div class="chart-time-note-v4">३० मिनेट वा बढी = ५, १०–२९ मिनेट = ३, १–९ मिनेट = १ अङ्क। सेवा प्रकार र समय दुवै इमान्दारीपूर्वक भर्नुहोस्।</div>
+                <div class="chart-service-grid-v4">
+                    <label class="chart-service-chip-v4"><input class="chart-service-multi-v4" type="checkbox" name="chart_sthool_service_type" value="सेवा केन्द्र/यज्ञस्थलको सफाइ"><span>🧹 सेवा केन्द्र/यज्ञस्थलको सफाइ</span></label>
+                    <label class="chart-service-chip-v4"><input class="chart-service-multi-v4" type="checkbox" name="chart_sthool_service_type" value="सामग्री तथा बस्ने ठाउँ मिलाउने"><span>🪑 सामग्री/बस्ने ठाउँ मिलाउने</span></label>
+                    <label class="chart-service-chip-v4"><input class="chart-service-multi-v4" type="checkbox" name="chart_sthool_service_type" value="कार्यक्रमको तयारी"><span>🎯 कार्यक्रमको तयारी</span></label>
+                    <label class="chart-service-chip-v4"><input class="chart-service-multi-v4" type="checkbox" name="chart_sthool_service_type" value="घरबाट गरिएको यज्ञ सेवा"><span>🏠 घरबाट गरिएको यज्ञ सेवा</span></label>
+                    <label class="chart-service-chip-v4"><input class="chart-service-multi-v4" type="checkbox" name="chart_sthool_service_type" value="अन्य स्थूल सेवा"><span>🤲 अन्य स्थूल सेवा</span></label>
+                    <label class="chart-service-chip-v4"><input class="chart-service-none-v4" type="checkbox" name="chart_sthool_service_none" value="none"><span>आज स्थूल सेवा गरिनँ</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="8">
                 <div class="chart-title-v2"><span>८. 🍚 ब्रह्माभोजन</span><b>५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">पूर्ण मौन र बाबाको यादमा भोजन गरेँ</span><span class="chart-score-v2">५</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_food" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सुरुमा याद थियो, पछि साधारण भयो वा बोलियो</span><span class="chart-score-v2">२</span></label>
+                <div class="chart-options-v2" data-single-group="chart_food">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_food" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">मौन र बाबाको यादमा भोजन गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_food" value="2"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">सुरुमा याद थियो, पछि साधारण भयो वा बोलियो</span><span class="chart-score-v2">२</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_food" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज विशेष अभ्यास हुन सकेन</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="9">
-                <div class="chart-title-v2"><span>९. 🏃 व्यायाम / शारीरिक स्वास्थ्य</span><b>५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_exercise" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आफ्नो अनुकूलताअनुसार व्यायाम/योगासन गरेँ</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-title-v2"><span>९. 🏃 व्यायाम तथा शारीरिक स्वास्थ्य</span><b>५</b></div>
+                <div class="chart-options-v2" data-single-group="chart_exercise">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_exercise" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आफ्नो अनुकूलताअनुसार व्यायाम/योगासन गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_exercise" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही मात्र गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_exercise" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज व्यायाम गरिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="10">
-                <div class="chart-title-v2"><span>१०. 🌇 साँझको योग</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">३० मिनेट वा बढी बाबाको यादमा बसेँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_evening" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">१५–३० मिनेट</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-title-v2"><span>१०. 🌇 दिउँसोको एकान्त तथा साँझको बाबाको याद</span><b>१०</b></div>
+                <div class="chart-time-list-v4">
+                    <div class="chart-time-row-v4"><label for="chart-time-daytime-yoga">दिउँसो एकान्तमा</label><input id="chart-time-daytime-yoga" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="दिउँसो एकान्तमा बाबाको यादको अवधि मिनेटमा"></div>
+                    <div class="chart-time-row-v4"><label for="chart-time-evening-yoga">साँझको योग</label><input id="chart-time-evening-yoga" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="साँझको बाबाको यादको अवधि मिनेटमा"></div>
                 </div>
+                <div class="chart-time-note-v4">दुवै समय जोडेर अङ्क स्वतः निर्धारण हुन्छ। अन्तिम फिल्ड पूरा गरेपछि अर्को बुँदामा अटो-स्क्रोल हुन्छ।</div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="11">
-                <div class="chart-title-v2"><span>११. 🌙 गुडनाइट योग एवं चार्ट</span><b>५</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_goodnight" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभरिको चार्ट बाबालाई दिएर सुतेँ</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-title-v2"><span>११. 🌙 गुडनाइट बाबाको याद तथा चार्ट अर्पण</span><b>५</b></div>
+                <div class="chart-time-list-v4">
+                    <div class="chart-time-row-v4"><label for="chart-time-goodnight">सुत्नुअघिको बाबाको याद</label><input id="chart-time-goodnight" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="सुत्नुअघि बाबाको यादको अवधि मिनेटमा"></div>
+                </div>
+                <div class="chart-subhead-v4">आजको अभ्यास छान्नुहोस्</div>
+                <div class="chart-options-v2" data-single-group="chart_goodnight">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_goodnight" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">चार्ट बाबालाई अर्पण गरेँ र सुत्नुअघि बाबाको यादमा बसेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_goodnight" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">चार्ट अर्पण गरेँ तर छुट्टै यादमा बस्न सकिनँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_goodnight" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">चार्ट अर्पण गर्न सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="12">
                 <div class="chart-title-v2"><span>१२. 📵 सूचना उपवास (Digital Detox)</span><b>१०</b></div>
-                <div class="chart-options-v2">
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_digital_detox" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">दिनभर अनावश्यक युट्युब, फेसबुक, टिकटक हेरिनँ, कामको लागि मात्र चलाएँ</span><span class="chart-score-v2">१०</span></label>
-                    <label class="chart-option-v2"><input type="checkbox" name="chart_digital_detox" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही समय यताउति गयो तर धेरै खेर फालिनँ र तुरुन्तै सम्हालेँ</span><span class="chart-score-v2">५</span></label>
+                <div class="chart-options-v2" data-single-group="chart_digital_detox">
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_digital_detox" value="10"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">अनावश्यक युट्युब, फेसबुक वा टिकटक हेरिनँ; आवश्यक काममा मात्र चलाएँ</span><span class="chart-score-v2">१०</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_digital_detox" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही समय अनावश्यक प्रयोग भयो तर आफैँलाई सम्हालेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_digital_detox" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">अनावश्यक प्रयोग नियन्त्रण गर्न सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
 
             <div class="chart-submit-wrap-v2">
-                <div class="chart-final-score-v2">कुल <strong id="chart-submit-score">0</strong> / 100</div>
-                <button type="submit" id="btn-submit-chart" style="padding:1rem; font-size:1.05rem; border-radius:14px; background: var(--chart-color);">✅ चार्ट सुरक्षित गर्नुहोस्</button>
+                <div class="chart-final-score-v2">कुल अङ्क <strong id="chart-submit-score">0</strong> / 100</div>
+                <div class="chart-final-time-v4">🕊️ आज बाबाको याद: <strong id="chart-submit-baba-time">0 मिनेट</strong></div>
+                <button type="submit" id="btn-submit-chart" style="padding:1rem; font-size:1.02rem; border-radius:14px; background:var(--chart-color);">✅ इमान्दारीपूर्वक चार्ट सुरक्षित गर्नुहोस्</button>
             </div>
         </form>
 
@@ -768,7 +836,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.16</div>
+        <div>Version: 106.4.17</div>
     </div>
 </div>
 
@@ -1008,6 +1076,19 @@
     </div>
 </div>
 
+<!-- Daily Chart Honesty Commitment -->
+<div id="chart-pledge-modal-v4" class="modal-overlay" style="z-index:2600;" onclick="if(event.target.id==='chart-pledge-modal-v4') cancelChartPledgeV4();">
+    <div class="modal-content chart-pledge-modal-content-v4" style="text-align:center;">
+        <div style="font-size:2.8rem; margin-bottom:6px;">🕊️</div>
+        <h3 style="color:var(--chart-color); margin:0; font-weight:900; font-size:1.35rem;">इमान्दारीको सङ्कल्प</h3>
+        <p class="chart-pledge-text-v4">म आजको आध्यात्मिक चार्ट शिव बाबालाई साक्षी राखी इमान्दारीपूर्वक भर्नेछु। बाबाको यादको समय र आफ्नो पुरुषार्थलाई बढाइचढाइ नगरी वास्तविक अभ्यासअनुसार लेख्नेछु। यो चार्ट अरूसँग तुलना गर्न होइन, आफ्नो सुधारका लागि हो।</p>
+        <div style="display:flex; gap:9px;">
+            <button type="button" onclick="cancelChartPledgeV4()" style="flex:1; background:var(--danger-bg); color:var(--danger-color); border:1px solid var(--danger-border); box-shadow:none;">फर्कनुहोस्</button>
+            <button type="button" onclick="confirmChartPledgeV4()" style="flex:1; background:var(--chart-color); color:#fff;">म इमान्दारीपूर्वक भर्छु ✓</button>
+        </div>
+    </div>
+</div>
+
 <!-- Detailed Progress Modal -->
 <div id="detailed-progress-modal" class="modal-overlay" onclick="if(event.target.id === 'detailed-progress-modal') document.getElementById('detailed-progress-modal').style.display='none';">
     <div class="modal-content" style="max-width: 600px; padding: 1.5rem;">
@@ -1219,7 +1300,7 @@
         });
     }
 
-    // 106.3 AUTO SYNC + WAIT FIX + MONTHLY MEGA
+    // 106.4.17 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1234,7 +1315,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.16"; 
+    const APP_VERSION = "106.4.17"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1551,7 +1632,10 @@ function getMegaActivationDateUI(quizDate) {
             const d = getValidDate(c); const score = Number(c && c.totalScore);
             if (!d || isNaN(d.getTime()) || !isFinite(score) || score < 0 || score > 100) return;
             const key=dateKeyLocal_(d); const item=Object.assign({},c,{__date:d,totalScore:score});
-            const prev=map.get(key); if(!prev || item.totalScore>prev.totalScore) map.set(key,item);
+            const prev=map.get(key);
+            const itemVersion=Number(item.chartVersion || item.schemaVersion || 3);
+            const prevVersion=prev ? Number(prev.chartVersion || prev.schemaVersion || 3) : 0;
+            if(!prev || itemVersion>prevVersion || (itemVersion===prevVersion && item.totalScore>prev.totalScore)) map.set(key,item);
         });
         return Array.from(map.values()).sort((a,b)=>a.__date-b.__date);
     }
@@ -1972,7 +2056,7 @@ function getMegaActivationDateUI(quizDate) {
                 quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
                 stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
 
-            // 106.4.16: A late state-save response must not resurrect a finished
+            // 106.4.17: A late state-save response must not resurrect a finished
             // quiz locally, or overwrite the state of a different quiz session.
             const stateQuizId = String(stateObj.quizId || '');
             const sameCurrentQuiz = !stateQuizId || !currentQuizId || stateQuizId === String(currentQuizId);
@@ -2063,8 +2147,12 @@ function getMegaActivationDateUI(quizDate) {
         try {
             for (const data of pendingData) {
                 try {
-                    const result = await apiPostJSON({action:'saveChart', chartVersion:3, name:data.name, address:data.address, phone:data.phone, pin:(localStorage.getItem('murali_pin') || ''), date:data.date,
-                        totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, murliManthan:data.murliManthan, swamanDrill:data.swamanDrill, traffic:data.traffic, conduct:data.conduct, sewa:data.sewa, food:data.food, exercise:data.exercise, eveningYoga:data.eveningYoga, goodnight:data.goodnight, digitalDetox:data.digitalDetox, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                    const result = await apiPostJSON({action:'saveChart', chartVersion:Number(data.chartVersion || 3), chartSchema:data.chartSchema || '', name:data.name, address:data.address, phone:data.phone, pin:(localStorage.getItem('murali_pin') || ''), date:data.date,
+                        totalScore:data.totalScore, stage:data.stage, amritvela:data.amritvela, murli:data.murli, murliManthan:data.murliManthan, swamanDrill:data.swamanDrill, traffic:data.traffic, conduct:data.conduct, sewa:data.sewa, food:data.food, exercise:data.exercise, eveningYoga:data.eveningYoga, goodnight:data.goodnight, digitalDetox:data.digitalDetox,
+                        amritvelaMinutes:data.amritvelaMinutes, murliClassBeforeMinutes:data.murliClassBeforeMinutes, murliClassAfterMinutes:data.murliClassAfterMinutes, amritvelaGroupMinutes:data.amritvelaGroupMinutes,
+                        daytimeYogaMinutes:data.daytimeYogaMinutes, eveningYogaMinutes:data.eveningYogaMinutes, eveningGroupMinutes:data.eveningGroupMinutes, goodnightYogaMinutes:data.goodnightYogaMinutes, totalBabaYaadMinutes:data.totalBabaYaadMinutes,
+                        knowledgeSewa:data.knowledgeSewa, sthoolSewa:data.sthoolSewa, sthoolSewaMinutes:data.sthoolSewaMinutes, sthoolServiceTypes:data.sthoolServiceTypes,
+                        dailyWeakness:data.dailyWeakness, tomorrowResolution:data.tomorrowResolution, honestyConfirmed:data.honestyConfirmed, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
                     if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); }
                 } catch(e) {}
             }
@@ -2156,15 +2244,20 @@ function getMegaActivationDateUI(quizDate) {
         if (!navigator.onLine || !userPhone || userPhone === 'N/A' || myChartsSyncInProgress) return false;
         myChartsSyncInProgress = true;
         try {
-            const data = await apiPostJSON({action:'fetchMyCharts', phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId(), chartVersion:3}, {retries:2, timeoutMs:12000});
+            const data = await apiPostJSON({action:'fetchMyCharts', phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId(), chartVersion:4}, {retries:2, timeoutMs:12000});
             if (data && data.status === 'success' && Array.isArray(data.charts)) {
                 let localCharts = safeJSON('murali_daily_charts', []);
                 const otherUsers = localCharts.filter(c => c && c.phone && c.phone !== userPhone);
                 const minePending = localCharts.filter(c => c && c.phone === userPhone && c.synced !== true);
-                const serverMap = new Map(data.charts.map(c => [String(c.date), c]));
+                const serverMap = new Map(data.charts.map(c => [String(c.date), Object.assign({}, c, {phone:userPhone, name:c.name || userName, address:c.address || userAddress})]));
+                for (const pending of minePending) {
+                    const key=String(pending.date), serverRecord=serverMap.get(key);
+                    const pendingVersion=Number(pending.chartVersion || pending.schemaVersion || 3);
+                    const serverVersion=serverRecord ? Number(serverRecord.chartVersion || serverRecord.schemaVersion || 3) : 0;
+                    if (!serverRecord || pendingVersion>serverVersion || (pendingVersion===serverVersion && pending.synced!==true)) serverMap.set(key,pending);
+                }
                 const mergedMine = Array.from(serverMap.values());
-                for (const pending of minePending) if (!serverMap.has(String(pending.date))) mergedMine.push(pending);
-                mergedMine.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+                mergedMine.sort((a,b)=>String(b.date).localeCompare(String(a.date)) || Number(b.chartVersion||3)-Number(a.chartVersion||3));
                 localStorage.setItem('murali_daily_charts', JSON.stringify([...mergedMine, ...otherUsers]));
                 return true;
             }
@@ -3116,7 +3209,7 @@ function getMegaActivationDateUI(quizDate) {
     stopTimer();
     clearInterval(qLockInterval);
     isQuizActive = false;
-    // 106.4.16: Stop queued ActiveStates retries as soon as submission begins.
+    // 106.4.17: Stop queued ActiveStates retries as soon as submission begins.
     // An already in-flight request is guarded again by the Backend completion check.
     if (activeStateSaveTimer) { clearTimeout(activeStateSaveTimer); activeStateSaveTimer = null; }
     if (activeStateSaveRetryTimer) { clearTimeout(activeStateSaveRetryTimer); activeStateSaveRetryTimer = null; }
@@ -3347,10 +3440,12 @@ function getMegaActivationDateUI(quizDate) {
     };
 
     // ==========================================
-    // 9. DAILY CHART LOGIC (V3 - 12 Points)
+    // 9. DAILY CHART LOGIC (V4 - 12 Points / 100 Marks / All-in-one)
     // ==========================================
-    const CHART_V3_GROUPS = ['chart_amritvela','chart_murli','chart_murli_manthan','chart_swaman_drill','chart_traffic','chart_conduct','chart_sewa','chart_food','chart_exercise','chart_evening','chart_goodnight','chart_digital_detox'];
-    
+    const CHART_V4_GROUPS = ['chart_murli','chart_murli_manthan','chart_swaman_drill','chart_traffic','chart_conduct','chart_knowledge_sewa','chart_food','chart_exercise','chart_goodnight','chart_digital_detox'];
+    // Retain the old symbol name for any legacy callers; the function now calculates V4.
+    const CHART_V3_GROUPS = CHART_V4_GROUPS;
+
     function activateNextChartSection(currentSection) {
         let next = currentSection ? currentSection.nextElementSibling : null;
         if(next && next.classList.contains('chart-section-v2')) {
@@ -3360,74 +3455,373 @@ function getMegaActivationDateUI(quizDate) {
         }
     }
 
+    function getDurationMinutesV4(id) {
+        const el = document.getElementById(id);
+        if (!el) return 0;
+        const raw = String(el.value == null ? '' : el.value).trim();
+        if (!raw) return 0;
+        const n = Number(raw);
+        if (!Number.isFinite(n) || n < 0) return 0;
+        return Math.min(1440, Math.floor(n));
+    }
+
+    function scoreAmritvelaMinutesV4(total) {
+        if (total >= 120) return 15;
+        if (total >= 90) return 12;
+        if (total >= 60) return 8;
+        if (total >= 30) return 4;
+        return 0;
+    }
+
+    function scoreEveningMinutesV4(total) {
+        if (total >= 30) return 10;
+        if (total >= 15) return 5;
+        return 0;
+    }
+
+    function getAmritvelaMinutesV4() {
+        return getDurationMinutesV4('chart-time-amritvela') + getDurationMinutesV4('chart-time-murli-before') + getDurationMinutesV4('chart-time-murli-after');
+    }
+
+    function getEveningGroupMinutesV4() {
+        return getDurationMinutesV4('chart-time-daytime-yoga') + getDurationMinutesV4('chart-time-evening-yoga');
+    }
+
+    function getTotalBabaYaadMinutesV4() {
+        return getAmritvelaMinutesV4() + getEveningGroupMinutesV4() + getDurationMinutesV4('chart-time-goodnight');
+    }
+
+    function formatBabaYaadDurationV4(totalMinutes) {
+        const total = Math.max(0, Math.floor(Number(totalMinutes) || 0));
+        const hours = Math.floor(total / 60), minutes = total % 60;
+        if (hours && minutes) return `${hours} घण्टा ${minutes} मिनेट`;
+        if (hours) return `${hours} घण्टा`;
+        return `${minutes} मिनेट`;
+    }
+
+    function getSelectedServiceTypesV4() {
+        return Array.from(document.querySelectorAll('#daily-chart-form input.chart-service-multi-v4:checked')).map(el => el.value);
+    }
+
+    function getStoolSewaScoreV4() {
+        const minutes = getDurationMinutesV4('chart-time-sthool-sewa');
+        const hasType = getSelectedServiceTypesV4().length > 0;
+        const noService = !!document.querySelector('#daily-chart-form input.chart-service-none-v4:checked');
+        if (!hasType || noService || minutes <= 0) return 0;
+        if (minutes >= 30) return 5;
+        if (minutes >= 10) return 3;
+        return 1;
+    }
+
+    function getChartOptionValue(groupName) {
+        const selected = document.querySelector(`#daily-chart-form input[name="${groupName}"]:checked`);
+        return selected ? Number(selected.value) || 0 : 0;
+    }
+
+    function getChartV4Score() {
+        return scoreAmritvelaMinutesV4(getAmritvelaMinutesV4()) +
+            getChartOptionValue('chart_murli') + getChartOptionValue('chart_murli_manthan') +
+            getChartOptionValue('chart_swaman_drill') + getChartOptionValue('chart_traffic') +
+            getChartOptionValue('chart_conduct') + getChartOptionValue('chart_knowledge_sewa') +
+            getStoolSewaScoreV4() + getChartOptionValue('chart_food') +
+            getChartOptionValue('chart_exercise') + scoreEveningMinutesV4(getEveningGroupMinutesV4()) +
+            getChartOptionValue('chart_goodnight') + getChartOptionValue('chart_digital_detox');
+    }
+
+    function getChartV3Score() { return getChartV4Score(); }
+
+    function updateChartV3Total() {
+        const score = getChartV4Score();
+        const pct = Math.max(0, Math.min(100, Math.round(score)));
+        const scoreEl = document.getElementById('chart-live-score');
+        const percentEl = document.getElementById('chart-live-percent');
+        const progressEl = document.getElementById('chart-live-progress');
+        const submitScoreEl = document.getElementById('chart-submit-score');
+        const liveTimeEl = document.getElementById('chart-live-baba-time');
+        const submitTimeEl = document.getElementById('chart-submit-baba-time');
+        if (scoreEl) scoreEl.innerText = score;
+        if (percentEl) percentEl.innerText = pct + '%';
+        if (progressEl) progressEl.style.width = pct + '%';
+        if (submitScoreEl) submitScoreEl.innerText = score;
+        const timeText = formatBabaYaadDurationV4(getTotalBabaYaadMinutesV4());
+        if (liveTimeEl) liveTimeEl.innerText = timeText;
+        if (submitTimeEl) submitTimeEl.innerText = timeText;
+    }
+
+    function chartSectionReadyForAutoScrollV4(section) {
+        if (!section) return false;
+        const sectionNo = Number(section.getAttribute('data-chart-section'));
+        const touchedTimes = Array.from(section.querySelectorAll('.chart-time-input-v4')).every(el => el.dataset.touched === '1');
+        if (sectionNo === 1 || sectionNo === 10) return touchedTimes;
+        if (sectionNo === 7) {
+            const hasService = getSelectedServiceTypesV4().length > 0;
+            const choseNone = !!section.querySelector('.chart-service-none-v4:checked');
+            return touchedTimes && (hasService || choseNone);
+        }
+        if (sectionNo === 11) {
+            return touchedTimes && !!section.querySelector('input[name="chart_goodnight"]:checked');
+        }
+        const grouped = Array.from(section.querySelectorAll('.chart-options-v2[data-single-group]'));
+        return grouped.length > 0 && grouped.every(group => !!group.querySelector('input:checked'));
+    }
+
+    function maybeAutoAdvanceChartSectionV4(section) {
+        const form = document.getElementById('daily-chart-form');
+        if (form && form.dataset.v4DisableAutoScroll === '1') return;
+        if (chartSectionReadyForAutoScrollV4(section)) activateNextChartSection(section);
+    }
+
     function initChartV3Interactions() {
-        document.querySelectorAll('.chart-option-v2 input[type="checkbox"]').forEach(input => {
-            let newInp = input.cloneNode(true); input.parentNode.replaceChild(newInp, input);
-            newInp.addEventListener('change', function() {
-                let groupName = this.name;
-                if(this.checked) { document.querySelectorAll(`input[name="${groupName}"]`).forEach(other => { if(other !== this) { other.checked = false; let optV2 = other.closest('.chart-option-v2'); if(optV2) optV2.classList.remove('selected-v2'); } }); }
-                let myOptV2 = this.closest('.chart-option-v2'); if(myOptV2) myOptV2.classList.toggle('selected-v2', this.checked);
+        document.querySelectorAll('#daily-chart-form input.chart-single-v4').forEach(input => {
+            if (input.dataset.chartV4Bound === '1') return;
+            input.dataset.chartV4Bound = '1';
+            input.addEventListener('change', function() {
+                const groupName = this.name;
+                if (this.checked) {
+                    document.querySelectorAll(`#daily-chart-form input[name="${groupName}"]`).forEach(other => {
+                        if (other !== this) {
+                            other.checked = false;
+                            const label = other.closest('.chart-option-v2');
+                            if (label) label.classList.remove('selected-v2');
+                        }
+                    });
+                }
+                const label = this.closest('.chart-option-v2');
+                if (label) label.classList.toggle('selected-v2', this.checked);
                 updateChartV3Total();
-                if(this.checked) activateNextChartSection(this.closest('.chart-section-v2'));
+                if (this.checked) maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
+            });
+        });
+
+        document.querySelectorAll('#daily-chart-form input.chart-time-input-v4').forEach(input => {
+            if (input.dataset.chartV4Bound === '1') return;
+            input.dataset.chartV4Bound = '1';
+            input.addEventListener('input', updateChartV3Total);
+            input.addEventListener('blur', function() {
+                this.dataset.touched = '1';
+                if (this.value !== '') {
+                    const num = Number(this.value);
+                    if (!Number.isFinite(num) || num < 0) this.value = '0';
+                    else if (num > 1440) this.value = '1440';
+                    else this.value = String(Math.floor(num));
+                }
+                updateChartV3Total();
+                maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+            });
+        });
+
+        document.querySelectorAll('#daily-chart-form input.chart-service-multi-v4').forEach(input => {
+            if (input.dataset.chartV4Bound === '1') return;
+            input.dataset.chartV4Bound = '1';
+            input.addEventListener('change', function() {
+                if (this.checked) {
+                    const none = document.querySelector('#daily-chart-form input.chart-service-none-v4');
+                    if (none) { none.checked = false; const noneLabel=none.closest('.chart-service-chip-v4'); if(noneLabel) noneLabel.classList.remove('selected-service-v4'); }
+                }
+                const label=this.closest('.chart-service-chip-v4'); if(label) label.classList.toggle('selected-service-v4',this.checked);
+                updateChartV3Total(); maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
+            });
+        });
+        document.querySelectorAll('#daily-chart-form input.chart-service-none-v4').forEach(input => {
+            if (input.dataset.chartV4Bound === '1') return;
+            input.dataset.chartV4Bound = '1';
+            input.addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelectorAll('#daily-chart-form input.chart-service-multi-v4').forEach(other => { other.checked=false; const lab=other.closest('.chart-service-chip-v4'); if(lab) lab.classList.remove('selected-service-v4'); });
+                }
+                const label=this.closest('.chart-service-chip-v4'); if(label) label.classList.toggle('selected-service-v4',this.checked);
+                updateChartV3Total(); maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
             });
         });
     }
 
-    function getChartOptionValue(groupName) { let selected = Array.from(document.querySelectorAll(`#daily-chart-form input[name="${groupName}"]:checked`)); return selected.length ? Number(selected[0].value) : 0; }
-    function getChartV3Score() { return CHART_V3_GROUPS.reduce((sum, name) => sum + getChartOptionValue(name), 0); }
-
-    function updateChartV3Total() {
-        let score = getChartV3Score(); let pct = Math.round((score / 100) * 100);
-        document.getElementById('chart-live-score').innerText = score; document.getElementById('chart-live-percent').innerText = pct + '%';
-        document.getElementById('chart-live-progress').style.width = pct + '%'; document.getElementById('chart-submit-score').innerText = score;
-    }
-
-    window.openChartDatePicker = function() { const input = document.getElementById('chart-date'); if(input.showPicker) input.showPicker(); else input.focus(); }
+    window.openChartDatePicker = function() {
+        const input = document.getElementById('chart-date');
+        if (input.showPicker) input.showPicker(); else input.focus();
+    };
 
     function updateChartDateLabel(dateVal) {
-        let d = new Date(dateVal.replace(/-/g, '/') + ' 00:00:00'); if(isNaN(d.getTime())) return;
-        let today = new Date(); today.setHours(0,0,0,0); let dd = new Date(d); dd.setHours(0,0,0,0);
+        if (!dateVal) return;
+        const d = new Date(dateVal.replace(/-/g, '/') + ' 00:00:00');
+        if (isNaN(d.getTime())) return;
+        const today = new Date(); today.setHours(0,0,0,0);
+        const dd = new Date(d); dd.setHours(0,0,0,0);
         let label = d.toLocaleDateString('ne-NP', {year:'numeric', month:'short', day:'numeric'});
-        if(dd.getTime() === today.getTime()) label = 'आज • ' + label; document.getElementById('chart-date-label').innerText = label;
+        if (dd.getTime() === today.getTime()) label = 'आज • ' + label;
+        document.getElementById('chart-date-label').innerText = label;
     }
 
-    function clearChartV3Form() { let form = document.getElementById('daily-chart-form'); form.reset(); document.querySelectorAll('.chart-option-v2').forEach(el => el.classList.remove('selected-v2')); updateChartV3Total(); }
-
-    function loadChartDataForDate(dateVal) {
-        clearChartV3Form(); let charts = safeJSON('murali_daily_charts', []); let existingChart = charts.find(c => c.date === dateVal && c.phone === userPhone); if(!existingChart) { if(navigator.onLine) syncMyChartsFromServer().then(()=>{ let fresh=safeJSON('murali_daily_charts',[]); if(fresh.find(c=>c.date===dateVal && c.phone===userPhone)) loadChartDataForDate(dateVal); }); return; }
-        const keyMap = { chart_amritvela: 'amritvela', chart_murli: 'murli', chart_murli_manthan: 'murliManthan', chart_swaman_drill: 'swamanDrill', chart_traffic: 'traffic', chart_conduct: 'conduct', chart_sewa: 'sewa', chart_food: 'food', chart_exercise: 'exercise', chart_evening: 'eveningYoga', chart_goodnight: 'goodnight', chart_digital_detox: 'digitalDetox' };
-        CHART_V3_GROUPS.forEach(groupName => {
-            let key = keyMap[groupName]; let value = Number(existingChart[key] || 0);
-            let match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${value}"]`);
-            if(match) { match.checked = true; let optV2 = match.closest('.chart-option-v2'); if(optV2) optV2.classList.add('selected-v2'); }
-        });
+    function clearChartV3Form() {
+        const form = document.getElementById('daily-chart-form');
+        if (form) { form.reset(); delete form.dataset.v4DisableAutoScroll; }
+        document.querySelectorAll('#daily-chart-form .chart-option-v2').forEach(el => el.classList.remove('selected-v2'));
+        document.querySelectorAll('#daily-chart-form .chart-service-chip-v4').forEach(el => el.classList.remove('selected-service-v4'));
+        document.querySelectorAll('#daily-chart-form .chart-time-input-v4').forEach(el => { delete el.dataset.touched; });
         updateChartV3Total();
     }
 
-    let chartDateEl = document.getElementById('chart-date');
-    if(chartDateEl) {
+    function setChartOptionV4(groupName, value) {
+        const match = document.querySelector(`#daily-chart-form input[name="${groupName}"][value="${Number(value) || 0}"]`);
+        if (match) {
+            match.checked = true;
+            const label = match.closest('.chart-option-v2'); if (label) label.classList.add('selected-v2');
+        }
+    }
+
+    function loadChartDataForDate(dateVal) {
+        clearChartV3Form();
+        const charts = safeJSON('murali_daily_charts', []);
+        const existingChart = charts.find(c => c.date === dateVal && c.phone === userPhone);
+        if (!existingChart) {
+            if (navigator.onLine) syncMyChartsFromServer().then(() => {
+                const fresh = safeJSON('murali_daily_charts', []);
+                if (fresh.find(c => c.date === dateVal && c.phone === userPhone)) loadChartDataForDate(dateVal);
+            });
+            return;
+        }
+        const schemaVersion = Number(existingChart.chartVersion || existingChart.schemaVersion || 3);
+        if (schemaVersion < 4) {
+            showToast('यो मितिको पुरानो संस्करणको चार्ट सुरक्षित छ। यसमा बाबाको यादको मिनेट विवरण छैन; नयाँ चार्ट भरेमा नयाँ संस्करणको रेकर्ड बन्नेछ।', 'info', 5000);
+            return;
+        }
+
+        document.getElementById('daily-chart-form').dataset.v4DisableAutoScroll = '1';
+        const keyMap = {
+            chart_murli:'murli', chart_murli_manthan:'murliManthan', chart_swaman_drill:'swamanDrill',
+            chart_traffic:'traffic', chart_conduct:'conduct', chart_knowledge_sewa:'knowledgeSewa',
+            chart_food:'food', chart_exercise:'exercise', chart_goodnight:'goodnight', chart_digital_detox:'digitalDetox'
+        };
+        Object.keys(keyMap).forEach(groupName => setChartOptionV4(groupName, existingChart[keyMap[groupName]]));
+        const timeMap = {
+            'chart-time-amritvela':'amritvelaMinutes', 'chart-time-murli-before':'murliClassBeforeMinutes',
+            'chart-time-murli-after':'murliClassAfterMinutes', 'chart-time-sthool-sewa':'sthoolSewaMinutes',
+            'chart-time-daytime-yoga':'daytimeYogaMinutes', 'chart-time-evening-yoga':'eveningYogaMinutes',
+            'chart-time-goodnight':'goodnightYogaMinutes'
+        };
+        Object.keys(timeMap).forEach(id => {
+            const input = document.getElementById(id); if (!input) return;
+            if (existingChart[timeMap[id]] !== undefined && existingChart[timeMap[id]] !== null && existingChart[timeMap[id]] !== '') {
+                input.value = String(Number(existingChart[timeMap[id]]) || 0); input.dataset.touched = '1';
+            }
+        });
+        setChartOptionV4('chart_knowledge_sewa', existingChart.knowledgeSewa);
+        const savedTypes = String(existingChart.sthoolServiceTypes || '').split(/[,،]/).map(x => x.trim()).filter(Boolean);
+        document.querySelectorAll('#daily-chart-form input.chart-service-multi-v4').forEach(input => {
+            input.checked = savedTypes.includes(input.value);
+            const label=input.closest('.chart-service-chip-v4'); if(label) label.classList.toggle('selected-service-v4',input.checked);
+        });
+        const noService = document.querySelector('#daily-chart-form input.chart-service-none-v4');
+        if (noService && !savedTypes.length && !(Number(existingChart.sthoolSewaMinutes) > 0)) {
+            noService.checked = true; const label=noService.closest('.chart-service-chip-v4'); if(label) label.classList.add('selected-service-v4');
+        }
+        const weakness = document.getElementById('chart-daily-weakness'); if (weakness) weakness.value = existingChart.dailyWeakness || '';
+        const resolution = document.getElementById('chart-tomorrow-resolution'); if (resolution) resolution.value = existingChart.tomorrowResolution || '';
+        updateChartV3Total();
+    }
+
+    const chartDateEl = document.getElementById('chart-date');
+    if (chartDateEl) {
         chartDateEl.addEventListener('change', function() {
-            updateChartDateLabel(this.value); document.getElementById('chart-result-box').style.display = 'none'; document.getElementById('daily-chart-form').style.display = 'block';
-            loadChartDataForDate(this.value); let exists = safeJSON('murali_daily_charts', []).some(c => c.date === this.value && c.phone === userPhone);
-            showToast(exists ? 'यो मितिको पुरानो चार्ट लोड भयो।' : 'नयाँ मिति छानिएको छ।', 'info');
+            updateChartDateLabel(this.value);
+            document.getElementById('chart-result-box').style.display = 'none';
+            document.getElementById('daily-chart-form').style.display = 'block';
+            loadChartDataForDate(this.value);
+            const existing = safeJSON('murali_daily_charts', []).find(c => c.date === this.value && c.phone === userPhone);
+            if (!existing) showToast('नयाँ मिति छानिएको छ।', 'info');
+            else if (Number(existing.chartVersion || existing.schemaVersion || 3) >= 4) showToast('यो मितिको नयाँ चार्ट लोड भयो।', 'info');
+            else showToast('पुरानो रेकर्ड सुरक्षित छ; नयाँ समय विवरण त्यसमा थिएन।', 'info', 4000);
         });
     }
 
+    function getChartV4Payload(dateVal) {
+        const amritvelaMinutes = getDurationMinutesV4('chart-time-amritvela');
+        const murliClassBeforeMinutes = getDurationMinutesV4('chart-time-murli-before');
+        const murliClassAfterMinutes = getDurationMinutesV4('chart-time-murli-after');
+        const daytimeYogaMinutes = getDurationMinutesV4('chart-time-daytime-yoga');
+        const eveningYogaMinutes = getDurationMinutesV4('chart-time-evening-yoga');
+        const goodnightYogaMinutes = getDurationMinutesV4('chart-time-goodnight');
+        const amritvelaGroupMinutes = amritvelaMinutes + murliClassBeforeMinutes + murliClassAfterMinutes;
+        const eveningGroupMinutes = daytimeYogaMinutes + eveningYogaMinutes;
+        const knowledgeSewa = getChartOptionValue('chart_knowledge_sewa');
+        const sthoolSewa = getStoolSewaScoreV4();
+        const chartData = {
+            id: Date.now(), schemaVersion:4, chartVersion:4, chartSchema:'CHART_V4_12P_100_ALL_IN_ONE', date:dateVal,
+            name:userName, address:userAddress, phone:userPhone,
+            amritvela:scoreAmritvelaMinutesV4(amritvelaGroupMinutes), amritvelaMinutes:amritvelaMinutes,
+            murliClassBeforeMinutes:murliClassBeforeMinutes, murliClassAfterMinutes:murliClassAfterMinutes, amritvelaGroupMinutes:amritvelaGroupMinutes,
+            murli:getChartOptionValue('chart_murli'), murliManthan:getChartOptionValue('chart_murli_manthan'),
+            swamanDrill:getChartOptionValue('chart_swaman_drill'), traffic:getChartOptionValue('chart_traffic'), conduct:getChartOptionValue('chart_conduct'),
+            knowledgeSewa:knowledgeSewa, sthoolSewa:sthoolSewa, sewa:knowledgeSewa+sthoolSewa,
+            sthoolSewaMinutes:getDurationMinutesV4('chart-time-sthool-sewa'), sthoolServiceTypes:getSelectedServiceTypesV4().join('، '),
+            food:getChartOptionValue('chart_food'), exercise:getChartOptionValue('chart_exercise'),
+            eveningYoga:scoreEveningMinutesV4(eveningGroupMinutes), daytimeYogaMinutes:daytimeYogaMinutes,
+            eveningYogaMinutes:eveningYogaMinutes, eveningGroupMinutes:eveningGroupMinutes,
+            goodnight:getChartOptionValue('chart_goodnight'), goodnightYogaMinutes:goodnightYogaMinutes,
+            totalBabaYaadMinutes:amritvelaGroupMinutes+eveningGroupMinutes+goodnightYogaMinutes,
+            dailyWeakness:(document.getElementById('chart-daily-weakness').value || '').trim().slice(0,240),
+            tomorrowResolution:(document.getElementById('chart-tomorrow-resolution').value || '').trim().slice(0,240),
+            honestyConfirmed:true, synced:false
+        };
+        chartData.digitalDetox = getChartOptionValue('chart_digital_detox');
+        chartData.totalScore = getChartV4Score();
+        if (chartData.totalScore >= 90) chartData.stage = 'उड्ती कला 🕊️';
+        else if (chartData.totalScore >= 70) chartData.stage = 'चढ्ती कला 🚶';
+        else if (chartData.totalScore >= 50) chartData.stage = 'पुरुषार्थी जीवन 🌱';
+        else chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
+        return chartData;
+    }
+
+    window._pendingChartV4Save = null;
     window.submitDailyChart = function() {
-        let dateVal = document.getElementById('chart-date').value; if(!dateVal) return showToast('कृपया मिति छान्नुहोस्।', 'error');
-        let chartData = { id: Date.now(), schemaVersion: 3, chartVersion: 3, date: dateVal, name: userName, address: userAddress, phone: userPhone, amritvela: getChartOptionValue('chart_amritvela'), murli: getChartOptionValue('chart_murli'), murliManthan: getChartOptionValue('chart_murli_manthan'), swamanDrill: getChartOptionValue('chart_swaman_drill'), traffic: getChartOptionValue('chart_traffic'), conduct: getChartOptionValue('chart_conduct'), sewa: getChartOptionValue('chart_sewa'), food: getChartOptionValue('chart_food'), exercise: getChartOptionValue('chart_exercise'), eveningYoga: getChartOptionValue('chart_evening'), goodnight: getChartOptionValue('chart_goodnight'), digitalDetox: getChartOptionValue('chart_digital_detox'), totalScore: getChartV3Score(), stage: '', synced: false };
-        if(chartData.totalScore >= 90) chartData.stage = 'उड्ती कला 🕊️'; else if(chartData.totalScore >= 70) chartData.stage = 'चढ्ती कला 🚶'; else if(chartData.totalScore >= 50) chartData.stage = 'पुरुषार्थी जीवन 🌱'; else chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
-
-        let charts = safeJSON('murali_daily_charts', []); charts = charts.filter(c => c.date !== dateVal || c.phone !== userPhone);
-        charts.push(chartData); charts.sort((a,b) => String(b.date).localeCompare(String(a.date))); localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
-
-        document.getElementById('daily-chart-form').style.display = 'none'; 
-        let resultHtml = `<div class="chart-result-title-v2" style="font-weight:900; color:var(--text-color); margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:3.2rem; font-weight:900; line-height:1; color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem; color:#94a3b8;">/100</small></div><div class="chart-result-stage-v2" style="margin-top:7px; font-weight:850; color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px; color:#64748b; font-size:.9rem; font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'अझै थोरै ध्यान दिँदा अझ राम्रो हुन्छ।'}</div><div class="chart-result-actions-v2" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent; color:var(--chart-color); border:1px solid var(--chart-color); border-radius:50px; padding:.62rem 1rem;">✏️ सच्याउनुहोस्</button></div>`;
-        let resBox = document.getElementById('chart-result-box'); resBox.innerHTML = resultHtml; resBox.style.display = 'block'; resBox.style.textAlign = 'center'; resBox.style.padding = '1.4rem 1rem'; resBox.style.background = 'var(--card-bg)'; resBox.style.borderRadius = '20px'; resBox.style.border = '2px solid var(--border-color)';
-
-        updateChartV3Total(); if(chartData.totalScore >= 90) fireConfetti(); syncPendingCharts(); renderDashboard();
+        const dateVal = document.getElementById('chart-date').value;
+        if (!dateVal) return showToast('कृपया मिति छान्नुहोस्।', 'error');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) return showToast('मिति सही छैन।', 'error');
+        const outOfRange = Array.from(document.querySelectorAll('#daily-chart-form .chart-time-input-v4')).some(el => el.value !== '' && (!Number.isFinite(Number(el.value)) || Number(el.value) < 0 || Number(el.value) > 1440));
+        if (outOfRange) return showToast('समय ० देखि १४४० मिनेटभित्र लेख्नुहोस्।', 'error');
+        window._pendingChartV4Save = getChartV4Payload(dateVal);
+        document.getElementById('chart-pledge-modal-v4').style.display = 'flex';
     };
-    window.editChartForm = function() { document.getElementById('chart-result-box').style.display = 'none'; document.getElementById('daily-chart-form').style.display = 'block'; window.scrollTo({ top:0, behavior:'smooth' }); }
+
+    window.cancelChartPledgeV4 = function() {
+        document.getElementById('chart-pledge-modal-v4').style.display = 'none';
+        window._pendingChartV4Save = null;
+    };
+
+    window.confirmChartPledgeV4 = function() {
+        document.getElementById('chart-pledge-modal-v4').style.display = 'none';
+        const chartData = window._pendingChartV4Save;
+        window._pendingChartV4Save = null;
+        if (!chartData) return showToast('चार्ट डेटा भेटिएन। कृपया फेरि प्रयास गर्नुहोस्।', 'error');
+        saveDailyChartV4_(chartData);
+    };
+
+    function saveDailyChartV4_(chartData) {
+        let charts = safeJSON('murali_daily_charts', []);
+        // Keep V3/older records intact; replace only an existing V4 entry for the same user/date.
+        charts = charts.filter(c => c.date !== chartData.date || c.phone !== userPhone || Number(c.chartVersion || c.schemaVersion || 3) < 4 || Number(c.chartVersion || c.schemaVersion || 3) > 4);
+        charts.push(chartData);
+        charts.sort((a,b) => String(b.date).localeCompare(String(a.date)) || Number(b.chartVersion||3)-Number(a.chartVersion||3));
+        localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+
+        document.getElementById('daily-chart-form').style.display = 'none';
+        const babaTimeText = formatBabaYaadDurationV4(chartData.totalBabaYaadMinutes);
+        const resultHtml = `<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem;color:#94a3b8;">/100</small></div><div style="margin-top:12px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">${babaTimeText}</strong></div><div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।'}</div><div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent;color:var(--chart-color);border:1px solid var(--chart-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;">✏️ सच्याउनुहोस्</button></div>`;
+        const resBox = document.getElementById('chart-result-box');
+        resBox.innerHTML = resultHtml; resBox.style.display='block'; resBox.style.textAlign='center'; resBox.style.padding='1.1rem .75rem'; resBox.style.background='var(--card-bg)'; resBox.style.borderRadius='20px'; resBox.style.border='2px solid var(--border-color)';
+        updateChartV3Total();
+        if (chartData.totalScore >= 90) fireConfetti();
+        syncPendingCharts(); renderDashboard();
+        setTimeout(() => { try { resBox.scrollIntoView({behavior:'smooth',block:'start'}); } catch(e) {} }, 80);
+    }
+
+    window.editChartForm = function() {
+        document.getElementById('chart-result-box').style.display='none';
+        document.getElementById('daily-chart-form').style.display='block';
+        window.scrollTo({top:0,behavior:'smooth'});
+    };
 
     // ==========================================
     // 10. DASHBOARD, STATS & CALENDAR
@@ -3801,11 +4195,25 @@ function getMegaActivationDateUI(quizDate) {
 
     window.openChartAdminDetail = function(index) {
         const user = window._chartAdminRecords[index]; if (!user) return;
-        const maxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,sewa:10,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
-        const labels = [['🌅 अमृतवेला','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘‍♂️ ५ स्वरूप/स्वमान','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/स्थिति','conduct'],['🤲 ईश्वरीय सेवा','sewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट चार्ट','goodnight'],['📵 सूचना उपवास','digitalDetox']];
-        document.getElementById('cad-name').textContent = user.name || '—'; document.getElementById('cad-address').textContent = user.address || '—';
-        document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--chart-color);">${Number(user.totalScore || 0)}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${user.stage || ''}</span>`;
-        document.getElementById('cad-details').innerHTML = labels.map(function(item){ const score = Number(user[item[1]] || 0); const max = maxByKey[item[1]]; return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span>${item[0]}</span><b style="min-width:52px;text-align:center;color:var(--chart-color);">${score}/${max}</b></div>`; }).join('');
+        const isV4 = Number(user.chartVersion || 3) >= 4;
+        const oldMaxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,sewa:10,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
+        const oldLabels = [['🌅 अमृतवेला','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘‍♂️ ५ स्वरूप/स्वमान','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/स्थिति','conduct'],['🤲 ईश्वरीय सेवा','sewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट चार्ट','goodnight'],['📵 सूचना उपवास','digitalDetox']];
+        const v4MaxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,knowledgeSewa:5,sthoolSewa:5,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
+        const v4Labels = [['🌅 अमृतवेला/क्लासअघिपछिको बाबाको याद','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘 पाँच स्वरूप/स्वमान ड्रिल','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/सम्बन्ध-सम्पर्क','conduct'],['📚 ईश्वरीय ज्ञान सेवा','knowledgeSewa'],['🪷 यज्ञको स्थूल सेवा','sthoolSewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 दिउँसो/साँझको बाबाको याद','eveningYoga'],['🌙 गुडनाइट अभ्यास','goodnight'],['📵 सूचना उपवास','digitalDetox']];
+        const labels = isV4 ? v4Labels : oldLabels;
+        const maxByKey = isV4 ? v4MaxByKey : oldMaxByKey;
+        document.getElementById('cad-name').textContent = user.name || '—';
+        document.getElementById('cad-address').textContent = user.address || '—';
+        const timeLine = isV4 ? `<div style="margin-top:6px;font-size:.9rem;font-weight:850;color:var(--chart-color);">🕊️ बाबाको याद: ${formatBabaYaadDurationV4(user.totalBabaYaadMinutes || 0)}</div>` : '';
+        document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--chart-color);">${Number(user.totalScore || 0)}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${user.stage || ''}</span>${timeLine}`;
+        document.getElementById('cad-details').innerHTML = labels.map(function(item){ const score=Number(user[item[1]]||0), max=maxByKey[item[1]]; return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span>${item[0]}</span><b style="min-width:52px;text-align:center;color:var(--chart-color);">${score}/${max}</b></div>`; }).join('');
+        if (isV4) {
+            const extras = [
+                ['अमृतवेला/क्लास समूह', user.amritvelaGroupMinutes], ['दिउँसोको एकान्त', user.daytimeYogaMinutes], ['साँझको योग', user.eveningYogaMinutes], ['गुडनाइट बाबाको याद', user.goodnightYogaMinutes]
+            ].map(x=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 8px;border-bottom:1px dashed var(--border-color);font-size:.8rem;"><span>${x[0]}</span><b>${formatBabaYaadDurationV4(x[1]||0)}</b></div>`).join('');
+            const escV4 = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+            document.getElementById('cad-details').insertAdjacentHTML('beforeend', extras + (user.sthoolServiceTypes ? `<div style="padding:8px;font-size:.8rem;"><b>स्थूल सेवा:</b> ${escV4(user.sthoolServiceTypes)}</div>` : '') + (user.dailyWeakness ? `<div style="padding:8px;font-size:.8rem;"><b>आजको कमजोरी:</b> ${escV4(user.dailyWeakness)}</div>` : '') + (user.tomorrowResolution ? `<div style="padding:8px;font-size:.8rem;"><b>भोलिको सङ्कल्प:</b> ${escV4(user.tomorrowResolution)}</div>` : ''));
+        }
         document.getElementById('chart-admin-detail-modal').style.display = 'flex';
     };
     window.closeChartAdminDetail = function() { document.getElementById('chart-admin-detail-modal').style.display = 'none'; };
@@ -3816,7 +4224,7 @@ function getMegaActivationDateUI(quizDate) {
         if (!navigator.onLine) { document.getElementById('cl-loading').innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         
         try {
-            const data = await apiPostJSON({action:'getStudentChartLeaderboard',chartVersion:3,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries: 2, timeoutMs: 15000});
+            const data = await apiPostJSON({action:'getStudentChartLeaderboard',chartVersion:4,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries: 2, timeoutMs: 15000});
             document.getElementById('cl-loading').style.display = 'none'; document.getElementById('cl-content').style.display = 'block';
             if (data.status !== 'success') { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-loading').innerHTML = '❌ डाटा ल्याउन समस्या भयो।'; return; }
             const tbody = document.getElementById('cl-table-body'); const isPrivilegedViewer = ['admin','manager'].includes(String(userRole||'').toLowerCase());
