@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.0">
+    <link rel="manifest" href="manifest.json?v=107.0.1">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -866,7 +866,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.0</div>
+        <div>Version: 107.0.1</div>
     </div>
 </div>
 
@@ -1170,42 +1170,37 @@
     </div>
 </div>
 
-<!-- Student Leaderboard Modal -->
+<!-- Student Leaderboard Modal — legacy Top 20 behavior restored -->
 <div id="student-leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'student-leaderboard-modal') document.getElementById('student-leaderboard-modal').style.display='none';">
-    <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
-        <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
-        <h3 style="margin-top:0; color: var(--exam-color); font-size: 1.3rem; font-weight: 800; text-align:center; margin-bottom: 10px;">
-            📋 परीक्षा सहभागी सूची
-        </h3>
-        
-        <div style="display:flex; gap:8px; margin-bottom:15px;">
-            <button class="chart-date-btn-v2" type="button" onclick="openStudentLeaderboardDatePicker()" style="flex:1; width:100%; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none;">
-                📅 <span id="sl-date-label">आज</span>
-            </button>
+    <div class="modal-content" style="max-width:450px;padding:1.5rem;">
+        <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute;top:15px;right:15px;border:none;background:transparent;font-size:1.5rem;cursor:pointer;color:var(--text-color);">❌</button>
+        <h3 style="margin-top:0;color:var(--exam-color);font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:10px;">🏆 विद्यार्थी लिडरबोर्ड</h3>
+        <div style="display:flex;gap:8px;margin-bottom:15px;">
+            <button class="chart-date-btn-v2" type="button" onclick="openStudentLeaderboardDatePicker()" style="flex:1;width:100%;background:var(--glass-bg);color:var(--text-color);border:1px solid var(--border-color);padding:.62rem .9rem;border-radius:10px;font-weight:800;box-shadow:none;">📅 <span id="sl-date-label">आज</span></button>
             <input id="sl-date-select" type="date" class="chart-hidden-date" aria-label="परीक्षा मिति छान्नुहोस्">
         </div>
-        
-        <div id="sl-loading" style="text-align:center; padding:20px; font-weight:bold; color:var(--exam-color);">
-            ⏳ डाटा लोड हुँदैछ...
-        </div>
-        
+        <div id="sl-loading" style="text-align:center;padding:20px;font-weight:bold;color:var(--exam-color);">⏳ डाटा लोड हुँदैछ...</div>
         <div id="sl-content" style="display:none;">
-            <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
-                <div id="sl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(2,132,199,.08); color:var(--exam-color); font-size:.84rem; font-weight:850; text-align:center;">यस परीक्षामा सहभागी: — जना</div>
-                <button type="button" id="sl-download-btn" onclick="downloadExamRosterV4()" style="display:none;width:100%;margin:0 0 10px;padding:.58rem .8rem;border-radius:10px;background:var(--exam-color);color:#fff;font-size:.88rem;font-weight:850;box-shadow:none;">⬇️ सहभागी सूची डाउनलोड गर्नुहोस्</button>
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
-                    <thead style="background: var(--exam-color); color: white;">
+            <div style="background:var(--bg-color);border-radius:12px;border:1px solid var(--border-color);overflow:hidden;">
+                <table style="width:100%;border-collapse:collapse;font-size:.88rem;text-align:left;table-layout:fixed;">
+                    <thead style="background:var(--exam-color);color:white;">
                         <tr>
-                            <th id="sl-rank-head" style="padding: 9px 6px; text-align:center; width:48px;">Rank</th>
-                            <th style="padding: 9px 7px; width:38%;">नाम</th>
-                            <th id="sl-address-head" style="padding: 9px 7px;">सेवा केन्द्र</th>
-                            <th id="sl-score-head" style="padding: 9px 6px; text-align:center; width:82px;">अङ्क / समय</th>
+                            <th id="sl-rank-head" style="padding:10px 5px;text-align:center;width:48px;">Rank</th>
+                            <th style="padding:10px 8px;">नाम</th>
+                            <th id="sl-score-head" style="padding:10px 6px;text-align:center;width:88px;">अङ्क / समय</th>
                         </tr>
                     </thead>
                     <tbody id="sl-table-body"></tbody>
                 </table>
             </div>
-            <div id="sl-admin-list-note" style="display:none; font-size:.76rem; color:var(--muted-text-color); margin-top:8px; text-align:center;">अङ्क र समय Admin खातामा मात्र देखिन्छ।</div>
+            <div id="sl-my-rank-box" style="display:none;margin-top:15px;background:rgba(2,132,199,.15);border:2px dashed var(--exam-color);border-radius:12px;padding:15px;text-align:center;">
+                <div style="font-size:.9rem;color:var(--text-color);font-weight:bold;">तपाईंको र्‍याङ्क:</div>
+                <div id="sl-my-rank-number" style="font-size:1.8rem;font-weight:900;color:var(--exam-color);margin:5px 0;">-- / --</div>
+                <div id="sl-my-score-text" style="font-size:.85rem;color:var(--muted-text-color);font-weight:bold;">Score: -- | Time: --</div>
+            </div>
+            <!-- Kept hidden for compatibility with existing empty-state code; not shown in the legacy UI. -->
+            <div id="sl-participant-count" style="display:none;"></div>
+            <div id="sl-admin-list-note" style="display:none;font-size:.76rem;color:var(--muted-text-color);margin-top:8px;text-align:center;">Admin खातामा सबै सहभागीको प्राप्ताङ्क र समय देखिन्छ।</div>
         </div>
     </div>
 </div>
@@ -1228,7 +1223,7 @@
             <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
                 <div id="cl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(139,92,246,.08); color:var(--chart-color); font-size:.84rem; font-weight:850; text-align:center;">यस मितिमा चार्ट भर्नेहरू: — जना</div>
                 <div id="cl-my-rank-private" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(139,92,246,.28);background:rgba(139,92,246,.07);color:var(--chart-color);font-weight:850;text-align:center;line-height:1.6;"></div>
-                <div id="cl-private-note" style="display:none;margin:0 0 8px;font-size:.76rem;color:var(--muted-text-color);text-align:center;">सूची अङ्कअनुसार क्रमबद्ध छ। अरू सहभागीको अङ्क गोप्य राखिएको छ।</div>
+                <div id="cl-private-note" style="display:none;"></div>
                 <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
                         <thead style="background: var(--chart-color); color: white;">
@@ -1328,7 +1323,7 @@
         });
     }
 
-    // 107.0 CHART PRIVACY/RANK + EXAM TOP 20 + SAFE EXAM WAIT + MONTHLY MEGA
+    // 107.0.1 RESTORE LEGACY TOP-20 EXAM RANK + SIMPLIFY CHART HEADER
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1343,7 +1338,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.0"; 
+    const APP_VERSION = "107.0.1"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4298,7 +4293,7 @@ function getMegaActivationDateUI(quizDate) {
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
         if (selectedQuiz && dateInput.value) fetchStudentLeaderboardData();
-        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; const dl=document.getElementById('sl-download-btn'); if(dl) dl.style.display='none'; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:3}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
+        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display='table-cell'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; document.getElementById('sl-my-rank-box').style.display='none'; }
     };
 
     window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
@@ -4307,46 +4302,71 @@ function getMegaActivationDateUI(quizDate) {
         const targetDateStr = String(overrideTargetDate || (matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate)).trim();
         const loading = document.getElementById('sl-loading');
         const content = document.getElementById('sl-content');
-        window._examRosterForDownloadV4 = []; window._examRosterDateV4 = targetDateStr;
-        const downloadBtn = document.getElementById('sl-download-btn'); if (downloadBtn) downloadBtn.style.display = 'none';
-        loading.style.display = 'block'; loading.textContent = '⏳ सहभागी सूची लोड हुँदैछ...'; content.style.display = 'none';
+        const myRankBox = document.getElementById('sl-my-rank-box');
+        loading.style.display = 'block'; loading.textContent = '⏳ लिडरबोर्ड लोड हुँदैछ...'; content.style.display = 'none';
+        if (myRankBox) myRankBox.style.display = 'none';
         if (!navigator.onLine) { loading.innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         try {
             const data = await apiPostJSON({action:'getStudentLeaderboard',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries:2, timeoutMs:15000});
-            if (!data || data.status !== 'success') throw new Error('exam-participant-list-failed');
+            if (!data || data.status !== 'success') throw new Error('exam-leaderboard-failed');
             const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
-            const list = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.roster) ? data.roster : (Array.isArray(data.top20) ? data.top20 : []));
-            // Backend returns the public Top 20 in score/time rank order; do not re-sort it.
-            window._examRosterForDownloadV4 = list.map((r, i) => isAdminViewer
-                ? {rank:i+1, name:r.name||'', address:r.address||'', score:Number(r.score||0), total:Number(r.total||0), timeText:r.timeText||''}
-                : {rank:i+1, name:r.name||'', address:r.address||''});
-            if (downloadBtn) downloadBtn.style.display = list.length ? 'flex' : 'none';
+            const list = isAdminViewer && Array.isArray(data.participants)
+                ? data.participants
+                : (Array.isArray(data.top20) ? data.top20 : (Array.isArray(data.participants) ? data.participants.slice(0,20) : []));
             document.getElementById('sl-rank-head').style.display = 'table-cell';
-            document.getElementById('sl-score-head').style.display = isAdminViewer ? 'table-cell' : 'none';
-            document.getElementById('sl-address-head').style.display = 'table-cell';
-            document.getElementById('sl-admin-list-note').style.display = isAdminViewer && list.length ? 'block' : 'none';
-            document.getElementById('sl-participant-count').textContent = !isAdminViewer && Number(data.total ?? list.length) > 20
-                ? `कुल सहभागी: ${Number(data.total)} जना • शीर्ष २० मात्र`
-                : `यस परीक्षामा सहभागी: ${Number(data.total ?? list.length)} जना`;
-            const oldMyRankBox = document.getElementById('sl-my-rank-box'); if (oldMyRankBox) oldMyRankBox.style.display = 'none';
+            document.getElementById('sl-score-head').style.display = 'table-cell';
+            const countEl = document.getElementById('sl-participant-count');
+            if (countEl) countEl.textContent = '';
+            document.getElementById('sl-admin-list-note').style.display = 'none';
             loading.style.display = 'none'; content.style.display = 'block';
             const tbody = document.getElementById('sl-table-body');
-            if (!list.length) { if (downloadBtn) downloadBtn.style.display = 'none';
-                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 3}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
+                if (myRankBox) myRankBox.style.display = 'none';
                 return;
             }
             const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
             tbody.innerHTML = list.map((u,index) => {
-                const name=esc(u.name), address=esc(u.address);
-                const rank=index+1, rankIcon=rank===1?'🥇':(rank===2?'🥈':(rank===3?'🥉':String(rank)));
-                if (isAdminViewer) {
-                    return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td><td style="padding:8px 5px;text-align:center;color:var(--exam-color);font-weight:900;">${Number(u.score||0)}/${Number(u.total||0)}<br><span style="font-size:.7rem;color:var(--muted-text-color);font-weight:700;">${esc(u.timeText||'')}</span></td></tr>`;
-                }
-                return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td></tr>`;
+                const rank = index + 1;
+                const rankIcon = rank===1?'🥇':(rank===2?'🥈':(rank===3?'🥉':String(rank)));
+                const isMe = Number(data.myRank) === rank && rank <= 20;
+                const rowStyle = isMe ? 'background:rgba(2,132,199,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);';
+                const name = esc(u.name), address = esc(u.address);
+                const score = Number(u.score || 0), total = Number(u.total || 0), timeText = esc(u.timeText || '');
+                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;color:var(--exam-color);font-weight:900;">${score}/${total}<br><span style="font-size:.72rem;color:var(--muted-text-color);font-weight:700;">${timeText}</span></td></tr>`;
             }).join('');
+
+            // Private self-position remains available even when the user is outside Top 20.
+            const myRank = Number(data.myRank || 0);
+            const myData = data.myRankData || null;
+            if (myRankBox && myRank > 0 && myData) {
+                myRankBox.style.display = 'block';
+                if (myRank <= 20) {
+                    myRankBox.style.borderColor = 'var(--success-color)';
+                    myRankBox.style.background = 'rgba(22,163,74,.1)';
+                    document.getElementById('sl-my-rank-number').textContent = `बधाई! तपाईं Top 20 मा हुनुहुन्छ।`;
+                    document.getElementById('sl-my-rank-number').style.fontSize = '1.12rem';
+                    document.getElementById('sl-my-rank-number').style.color = 'var(--success-color)';
+                    document.getElementById('sl-my-score-text').textContent = `Rank: ${myRank} / ${Number(data.total || 0)}`;
+                } else {
+                    myRankBox.style.borderColor = 'var(--exam-color)';
+                    myRankBox.style.background = 'rgba(2,132,199,.12)';
+                    document.getElementById('sl-my-rank-number').textContent = `${myRank} / ${Number(data.total || 0)}`;
+                    document.getElementById('sl-my-rank-number').style.fontSize = '1.8rem';
+                    document.getElementById('sl-my-rank-number').style.color = 'var(--exam-color)';
+                    document.getElementById('sl-my-score-text').textContent = `Score: ${Number(myData.score || 0)}/${Number(myData.total || 0)} | Time: ${esc(myData.timeText || '—')}`;
+                }
+            } else if (myRankBox) {
+                myRankBox.style.display = 'block';
+                myRankBox.style.borderColor = 'var(--danger-color)';
+                myRankBox.style.background = 'rgba(220,38,38,.1)';
+                document.getElementById('sl-my-rank-number').textContent = `— / ${Number(data.total || 0)}`;
+                document.getElementById('sl-my-rank-number').style.color = 'var(--danger-color)';
+                document.getElementById('sl-my-score-text').textContent = 'तपाईंले यो परीक्षा दिनुभएको छैन।';
+            }
         } catch(err) {
-            loading.style.display='block'; content.style.display='none';
-            loading.innerHTML='❌ सहभागी सूची ल्याउन सकिएन। इन्टरनेट जाँचेर फेरि प्रयास गर्नुहोस्।';
+            loading.style.display = 'block'; content.style.display = 'none';
+            loading.innerHTML = '❌ लिडरबोर्ड ल्याउन सकिएन। इन्टरनेट जाँचेर फेरि प्रयास गर्नुहोस्।';
         }
     };
 
@@ -4401,7 +4421,7 @@ function getMegaActivationDateUI(quizDate) {
             scoreHead.style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('cl-rank-head').style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('cl-admin-note').style.display = isAdminViewer && rows.length ? 'block' : 'none';
-            document.getElementById('cl-private-note').style.display = !isAdminViewer && rows.length ? 'block' : 'none';
+            document.getElementById('cl-private-note').style.display = 'none';
             const myRankBox = document.getElementById('cl-my-rank-private');
             if (data.myRank != null && Number(data.myRank) > 0 && data.myScore != null && Number.isFinite(Number(data.myScore))) {
                 myRankBox.innerHTML = `🪷 तपाईंको निजी स्थान: #${Number(data.myRank)} <span style="opacity:.6;padding:0 5px;">|</span> तपाईंको अङ्क: ${Number(data.myScore)}/100`;
@@ -4440,7 +4460,7 @@ function getMegaActivationDateUI(quizDate) {
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.1)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
