@@ -1,5 +1,5 @@
-/* Chart V4 / app shell 107.0.1. Keeps skipWaiting disabled so active exams are not interrupted. */
-const CACHE_NAME = "murali-quiz-v107-0-1";
+/* Chart V4 / app shell 107.0.2. Keeps skipWaiting disabled so active exams are not interrupted. */
+const CACHE_NAME = "murali-quiz-v107-0-2";
 
 const APP_SHELL = [
     "./",
@@ -17,30 +17,22 @@ const STATIC_ASSETS = [
    ========================================================== */
 
 self.addEventListener("install", event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(async cache => {
+    event.waitUntil((async () => {
+        const cache = await caches.open(CACHE_NAME);
 
-                for (const url of APP_SHELL) {
-                    try {
-                        await cache.add(url);
-                    } catch (e) {
-                        // Shell resource fail भए पनि SW install रोकिँदैन।
-                    }
-                }
+        // Cache the core page and manifest atomically. If either fails, installation
+        // rejects and the previous active worker/cache remains available.
+        await cache.addAll(["./index.html", "./manifest.json"]);
 
-                for (const url of STATIC_ASSETS) {
-                    try {
-                        await cache.add(url);
-                    } catch (e) {
-                        // CDN unavailable हुँदा SW install fail नगराउने।
-                    }
-                }
-            })
+        // Root navigation and CDNs are optional: their failure must not prevent
+        // a new shell from installing when the two core files are available.
+        try { await cache.add("./"); } catch (e) {}
+        for (const url of STATIC_ASSETS) {
+            try { await cache.add(url); } catch (e) {}
+        }
 
-            // skipWaiting() जानाजानी प्रयोग गरिएको छैन।
-            // चलिरहेको exam लाई जबर्जस्ती reload गराउँदैन।
-    );
+        // skipWaiting() remains intentionally disabled so active exams are not interrupted.
+    })());
 });
 
 
