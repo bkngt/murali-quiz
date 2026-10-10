@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.0.2">
+    <link rel="manifest" href="manifest.json?v=107.0.3">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -867,7 +867,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.0.2</div>
+        <div>Version: 107.0.3</div>
     </div>
 </div>
 
@@ -1326,7 +1326,7 @@
         });
     }
 
-    // 107.0.2 CHART REVIEW + AUTO-RESTORE PRIVATE CHART HISTORY + EXAM TOP-20
+    // 107.0.3 CHART REVIEW + AUTO-RESTORE PRIVATE CHART HISTORY + EXAM TOP-20
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1341,7 +1341,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.0.2"; 
+    const APP_VERSION = "107.0.3"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4439,7 +4439,7 @@ function getMegaActivationDateUI(quizDate) {
                 const rowStyle = isMe ? 'background:rgba(2,132,199,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);';
                 const name = esc(u.name), address = esc(u.address);
                 const score = Number(u.score || 0), total = Number(u.total || 0), timeText = esc(u.timeText || '');
-                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;color:var(--exam-color);font-weight:900;">${score}/${total}<br><span style="font-size:.72rem;color:var(--muted-text-color);font-weight:700;">${timeText}</span></td></tr>`;
+                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;white-space:nowrap;"><span style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;"><span style="font-size:.92rem;line-height:1.15;color:var(--exam-color);font-weight:900;">${score}/${total}</span><span style="font-size:.64rem;line-height:1.15;color:var(--muted-text-color);font-weight:700;">${timeText}</span></span></td></tr>`;
             }).join('');
 
             // Private self-position remains available even when the user is outside Top 20.
@@ -4484,26 +4484,72 @@ function getMegaActivationDateUI(quizDate) {
     };
 
     window.openChartAdminDetail = function(index) {
-        const user = window._chartAdminRecords[index]; if (!user) return;
+        // Personal chart details are Admin-only; the backend also enforces this role.
+        if (String(userRole || '').trim().toLowerCase() !== 'admin') return;
+        const user = window._chartAdminRecords[index];
+        if (!user) return;
         const isV4 = Number(user.chartVersion || 3) >= 4;
-        const oldMaxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,sewa:10,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
-        const oldLabels = [['🌅 अमृतवेला','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘‍♂️ ५ स्वरूप/स्वमान','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/स्थिति','conduct'],['🤲 ईश्वरीय सेवा','sewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 साँझको योग','eveningYoga'],['🌙 गुडनाइट चार्ट','goodnight'],['📵 सूचना उपवास','digitalDetox']];
-        const v4MaxByKey = {amritvela:15,murli:10,murliManthan:5,swamanDrill:10,traffic:5,conduct:10,knowledgeSewa:5,sthoolSewa:5,food:5,exercise:5,eveningYoga:10,goodnight:5,digitalDetox:10};
-        const v4Labels = [['🌅 अमृतवेला/क्लासअघिपछिको बाबाको याद','amritvela'],['📖 मुरली अध्ययन','murli'],['🧠 मुरली मन्थन','murliManthan'],['🧘 पाँच स्वरूप/स्वमान ड्रिल','swamanDrill'],['🚦 ट्राफिक कन्ट्रोल','traffic'],['🌸 धारणा/सम्बन्ध-सम्पर्क','conduct'],['📚 ईश्वरीय ज्ञान सेवा','knowledgeSewa'],['🪷 यज्ञको स्थूल सेवा','sthoolSewa'],['🍚 ब्रह्माभोजन','food'],['🏃 व्यायाम','exercise'],['🌇 दिउँसो/साँझको बाबाको याद','eveningYoga'],['🌙 गुडनाइट अभ्यास','goodnight'],['📵 सूचना उपवास','digitalDetox']];
+        const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        const oldLabels = [
+            ['🌅 अमृतवेला','amritvela',15],['📖 मुरली अध्ययन','murli',10],['🧠 मुरली मन्थन','murliManthan',5],
+            ['🧘‍♂️ ५ स्वरूप/स्वमान','swamanDrill',10],['🚦 ट्राफिक कन्ट्रोल','traffic',5],['🌸 धारणा/स्थिति','conduct',10],
+            ['🤲 ईश्वरीय सेवा','sewa',10],['🍚 ब्रह्माभोजन','food',5],['🏃 व्यायाम','exercise',5],
+            ['🌇 साँझको योग','eveningYoga',10],['🌙 गुडनाइट चार्ट','goodnight',5],['📵 सूचना उपवास','digitalDetox',10]
+        ];
+        const v4Labels = [
+            ['१. अमृतवेला तथा मुरली क्लासको याद','amritvela',15],
+            ['२. मुरली अध्ययन तथा मनन–चिन्तन','murli+murliManthan',15],
+            ['३. स्वमान तथा ड्रिल','swamanDrill',10],
+            ['४. ट्राफिक कन्ट्रोल','traffic',5],
+            ['५. धारणा, चालचलन तथा सम्बन्ध','conduct',10],
+            ['६. ज्ञान सेवा','knowledgeSewa',5],
+            ['७. यज्ञको स्थूल सेवा','sthoolSewa',5],
+            ['८. ब्रह्माभोजन','food',5],
+            ['९. व्यायाम तथा स्वास्थ्य','exercise',5],
+            ['१०. दिउँसोको एकान्त तथा साँझको याद','eveningYoga',10],
+            ['११. गुडनाइट बाबाको याद तथा चार्ट अर्पण','goodnight',5],
+            ['१२. डिजिटल डिटक्स','digitalDetox',10]
+        ];
         const labels = isV4 ? v4Labels : oldLabels;
-        const maxByKey = isV4 ? v4MaxByKey : oldMaxByKey;
+        const scoreFor = key => key === 'murli+murliManthan'
+            ? Number(user.murli || 0) + Number(user.murliManthan || 0)
+            : Number(user[key] || 0);
         document.getElementById('cad-name').textContent = user.name || '—';
         document.getElementById('cad-address').textContent = user.address || '—';
-        const timeLine = isV4 ? `<div style="margin-top:6px;font-size:.9rem;font-weight:850;color:var(--chart-color);">🕊️ बाबाको याद: ${formatBabaYaadDurationV4(user.totalBabaYaadMinutes || 0)}</div>` : '';
-        document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--chart-color);">${Number(user.totalScore || 0)}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${user.stage || ''}</span>${timeLine}`;
-        document.getElementById('cad-details').innerHTML = labels.map(function(item){ const score=Number(user[item[1]]||0), max=maxByKey[item[1]]; return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span>${item[0]}</span><b style="min-width:52px;text-align:center;color:var(--chart-color);">${score}/${max}</b></div>`; }).join('');
+
+        const totalScore = Number(user.totalScore || 0);
+        const stageText = esc(user.stage || (isV4 ? 'दैनिक चार्ट' : 'पुरानो चार्ट'));
+        document.getElementById('cad-total').innerHTML = `कुल <span style="color:var(--chart-color);">${totalScore}/100</span> <span style="font-size:.8rem;color:#64748b;">• ${stageText}</span>`;
+        const detailRows = labels.map(([label,key,max]) => {
+            const score = scoreFor(key);
+            return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 8px;border-bottom:1px dashed var(--border-color);font-size:.82rem;font-weight:700;"><span style="flex:1;min-width:0;line-height:1.4;">${esc(label)}</span><b style="flex:0 0 auto;min-width:52px;text-align:center;color:var(--chart-color);white-space:nowrap;">${Number.isFinite(score)?score:0}/${max}</b></div>`;
+        }).join('');
+        document.getElementById('cad-details').innerHTML = detailRows;
+
         if (isV4) {
-            const extras = [
-                ['अमृतवेला/क्लास समूह', user.amritvelaGroupMinutes], ['दिउँसोको एकान्त', user.daytimeYogaMinutes], ['साँझको योग', user.eveningYogaMinutes], ['गुडनाइट बाबाको याद', user.goodnightYogaMinutes]
-            ].map(x=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 8px;border-bottom:1px dashed var(--border-color);font-size:.8rem;"><span>${x[0]}</span><b>${formatBabaYaadDurationV4(x[1]||0)}</b></div>`).join('');
-            const escV4 = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-            document.getElementById('cad-details').insertAdjacentHTML('beforeend', extras + (user.sthoolServiceTypes ? `<div style="padding:8px;font-size:.8rem;"><b>स्थूल सेवा:</b> ${escV4(user.sthoolServiceTypes)}</div>` : '') + (user.dailyWeakness ? `<div style="padding:8px;font-size:.8rem;"><b>आजको कमजोरी:</b> ${escV4(user.dailyWeakness)}</div>` : '') + (user.tomorrowResolution ? `<div style="padding:8px;font-size:.8rem;"><b>भोलिको सङ्कल्प:</b> ${escV4(user.tomorrowResolution)}</div>` : ''));
+            const duration = value => formatBabaYaadDurationV4(Number(value || 0));
+            const timeRows = [
+                ['अमृतवेला',user.amritvelaMinutes],
+                ['मुरली क्लासअघि',user.murliClassBeforeMinutes],
+                ['मुरली क्लासपछि',user.murliClassAfterMinutes],
+                ['दिउँसोको एकान्त',user.daytimeYogaMinutes],
+                ['साँझको योग',user.eveningYogaMinutes],
+                ['गुडनाइट याद',user.goodnightYogaMinutes],
+                ['स्थूल सेवाको समय',user.sthoolSewaMinutes]
+            ];
+            const timeHtml = `<div style="margin:12px 0 5px;padding:10px 8px 5px;border-top:1px dashed var(--border-color);font-weight:900;color:var(--chart-color);">⏱️ समयको विवरण</div>` +
+                timeRows.map(([label,value]) => `<div style="display:flex;justify-content:space-between;gap:10px;padding:4px 8px;font-size:.8rem;line-height:1.4;"><span>${esc(label)}</span><b style="white-space:nowrap;">${duration(value)}</b></div>`).join('') +
+                `<div style="margin:7px 0;padding:8px;border-radius:8px;background:rgba(139,92,246,.09);font-weight:900;color:var(--chart-color);">🕊️ बाबाको याद — जम्मा ${duration(user.totalBabaYaadMinutes)}</div>`;
+            const weakness = String(user.dailyWeakness || '').trim();
+            const resolution = String(user.tomorrowResolution || '').trim();
+            const serviceTypes = String(user.sthoolServiceTypes || '').trim();
+            const extras = (serviceTypes ? `<div style="padding:8px;border-bottom:1px solid var(--border-color);font-size:.82rem;overflow-wrap:anywhere;"><b>🪷 स्थूल सेवाका प्रकार:</b> ${esc(serviceTypes)}</div>` : '') +
+                `<div style="padding:8px;border-bottom:1px solid var(--border-color);font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🔍 आजको कमजोरी:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(weakness || 'उल्लेख गरिएको छैन।')}</div></div>` +
+                `<div style="padding:8px;font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🌱 भोलिको कमिटमेन्ट:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(resolution || 'उल्लेख गरिएको छैन।')}</div></div>`;
+            document.getElementById('cad-details').insertAdjacentHTML('beforeend', timeHtml + extras);
         }
+        const modalContent = document.querySelector('#chart-admin-detail-modal .modal-content');
+        if (modalContent) { modalContent.style.maxHeight = '88vh'; modalContent.style.overflowY = 'auto'; }
         document.getElementById('chart-admin-detail-modal').style.display = 'flex';
     };
     window.closeChartAdminDetail = function() { document.getElementById('chart-admin-detail-modal').style.display = 'none'; };
@@ -4566,7 +4612,7 @@ function getMegaActivationDateUI(quizDate) {
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.2)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.3)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
