@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.0.4">
+    <link rel="manifest" href="manifest.json?v=107.0.5">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -867,7 +867,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.0.4</div>
+        <div>Version: 107.0.5</div>
     </div>
 </div>
 
@@ -1245,6 +1245,16 @@
     </div>
 </div>
 
+<!-- Admin-only Participant Exam Review Modal -->
+<div id="admin-exam-review-modal" class="modal-overlay" style="display:none;z-index:10050;" onclick="if(event.target.id === 'admin-exam-review-modal') closeAdminExamReview();">
+    <div class="modal-content" style="max-width:640px;width:calc(100% - 24px);max-height:88vh;overflow:auto;padding:1.1rem;">
+        <button type="button" onclick="closeAdminExamReview();" style="position:sticky;float:right;top:0;width:auto;min-width:42px;padding:7px 10px;border:none;background:var(--bg-color);box-shadow:none;font-size:1.1rem;color:var(--text-color);">✕</button>
+        <div id="aer-title" style="font-size:1.12rem;font-weight:900;color:var(--exam-color);padding-right:45px;">📋 परीक्षा Review</div>
+        <div id="aer-summary" style="margin:9px 0 12px;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-color);font-weight:800;line-height:1.6;"></div>
+        <div id="aer-body" style="display:flex;flex-direction:column;gap:10px;"><div style="padding:15px;text-align:center;">परीक्षा विवरण लोड हुँदैछ...</div></div>
+    </div>
+</div>
+
 <!-- Admin Chart Detail Modal -->
 <div id="chart-admin-detail-modal" class="modal-overlay" onclick="if(event.target.id === 'chart-admin-detail-modal') closeChartAdminDetail();">
     <div class="modal-content" style="max-width: 390px; padding: 1.2rem;">
@@ -1326,7 +1336,7 @@
         });
     }
 
-    // 107.0.4 SCORE HEADER SINGLE-LINE + ADMIN-ONLY CHART DETAIL
+    // 107.0.5 ADMIN-ONLY EXAM REVIEW + ADMIN-ONLY CHART DETAIL
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1341,7 +1351,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.0.4"; 
+    const APP_VERSION = "107.0.5"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4402,6 +4412,92 @@ function getMegaActivationDateUI(quizDate) {
         else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display='table-cell'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; document.getElementById('sl-my-rank-box').style.display='none'; }
     };
 
+    // Admin-only: load one participant's saved answers from the secured backend.
+    window._examAdminRecordsV5 = [];
+    window._examRosterDateV5 = '';
+    window.closeAdminExamReview = function() {
+        const modal = document.getElementById('admin-exam-review-modal');
+        if (modal) modal.style.display = 'none';
+    };
+    window.openAdminExamReview = async function(index) {
+        if (String(userRole || '').trim().toLowerCase() !== 'admin') {
+            showToast('पूरा परीक्षा Review हेर्ने अधिकार Admin लाई मात्र छ।', 'error');
+            return;
+        }
+        const records = Array.isArray(window._examAdminRecordsV5) ? window._examAdminRecordsV5 : [];
+        const rec = records[Number(index)];
+        if (!rec || !rec.phone) {
+            showToast('सहभागीको सुरक्षित परिचय भेटिएन। सूची Refresh गर्नुहोस्।', 'error');
+            return;
+        }
+        const modal = document.getElementById('admin-exam-review-modal');
+        const title = document.getElementById('aer-title');
+        const summary = document.getElementById('aer-summary');
+        const body = document.getElementById('aer-body');
+        const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        title.textContent = '📋 ' + String(rec.name || 'सहभागी') + ' — परीक्षा Review';
+        summary.textContent = 'मिति: ' + String(window._examRosterDateV5 || '—') + '  |  अङ्क: ' + Number(rec.score || 0) + '/' + Number(rec.total || 0) + '  |  समय: ' + String(rec.timeText || '—');
+        body.innerHTML = '<div style="padding:18px;text-align:center;font-weight:800;">⏳ सुरक्षित Review डाटा ल्याउँदैछ...</div>';
+        modal.style.display = 'flex';
+        try {
+            const data = await apiPostJSON({
+                action:'fetchAdminExamReview', targetPhone:rec.phone,
+                targetDate:String(window._examRosterDateV5 || ''),
+                targetRevision:Number(rec.revision || rec.quizRevision || 1),
+                targetQuizId:String(rec.quizId || ''),
+                phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId()
+            }, {retries:1, timeoutMs:18000});
+            if (!data || data.status !== 'success') {
+                throw new Error(data && data.message ? data.message : 'परीक्षा Review ल्याउन सकिएन।');
+            }
+            const result = data.result || {};
+            summary.textContent = 'मिति: ' + String(result.date || window._examRosterDateV5 || '—') +
+                '  |  अङ्क: ' + Number(result.score || 0) + '/' + Number(result.total || 0) +
+                '  |  समय: ' + String(result.timeText || '—') +
+                (result.percent !== '' && result.percent != null ? '  |  ' + Number(result.percent) + '%' : '');
+            const qs = Array.isArray(data.questions) ? data.questions : [];
+            if (!data.reviewAvailable || !qs.length) {
+                body.innerHTML = '<div style="padding:14px;border:1px solid var(--border-color);border-radius:10px;line-height:1.6;">' +
+                    '<div style="font-weight:900;color:var(--warning-color);margin-bottom:5px;">यो पुरानो नतिजामा प्रश्नगत Review सुरक्षित छैन।</div>' +
+                    '<div>प्राप्ताङ्क र समयको रेकर्ड उपलब्ध छ, तर यस प्रयासका उत्तरहरू सुरक्षित नभएकाले प्रश्नअनुसारको समीक्षा देखाउन सकिएन।</div></div>';
+                return;
+            }
+            body.innerHTML = qs.map((q, i) => {
+                const question = String(q.q || q.question || '').trim();
+                const opts = Array.isArray(q.options) ? q.options : [];
+                const ans = String(q.answer == null ? '' : q.answer).trim();
+                const idx = (typeof q.userSelectedIndex === 'number') ? q.userSelectedIndex : -1;
+                const selected = idx >= 0 && idx < opts.length ? String(opts[idx]) : '';
+                const correctFlag = typeof q.userCorrect === 'boolean' ? q.userCorrect : (selected !== '' && ans !== '' && selected.trim() === ans);
+                const optionHtml = opts.map((opt, oi) => {
+                    const value = String(opt == null ? '' : opt);
+                    const isCorrect = ans !== '' && value.trim() === ans;
+                    const isSelected = oi === idx;
+                    let style = 'border:1px solid var(--border-color);background:var(--bg-color);';
+                    if (isCorrect) style = 'border:1px solid #16a34a;background:rgba(22,163,74,.11);';
+                    else if (isSelected) style = 'border:1px solid #dc2626;background:rgba(220,38,38,.10);';
+                    const badge = isCorrect ? '✅ सही उत्तर' : (isSelected ? '❌ सहभागीको उत्तर' : '');
+                    return '<div style="padding:8px 10px;margin-top:5px;border-radius:8px;' + style + '">' +
+                        '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;"><span>' + esc(value) + '</span>' +
+                        (badge ? '<strong style="font-size:.72rem;white-space:nowrap;">' + badge + '</strong>' : '') + '</div></div>';
+                }).join('');
+                const missingQuestion = !question ? '<div style="font-size:.82rem;color:var(--muted-text-color);margin:4px 0;">यो पुरानो रेकर्डमा प्रश्नको मूल पाठ सुरक्षित छैन।</div>' : '';
+                const original = q.original ? '<div style="font-size:.78rem;color:var(--muted-text-color);margin-top:6px;white-space:pre-wrap;">मूल आधार: ' + esc(q.original) + '</div>' : '';
+                const exp = q.explanation ? '<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(2,132,199,.08);white-space:pre-wrap;"><b>💡 कारण:</b> ' + esc(q.explanation) + '</div>' : '';
+                const tag = q.tag ? '<div style="font-size:.74rem;color:var(--chart-color);font-weight:800;margin-top:4px;">🏷️ ' + esc(q.tag) + '</div>' : '';
+                const responseText = idx < 0 ? '<span style="color:var(--muted-text-color);">उत्तर चयन सुरक्षित छैन</span>' :
+                    (correctFlag ? '<span style="color:#16a34a;">✅ सही</span>' : '<span style="color:#dc2626;">❌ गलत</span>');
+                return '<section style="padding:11px;border:1px solid var(--border-color);border-radius:11px;background:var(--card-bg,var(--bg-color));">' +
+                    '<div style="font-weight:900;margin-bottom:5px;">प्रश्न ' + (i+1) + '</div>' +
+                    (question ? '<div style="font-weight:750;line-height:1.55;white-space:pre-wrap;">' + esc(question) + '</div>' : missingQuestion) +
+                    tag + '<div style="font-size:.82rem;font-weight:800;margin-top:8px;">' + responseText + '</div>' +
+                    (optionHtml || '<div style="color:var(--muted-text-color);">विकल्प सुरक्षित छैनन्।</div>') + original + exp + '</section>';
+            }).join('');
+        } catch (err) {
+            body.innerHTML = '<div style="padding:14px;border:1px solid var(--danger-color);border-radius:10px;">❌ ' + esc(err && err.message ? err.message : 'Review लोड हुन सकेन।') + '</div>';
+        }
+    };
+
     window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
         const pickerDate = document.getElementById('sl-date-select').value;
         const matchingQuiz = getExamQuizForPickerDate(pickerDate);
@@ -4419,6 +4515,9 @@ function getMegaActivationDateUI(quizDate) {
             const list = isAdminViewer && Array.isArray(data.participants)
                 ? data.participants
                 : (Array.isArray(data.top20) ? data.top20 : (Array.isArray(data.participants) ? data.participants.slice(0,20) : []));
+            // Only exact Admin accounts receive identity tokens used by the admin-only review endpoint.
+            window._examAdminRecordsV5 = isAdminViewer ? list : [];
+            window._examRosterDateV5 = targetDateStr;
             document.getElementById('sl-rank-head').style.display = 'table-cell';
             document.getElementById('sl-score-head').style.display = 'table-cell';
             const countEl = document.getElementById('sl-participant-count');
@@ -4439,7 +4538,11 @@ function getMegaActivationDateUI(quizDate) {
                 const rowStyle = isMe ? 'background:rgba(2,132,199,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);';
                 const name = esc(u.name), address = esc(u.address);
                 const score = Number(u.score || 0), total = Number(u.total || 0), timeText = esc(u.timeText || '');
-                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;white-space:nowrap;"><span style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;"><span style="font-size:.92rem;line-height:1.15;color:var(--exam-color);font-weight:900;">${score}/${total}</span><span style="font-size:.64rem;line-height:1.15;color:var(--muted-text-color);font-weight:700;">${timeText}</span></span></td></tr>`;
+                const scoreContent = `<span style="font-size:.92rem;line-height:1.15;color:var(--exam-color);font-weight:900;">${score}/${total}</span><span style="font-size:.64rem;line-height:1.15;color:var(--muted-text-color);font-weight:700;">${timeText}</span>`;
+                const scoreCell = isAdminViewer
+                    ? `<span role="button" tabindex="0" onclick="openAdminExamReview(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAdminExamReview(${index});}" title="प्रश्नगत परीक्षा Review हेर्न थिच्नुहोस्" style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;">${scoreContent}</span>`
+                    : `<span style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;">${scoreContent}</span>`;
+                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;white-space:nowrap;">${scoreCell}</td></tr>`;
             }).join('');
 
             // Private self-position remains available even when the user is outside Top 20.
@@ -4612,7 +4715,7 @@ function getMegaActivationDateUI(quizDate) {
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.4)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.5)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
