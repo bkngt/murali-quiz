@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.17">
+    <link rel="manifest" href="manifest.json?v=106.4.18">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -269,7 +269,19 @@
         .chart-subhead-v4 { margin:10px 0 5px; color:var(--muted-text-color); font-size:.78rem; font-weight:850; }
         .chart-reflection-field-v4 { display:block; margin-top:9px; }
         .chart-reflection-field-v4 > span { display:block; margin-bottom:5px; font-size:.8rem; font-weight:800; }
-        .chart-reflection-input-v4 { display:block; width:100%; min-height:42px; padding:9px 10px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font:inherit; font-size:.88rem; outline:none; resize:vertical; }
+        .chart-reflection-input-v4 { display:block; width:100%; min-height:38px; max-height:150px; height:38px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font:inherit; font-size:.88rem; line-height:1.45; outline:none; resize:none; overflow-y:hidden; transition:height .12s ease; }
+        .chart-title-v2 { font-size:1.06rem; line-height:1.35; }
+        .chart-title-v2 b { font-size:.86rem; min-width:34px; padding:4px 8px; }
+        .chart-score-v2 { font-size:.84rem; min-width:44px; padding:4px 8px; }
+        .chart-reflection-section-v4 { margin-top:10px; border-style:dashed; }
+        .chart-reflection-section-v4 .chart-title-v2 { align-items:flex-start; }
+        .chart-reflection-section-v4 .q-tag { flex:0 0 auto; font-size:.68rem; padding:3px 7px; }
+        .chart-reflection-field-v4 > span { font-size:.84rem; }
+        @media (max-width:380px) {
+            .chart-title-v2 { font-size:.98rem; }
+            .chart-title-v2 b { font-size:.82rem; min-width:32px; padding:3px 7px; }
+            .chart-score-v2 { font-size:.80rem; min-width:40px; padding:4px 6px; }
+        }
         .chart-service-grid-v4 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }
         .chart-service-chip-v4 { display:flex; align-items:flex-start; gap:7px; padding:9px 8px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font-size:.79rem; font-weight:700; line-height:1.3; min-width:0; cursor:pointer; }
         .chart-service-chip-v4 input { margin:2px 0 0; flex:0 0 auto; accent-color:var(--chart-color); }
@@ -372,6 +384,9 @@
         #btn-toggle-settings { width:auto !important; min-width:0; flex:0 0 auto; white-space:nowrap; height:32px; min-height:32px; box-sizing:border-box; border:1px solid var(--border-color); border-radius:999px; padding:0 .6rem !important; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
         #toolbar-right-actions > .murali-link { height:32px; min-height:32px; box-sizing:border-box; }
         #toolbar-right-actions > #btn-rank-quick { height:32px; min-height:32px; box-sizing:border-box; border-width:1px; border-style:solid; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+        #toolbar-right-actions > .murali-link,
+        #toolbar-right-actions > #btn-toggle-settings,
+        #toolbar-right-actions > #btn-rank-quick { height:32px !important; min-height:32px !important; max-height:32px !important; box-sizing:border-box !important; align-self:center; border-width:1px !important; border-style:solid; line-height:1 !important; padding-top:0 !important; padding-bottom:0 !important; }
         .mega-modal-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
         .mega-modal-card { width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
         .mega-modal-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -686,8 +701,6 @@
                     <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_conduct" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">केही हलचल वा कमजोरी भयो, तर पहिचान गरेर सम्हाल्ने प्रयास गरेँ</span><span class="chart-score-v2">५</span></label>
                     <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_conduct" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज आफ्नो चालचलनप्रति सचेत रहन सकिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
-                <label class="chart-reflection-field-v4"><span>🔍 आजको एउटा मुख्य कमजोरी (ऐच्छिक)</span><textarea id="chart-daily-weakness" class="chart-reflection-input-v4" rows="2" maxlength="240" placeholder="जस्तै: वाणीमा हतार भयो…"></textarea></label>
-                <label class="chart-reflection-field-v4"><span>🌱 भोलि सुधार गर्ने सङ्कल्प (ऐच्छिक)</span><textarea id="chart-tomorrow-resolution" class="chart-reflection-input-v4" rows="2" maxlength="240" placeholder="भोलि बोल्नुअघि एकछिन सोच्नेछु…"></textarea></label>
             </div>
 
             <div class="chart-section-v2" data-chart-section="6">
@@ -764,6 +777,14 @@
                 </div>
             </div>
 
+            <!-- Optional personal reflection: deliberately unnumbered and excluded from the 100-point score. -->
+            <div class="chart-section-v2 chart-reflection-section-v4" id="chart-reflection-section-v4">
+                <div class="chart-title-v2"><span>📝 व्यक्तिगत टिपोट तथा भोलिको कमिटमेन्ट (ऐच्छिक)</span><span class="q-tag" style="white-space:nowrap;">निजी अभिलेख</span></div>
+                <div class="chart-time-note-v4" style="margin-top:0;">मन लागेमा मात्र भर्नुहोस्। लेखिएको कुरा तपाईंको आफ्नै चार्ट अभिलेखमा सुरक्षित हुनेछ। क्यालेन्डरमा 📝 संकेत देखिनेछ।</div>
+                <label class="chart-reflection-field-v4"><span>🔍 आजको एउटा मुख्य कमजोरी</span><textarea id="chart-daily-weakness" class="chart-reflection-input-v4" rows="1" maxlength="240" data-autogrow-v4="1" placeholder="जस्तै: वाणीमा हतार भयो…"></textarea></label>
+                <label class="chart-reflection-field-v4"><span>🌱 भोलि सुधार गर्ने कमिटमेन्ट</span><textarea id="chart-tomorrow-resolution" class="chart-reflection-input-v4" rows="1" maxlength="240" data-autogrow-v4="1" placeholder="जस्तै: भोलि बोल्नुअघि एकछिन रोकिनेछु…"></textarea></label>
+            </div>
+
             <div class="chart-submit-wrap-v2">
                 <div class="chart-final-score-v2">कुल अङ्क <strong id="chart-submit-score">0</strong> / 100</div>
                 <div class="chart-final-time-v4">🕊️ आज बाबाको याद: <strong id="chart-submit-baba-time">0 मिनेट</strong></div>
@@ -836,7 +857,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.17</div>
+        <div>Version: 106.4.18</div>
     </div>
 </div>
 
@@ -1132,6 +1153,7 @@
         <h3 id="cal-detail-date" style="margin-top:0; color: var(--primary-color); font-size: 1.2rem;"></h3>
         <div id="cal-detail-score" style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;"></div>
         <div id="cal-detail-remark" style="font-size: 1rem; font-weight: 700; padding: 5px 15px; border-radius: 50px; display: inline-block; margin-bottom: 20px;"></div>
+        <div id="cal-detail-reflection" style="display:none; text-align:left; margin:0 0 16px; padding:10px 12px; background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px; max-height:32vh; overflow:auto;"></div>
         <div style="display: flex; gap: 10px;">
             <button onclick="document.getElementById('calendar-detail-modal').style.display='none';" style="background: #64748b; flex:1;">Close</button>
             <button id="cal-detail-review-btn" style="background: var(--success-color); flex:1.5;">उत्तर रिभ्यु गर्नुहोस्</button>
@@ -1144,7 +1166,7 @@
     <div class="modal-content" style="max-width: 450px; padding: 1.5rem;">
         <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
         <h3 style="margin-top:0; color: var(--exam-color); font-size: 1.3rem; font-weight: 800; text-align:center; margin-bottom: 10px;">
-            🏆 विद्यार्थी लिडरबोर्ड
+            📋 परीक्षा सहभागी सूची
         </h3>
         
         <div style="display:flex; gap:8px; margin-bottom:15px;">
@@ -1160,24 +1182,20 @@
         
         <div id="sl-content" style="display:none;">
             <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                <div id="sl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(2,132,199,.08); color:var(--exam-color); font-size:.84rem; font-weight:850; text-align:center;">यस परीक्षामा सहभागी: — जना</div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
                     <thead style="background: var(--exam-color); color: white;">
                         <tr>
-                            <th style="padding: 10px; text-align:center;">Rank</th>
-                            <th style="padding: 10px;">Name</th>
-                            <th style="padding: 10px; text-align:center;">Score</th>
+                            <th id="sl-rank-head" style="padding: 9px 6px; text-align:center; width:48px;">Rank</th>
+                            <th style="padding: 9px 7px; width:38%;">नाम</th>
+                            <th id="sl-address-head" style="padding: 9px 7px;">सेवा केन्द्र</th>
+                            <th id="sl-score-head" style="padding: 9px 6px; text-align:center; width:82px;">अङ्क / समय</th>
                         </tr>
                     </thead>
-                    <tbody id="sl-table-body">
-                    </tbody>
+                    <tbody id="sl-table-body"></tbody>
                 </table>
             </div>
-            
-            <div id="sl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(2, 132, 199, 0.15); border: 2px dashed var(--exam-color); border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको र्‍याङ्क:</div>
-                <div style="font-size: 1.8rem; font-weight: 900; color: var(--exam-color); margin: 5px 0;" id="sl-my-rank-number">-- / --</div>
-                <div style="font-size: 0.85rem; color: var(--muted-text-color); font-weight: bold;" id="sl-my-score-text">Score: -- | Time: --</div>
-            </div>
+            <div id="sl-admin-list-note" style="display:none; font-size:.76rem; color:var(--muted-text-color); margin-top:8px; text-align:center;">अङ्क र समय Admin खातामा मात्र देखिन्छ।</div>
         </div>
     </div>
 </div>
@@ -1198,23 +1216,20 @@
         
         <div id="cl-content" style="display:none;">
             <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-                    <thead style="background: var(--chart-color); color: white;">
-                        <tr>
-                            <th style="padding: 10px; text-align:center; width:54px;">Rank</th>
-                            <th style="padding: 10px;">नाम</th>
-                            <th style="padding: 10px;">सेवा केन्द्र</th>
-                            <th id="cl-score-head" style="padding: 10px; text-align:center;">अंक</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cl-table-body"></tbody>
-                </table>
-            </div>
-            <div id="cl-my-rank-box" style="display:none; margin-top: 15px; background: rgba(139, 92, 246, 0.15); border: 2px dashed var(--chart-color); border-radius: 12px; padding: 15px; text-align: center;">
-                <div style="font-size: 0.9rem; color: var(--text-color); font-weight: bold;">तपाईंको र्‍याङ्क:</div>
-                <div style="font-size: 1.8rem; font-weight: 900; color: var(--chart-color); margin: 5px 0;" id="cl-my-rank-number">-- / --</div>
-                <div style="font-size: 0.85rem; color: var(--muted-text-color); font-weight: bold;" id="cl-my-score-text">Score: --</div>
-            </div>
+                <div id="cl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(139,92,246,.08); color:var(--chart-color); font-size:.84rem; font-weight:850; text-align:center;">यस मितिमा चार्ट भर्नेहरू: — जना</div>
+                <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
+                        <thead style="background: var(--chart-color); color: white;">
+                            <tr>
+                                <th style="padding: 10px 8px; width:42%;">नाम</th>
+                                <th style="padding: 10px 8px;">सेवा केन्द्र</th>
+                                <th id="cl-score-head" style="padding: 10px 6px; text-align:center; width:54px; display:none;">अङ्क</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cl-table-body"></tbody>
+                    </table>
+                </div>
+                <div id="cl-admin-note" style="display:none; font-size:.76rem; color:var(--muted-text-color); margin-top:8px; text-align:center;">Admin खाताबाट सहभागीको व्यक्तिगत विवरण हेर्न नाममा थिच्नुहोस्।</div>
         </div>
     </div>
 </div>
@@ -1300,7 +1315,7 @@
         });
     }
 
-    // 106.4.17 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
+    // 106.4.18 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1315,7 +1330,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.17"; 
+    const APP_VERSION = "106.4.18"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2056,7 +2071,7 @@ function getMegaActivationDateUI(quizDate) {
                 quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
                 stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
 
-            // 106.4.17: A late state-save response must not resurrect a finished
+            // 106.4.18: A late state-save response must not resurrect a finished
             // quiz locally, or overwrite the state of a different quiz session.
             const stateQuizId = String(stateObj.quizId || '');
             const sameCurrentQuiz = !stateQuizId || !currentQuizId || stateQuizId === String(currentQuizId);
@@ -3209,7 +3224,7 @@ function getMegaActivationDateUI(quizDate) {
     stopTimer();
     clearInterval(qLockInterval);
     isQuizActive = false;
-    // 106.4.17: Stop queued ActiveStates retries as soon as submission begins.
+    // 106.4.18: Stop queued ActiveStates retries as soon as submission begins.
     // An already in-flight request is guarded again by the Backend completion check.
     if (activeStateSaveTimer) { clearTimeout(activeStateSaveTimer); activeStateSaveTimer = null; }
     if (activeStateSaveRetryTimer) { clearTimeout(activeStateSaveRetryTimer); activeStateSaveRetryTimer = null; }
@@ -3571,6 +3586,16 @@ function getMegaActivationDateUI(quizDate) {
         if (chartSectionReadyForAutoScrollV4(section)) activateNextChartSection(section);
     }
 
+    function resizeChartReflectionTextareasV4() {
+        document.querySelectorAll('#daily-chart-form .chart-reflection-input-v4').forEach(el => {
+            el.style.height = '38px';
+            const maxHeight = 150;
+            const targetHeight = Math.min(Math.max(38, el.scrollHeight), maxHeight);
+            el.style.height = targetHeight + 'px';
+            el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+        });
+    }
+
     function initChartV3Interactions() {
         document.querySelectorAll('#daily-chart-form input.chart-single-v4').forEach(input => {
             if (input.dataset.chartV4Bound === '1') return;
@@ -3636,6 +3661,13 @@ function getMegaActivationDateUI(quizDate) {
                 updateChartV3Total(); maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
             });
         });
+        document.querySelectorAll('#daily-chart-form .chart-reflection-input-v4').forEach(input => {
+            if (input.dataset.autoGrowBoundV4 !== '1') {
+                input.dataset.autoGrowBoundV4 = '1';
+                input.addEventListener('input', resizeChartReflectionTextareasV4);
+            }
+        });
+        resizeChartReflectionTextareasV4();
     }
 
     window.openChartDatePicker = function() {
@@ -3660,6 +3692,7 @@ function getMegaActivationDateUI(quizDate) {
         document.querySelectorAll('#daily-chart-form .chart-option-v2').forEach(el => el.classList.remove('selected-v2'));
         document.querySelectorAll('#daily-chart-form .chart-service-chip-v4').forEach(el => el.classList.remove('selected-service-v4'));
         document.querySelectorAll('#daily-chart-form .chart-time-input-v4').forEach(el => { delete el.dataset.touched; });
+        resizeChartReflectionTextareasV4();
         updateChartV3Total();
     }
 
@@ -3719,6 +3752,7 @@ function getMegaActivationDateUI(quizDate) {
         }
         const weakness = document.getElementById('chart-daily-weakness'); if (weakness) weakness.value = existingChart.dailyWeakness || '';
         const resolution = document.getElementById('chart-tomorrow-resolution'); if (resolution) resolution.value = existingChart.tomorrowResolution || '';
+        resizeChartReflectionTextareasV4();
         updateChartV3Total();
     }
 
@@ -3881,7 +3915,7 @@ function getMegaActivationDateUI(quizDate) {
         for(let day=1;day<=daysInMonth;day++){
             const dt=new Date(cy,cm,day), isToday=sameLocalDate_(dt,now); const border=isToday?(isChartTab?'border:2px dashed var(--chart-color);':'border:2px dashed var(--exam-color);'):'';
             if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+=`<div class="cal-day has-data ${pct>=80?'excellent':pct>=50?'good':'poor'}" style="${border}" onclick="showCalendarDetail(${h.id})"><span>${day}</span><span style="font-size:.65rem;">${pct}%</span></div>`;}
-            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore);calHtml+=`<div class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'}" style="${border}" onclick="showChartCalendarDetail(${c.id})"><span>${day}</span><span style="font-size:.65rem;">${score}</span></div>`;}
+            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasNote=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim());calHtml+=`<div class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'}" style="${border}" title="${hasNote?'स्वचेकिङ/कमिटमेन्ट लेखिएको छ':''}" onclick="showChartCalendarDetail(${c.id})"><span>${day}</span><span style="font-size:.65rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}${hasNote?'<span aria-label="टिपोट छ" style="font-size:.65rem;line-height:1;">📝</span>':''}</span></div>`;}
             else {const past=dt<dateOnlyLocal_(now); calHtml+=`<div class="cal-day" style="${border}${past?'opacity:.5;':''}"><span>${day}</span></div>`;}
         }
         document.getElementById('cal-grid-days').innerHTML=calHtml;
@@ -3957,7 +3991,8 @@ function getMegaActivationDateUI(quizDate) {
         for(let day=1;day<=days;day++){
             const x=map[day], v=x ? (chartMode?Math.round(x.totalScore):Math.round(x.percent)) : null;
             const cls=v===null?'':(v>=80?'excellent':v>=50?'good':'poor');
-            h+=`<div style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span>${day}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
+            const hasNote=!!(chartMode&&x&&(String(x.dailyWeakness||'').trim()||String(x.tomorrowResolution||'').trim()));
+            h+=`<div title="${hasNote?'स्वचेकिङ/कमिटमेन्ट लेखिएको छ':''}" style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span style="display:flex;align-items:center;justify-content:center;gap:2px;">${day}${hasNote?'<small aria-label="टिपोट छ" style="font-size:.55rem;line-height:1;">📝</small>':''}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
         }
         h+='</div>'; targetEl.innerHTML=h;
     }
@@ -4008,21 +4043,46 @@ function getMegaActivationDateUI(quizDate) {
         document.getElementById('progress-year-grid').innerHTML=y.map(x=>`<div style="border:1px solid var(--border-color);border-radius:10px;padding:8px;text-align:center;background:var(--card-bg);"><b>${x.label}</b><div style="font-size:.8rem;color:var(--muted-text-color);">${x.count||0} दिन</div><strong style="color:var(--stats-color);">${x.average||0}%</strong></div>`).join('');
     }
 
+    function renderCalendarReflectionV4_(record) {
+        const box = document.getElementById('cal-detail-reflection');
+        if (!box) return;
+        box.innerHTML = '';
+        const entries = [
+            ['🔍 आजको स्वचेकिङ / कमजोरी', record && record.dailyWeakness],
+            ['🌱 भोलिको कमिटमेन्ट', record && record.tomorrowResolution]
+        ].filter(item => String(item[1] || '').trim());
+        if (!entries.length) { box.style.display = 'none'; return; }
+        entries.forEach(([label, value]) => {
+            const item = document.createElement('div');
+            item.style.cssText = 'padding:6px 0 8px;border-bottom:1px dashed var(--border-color);';
+            const heading = document.createElement('div');
+            heading.style.cssText = 'font-size:.78rem;font-weight:900;color:var(--chart-color);margin-bottom:3px;';
+            heading.textContent = label;
+            const text = document.createElement('div');
+            text.style.cssText = 'font-size:.88rem;line-height:1.5;color:var(--text-color);white-space:pre-wrap;overflow-wrap:anywhere;';
+            text.textContent = String(value);
+            item.appendChild(heading); item.appendChild(text); box.appendChild(item);
+        });
+        box.style.display = 'block';
+    }
+
     window.showCalendarDetail = function(id) {
         let history = safeJSON('murali_progress', []); let record = history.find(item => item.id === id); if (!record) return;
         document.getElementById('cal-detail-date').innerText = record.date; document.getElementById('cal-detail-score').innerText = `${record.score}/${record.total} (${record.percent}%)`;
         let remarkEl = document.getElementById('cal-detail-remark'); let rText = record.percent >= 80 ? 'Excellent' : (record.percent >= 50 ? 'Good' : 'Needs Practice'); let rClass = record.percent >= 80 ? 'remark-excellent' : (record.percent >= 50 ? 'remark-good' : 'remark-poor');
         remarkEl.innerText = rText; remarkEl.className = `prog-remark ${rClass}`;
+        renderCalendarReflectionV4_(null);
         let reviewBtn = document.getElementById('cal-detail-review-btn'); reviewBtn.style.display = 'block'; reviewBtn.onclick = () => { document.getElementById('calendar-detail-modal').style.display = 'none'; reviewPastQuiz(id); };
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
 
     window.showChartCalendarDetail = function(id) {
         let charts = safeJSON('murali_daily_charts', []); let record = charts.find(item => item.id === id); if (!record) return;
-        document.getElementById('cal-detail-date').innerText = record.date + " (Chart)"; document.getElementById('cal-detail-score').innerText = `${record.totalScore}`;
+        document.getElementById('cal-detail-date').innerText = record.date + " (Chart)"; document.getElementById('cal-detail-score').innerText = `${record.totalScore}/100`;
         let remarkEl = document.getElementById('cal-detail-remark'); let rText = record.stage; let rClass = record.totalScore >= 90 ? 'remark-excellent' : (record.totalScore >= 70 ? 'remark-good' : 'remark-poor');
         remarkEl.innerText = rText; remarkEl.className = `prog-remark ${rClass}`;
-        let reviewBtn = document.getElementById('cal-detail-review-btn'); reviewBtn.style.display = 'none'; 
+        renderCalendarReflectionV4_(record);
+        let reviewBtn = document.getElementById('cal-detail-review-btn'); reviewBtn.style.display = 'none';
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
 
@@ -4054,7 +4114,7 @@ function getMegaActivationDateUI(quizDate) {
     window.toggleLbDateInputs = function() { let type = document.querySelector('input[name="lb-report-type"]:checked').value; document.getElementById('lb-daily-input-group').style.display = type === 'daily' ? 'flex' : 'none'; document.getElementById('lb-range-input-group').style.display = type === 'range' ? 'flex' : 'none'; }
     window.switchLbTab = function(tab) { document.getElementById('tab-wa').classList.toggle('active', tab === 'wa'); document.getElementById('tab-table').classList.toggle('active', tab === 'table'); document.getElementById('lb-wa-section').style.display = tab === 'wa' ? 'block' : 'none'; document.getElementById('lb-table-section').style.display = tab === 'table' ? 'block' : 'none'; }
     window.fetchLeaderboard = function() {
-        let type = document.querySelector('input[name="lb-report-type"]:checked').value; let payload = { action: "getLeaderboard", reportType: type };
+        let type = document.querySelector('input[name="lb-report-type"]:checked').value; let payload = { action: "getLeaderboard", reportType: type, phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), deviceId:getDeviceId() };
         if (type === 'daily') { let selectedQuizDate = document.getElementById('lb-daily-date').value; if(!selectedQuizDate) return showToast("कृपया क्वीज छान्नुहोस्।", "error"); payload.targetDate = selectedQuizDate; payload.limit = document.getElementById('lb-limit-select-daily').value; } 
         else { let sDate = document.getElementById('lb-start-date').value; let eDate = document.getElementById('lb-end-date').value; if(!sDate || !eDate) return showToast("कृपया सुरु र अन्तिम मिति छान्नुहोस्।", "error"); if(new Date(sDate.replace(/-/g, '/')) > new Date(eDate.replace(/-/g, '/'))) return showToast("सुरु मिति अन्तिम मिति भन्दा पछाडि हुन सक्दैन।", "error"); payload.startDate = sDate; payload.endDate = eDate; payload.limit = document.getElementById('lb-limit-select-range').value; }
         
@@ -4147,44 +4207,49 @@ function getMegaActivationDateUI(quizDate) {
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
         if (selectedQuiz && dateInput.value) fetchStudentLeaderboardData();
-        else { document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-my-rank-box').style.display = 'none'; }
+        else { document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:2}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
     };
 
     window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
-        const pickerDate = document.getElementById('sl-date-select').value; const matchingQuiz = getExamQuizForPickerDate(pickerDate); const targetDateStr = String(overrideTargetDate || (matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate)).trim();
-        document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-content').style.display = 'none';
-        if (!navigator.onLine) { document.getElementById('sl-loading').innerHTML = "❌ इन्टरनेट कनेक्सन छैन!"; return; }
-
+        const pickerDate = document.getElementById('sl-date-select').value;
+        const matchingQuiz = getExamQuizForPickerDate(pickerDate);
+        const targetDateStr = String(overrideTargetDate || (matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate)).trim();
+        const loading = document.getElementById('sl-loading');
+        const content = document.getElementById('sl-content');
+        loading.style.display = 'block'; loading.textContent = '⏳ सहभागी सूची लोड हुँदैछ...'; content.style.display = 'none';
+        if (!navigator.onLine) { loading.innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         try {
-            const data = await apiPostJSON({ action: "getStudentLeaderboard", targetDate: targetDateStr, phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }, {retries: 2, timeoutMs: 15000});
-            document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block';
-            if (data.status === "success") {
-                let tbody = document.getElementById('sl-table-body');
-                if (data.total === 0) { tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:var(--danger-color); font-weight:bold;">यस मितिमा कसैले पनि परीक्षा दिएको छैन।</td></tr>`; document.getElementById('sl-my-rank-box').style.display = 'none'; return; }
-
-                let leaderboardData = data.top20 || data.top10 || [];
-                tbody.innerHTML = leaderboardData.map((user, index) => {
-                    let isMe = (data.myRank === index + 1); let rowStyle = isMe ? 'background: rgba(2, 132, 199, 0.15); font-weight: 800;' : 'border-bottom: 1px solid var(--border-color);'; let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
-                    return `<tr style="${rowStyle}"><td style="padding: 10px; text-align:center; font-weight:bold; font-size: 1.1rem;">${rankIcon}</td><td style="padding: 10px;">${user.name} <br><span style="font-size:0.75rem; color:#64748b;">${user.address}</span></td><td style="padding: 10px; text-align:center; color:var(--exam-color); font-weight:bold;">${user.score}/${user.total}<br><span style="font-size:0.75rem; color:#64748b;">${user.timeText}</span></td></tr>`;
-                }).join('');
-
-                let myRankBox = document.getElementById('sl-my-rank-box');
-                if (data.myRank > 20) { 
-                    myRankBox.style.display = 'block'; myRankBox.style.borderColor = '#0284c7'; myRankBox.style.background = 'rgba(2, 132, 199, 0.15)';
-                    document.getElementById('sl-my-rank-number').innerText = `${data.myRank} / ${data.total}`; document.getElementById('sl-my-rank-number').style.fontSize = '1.8rem'; document.getElementById('sl-my-rank-number').style.color = '#0284c7';
-                    document.getElementById('sl-my-score-text').innerText = `Score: ${data.myRankData.score}/${data.myRankData.total} | Time: ${data.myRankData.timeText} मि.`;
-                } else if (data.myRank > 0 && data.myRank <= 20) { 
-                    myRankBox.style.display = 'block'; myRankBox.style.borderColor = 'var(--success-color)'; myRankBox.style.background = 'rgba(22, 163, 74, 0.1)';
-                    document.getElementById('sl-my-rank-number').innerText = `बधाई छ! तपाईं Top 20 मा हुनुहुन्छ।`; document.getElementById('sl-my-rank-number').style.fontSize = '1.2rem'; document.getElementById('sl-my-rank-number').style.color = 'var(--success-color)';
-                    document.getElementById('sl-my-score-text').innerText = `Rank: ${data.myRank} / ${data.total}`;
-                } else {
-                    myRankBox.style.display = 'block'; myRankBox.style.borderColor = 'var(--danger-color)'; myRankBox.style.background = 'rgba(220, 38, 38, 0.1)';
-                    document.getElementById('sl-my-rank-number').innerText = `- / ${data.total}`; document.getElementById('sl-my-rank-number').style.color = 'var(--danger-color)';
-                    document.getElementById('sl-my-score-text').innerText = `तपाईंले यो परीक्षा दिनुभएको छैन।`;
+            const data = await apiPostJSON({action:'getStudentLeaderboard',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries:2, timeoutMs:15000});
+            if (!data || data.status !== 'success') throw new Error('exam-participant-list-failed');
+            const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
+            const list = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.roster) ? data.roster : (Array.isArray(data.top20) ? data.top20 : []));
+            if (!isAdminViewer) list.sort((a,b) => String(a.name||'').localeCompare(String(b.name||''),'ne') || String(a.address||'').localeCompare(String(b.address||''),'ne'));
+            document.getElementById('sl-rank-head').style.display = isAdminViewer ? 'table-cell' : 'none';
+            document.getElementById('sl-score-head').style.display = isAdminViewer ? 'table-cell' : 'none';
+            document.getElementById('sl-address-head').style.display = 'table-cell';
+            document.getElementById('sl-admin-list-note').style.display = isAdminViewer && list.length ? 'block' : 'none';
+            document.getElementById('sl-participant-count').textContent = `यस परीक्षामा सहभागी: ${Number(data.total ?? list.length)} जना`;
+            document.getElementById('sl-my-rank-box').style.display = 'none';
+            loading.style.display = 'none'; content.style.display = 'block';
+            const tbody = document.getElementById('sl-table-body');
+            if (!list.length) {
+                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
+                return;
+            }
+            const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+            tbody.innerHTML = list.map((u,index) => {
+                const name=esc(u.name), address=esc(u.address);
+                if (isAdminViewer) {
+                    const rank=index+1, rankIcon=rank===1?'🥇':(rank===2?'🥈':(rank===3?'🥉':String(rank)));
+                    return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td><td style="padding:8px 5px;text-align:center;color:var(--exam-color);font-weight:900;">${Number(u.score||0)}/${Number(u.total||0)}<br><span style="font-size:.7rem;color:var(--muted-text-color);font-weight:700;">${esc(u.timeText||'')}</span></td></tr>`;
                 }
-            } else { document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-loading').innerHTML = "❌ डाटा ल्याउन समस्या भयो।"; }
-        } catch(err) { document.getElementById('sl-loading').style.display = 'block'; document.getElementById('sl-loading').innerHTML = "❌ नेटवर्क समस्या!"; }
-    }
+                return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td></tr>`;
+            }).join('');
+        } catch(err) {
+            loading.style.display='block'; content.style.display='none';
+            loading.innerHTML='❌ सहभागी सूची ल्याउन सकिएन। इन्टरनेट जाँचेर फेरि प्रयास गर्नुहोस्।';
+        }
+    };
 
     // Chart Leaderboard
     window._chartAdminRecords = [];
@@ -4220,36 +4285,43 @@ function getMegaActivationDateUI(quizDate) {
 
     window.fetchChartLeaderboardData = async function() {
         const targetDateStr = document.getElementById('cl-date-select').value;
-        document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none';
-        if (!navigator.onLine) { document.getElementById('cl-loading').innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
-        
+        const loading = document.getElementById('cl-loading');
+        const content = document.getElementById('cl-content');
+        const countEl = document.getElementById('cl-participant-count');
+        loading.style.display = 'block'; loading.textContent = '⏳ सहभागी सूची लोड हुँदैछ...';
+        content.style.display = 'none';
+        if (!navigator.onLine) { loading.innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         try {
-            const data = await apiPostJSON({action:'getStudentChartLeaderboard',chartVersion:4,view:'participant_list',role:userRole||'Student',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries: 2, timeoutMs: 15000});
-            document.getElementById('cl-loading').style.display = 'none'; document.getElementById('cl-content').style.display = 'block';
-            if (data.status !== 'success') { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-loading').innerHTML = '❌ डाटा ल्याउन समस्या भयो।'; return; }
-            const tbody = document.getElementById('cl-table-body'); const isPrivilegedViewer = ['admin','manager'].includes(String(userRole||'').toLowerCase());
-            document.getElementById('cl-score-head').style.display = isPrivilegedViewer ? 'table-cell' : 'none'; window._chartAdminRecords = isPrivilegedViewer ? (data.participants || data.records || []) : [];
-            if (data.total === 0) { tbody.innerHTML = `<tr><td colspan="${isPrivilegedViewer?4:3}" style="text-align:center;padding:15px;color:var(--danger-color);font-weight:bold;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`; document.getElementById('cl-my-rank-box').style.display = 'none'; return; }
-            const list = data.participants || data.records || data.top20 || [];
-            tbody.innerHTML = list.map((u,index) => {
-                const isMe = data.myRank === index+1; const rowStyle = (isMe ? 'background:rgba(22,163,74,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);') + (isPrivilegedViewer ? 'cursor:pointer;' : '');
-                const icon = index===0?'🥇':(index===1?'🥈':(index===2?'🥉':index+1));
-                if (isPrivilegedViewer) return `<tr style="${rowStyle}" onclick="openChartAdminDetail(${index})" title="विवरण हेर्न क्लिक गर्नुहोस्"><td style="padding:9px 5px;text-align:center;font-weight:bold;">${icon}</td><td style="padding:9px 6px;">${u.name||'—'}</td><td style="padding:9px 6px;color:#64748b;font-size:.75rem;">${u.address||'—'}</td><td style="padding:9px 5px;text-align:center;color:var(--chart-color);font-weight:900;">${Number(u.totalScore||0)}</td></tr>`;
-                return `<tr style="${rowStyle}"><td style="padding:9px 5px;text-align:center;font-weight:bold;">${icon}</td><td style="padding:9px 6px;">${u.name||'—'}</td><td style="padding:9px 6px;color:#64748b;font-size:.75rem;">${u.address||'—'}</td></tr>`;
-            }).join('');
-
-            const myBox = document.getElementById('cl-my-rank-box');
-            if (data.myRank > 0) {
-                myBox.style.display = 'block'; myBox.style.borderColor = data.myRank <= 20 ? 'var(--success-color)' : '#a855f7'; myBox.style.background = data.myRank <= 20 ? 'rgba(22,163,74,.1)' : 'rgba(168,85,247,.15)';
-                document.getElementById('cl-my-rank-number').innerText = data.myRank <= 20 ? `Top 20 • Rank ${data.myRank}/${data.total}` : `${data.myRank} / ${data.total}`;
-                document.getElementById('cl-my-rank-number').style.color = data.myRank <= 20 ? 'var(--success-color)' : '#a855f7'; document.getElementById('cl-my-rank-number').style.fontSize = '1.2rem';
-                document.getElementById('cl-my-score-text').innerText = data.myRankData ? `तपाईंको अंक: ${Number(data.myRankData.totalScore || 0)}/100 • ${data.myRankData.stage || ''}` : 'तपाईंको अंक उपलब्ध छैन।';
-            } else {
-                myBox.style.display = 'block'; myBox.style.borderColor = 'var(--danger-color)'; myBox.style.background = 'rgba(220,38,38,.1)';
-                document.getElementById('cl-my-rank-number').innerText = `- / ${data.total}`; document.getElementById('cl-my-rank-number').style.color = 'var(--danger-color)';
-                document.getElementById('cl-my-score-text').innerText = 'तपाईंले यो दिनको चार्ट भर्नुभएको छैन।';
+            const data = await apiPostJSON({action:'getStudentChartLeaderboard',chartVersion:4,view:'participant_list',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries:2, timeoutMs:15000});
+            if (!data || data.status !== 'success') throw new Error('participant-list-failed');
+            const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
+            const rows = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.records) ? data.records : []);
+            rows.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), 'ne') || String(a.address || '').localeCompare(String(b.address || ''), 'ne'));
+            loading.style.display = 'none'; content.style.display = 'block';
+            const scoreHead = document.getElementById('cl-score-head');
+            scoreHead.style.display = isAdminViewer ? 'table-cell' : 'none';
+            document.getElementById('cl-admin-note').style.display = isAdminViewer && rows.length ? 'block' : 'none';
+            // The browser only receives detailed rows from the backend for Admin accounts.
+            window._chartAdminRecords = isAdminViewer ? rows : [];
+            if (countEl) countEl.textContent = `यस मितिमा चार्ट भर्नेहरू: ${Number(data.total ?? rows.length)} जना`;
+            const tbody = document.getElementById('cl-table-body');
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 3 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
+                return;
             }
-        } catch(err) { document.getElementById('cl-loading').style.display = 'block'; document.getElementById('cl-content').style.display = 'none'; document.getElementById('cl-loading').innerHTML = '❌ नेटवर्क समस्या!'; }
+            const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+            tbody.innerHTML = rows.map((u,index) => {
+                const name = esc(u.name), address = esc(u.address);
+                const rowStyle = `border-bottom:1px solid var(--border-color);${isAdminViewer?'cursor:pointer;':''}`;
+                if (isAdminViewer) {
+                    return `<tr style="${rowStyle}" onclick="openChartAdminDetail(${index})" title="Admin विवरण खोल्न थिच्नुहोस्"><td style="padding:9px 8px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 8px;overflow-wrap:anywhere;color:var(--muted-text-color);">${address}</td><td style="padding:9px 6px;text-align:center;color:var(--chart-color);font-weight:900;">${Number(u.totalScore || 0)}</td></tr>`;
+                }
+                return `<tr style="${rowStyle}"><td style="padding:9px 8px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 8px;overflow-wrap:anywhere;color:var(--muted-text-color);">${address}</td></tr>`;
+            }).join('');
+        } catch(err) {
+            loading.style.display = 'block'; content.style.display = 'none';
+            loading.innerHTML = '❌ सहभागी सूची ल्याउन सकिएन। इन्टरनेट जाँचेर फेरि प्रयास गर्नुहोस्।';
+        }
     };
 
     // Exporting Tools
