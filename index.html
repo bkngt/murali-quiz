@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.19">
+    <link rel="manifest" href="manifest.json?v=107.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -866,7 +866,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.19</div>
+        <div>Version: 107.0</div>
     </div>
 </div>
 
@@ -1227,11 +1227,14 @@
         <div id="cl-content" style="display:none;">
             <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
                 <div id="cl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(139,92,246,.08); color:var(--chart-color); font-size:.84rem; font-weight:850; text-align:center;">यस मितिमा चार्ट भर्नेहरू: — जना</div>
+                <div id="cl-my-rank-private" style="display:none;margin:0 0 10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(139,92,246,.28);background:rgba(139,92,246,.07);color:var(--chart-color);font-weight:850;text-align:center;line-height:1.6;"></div>
+                <div id="cl-private-note" style="display:none;margin:0 0 8px;font-size:.76rem;color:var(--muted-text-color);text-align:center;">सूची अङ्कअनुसार क्रमबद्ध छ। अरू सहभागीको अङ्क गोप्य राखिएको छ।</div>
                 <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
                         <thead style="background: var(--chart-color); color: white;">
                             <tr>
-                                <th style="padding: 10px 8px; width:42%;">नाम</th>
+                                <th id="cl-rank-head" style="padding:10px 5px;text-align:center;width:43px;display:none;">स्थान</th>
+                                <th style="padding: 10px 8px; width:38%;">नाम</th>
                                 <th style="padding: 10px 8px;">सेवा केन्द्र</th>
                                 <th id="cl-score-head" style="padding: 10px 6px; text-align:center; width:54px; display:none;">अङ्क</th>
                             </tr>
@@ -1325,7 +1328,7 @@
         });
     }
 
-    // 106.4.19 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
+    // 107.0 CHART PRIVACY/RANK + EXAM TOP 20 + SAFE EXAM WAIT + MONTHLY MEGA
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1340,7 +1343,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.19"; 
+    const APP_VERSION = "107.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2093,7 +2096,7 @@ function getMegaActivationDateUI(quizDate) {
                 quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
                 stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
 
-            // 106.4.19: A late state-save response must not resurrect a finished
+            // 107.0: A late state-save response must not resurrect a finished
             // quiz locally, or overwrite the state of a different quiz session.
             const stateQuizId = String(stateObj.quizId || '');
             const sameCurrentQuiz = !stateQuizId || !currentQuizId || stateQuizId === String(currentQuizId);
@@ -3246,7 +3249,7 @@ function getMegaActivationDateUI(quizDate) {
     stopTimer();
     clearInterval(qLockInterval);
     isQuizActive = false;
-    // 106.4.19: Stop queued ActiveStates retries as soon as submission begins.
+    // 107.0: Stop queued ActiveStates retries as soon as submission begins.
     // An already in-flight request is guarded again by the Backend completion check.
     if (activeStateSaveTimer) { clearTimeout(activeStateSaveTimer); activeStateSaveTimer = null; }
     if (activeStateSaveRetryTimer) { clearTimeout(activeStateSaveRetryTimer); activeStateSaveRetryTimer = null; }
@@ -4201,8 +4204,8 @@ function getMegaActivationDateUI(quizDate) {
             return '"' + s.replace(/"/g, '""') + '"';
         };
         const rows = isAdminViewer
-            ? [['क्रम','नाम','सेवा केन्द्र','प्राप्त अङ्क','पूर्णाङ्क','समय'], ...records.map((r,i)=>[i+1,r.name||'',r.address||'',r.score||0,r.total||0,r.timeText||''])]
-            : [['नाम','सेवा केन्द्र'], ...records.map(r=>[r.name||'',r.address||''])];
+            ? [['स्थान','नाम','सेवा केन्द्र','प्राप्त अङ्क','पूर्णाङ्क','समय'], ...records.map((r,i)=>[r.rank || i+1,r.name||'',r.address||'',r.score||0,r.total||0,r.timeText||''])]
+            : [['स्थान','नाम','सेवा केन्द्र'], ...records.map((r,i)=>[r.rank || i+1,r.name||'',r.address||''])];
         const csv = '\uFEFF' + rows.map(row=>row.map(safeCsv).join(',')).join('\r\n');
         const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
         const datePart = String(window._examRosterDateV4 || getLocalDateISO()).replace(/[^0-9A-Za-z_-]/g,'-');
@@ -4295,7 +4298,7 @@ function getMegaActivationDateUI(quizDate) {
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
         if (selectedQuiz && dateInput.value) fetchStudentLeaderboardData();
-        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; const dl=document.getElementById('sl-download-btn'); if(dl) dl.style.display='none'; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:2}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
+        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; const dl=document.getElementById('sl-download-btn'); if(dl) dl.style.display='none'; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:3}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
     };
 
     window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
@@ -4313,31 +4316,33 @@ function getMegaActivationDateUI(quizDate) {
             if (!data || data.status !== 'success') throw new Error('exam-participant-list-failed');
             const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
             const list = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.roster) ? data.roster : (Array.isArray(data.top20) ? data.top20 : []));
-            if (!isAdminViewer) list.sort((a,b) => String(a.name||'').localeCompare(String(b.name||''),'ne') || String(a.address||'').localeCompare(String(b.address||''),'ne'));
-            window._examRosterForDownloadV4 = list.map(r => isAdminViewer
-                ? {name:r.name||'', address:r.address||'', score:Number(r.score||0), total:Number(r.total||0), timeText:r.timeText||''}
-                : {name:r.name||'', address:r.address||''});
+            // Backend returns the public Top 20 in score/time rank order; do not re-sort it.
+            window._examRosterForDownloadV4 = list.map((r, i) => isAdminViewer
+                ? {rank:i+1, name:r.name||'', address:r.address||'', score:Number(r.score||0), total:Number(r.total||0), timeText:r.timeText||''}
+                : {rank:i+1, name:r.name||'', address:r.address||''});
             if (downloadBtn) downloadBtn.style.display = list.length ? 'flex' : 'none';
-            document.getElementById('sl-rank-head').style.display = isAdminViewer ? 'table-cell' : 'none';
+            document.getElementById('sl-rank-head').style.display = 'table-cell';
             document.getElementById('sl-score-head').style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('sl-address-head').style.display = 'table-cell';
             document.getElementById('sl-admin-list-note').style.display = isAdminViewer && list.length ? 'block' : 'none';
-            document.getElementById('sl-participant-count').textContent = `यस परीक्षामा सहभागी: ${Number(data.total ?? list.length)} जना`;
+            document.getElementById('sl-participant-count').textContent = !isAdminViewer && Number(data.total ?? list.length) > 20
+                ? `कुल सहभागी: ${Number(data.total)} जना • शीर्ष २० मात्र`
+                : `यस परीक्षामा सहभागी: ${Number(data.total ?? list.length)} जना`;
             const oldMyRankBox = document.getElementById('sl-my-rank-box'); if (oldMyRankBox) oldMyRankBox.style.display = 'none';
             loading.style.display = 'none'; content.style.display = 'block';
             const tbody = document.getElementById('sl-table-body');
             if (!list.length) { if (downloadBtn) downloadBtn.style.display = 'none';
-                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 3}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
                 return;
             }
             const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
             tbody.innerHTML = list.map((u,index) => {
                 const name=esc(u.name), address=esc(u.address);
+                const rank=index+1, rankIcon=rank===1?'🥇':(rank===2?'🥈':(rank===3?'🥉':String(rank)));
                 if (isAdminViewer) {
-                    const rank=index+1, rankIcon=rank===1?'🥇':(rank===2?'🥈':(rank===3?'🥉':String(rank)));
                     return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td><td style="padding:8px 5px;text-align:center;color:var(--exam-color);font-weight:900;">${Number(u.score||0)}/${Number(u.total||0)}<br><span style="font-size:.7rem;color:var(--muted-text-color);font-weight:700;">${esc(u.timeText||'')}</span></td></tr>`;
                 }
-                return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td></tr>`;
+                return `<tr style="border-bottom:1px solid var(--border-color);"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 7px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 7px;color:var(--muted-text-color);overflow-wrap:anywhere;">${address}</td></tr>`;
             }).join('');
         } catch(err) {
             loading.style.display='block'; content.style.display='none';
@@ -4390,17 +4395,24 @@ function getMegaActivationDateUI(quizDate) {
             if (!data || data.status !== 'success') throw new Error('participant-list-failed');
             const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
             const rows = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.records) ? data.records : []);
-            rows.sort((a,b) => String(a.name || '').localeCompare(String(b.name || ''), 'ne') || String(a.address || '').localeCompare(String(b.address || ''), 'ne'));
+            // Backend orders all participants by score descending but strips score from non-admin rows.
             loading.style.display = 'none'; content.style.display = 'block';
             const scoreHead = document.getElementById('cl-score-head');
             scoreHead.style.display = isAdminViewer ? 'table-cell' : 'none';
+            document.getElementById('cl-rank-head').style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('cl-admin-note').style.display = isAdminViewer && rows.length ? 'block' : 'none';
+            document.getElementById('cl-private-note').style.display = !isAdminViewer && rows.length ? 'block' : 'none';
+            const myRankBox = document.getElementById('cl-my-rank-private');
+            if (data.myRank != null && Number(data.myRank) > 0 && data.myScore != null && Number.isFinite(Number(data.myScore))) {
+                myRankBox.innerHTML = `🪷 तपाईंको निजी स्थान: #${Number(data.myRank)} <span style="opacity:.6;padding:0 5px;">|</span> तपाईंको अङ्क: ${Number(data.myScore)}/100`;
+                myRankBox.style.display = 'block';
+            } else { myRankBox.style.display = 'none'; }
             // The browser only receives detailed rows from the backend for Admin accounts.
             window._chartAdminRecords = isAdminViewer ? rows : [];
             if (countEl) countEl.textContent = `यस मितिमा चार्ट भर्नेहरू: ${Number(data.total ?? rows.length)} जना`;
             const tbody = document.getElementById('cl-table-body');
             if (!rows.length) {
-                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 3 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि चार्ट भरेको छैन।</td></tr>`;
                 return;
             }
             const esc = v => String(v == null || v === '' ? '—' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -4408,7 +4420,8 @@ function getMegaActivationDateUI(quizDate) {
                 const name = esc(u.name), address = esc(u.address);
                 const rowStyle = `border-bottom:1px solid var(--border-color);${isAdminViewer?'cursor:pointer;':''}`;
                 if (isAdminViewer) {
-                    return `<tr style="${rowStyle}" onclick="openChartAdminDetail(${index})" title="Admin विवरण खोल्न थिच्नुहोस्"><td style="padding:9px 8px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 8px;overflow-wrap:anywhere;color:var(--muted-text-color);">${address}</td><td style="padding:9px 6px;text-align:center;color:var(--chart-color);font-weight:900;">${Number(u.totalScore || 0)}</td></tr>`;
+                    const rank = index + 1, rankIcon = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : String(rank)));
+                    return `<tr style="${rowStyle}" onclick="openChartAdminDetail(${index})" title="Admin विवरण खोल्न थिच्नुहोस्"><td style="padding:9px 5px;text-align:center;font-weight:850;">${rankIcon}</td><td style="padding:9px 8px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 8px;overflow-wrap:anywhere;color:var(--muted-text-color);">${address}</td><td style="padding:9px 6px;text-align:center;color:var(--chart-color);font-weight:900;">${Number(u.totalScore || 0)}</td></tr>`;
                 }
                 return `<tr style="${rowStyle}"><td style="padding:9px 8px;overflow-wrap:anywhere;">${name}</td><td style="padding:9px 8px;overflow-wrap:anywhere;color:var(--muted-text-color);">${address}</td></tr>`;
             }).join('');
@@ -4427,7 +4440,7 @@ function getMegaActivationDateUI(quizDate) {
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 106.1)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
