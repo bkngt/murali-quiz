@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.0.5">
+    <link rel="manifest" href="manifest.json?v=107.0.6">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -364,6 +364,32 @@
 
         .chart-container { position: relative; width: 100%; height: 250px; margin-bottom: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .lb-tabs, .progress-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: var(--bg-color); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color); }
+
+        /* Exam Rank: exactly two visible lines per participant side on narrow screens. */
+        #student-leaderboard-modal .sl-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:.84rem; text-align:left; }
+        #student-leaderboard-modal .sl-rank-head, #student-leaderboard-modal .sl-rank-cell { width:40px; text-align:center; }
+        #student-leaderboard-modal .sl-score-head, #student-leaderboard-modal .sl-score-cell { width:84px; text-align:center; }
+        #student-leaderboard-modal .sl-person-cell { min-width:0; overflow:hidden; padding:9px 8px; }
+        #student-leaderboard-modal .sl-name-line, #student-leaderboard-modal .sl-address-line { display:block; width:100%; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        #student-leaderboard-modal .sl-name-line { font-size:.9rem; line-height:1.25; font-weight:750; color:var(--text-color); }
+        #student-leaderboard-modal .sl-address-line { margin-top:4px; font-size:.72rem; line-height:1.2; font-weight:700; color:var(--muted-text-color); }
+        #student-leaderboard-modal .sl-rank-cell { padding:9px 3px; font-size:1rem; font-weight:800; vertical-align:middle; }
+        #student-leaderboard-modal .sl-score-cell { padding:7px 3px; white-space:nowrap; vertical-align:middle; }
+        #student-leaderboard-modal .sl-score-stack { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; width:100%; min-width:0; white-space:nowrap; line-height:1.1; }
+        #student-leaderboard-modal .sl-score-value { color:var(--exam-color); font-size:.92rem; font-weight:900; }
+        #student-leaderboard-modal .sl-time-value { color:var(--muted-text-color); font-size:.68rem; font-weight:750; }
+        #student-leaderboard-modal .sl-row { border-bottom:1px solid var(--border-color); }
+        #student-leaderboard-modal .sl-row-me { background:rgba(2,132,199,.12); font-weight:800; }
+        @media (max-width:380px) {
+            #student-leaderboard-modal .modal-content { padding:.7rem !important; }
+            #student-leaderboard-modal .sl-rank-head, #student-leaderboard-modal .sl-rank-cell { width:34px; }
+            #student-leaderboard-modal .sl-score-head, #student-leaderboard-modal .sl-score-cell { width:74px; }
+            #student-leaderboard-modal .sl-person-cell { padding:8px 6px; }
+            #student-leaderboard-modal .sl-name-line { font-size:.83rem; }
+            #student-leaderboard-modal .sl-address-line { font-size:.67rem; }
+            #student-leaderboard-modal .sl-score-value { font-size:.86rem; }
+            #student-leaderboard-modal .sl-time-value { font-size:.64rem; }
+        }
         .lb-tabs button, .progress-tabs button { flex: 1; background: transparent; color: var(--text-color); border: none; padding: 8px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; box-shadow: none; opacity: 0.7; }
         .lb-tabs button.active, .progress-tabs button.active { background: var(--primary-color); color: white; opacity: 1; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3); }
         
@@ -867,7 +893,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.0.5</div>
+        <div>Version: 107.0.6</div>
     </div>
 </div>
 
@@ -1175,7 +1201,7 @@
 
 <!-- Student Leaderboard Modal — legacy Top 20 behavior restored -->
 <div id="student-leaderboard-modal" class="modal-overlay" onclick="if(event.target.id === 'student-leaderboard-modal') document.getElementById('student-leaderboard-modal').style.display='none';">
-    <div class="modal-content" style="max-width:450px;padding:1.5rem;">
+    <div class="modal-content" style="max-width:450px;padding:clamp(.7rem,3vw,1.1rem);">
         <button class="close-modal" onclick="document.getElementById('student-leaderboard-modal').style.display='none';" style="position:absolute;top:15px;right:15px;border:none;background:transparent;font-size:1.5rem;cursor:pointer;color:var(--text-color);">❌</button>
         <h3 style="margin-top:0;color:var(--exam-color);font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:10px;">🏆 विद्यार्थी लिडरबोर्ड</h3>
         <div style="display:flex;gap:8px;margin-bottom:15px;">
@@ -1185,12 +1211,12 @@
         <div id="sl-loading" style="text-align:center;padding:20px;font-weight:bold;color:var(--exam-color);">⏳ डाटा लोड हुँदैछ...</div>
         <div id="sl-content" style="display:none;">
             <div style="background:var(--bg-color);border-radius:12px;border:1px solid var(--border-color);overflow:hidden;">
-                <table style="width:100%;border-collapse:collapse;font-size:.88rem;text-align:left;table-layout:fixed;">
+                <table class="sl-table">
                     <thead style="background:var(--exam-color);color:white;">
                         <tr>
-                            <th id="sl-rank-head" style="padding:10px 5px;text-align:center;width:48px;">Rank</th>
-                            <th style="padding:10px 8px;">नाम</th>
-                            <th id="sl-score-head" style="padding:10px 6px;text-align:center;width:110px;white-space:nowrap;word-break:keep-all;">अङ्क / समय</th>
+                            <th id="sl-rank-head" class="sl-rank-head" style="padding:9px 3px;">Rank</th>
+                            <th class="sl-person-head" style="padding:9px 8px;">नाम / सेवा केन्द्र</th>
+                            <th id="sl-score-head" class="sl-score-head" style="padding:9px 3px;">अङ्क<br>समय</th>
                         </tr>
                     </thead>
                     <tbody id="sl-table-body"></tbody>
@@ -1336,7 +1362,7 @@
         });
     }
 
-    // 107.0.5 ADMIN-ONLY EXAM REVIEW + ADMIN-ONLY CHART DETAIL
+    // 107.0.6 ADMIN-ONLY EXAM REVIEW + ADMIN-ONLY CHART DETAIL
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1351,10 +1377,29 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.0.5"; 
+    const APP_VERSION = "107.0.6"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
+
+    // Accept both the canonical `q` key and legacy/imported `question` keys.
+    // Normalize at every quiz entry point so rendering, TTS, Mega Quiz and review agree.
+    function normalizeQuizItem_(item) {
+        if (!item || typeof item !== 'object') return item;
+        const normalized = Object.assign({}, item);
+        const canonicalQuestion = normalized.q == null ? '' : String(normalized.q).trim();
+        if (canonicalQuestion) {
+            normalized.q = canonicalQuestion;
+        } else {
+            const alternativeQuestion = normalized.question ?? normalized.questionText ?? normalized.question_text;
+            normalized.q = alternativeQuestion == null ? '' : String(alternativeQuestion).trim();
+        }
+        if (!Array.isArray(normalized.options)) normalized.options = [];
+        return normalized;
+    }
+    function normalizeQuizItems_(items) {
+        return Array.isArray(items) ? items.map(normalizeQuizItem_) : [];
+    }
     
     let lang = "ne"; let userName = "Student"; let userPhone = "N/A"; let userAddress = "N/A"; 
     let userCountry = "N/A"; let userRole = "Student"; let isAdminViewActive = true; 
@@ -1489,8 +1534,10 @@
         if (!nepaliVoice) initVoices(); 
         if (!nepaliVoice) return showToast("तपाईंको मोबाइलमा नेपाली आवाज (Nepali TTS) इन्स्टल छैन।", "warning");
         window.speechSynthesis.cancel(); 
-        let q = currentQuiz[qIndex];
-        let textToRead = `प्रश्न: ${q.q}. विकल्पहरू: ए: ${q.options[0]}. बी: ${q.options[1]}. सी: ${q.options[2]}. डी: ${q.options[3]}.`;
+        let q = normalizeQuizItem_(currentQuiz[qIndex]);
+        const optionLetters = ['ए', 'बी', 'सी', 'डी'];
+        const optionsText = q.options.map((option, index) => `${optionLetters[index] || (index + 1)}: ${option}`).join('। ');
+        let textToRead = `प्रश्न: ${q.q || ''}. विकल्पहरू: ${optionsText}.`;
         let utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.voice = nepaliVoice; utterance.lang = 'ne-NP'; utterance.rate = 0.85; 
         window.speechSynthesis.speak(utterance);
@@ -2759,7 +2806,7 @@ function getMegaActivationDateUI(quizDate) {
         try {
             let sIdx = jsonText.indexOf('{'); let eIdx = jsonText.lastIndexOf('}'); if (sIdx !== -1 && eIdx !== -1) jsonText = jsonText.substring(sIdx, eIdx + 1);
             let parsedData = JSON.parse(jsonText); if(!parsedData.quiz || !Array.isArray(parsedData.quiz)) throw new Error("Invalid JSON");
-            currentQuiz = parsedData.quiz; currentSwaman = parsedData.swaman || ""; currentMurliDate = dateStr; 
+            currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ""; currentMurliDate = dateStr; 
             document.getElementById('custom-json-input').value = ''; document.getElementById('custom-quiz-date').value = ''; saveQuizToServer();
         } catch(e) { showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error"); }
     };
@@ -2826,7 +2873,7 @@ function getMegaActivationDateUI(quizDate) {
                         break;
                     }
 
-                    usedModel = model; currentQuiz = parsedData.quiz; currentSwaman = parsedData.swaman || "";
+                    usedModel = model; currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || "";
                     document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate} (${currentDayName})`;
                     renderQuizArea(); showToast(`क्विज तयार भयो! (Model: ${usedModel})`, "success", 8000);
                     document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; document.getElementById('btn-cancel-top').style.display = 'inline-block';
@@ -2842,6 +2889,7 @@ function getMegaActivationDateUI(quizDate) {
 
     window.saveQuizToServer = function() {
         if (!currentQuiz || currentQuiz.length === 0) return showToast("पहिले क्विज तयार गर्नुहोस्!", "error");
+        currentQuiz = normalizeQuizItems_(currentQuiz);
         document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
@@ -2890,6 +2938,7 @@ function getMegaActivationDateUI(quizDate) {
                 if(qDateObj && qDateObj >= sDate && qDateObj <= eDate) allQuestions = allQuestions.concat(sq.quizData); 
             } 
         });
+        allQuestions = normalizeQuizItems_(allQuestions);
         
         if(allQuestions.length < 5) return showToast("यो मिति भित्र पर्याप्त प्रश्नहरू छैनन्!", "error");
         
@@ -2933,7 +2982,7 @@ function getMegaActivationDateUI(quizDate) {
         for (let i = uniqueQ.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [uniqueQ[i], uniqueQ[j]] = [uniqueQ[j], uniqueQ[i]]; }
         
         qCount = uniqueQ.length > qCount ? qCount : uniqueQ.length;
-        currentQuiz = uniqueQ.slice(0, qCount); 
+        currentQuiz = normalizeQuizItems_(uniqueQ.slice(0, qCount)); 
         currentSwaman = "🏆 **मेगा क्वीज विजेता भव:**! मीठे बच्चे, पुराना मुरलीहरूको यो रिभिजनले तिम्रो स्मृतिलाई अझै शक्तिशाली बनाउनेछ।";
         
         if (isMonthly) { 
@@ -3144,11 +3193,11 @@ function getMegaActivationDateUI(quizDate) {
         else if (isSameLocalQuiz) { stateToUse = localState; }
 
         if (stateToUse) {
-            currentQuiz = stateToUse.quizData; currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0; activeStateSeq = Number(stateToUse.stateSeq || 0);
+            currentQuiz = normalizeQuizItems_(stateToUse.quizData); currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0; activeStateSeq = Number(stateToUse.stateSeq || 0);
             showToast("तपाईंको रोकिएको परीक्षा पुनः सुरु भयो।", "info");
         } else {
             currentScore = 0; answeredCount = 0; totalTimeSec = 0; activeQuestionIndex = 0; activeStateSeq = 0;
-            currentQuiz = JSON.parse(JSON.stringify(originalQuizData));
+            currentQuiz = normalizeQuizItems_(JSON.parse(JSON.stringify(originalQuizData)));
             shuffleArray(currentQuiz);
             currentQuiz.forEach(q => {
                 delete q.userSelectedIndex;
@@ -3208,7 +3257,8 @@ function getMegaActivationDateUI(quizDate) {
 
     function renderQuizArea() {
         const area = document.getElementById('quiz-area'); let htmlString = ''; const letters = ['A', 'B', 'C', 'D'];
-        currentQuiz.forEach((item, qIndex) => {
+        currentQuiz.forEach((rawItem, qIndex) => {
+            const item = normalizeQuizItem_(rawItem);
             let optsHTML = item.options.map((opt, oIndex) => 
                 `<button type="button" class="option-container" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex})" style="text-align: left; width: 100%; display: block; font-family: inherit; margin: 0; appearance: none;">
                     <div class="option-text"><span class="option-letter">${letters[oIndex]}</span> <span>${opt}</span></div>
@@ -3218,7 +3268,7 @@ function getMegaActivationDateUI(quizDate) {
             let displayStyle = qIndex === activeQuestionIndex ? 'block' : 'none'; let tagHtml = item.tag ? `<span class="q-tag">🏷️ ${item.tag}</span>` : ''; let ttsBtn = ('speechSynthesis' in window) ? `<button type="button" class="btn-tts" onclick="readQuestion(${qIndex})">🔊 सुन्नुहोस्</button>` : '';
             htmlString += `<div class="question-block" id="qb-${qIndex}" style="display: ${displayStyle};">
                 <div class="question-meta"><span>Question ${qIndex + 1} of ${currentQuiz.length}</span> ${tagHtml}</div>
-                <p class="question-text">${item.q}</p> ${ttsBtn}
+                <p class="question-text">${item.q || ""}</p> ${ttsBtn}
                 <div id="lock-timer-${qIndex}" class="lock-timer-msg" style="font-size: 0.9rem; font-weight: 800; text-align: center; padding: 8px; margin-bottom: 10px; border-radius: 8px; background: var(--bg-color); border: 1px dashed var(--border-color); display: ${reviewSource === 'past' ? 'none' : 'block'};"></div>
                 <div class="options-group">${optsHTML}</div>
             </div>`;
@@ -3232,7 +3282,7 @@ function getMegaActivationDateUI(quizDate) {
         let block = document.getElementById(`qb-${qIndex}`); if(block.classList.contains('answered')) return; block.classList.add('answered'); 
         if (qIndex === 0) { let cancelBtn = document.getElementById('btn-cancel-top'); if(cancelBtn) cancelBtn.style.display = 'none'; }
         
-        for(let i=0; i<4; i++) { let opt = document.getElementById(`opt-${qIndex}-${i}`); opt.classList.add('disabled'); if(i === oIndex) opt.classList.add('selected-temp'); }
+        for(let i=0; i<4; i++) { let opt = document.getElementById(`opt-${qIndex}-${i}`); if (opt) { opt.classList.add('disabled'); if(i === oIndex) opt.classList.add('selected-temp'); } }
         
         let q = currentQuiz[qIndex]; if (q.userSelectedIndex === undefined) answeredCount++; q.userSelectedIndex = oIndex;
         let tempScore = currentScore; let selectedText = String(q.options[oIndex]).trim(); let answerText = String(q.answer).trim();
@@ -3485,7 +3535,7 @@ function getMegaActivationDateUI(quizDate) {
     window.reviewPastQuiz = function(id) {
         let history = safeJSON('murali_progress', []); let record = history.find(item => item.id === id);
         if(record && record.quizData) {
-            currentQuiz = record.quizData; currentScore = record.score; currentMurliDate = record.date;
+            currentQuiz = normalizeQuizItems_(record.quizData); currentScore = record.score; currentMurliDate = record.date;
             document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; reviewSource = 'past'; 
             document.getElementById('tab-gen').classList.add('active'); document.getElementById('tab-chart').classList.remove('active'); document.getElementById('tab-prog').classList.remove('active');
             document.getElementById('view-generator').style.display = 'block'; document.getElementById('view-chart').style.display = 'none'; document.getElementById('view-progress').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
@@ -4537,12 +4587,12 @@ function getMegaActivationDateUI(quizDate) {
                 const isMe = Number(data.myRank) === rank && rank <= 20;
                 const rowStyle = isMe ? 'background:rgba(2,132,199,.15);font-weight:800;' : 'border-bottom:1px solid var(--border-color);';
                 const name = esc(u.name), address = esc(u.address);
-                const score = Number(u.score || 0), total = Number(u.total || 0), timeText = esc(u.timeText || '');
-                const scoreContent = `<span style="font-size:.92rem;line-height:1.15;color:var(--exam-color);font-weight:900;">${score}/${total}</span><span style="font-size:.64rem;line-height:1.15;color:var(--muted-text-color);font-weight:700;">${timeText}</span>`;
+                const score = Number(u.score || 0), total = Number(u.total || 0), timeText = esc(u.timeText || '—');
+                const scoreContent = `<span class="sl-score-value">${score}/${total}</span><span class="sl-time-value">${timeText}</span>`;
                 const scoreCell = isAdminViewer
-                    ? `<span role="button" tabindex="0" onclick="openAdminExamReview(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAdminExamReview(${index});}" title="प्रश्नगत परीक्षा Review हेर्न थिच्नुहोस्" style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;">${scoreContent}</span>`
-                    : `<span style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;max-width:100%;">${scoreContent}</span>`;
-                return `<tr style="${rowStyle}"><td style="padding:10px 5px;text-align:center;font-weight:bold;font-size:1.05rem;">${rankIcon}</td><td style="padding:10px 8px;overflow-wrap:anywhere;">${name}<br><span style="font-size:.75rem;color:var(--muted-text-color);font-weight:600;">${address}</span></td><td style="padding:8px 5px;text-align:center;white-space:nowrap;">${scoreCell}</td></tr>`;
+                    ? `<span class="sl-score-stack" role="button" tabindex="0" onclick="openAdminExamReview(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAdminExamReview(${index});}" title="प्रश्नगत परीक्षा Review हेर्न थिच्नुहोस्" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;">${scoreContent}</span>`
+                    : `<span class="sl-score-stack">${scoreContent}</span>`;
+                return `<tr class="sl-row${isMe ? ' sl-row-me' : ''}"><td class="sl-rank-cell">${rankIcon}</td><td class="sl-person-cell"><span class="sl-name-line" title="${name}">${name}</span><span class="sl-address-line" title="${address}">${address}</span></td><td class="sl-score-cell">${scoreCell}</td></tr>`;
             }).join('');
 
             // Private self-position remains available even when the user is outside Top 20.
@@ -4713,9 +4763,9 @@ function getMegaActivationDateUI(quizDate) {
         quizData.forEach((q, i) => {
             let optsHtml = q.options.map(opt => { let isCorrect = (opt === q.answer); let liClass = isCorrect ? 'class="correct-ans"' : ''; let icon = isCorrect ? '✅' : '⚪'; return `<li ${liClass}><span>${icon}</span> <span>${opt}</span></li>`; }).join('');
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
-            html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
+            html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.5)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.0.6)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
