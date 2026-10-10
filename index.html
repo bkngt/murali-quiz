@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=106.4.18">
+    <link rel="manifest" href="manifest.json?v=106.4.19">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -345,6 +345,15 @@
         .cal-day.excellent { background: var(--success-bg); color: var(--success-color); border-color: var(--success-border); }
         .cal-day.good { background: var(--warning-bg); color: var(--warning-color); border-color: var(--warning-color); }
         .cal-day.poor { background: var(--danger-bg); color: var(--danger-color); border-color: var(--danger-border); }
+        .cal-day.has-reflection-v4 { padding-top: 10px; }
+        .cal-note-indicator-v4 { position:absolute; top:2px; right:2px; z-index:2; display:inline-flex; align-items:center; justify-content:center; min-width:13px; height:13px; padding:0 2px; border-radius:4px; background:rgba(139,92,246,.16); color:var(--chart-color); font-size:.58rem; line-height:1; box-shadow:0 0 0 1px rgba(139,92,246,.14); }
+        .mini-cal-day-v4 { width:100%; min-width:0; min-height:38px; margin:0; padding:4px 2px; border:1px solid var(--border-color); border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; background:var(--card-bg); color:var(--text-color); box-shadow:none; font-family:inherit; font-weight:800; line-height:1.15; font-size:.72rem; position:relative; }
+        .mini-cal-day-v4.has-note { border-color:var(--chart-color); background:rgba(139,92,246,.07); }
+        .mini-cal-day-v4.excellent { background:var(--success-bg); color:var(--success-color); border-color:var(--success-border); }
+        .mini-cal-day-v4.good { background:var(--warning-bg); color:var(--warning-color); border-color:var(--warning-color); }
+        .mini-cal-day-v4.poor { background:var(--danger-bg); color:var(--danger-color); border-color:var(--danger-border); }
+        .mini-cal-day-v4:focus-visible { outline:2px solid var(--chart-color); outline-offset:1px; }
+        .mini-cal-day-v4:hover { transform:translateY(-1px); box-shadow:0 2px 7px rgba(0,0,0,.10); }
         
         .progress-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 14px; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
         .prog-percent { font-size: 1.4rem; font-weight: 800; line-height: 1; color: var(--primary-color);}
@@ -857,7 +866,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 106.4.18</div>
+        <div>Version: 106.4.19</div>
     </div>
 </div>
 
@@ -1183,6 +1192,7 @@
         <div id="sl-content" style="display:none;">
             <div style="background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
                 <div id="sl-participant-count" style="padding:8px 10px; margin-bottom:8px; border-radius:10px; background:rgba(2,132,199,.08); color:var(--exam-color); font-size:.84rem; font-weight:850; text-align:center;">यस परीक्षामा सहभागी: — जना</div>
+                <button type="button" id="sl-download-btn" onclick="downloadExamRosterV4()" style="display:none;width:100%;margin:0 0 10px;padding:.58rem .8rem;border-radius:10px;background:var(--exam-color);color:#fff;font-size:.88rem;font-weight:850;box-shadow:none;">⬇️ सहभागी सूची डाउनलोड गर्नुहोस्</button>
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; table-layout:fixed;">
                     <thead style="background: var(--exam-color); color: white;">
                         <tr>
@@ -1315,7 +1325,7 @@
         });
     }
 
-    // 106.4.18 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
+    // 106.4.19 CHART V4 + AUTO SYNC + SAFE EXAM WAIT + MONTHLY MEGA
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1330,7 +1340,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "106.4.18"; 
+    const APP_VERSION = "106.4.19"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1639,6 +1649,18 @@ function getMegaActivationDateUI(quizDate) {
         let run = 0;
         while (keys.has(dateKeyLocal_(d))) { run++; d.setDate(d.getDate()-1); }
         return run;
+    }
+
+    function chartRecordBelongsToCurrentUserV4_(record) {
+        if (!record || typeof record !== 'object') return false;
+        const digits = value => String(value || '').replace(/\D/g, '');
+        const minePhone = digits(userPhone);
+        const recordPhone = digits(record.phone);
+        if (minePhone && recordPhone) return minePhone === recordPhone;
+        // Backward-compatible only for phone-less legacy records that match this profile.
+        if (recordPhone) return false;
+        const norm = value => String(value || '').trim().toLocaleLowerCase();
+        return !!(norm(record.name) && norm(record.name) === norm(userName) && norm(record.address) === norm(userAddress));
     }
 
     function validChartHistoryForStats_(charts) {
@@ -2071,7 +2093,7 @@ function getMegaActivationDateUI(quizDate) {
                 quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
                 stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
 
-            // 106.4.18: A late state-save response must not resurrect a finished
+            // 106.4.19: A late state-save response must not resurrect a finished
             // quiz locally, or overwrite the state of a different quiz session.
             const stateQuizId = String(stateObj.quizId || '');
             const sameCurrentQuiz = !stateQuizId || !currentQuizId || stateQuizId === String(currentQuizId);
@@ -3224,7 +3246,7 @@ function getMegaActivationDateUI(quizDate) {
     stopTimer();
     clearInterval(qLockInterval);
     isQuizActive = false;
-    // 106.4.18: Stop queued ActiveStates retries as soon as submission begins.
+    // 106.4.19: Stop queued ActiveStates retries as soon as submission begins.
     // An already in-flight request is guarded again by the Backend completion check.
     if (activeStateSaveTimer) { clearTimeout(activeStateSaveTimer); activeStateSaveTimer = null; }
     if (activeStateSaveRetryTimer) { clearTimeout(activeStateSaveRetryTimer); activeStateSaveRetryTimer = null; }
@@ -3884,7 +3906,7 @@ function getMegaActivationDateUI(quizDate) {
         if (isQuizActive) return; // Never redraw the dashboard while an exam is running.
         const isChartTab=document.getElementById('tab-stat-chart').classList.contains('active');
         const history=safeJSON('murali_progress',[]);
-        const charts=safeJSON('murali_daily_charts',[]);
+        const charts=safeJSON('murali_daily_charts',[]).filter(chartRecordBelongsToCurrentUserV4_);
         const exams=normalizeExamHistoryForStats_(history);
         const chartItems=validChartHistoryForStats_(charts);
         const cy=currentCalDate.getFullYear(), cm=currentCalDate.getMonth();
@@ -3915,7 +3937,7 @@ function getMegaActivationDateUI(quizDate) {
         for(let day=1;day<=daysInMonth;day++){
             const dt=new Date(cy,cm,day), isToday=sameLocalDate_(dt,now); const border=isToday?(isChartTab?'border:2px dashed var(--chart-color);':'border:2px dashed var(--exam-color);'):'';
             if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+=`<div class="cal-day has-data ${pct>=80?'excellent':pct>=50?'good':'poor'}" style="${border}" onclick="showCalendarDetail(${h.id})"><span>${day}</span><span style="font-size:.65rem;">${pct}%</span></div>`;}
-            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasNote=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim());calHtml+=`<div class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'}" style="${border}" title="${hasNote?'स्वचेकिङ/कमिटमेन्ट लेखिएको छ':''}" onclick="showChartCalendarDetail(${c.id})"><span>${day}</span><span style="font-size:.65rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}${hasNote?'<span aria-label="टिपोट छ" style="font-size:.65rem;line-height:1;">📝</span>':''}</span></div>`;}
+            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasNote=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim()),dateKey=dateKeyLocal_(c.__date);calHtml+=`<div role="button" tabindex="0" class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'} ${hasNote?'has-reflection-v4':''}" style="${border}" title="${hasNote?'📝 आफ्नो कमजोरी/कमिटमेन्ट पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showChartCalendarDetailByDateV4('${dateKey}');}"><span>${day}</span>${hasNote?'<span class="cal-note-indicator-v4" aria-label="टिपोट छ">📝</span>':''}<span style="font-size:.7rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}</span></div>`;}
             else {const past=dt<dateOnlyLocal_(now); calHtml+=`<div class="cal-day" style="${border}${past?'opacity:.5;':''}"><span>${day}</span></div>`;}
         }
         document.getElementById('cal-grid-days').innerHTML=calHtml;
@@ -3985,21 +4007,26 @@ function getMegaActivationDateUI(quizDate) {
     function renderMiniMonthCalendar_(items, cy, cm, targetEl, chartMode=false) {
         const days=new Date(cy,cm+1,0).getDate(), first=new Date(cy,cm,1).getDay();
         const map={}; (items||[]).forEach(x=>{const d=x.__date; if(d&&d.getFullYear()===cy&&d.getMonth()===cm) map[d.getDate()]=x;});
-        let h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:.72rem;text-align:center;font-weight:800;color:var(--muted-text-color);">';
-        ['आइत','सोम','मंगल','बुध','बिहि','शुक्र','शनि'].forEach((n,i)=>{h+=`<div>${n}</div>`;});
+        let h='<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;font-size:.72rem;text-align:center;font-weight:800;color:var(--muted-text-color);">';
+        ['आइत','सोम','मंगल','बुध','बिहि','शुक्र','शनि'].forEach(n=>{h+=`<div>${n}</div>`;});
         for(let i=0;i<first;i++) h+='<div></div>';
         for(let day=1;day<=days;day++){
             const x=map[day], v=x ? (chartMode?Math.round(x.totalScore):Math.round(x.percent)) : null;
             const cls=v===null?'':(v>=80?'excellent':v>=50?'good':'poor');
             const hasNote=!!(chartMode&&x&&(String(x.dailyWeakness||'').trim()||String(x.tomorrowResolution||'').trim()));
-            h+=`<div title="${hasNote?'स्वचेकिङ/कमिटमेन्ट लेखिएको छ':''}" style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span style="display:flex;align-items:center;justify-content:center;gap:2px;">${day}${hasNote?'<small aria-label="टिपोट छ" style="font-size:.55rem;line-height:1;">📝</small>':''}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
+            if(chartMode&&x){
+                const dateKey=dateKeyLocal_(x.__date);
+                h+=`<button type="button" class="mini-cal-day-v4 ${hasNote?'has-note':''} ${cls}" title="${hasNote?'आफ्नो टिपोट/कमिटमेन्ट पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')"><span style="display:flex;align-items:center;justify-content:center;gap:2px;">${day}${hasNote?'<span aria-label="टिपोट छ" style="font-size:.62rem;">📝</span>':''}</span><b style="font-size:.68rem;">${v}</b></button>`;
+            } else {
+                h+=`<div title="${hasNote?'टिपोट छ':''}" style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span>${day}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
+            }
         }
         h+='</div>'; targetEl.innerHTML=h;
     }
 
     async function renderDetailedProgressCharts() {
         const history=safeJSON('murali_progress', []);
-        const charts=safeJSON('murali_daily_charts', []);
+        const charts=safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
         const exams=normalizeExamHistoryForStats_(history);
         const chartItems=validChartHistoryForStats_(charts);
         const cy=progressModalDate.getFullYear(), cm=progressModalDate.getMonth();
@@ -4076,15 +4103,35 @@ function getMegaActivationDateUI(quizDate) {
         document.getElementById('calendar-detail-modal').style.display = 'flex';
     }
 
+    window.showChartCalendarDetailByDateV4 = function(dateKey) {
+        const target = String(dateKey || '').trim();
+        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+        const matches = charts.filter(item => String(item.date || '').replace(/^'/,'').trim() === target);
+        matches.sort((a,b) => Number(b.chartVersion || b.schemaVersion || 3) - Number(a.chartVersion || a.schemaVersion || 3));
+        const record = matches[0];
+        if (record) window.showChartCalendarRecordV4_(record);
+    };
+
     window.showChartCalendarDetail = function(id) {
-        let charts = safeJSON('murali_daily_charts', []); let record = charts.find(item => item.id === id); if (!record) return;
-        document.getElementById('cal-detail-date').innerText = record.date + " (Chart)"; document.getElementById('cal-detail-score').innerText = `${record.totalScore}/100`;
-        let remarkEl = document.getElementById('cal-detail-remark'); let rText = record.stage; let rClass = record.totalScore >= 90 ? 'remark-excellent' : (record.totalScore >= 70 ? 'remark-good' : 'remark-poor');
+        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+        const record = charts.find(item => String(item.id) === String(id));
+        if (record) window.showChartCalendarRecordV4_(record);
+    };
+
+    window.showChartCalendarRecordV4_ = function(record) {
+        if (!record || !chartRecordBelongsToCurrentUserV4_(record)) return;
+        const cleanDate = String(record.date || '').replace(/^'/,'').trim();
+        document.getElementById('cal-detail-date').innerText = cleanDate + ' (Chart)';
+        document.getElementById('cal-detail-score').innerText = `${Number(record.totalScore || 0)}/100`;
+        let remarkEl = document.getElementById('cal-detail-remark');
+        let rText = record.stage || 'चार्ट विवरण';
+        let rClass = Number(record.totalScore || 0) >= 90 ? 'remark-excellent' : (Number(record.totalScore || 0) >= 70 ? 'remark-good' : 'remark-poor');
         remarkEl.innerText = rText; remarkEl.className = `prog-remark ${rClass}`;
         renderCalendarReflectionV4_(record);
-        let reviewBtn = document.getElementById('cal-detail-review-btn'); reviewBtn.style.display = 'none';
+        const reviewBtn = document.getElementById('cal-detail-review-btn');
+        reviewBtn.style.display = 'none';
         document.getElementById('calendar-detail-modal').style.display = 'flex';
-    }
+    };
 
     // ==========================================
     // 11. LEADERBOARDS & EXPORTS
@@ -4142,6 +4189,47 @@ function getMegaActivationDateUI(quizDate) {
     window.shareLeaderboardWA = function() { let txtArea = document.getElementById('lb-result-text'); if(!txtArea.value || txtArea.value.includes("Loading") || txtArea.value.includes("Select date")) return showToast("Nothing to share.", "error"); let text = encodeURIComponent(txtArea.value); window.open('https://wa.me/?text=' + text, '_blank'); }
 
     // Student Leaderboard
+    window._examRosterForDownloadV4 = [];
+    window._examRosterDateV4 = '';
+    window.downloadExamRosterV4 = async function() {
+        const records = Array.isArray(window._examRosterForDownloadV4) ? window._examRosterForDownloadV4 : [];
+        if (!records.length) return showToast('डाउनलोड गर्न सहभागी सूची उपलब्ध छैन।', 'error');
+        const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
+        const safeCsv = value => {
+            let s = String(value == null ? '' : value);
+            if (/^[=+@\-\t\r]/.test(s)) s = "'" + s; // Spreadsheet formula-injection guard.
+            return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const rows = isAdminViewer
+            ? [['क्रम','नाम','सेवा केन्द्र','प्राप्त अङ्क','पूर्णाङ्क','समय'], ...records.map((r,i)=>[i+1,r.name||'',r.address||'',r.score||0,r.total||0,r.timeText||''])]
+            : [['नाम','सेवा केन्द्र'], ...records.map(r=>[r.name||'',r.address||''])];
+        const csv = '\uFEFF' + rows.map(row=>row.map(safeCsv).join(',')).join('\r\n');
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const datePart = String(window._examRosterDateV4 || getLocalDateISO()).replace(/[^0-9A-Za-z_-]/g,'-');
+        const filename = `BK_Murali_Exam_Participants_${datePart}.csv`;
+        try {
+            const file = new File([blob], filename, {type:'text/csv;charset=utf-8'});
+            const isIOS = /iPad|iPhone|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIOS && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+                await navigator.share({files:[file], title:'BK Murali Quiz — Exam Participants'});
+                showToast('सहभागी सूची सेयर वा Files मा सुरक्षित गर्न खोलियो।', 'success');
+                return;
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = filename; a.rel = 'noopener';
+            a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(()=>URL.revokeObjectURL(url), 30000);
+            showToast('सहभागी सूची डाउनलोड सुरु भयो।', 'success');
+        } catch (err) {
+            try {
+                const url = URL.createObjectURL(blob); window.open(url, '_blank', 'noopener');
+                setTimeout(()=>URL.revokeObjectURL(url), 60000);
+                showToast('डाउनलोड रोकिएमा खुलेको पृष्ठबाट फाइल सुरक्षित गर्नुहोस्।', 'warning');
+            } catch (fallbackErr) {
+                showToast('डाउनलोड हुन सकेन। अर्को ब्राउजरबाट प्रयास गर्नुहोस्।', 'error');
+            }
+        }
+    };
     window.openStudentLeaderboardDatePicker = function() { const input = document.getElementById('sl-date-select'); if (!input) return; if (input.showPicker) input.showPicker(); else input.focus(); }
     function updateStudentLeaderboardDateLabel(dateVal) {
         const labelEl = document.getElementById('sl-date-label'); if (!labelEl || !dateVal) return;
@@ -4207,7 +4295,7 @@ function getMegaActivationDateUI(quizDate) {
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
         if (selectedQuiz && dateInput.value) fetchStudentLeaderboardData();
-        else { document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:2}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
+        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; const dl=document.getElementById('sl-download-btn'); if(dl) dl.style.display='none'; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; const adminView = String(userRole||'').trim().toLowerCase()==='admin'; document.getElementById('sl-rank-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-score-head').style.display=adminView?'table-cell':'none'; document.getElementById('sl-participant-count').textContent='यस परीक्षामा सहभागी: ० जना'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="${adminView?4:2}" style="text-align:center; padding:15px; color:var(--muted-text-color); font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; }
     };
 
     window.fetchStudentLeaderboardData = async function(overrideTargetDate = "") {
@@ -4216,6 +4304,8 @@ function getMegaActivationDateUI(quizDate) {
         const targetDateStr = String(overrideTargetDate || (matchingQuiz ? String(matchingQuiz.quizDate).trim() : pickerDate)).trim();
         const loading = document.getElementById('sl-loading');
         const content = document.getElementById('sl-content');
+        window._examRosterForDownloadV4 = []; window._examRosterDateV4 = targetDateStr;
+        const downloadBtn = document.getElementById('sl-download-btn'); if (downloadBtn) downloadBtn.style.display = 'none';
         loading.style.display = 'block'; loading.textContent = '⏳ सहभागी सूची लोड हुँदैछ...'; content.style.display = 'none';
         if (!navigator.onLine) { loading.innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         try {
@@ -4224,15 +4314,19 @@ function getMegaActivationDateUI(quizDate) {
             const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
             const list = Array.isArray(data.participants) ? data.participants : (Array.isArray(data.roster) ? data.roster : (Array.isArray(data.top20) ? data.top20 : []));
             if (!isAdminViewer) list.sort((a,b) => String(a.name||'').localeCompare(String(b.name||''),'ne') || String(a.address||'').localeCompare(String(b.address||''),'ne'));
+            window._examRosterForDownloadV4 = list.map(r => isAdminViewer
+                ? {name:r.name||'', address:r.address||'', score:Number(r.score||0), total:Number(r.total||0), timeText:r.timeText||''}
+                : {name:r.name||'', address:r.address||''});
+            if (downloadBtn) downloadBtn.style.display = list.length ? 'flex' : 'none';
             document.getElementById('sl-rank-head').style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('sl-score-head').style.display = isAdminViewer ? 'table-cell' : 'none';
             document.getElementById('sl-address-head').style.display = 'table-cell';
             document.getElementById('sl-admin-list-note').style.display = isAdminViewer && list.length ? 'block' : 'none';
             document.getElementById('sl-participant-count').textContent = `यस परीक्षामा सहभागी: ${Number(data.total ?? list.length)} जना`;
-            document.getElementById('sl-my-rank-box').style.display = 'none';
+            const oldMyRankBox = document.getElementById('sl-my-rank-box'); if (oldMyRankBox) oldMyRankBox.style.display = 'none';
             loading.style.display = 'none'; content.style.display = 'block';
             const tbody = document.getElementById('sl-table-body');
-            if (!list.length) {
+            if (!list.length) { if (downloadBtn) downloadBtn.style.display = 'none';
                 tbody.innerHTML = `<tr><td colspan="${isAdminViewer ? 4 : 2}" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:700;">यस मितिमा कसैले पनि परीक्षा पूरा गरेको छैन।</td></tr>`;
                 return;
             }
