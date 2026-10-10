@@ -2,7 +2,7 @@
   "id": "./",
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "start_url": "./index.html?v=107.0.3",
+  "start_url": "./index.html?v=107.0.4",
   "scope": "./",
   "display": "standalone",
   "background_color": "#fffdf8",
