@@ -1,5 +1,5 @@
-/* Chart V4 / app shell 107.0.2. Keeps skipWaiting disabled so active exams are not interrupted. */
-const CACHE_NAME = "murali-quiz-v107-0-2";
+/* Chart V4 / app shell 107.0.3. Keeps skipWaiting disabled so active exams are not interrupted. */
+const CACHE_NAME = "murali-quiz-v107-0-3";
 
 const APP_SHELL = [
     "./",
