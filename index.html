@@ -3591,9 +3591,9 @@ function getMegaActivationDateUI(quizDate) {
     }
 
     function scoreEveningMinutesV4(total) {
-        // 10 points require a full 60 minutes combined across daytime + evening.
+        // 0–29 minutes = 0; 30–59 = 5; 60+ = 10 points.
         if (total >= 60) return 10;
-        if (total >= 15) return 5;
+        if (total >= 30) return 5;
         return 0;
     }
 
