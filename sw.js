@@ -1,5 +1,5 @@
-/* Chart V4 / app shell 107.0.8. Keeps skipWaiting disabled so active exams are not interrupted. */
-const CACHE_NAME = "murali-quiz-v107-0-8";
+/* BK Murali Quiz 107.1.0 compatibility shell. Delayed activation protects open exam pages. */
+const CACHE_NAME = "murali-quiz-v107-1-0";
 
 const APP_SHELL = [
     "./",
@@ -58,7 +58,6 @@ self.addEventListener("activate", event => {
                 })
 
             ))
-            .then(() => self.clients.claim())
     );
 });
 
