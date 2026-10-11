@@ -2,7 +2,7 @@
   "id": "./",
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "start_url": "./index.html?v=107.0.8",
+  "start_url": "./index.html?v=107.1.3",
   "scope": "./",
   "display": "standalone",
   "background_color": "#fffdf8",
@@ -13,15 +13,15 @@
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3176/3176298.png",
-      "sizes": "192x192",
+      "sizes": "192x192 512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3176/3176298.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
