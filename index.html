@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.1.3">
+    <link rel="manifest" href="manifest.json?v=107.1.4">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -285,7 +285,14 @@
         .chart-service-grid-v4 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }
         .chart-service-chip-v4 { display:flex; align-items:flex-start; gap:7px; padding:9px 8px; border:1px solid var(--border-color); border-radius:10px; background:var(--bg-color); color:var(--text-color); font-size:.79rem; font-weight:700; line-height:1.3; min-width:0; cursor:pointer; }
         .chart-service-chip-v4 input { margin:2px 0 0; flex:0 0 auto; accent-color:var(--chart-color); }
-        .chart-service-chip-v4.selected-service-v4 { border-color:var(--chart-color); background:rgba(139,92,246,.08); }
+        .chart-service-chip-v4.selected-service-v4, .chart-dream-chip-v4.selected-dream-v4 { border-color:var(--chart-color); background:rgba(139,92,246,.12); font-weight:850; }
+        .chart-subtabs-v4 { display:flex; gap:6px; margin-bottom:10px; background:var(--bg-color); padding:4px; border-radius:12px; border:1px solid var(--border-color); }
+        .chart-subtabs-v4 button { flex:1; background:transparent; color:var(--text-color); border:none; padding:7px 5px; border-radius:9px; font-weight:800; font-size:.76rem; box-shadow:none; opacity:.78; line-height:1.2; }
+        .chart-subtabs-v4 button.active { background:var(--chart-color); color:#fff; opacity:1; box-shadow:0 2px 8px rgba(139,92,246,.32); }
+        .chart-submetric-summary-v4 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-bottom:10px; }
+        .chart-submetric-box-v4 { background:var(--bg-color); border:1px solid var(--border-color); border-radius:10px; padding:7px 5px; text-align:center; }
+        .chart-submetric-box-v4 b { display:block; font-size:.9rem; color:var(--chart-color); font-weight:900; line-height:1.2; }
+        .chart-submetric-box-v4 span { font-size:.66rem; color:var(--muted-text-color); font-weight:750; }
         .chart-baba-time-v4 { display:block; margin-top:4px; color:var(--muted-text-color); font-size:.78rem; font-weight:800; }
         .chart-baba-time-v4 strong { color:var(--chart-color); font-size:.94rem; }
         .chart-final-time-v4 { text-align:center; margin:0 0 8px; font-weight:850; color:var(--text-color); font-size:.88rem; }
@@ -741,8 +748,8 @@
             <div class="chart-section-v2" data-chart-section="6">
                 <div class="chart-title-v2"><span>६. 📚 ईश्वरीय ज्ञान सेवा</span><b>५</b></div>
                 <div class="chart-options-v2" data-single-group="chart_knowledge_sewa">
-                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">लेक्चर, क्लास वा प्रत्यक्ष ज्ञान सेवा गरेँ</span><span class="chart-score-v2">५</span></label>
-                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ज्ञान सामग्री तयार वा ज्ञान सेवामा सहयोग गरेँ</span><span class="chart-score-v2">३</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="5"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">क्लासमा मुरली पढाएँ/सुनाएँ, कोर्स/लेक्चर दिएँ वा प्रत्यक्ष ज्ञान सेवा गरेँ</span><span class="chart-score-v2">५</span></label>
+                    <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="3"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">ज्ञान सामग्री तयार गरेँ, मुरली रिभिजन/प्रश्नोत्तर वा ज्ञान सेवामा सहयोग गरेँ</span><span class="chart-score-v2">३</span></label>
                     <label class="chart-option-v2"><input class="chart-single-v4" type="checkbox" name="chart_knowledge_sewa" value="0"><span class="check-box-v2">✓</span><span class="chart-option-text-v2">आज ज्ञान सेवा गरिनँ</span><span class="chart-score-v2">०</span></label>
                 </div>
             </div>
@@ -812,12 +819,23 @@
                 </div>
             </div>
 
-            <!-- Optional personal reflection: deliberately unnumbered and excluded from the 100-point score. -->
+            <!-- Optional personal reflection & dream tracker: unnumbered, private (Self + Admin only), excluded from 100-point score. -->
             <div class="chart-section-v2 chart-reflection-section-v4" id="chart-reflection-section-v4">
-                <div class="chart-title-v2"><span>📝 व्यक्तिगत टिपोट तथा भोलिको कमिटमेन्ट (ऐच्छिक)</span><span class="q-tag" style="white-space:nowrap;">निजी अभिलेख</span></div>
-                <div class="chart-time-note-v4" style="margin-top:0;">मन लागेमा मात्र भर्नुहोस्। लेखिएको कुरा तपाईंको आफ्नै चार्ट अभिलेखमा सुरक्षित हुनेछ। क्यालेन्डरमा 📝 संकेत देखिनेछ।</div>
+                <div class="chart-title-v2"><span>📝 व्यक्तिगत टिपोट, कमिटमेन्ट तथा स्वप्न ट्र्याकर (ऐच्छिक)</span><span class="q-tag" style="white-space:nowrap;">गोप्य अभिलेख</span></div>
+                <div class="chart-time-note-v4" style="margin-top:0;">मन लागेमा मात्र भर्नुहोस्। यो विवरण अरू सहभागीले देख्न पाउँदैनन् (तपाईं र Admin ले मात्र हेर्न मिल्छ)। क्यालेन्डरमा 📝 र 🌙 संकेत देखिनेछ।</div>
                 <label class="chart-reflection-field-v4"><span>🔍 आजको एउटा मुख्य कमजोरी</span><textarea id="chart-daily-weakness" class="chart-reflection-input-v4" rows="1" maxlength="240" data-autogrow-v4="1" placeholder="जस्तै: वाणीमा हतार भयो…"></textarea></label>
                 <label class="chart-reflection-field-v4"><span>🌱 भोलि सुधार गर्ने कमिटमेन्ट</span><textarea id="chart-tomorrow-resolution" class="chart-reflection-input-v4" rows="1" maxlength="240" data-autogrow-v4="1" placeholder="जस्तै: भोलि बोल्नुअघि एकछिन रोकिनेछु…"></textarea></label>
+                <div class="chart-reflection-field-v4" style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border-color);">
+                    <span style="display:block;margin-bottom:4px;font-size:.84rem;font-weight:800;color:var(--chart-color);">🌙 आजको स्वप्न तथा अवचेतन मनको स्थिति (Dream Tracker)</span>
+                    <div class="chart-time-note-v4" style="margin:0 0 7px;">कुनै एक स्थिति छान्नुहोस् र चाहेमा तल स्वप्नको विवरण लेख्नुहोस्:</div>
+                    <div class="chart-service-grid-v4" id="chart-dream-type-grid">
+                        <label class="chart-service-chip-v4 chart-dream-chip-v4"><input class="chart-dream-type-v4" type="checkbox" name="chart_dream_type" value="divine"><span>🕊️ ईश्वरीय / बाबा वा सेवा</span></label>
+                        <label class="chart-service-chip-v4 chart-dream-chip-v4"><input class="chart-dream-type-v4" type="checkbox" name="chart_dream_type" value="peaceful"><span>🌿 शान्त / सकारात्मक</span></label>
+                        <label class="chart-service-chip-v4 chart-dream-chip-v4"><input class="chart-dream-type-v4" type="checkbox" name="chart_dream_type" value="deep_sleep"><span>💤 गहिरो निद्रा / याद रहेन</span></label>
+                        <label class="chart-service-chip-v4 chart-dream-chip-v4"><input class="chart-dream-type-v4" type="checkbox" name="chart_dream_type" value="restless"><span>🌪️ व्यर्थ / साधारण वा हलचल</span></label>
+                    </div>
+                    <textarea id="chart-dream-note" class="chart-reflection-input-v4" style="margin-top:8px;" rows="1" maxlength="240" data-autogrow-v4="1" placeholder="स्वप्नको विवरण वा अनुभूति लेख्न चाहेमा यहाँ टिप्नुहोस् (ऐच्छिक)…"></textarea>
+                </div>
             </div>
 
             <div class="chart-submit-wrap-v2">
@@ -846,6 +864,12 @@
         </div>
 
         <div id="stat-chart-section" style="display: none;">
+            <div class="chart-subtabs-v4">
+                <button type="button" id="subtab-chart-score" class="active" onclick="switchChartAnalyticsModeV4('score')">📈 चार्ट अङ्क (100)</button>
+                <button type="button" id="subtab-chart-yoga" onclick="switchChartAnalyticsModeV4('yoga')">🕊️ बाबाको याद (मिनेट)</button>
+                <button type="button" id="subtab-chart-dream" onclick="switchChartAnalyticsModeV4('dream')">🌙 स्वप्न / अवचेतन</button>
+            </div>
+            <div id="chart-submetric-summary-v4" class="chart-submetric-summary-v4"></div>
             <div class="chart-container">
                 <canvas id="chartAnalyticsLine"></canvas>
             </div>
@@ -871,7 +895,7 @@
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; font-size:0.75rem; font-weight:800; color:#94a3b8; margin-bottom:6px;">
                     <div style="color:var(--danger-color);">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div style="color:var(--exam-color);">Sat</div>
                 </div>
-                <div id="calendar-note-legend-v4" style="display:none;margin:0 0 8px;padding:7px 9px;border:1px solid rgba(139,92,246,.35);border-radius:9px;background:rgba(139,92,246,.07);color:var(--chart-color);font-size:.78rem;font-weight:800;line-height:1.4;">📝 कमजोरी वा भोलिको कमिटमेन्ट लेखिएको दिन हो। मिति थिचेर आफ्नो टिपोट र Chart Review हेर्नुहोस्।</div>
+                <div id="calendar-note-legend-v4" style="display:none;margin:0 0 8px;padding:7px 9px;border:1px solid rgba(139,92,246,.35);border-radius:9px;background:rgba(139,92,246,.07);color:var(--chart-color);font-size:.78rem;font-weight:800;line-height:1.4;">📝 कमजोरी/कमिटमेन्ट र 🌙 स्वप्न ट्र्याक गरिएको दिन हो (गोप्य निजी अभिलेख)। मिति थिचेर विवरण र Chart Review हेर्नुहोस्।</div>
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;" id="cal-grid-days"></div>
             </div>
         </div>
@@ -893,7 +917,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.1.3</div>
+        <div>Version: 107.1.4</div>
     </div>
 </div>
 
@@ -1378,7 +1402,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.1.3"; 
+    const APP_VERSION = "107.1.4"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2257,7 +2281,7 @@ function getMegaActivationDateUI(quizDate) {
                         amritvelaMinutes:data.amritvelaMinutes, murliClassBeforeMinutes:data.murliClassBeforeMinutes, murliClassAfterMinutes:data.murliClassAfterMinutes, amritvelaGroupMinutes:data.amritvelaGroupMinutes,
                         daytimeYogaMinutes:data.daytimeYogaMinutes, eveningYogaMinutes:data.eveningYogaMinutes, eveningGroupMinutes:data.eveningGroupMinutes, goodnightYogaMinutes:data.goodnightYogaMinutes, totalBabaYaadMinutes:data.totalBabaYaadMinutes,
                         knowledgeSewa:data.knowledgeSewa, sthoolSewa:data.sthoolSewa, sthoolSewaMinutes:data.sthoolSewaMinutes, sthoolServiceTypes:data.sthoolServiceTypes,
-                        dailyWeakness:data.dailyWeakness, tomorrowResolution:data.tomorrowResolution, honestyConfirmed:data.honestyConfirmed, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
+                        dailyWeakness:data.dailyWeakness, tomorrowResolution:data.tomorrowResolution, dreamType:data.dreamType || '', dreamNote:data.dreamNote || '', honestyConfirmed:data.honestyConfirmed, deviceId:getDeviceId()}, {retries:3, timeoutMs:12000});
                     if (result && result.status === 'success') { data.synced = true; localStorage.setItem('murali_daily_charts', JSON.stringify(charts)); }
                 } catch(e) {}
             }
@@ -3781,6 +3805,23 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
                 updateChartV3Total(); maybeAutoAdvanceChartSectionV4(this.closest('.chart-section-v2'));
             });
         });
+        document.querySelectorAll('#daily-chart-form input.chart-dream-type-v4').forEach(input => {
+            if (input.dataset.chartDreamBoundV4 === '1') return;
+            input.dataset.chartDreamBoundV4 = '1';
+            input.addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelectorAll('#daily-chart-form input.chart-dream-type-v4').forEach(other => {
+                        if (other !== this) {
+                            other.checked = false;
+                            const lab = other.closest('.chart-dream-chip-v4');
+                            if (lab) lab.classList.remove('selected-dream-v4');
+                        }
+                    });
+                }
+                const myLab = this.closest('.chart-dream-chip-v4');
+                if (myLab) myLab.classList.toggle('selected-dream-v4', this.checked);
+            });
+        });
         document.querySelectorAll('#daily-chart-form .chart-reflection-input-v4').forEach(input => {
             if (input.dataset.autoGrowBoundV4 !== '1') {
                 input.dataset.autoGrowBoundV4 = '1';
@@ -3810,7 +3851,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         const form = document.getElementById('daily-chart-form');
         if (form) { form.reset(); delete form.dataset.v4DisableAutoScroll; }
         document.querySelectorAll('#daily-chart-form .chart-option-v2').forEach(el => el.classList.remove('selected-v2'));
-        document.querySelectorAll('#daily-chart-form .chart-service-chip-v4').forEach(el => el.classList.remove('selected-service-v4'));
+        document.querySelectorAll('#daily-chart-form .chart-service-chip-v4').forEach(el => el.classList.remove('selected-service-v4', 'selected-dream-v4'));
         document.querySelectorAll('#daily-chart-form .chart-time-input-v4').forEach(el => { delete el.dataset.touched; });
         resizeChartReflectionTextareasV4();
         updateChartV3Total();
@@ -3885,6 +3926,13 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         }
         const weakness = document.getElementById('chart-daily-weakness'); if (weakness) weakness.value = existingChart.dailyWeakness || '';
         const resolution = document.getElementById('chart-tomorrow-resolution'); if (resolution) resolution.value = existingChart.tomorrowResolution || '';
+        const savedDreamType = String(existingChart.dreamType || '').trim();
+        document.querySelectorAll('#daily-chart-form input.chart-dream-type-v4').forEach(input => {
+            input.checked = (savedDreamType !== '' && input.value === savedDreamType);
+            const lab = input.closest('.chart-dream-chip-v4');
+            if (lab) lab.classList.toggle('selected-dream-v4', input.checked);
+        });
+        const dreamNoteEl = document.getElementById('chart-dream-note'); if (dreamNoteEl) dreamNoteEl.value = existingChart.dreamNote || '';
         resizeChartReflectionTextareasV4();
         updateChartV3Total();
     }
@@ -3930,6 +3978,8 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             totalBabaYaadMinutes:amritvelaGroupMinutes+eveningGroupMinutes+goodnightYogaMinutes,
             dailyWeakness:(document.getElementById('chart-daily-weakness').value || '').trim().slice(0,240),
             tomorrowResolution:(document.getElementById('chart-tomorrow-resolution').value || '').trim().slice(0,240),
+            dreamType:(document.querySelector('#daily-chart-form input.chart-dream-type-v4:checked') ? document.querySelector('#daily-chart-form input.chart-dream-type-v4:checked').value : ''),
+            dreamNote:((document.getElementById('chart-dream-note') && document.getElementById('chart-dream-note').value) || '').trim().slice(0,240),
             honestyConfirmed:true, synced:false
         };
         chartData.digitalDetox = getChartOptionValue('chart_digital_detox');
@@ -4048,7 +4098,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         for(let day=1;day<=daysInMonth;day++){
             const dt=new Date(cy,cm,day), isToday=sameLocalDate_(dt,now); const border=isToday?(isChartTab?'border:2px dashed var(--chart-color);':'border:2px dashed var(--exam-color);'):'';
             if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+=`<div class="cal-day has-data ${pct>=80?'excellent':pct>=50?'good':'poor'}" style="${border}" onclick="showCalendarDetail(${h.id})"><span>${day}</span><span style="font-size:.65rem;">${pct}%</span></div>`;}
-            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasNote=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim()),dateKey=dateKeyLocal_(c.__date);calHtml+=`<div role="button" tabindex="0" class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'} ${hasNote?'has-reflection-v4':''}" style="${border}" title="${hasNote?'📝 आफ्नो कमजोरी/कमिटमेन्ट पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showChartCalendarDetailByDateV4('${dateKey}');}"><span>${day}</span>${hasNote?'<span class="cal-note-indicator-v4" aria-label="टिपोट छ">📝</span>':''}<span style="font-size:.7rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}</span></div>`;}
+            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasRef=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim()),hasDrm=!!(String(c.dreamType||'').trim()||String(c.dreamNote||'').trim()),hasNote=(hasRef||hasDrm),badgeTxt=(hasRef?'📝':'')+(hasDrm?'🌙':''),dateKey=dateKeyLocal_(c.__date);calHtml+=`<div role="button" tabindex="0" class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'} ${hasNote?'has-reflection-v4':''}" style="${border}" title="${hasNote?badgeTxt+' आफ्नो टिपोट/स्वप्न विवरण पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showChartCalendarDetailByDateV4('${dateKey}');}"><span>${day}</span>${hasNote?`<span class="cal-note-indicator-v4" aria-label="टिपोट छ">${badgeTxt}</span>`:''}<span style="font-size:.7rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}</span></div>`;}
             else {const past=dt<dateOnlyLocal_(now); calHtml+=`<div class="cal-day" style="${border}${past?'opacity:.5;':''}"><span>${day}</span></div>`;}
         }
         document.getElementById('cal-grid-days').innerHTML=calHtml;
@@ -4057,7 +4107,35 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         const monthly=sourceStats&&sourceStats.status==='success' ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : (isChartTab?localStatsMonthly_(chartItems,cy,cm):localStatsMonthly_(exams,cy,cm));
         const labels=monthly.map(x=>x.day), points=monthly.map(x=>x.data?(isChartTab?x.data.score:x.data.percent):null);
         let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
-        if(isChartTab){ if(chartAnalyticsInstance) chartAnalyticsInstance.destroy(); chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Chart Score',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Chart Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}}); }
+        if(isChartTab){
+            if(chartAnalyticsInstance) chartAnalyticsInstance.destroy();
+            const subMode = window._chartAnalyticsModeV4 || 'score';
+            const summaryEl = document.getElementById('chart-submetric-summary-v4');
+            const monthRecords = Object.values(chartMap);
+            if(subMode === 'yoga'){
+                const yogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].totalBabaYaadMinutes || 0) : null);
+                const validYoga = yogaPoints.filter(v => v !== null && v > 0);
+                const sumYoga = validYoga.reduce((a,b)=>a+b, 0);
+                const avgYoga = validYoga.length ? Math.round(sumYoga / validYoga.length) : 0;
+                const maxYoga = validYoga.length ? Math.max(...validYoga) : 0;
+                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(sumYoga)}</b><span>यो महिना कुल याद</span></div><div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(avgYoga)}</b><span>दैनिक औसत याद</span></div><div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(maxYoga)}</b><span>उच्चतम दैनिक याद</span></div>`;
+                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'बाबाको याद (मिनेट)',data:yogaPoints,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.18)',spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'🕊️ दैनिक कुल बाबाको याद (मिनेटमा)',color:theme.text,font:{size:13,family:'Poppins'}},tooltip:{callbacks:{label:function(c){return 'बाबाको याद: '+formatBabaYaadDurationV4(c.parsed.y)+' ('+c.parsed.y+' मिनेट)';}}}},scales:{y:{beginAtZero:true,suggestedMax:Math.max(180,maxYoga+30),ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
+            } else if(subMode === 'dream'){
+                const dreamPoints = labels.map(day => chartMap[day] ? dreamScoreFromRecordV4_(chartMap[day]) : null);
+                const gnYogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].goodnightYogaMinutes || 0) : null);
+                const trackedDays = dreamPoints.filter(v => v !== null).length;
+                const peacefulDays = monthRecords.filter(r => r.dreamType === 'divine' || r.dreamType === 'peaceful').length;
+                const avgGn = monthRecords.length ? Math.round(monthRecords.reduce((s,r)=>s+Number(r.goodnightYogaMinutes||0),0)/monthRecords.length) : 0;
+                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${trackedDays} दिन</b><span>स्वप्न ट्र्याक गरियो</span></div><div class="chart-submetric-box-v4"><b>${peacefulDays} दिन</b><span>🕊️ ईश्वरीय / 🌿 शान्त</span></div><div class="chart-submetric-box-v4"><b>${avgGn} मिनेट</b><span>औसत सुत्नुअघिको याद</span></div>`;
+                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'अवचेतन / स्वप्न स्थिति (%)',data:dreamPoints,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.16)',spanGaps:true,fill:true,tension:.3},{label:'सुत्नुअघिको याद (मिनेट)',data:gnYogaPoints,borderColor:'#0ea5e9',backgroundColor:'rgba(14,165,233,0.10)',borderDash:[4,4],spanGaps:true,fill:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:theme.text,boxWidth:12,font:{size:11}}},title:{display:true,text:'🌙 अवचेतन मन (स्वप्न) र सुत्नुअघिको याद तुलना',color:theme.text,font:{size:13,family:'Poppins'}},tooltip:{callbacks:{label:function(c){if(c.datasetIndex===0){const day=labels[c.dataIndex];const rec=chartMap[day];return 'स्वप्न स्थिति: '+(rec?formatDreamTypeLabelV4_(rec.dreamType)||'टिपोट मात्र':'')+' ('+c.parsed.y+'%)';}return 'सुत्नुअघिको याद: '+c.parsed.y+' मिनेट';}}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
+            } else {
+                const mScores = points.filter(v => v !== null);
+                const mAvg = mScores.length ? Math.round(mScores.reduce((a,b)=>a+b,0)/mScores.length) : 0;
+                const mMax = mScores.length ? Math.max(...mScores) : 0;
+                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${mScores.length} दिन</b><span>यो महिना चार्ट भरियो</span></div><div class="chart-submetric-box-v4"><b>${mAvg}/100</b><span>मासिक औसत अङ्क</span></div><div class="chart-submetric-box-v4"><b>${mMax}/100</b><span>उच्चतम अङ्क</span></div>`;
+                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Chart Score',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Chart Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
+            }
+        }
         else { if(progressChartInstance) progressChartInstance.destroy(); progressChartInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Score (%)',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Quiz Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}}); }
 
         // Detailed progress button remains available in Exam mode.
@@ -4124,10 +4202,12 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         for(let day=1;day<=days;day++){
             const x=map[day], v=x ? (chartMode?Math.round(x.totalScore):Math.round(x.percent)) : null;
             const cls=v===null?'':(v>=80?'excellent':v>=50?'good':'poor');
-            const hasNote=!!(chartMode&&x&&(String(x.dailyWeakness||'').trim()||String(x.tomorrowResolution||'').trim()));
+            const hasRef=!!(chartMode&&x&&(String(x.dailyWeakness||'').trim()||String(x.tomorrowResolution||'').trim()));
+            const hasDrm=!!(chartMode&&x&&(String(x.dreamType||'').trim()||String(x.dreamNote||'').trim()));
+            const hasNote=(hasRef||hasDrm), badgeTxt=(hasRef?'📝':'')+(hasDrm?'🌙':'');
             if(chartMode&&x){
                 const dateKey=dateKeyLocal_(x.__date);
-                h+=`<button type="button" class="mini-cal-day-v4 ${hasNote?'has-note':''} ${cls}" title="${hasNote?'आफ्नो टिपोट/कमिटमेन्ट पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')"><span style="display:flex;align-items:center;justify-content:center;gap:2px;">${day}${hasNote?'<span aria-label="टिपोट छ" style="display:inline-flex;align-items:center;justify-content:center;padding:1px 3px;border-radius:4px;background:var(--chart-color);color:#fff;font-size:.66rem;line-height:1.2;">📝</span>':''}</span><b style="font-size:.68rem;">${v}</b></button>`;
+                h+=`<button type="button" class="mini-cal-day-v4 ${hasNote?'has-note':''} ${cls}" title="${hasNote?badgeTxt+' आफ्नो टिपोट/स्वप्न पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')"><span style="display:flex;align-items:center;justify-content:center;gap:2px;">${day}${hasNote?`<span aria-label="टिपोट छ" style="display:inline-flex;align-items:center;justify-content:center;padding:1px 3px;border-radius:4px;background:var(--chart-color);color:#fff;font-size:.62rem;line-height:1.2;">${badgeTxt}</span>`:''}</span><b style="font-size:.68rem;">${v}</b></button>`;
             } else {
                 h+=`<div title="${hasNote?'टिपोट छ':''}" style="min-height:38px;border:1px solid var(--border-color);border-radius:8px;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;${v===null?'opacity:.45;':''}"><span>${day}</span>${v!==null?`<b style="font-size:.68rem;">${v}${chartMode?'':'%'}</b>`:''}</div>`;
             }
@@ -4181,13 +4261,51 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         document.getElementById('progress-year-grid').innerHTML=y.map(x=>`<div style="border:1px solid var(--border-color);border-radius:10px;padding:8px;text-align:center;background:var(--card-bg);"><b>${x.label}</b><div style="font-size:.8rem;color:var(--muted-text-color);">${x.count||0} दिन</div><strong style="color:var(--stats-color);">${x.average||0}%</strong></div>`).join('');
     }
 
+    window._chartAnalyticsModeV4 = 'score';
+    window.switchChartAnalyticsModeV4 = function(mode) {
+        window._chartAnalyticsModeV4 = mode || 'score';
+        ['score','yoga','dream'].forEach(k => {
+            const btn = document.getElementById('subtab-chart-' + k);
+            if (btn) btn.classList.toggle('active', k === window._chartAnalyticsModeV4);
+        });
+        renderDashboard();
+    };
+    function formatDreamTypeLabelV4_(dreamType) {
+        const map = {
+            divine: '🕊️ ईश्वरीय / बाबा वा सेवा',
+            peaceful: '🌿 शान्त / सकारात्मक',
+            deep_sleep: '💤 गहिरो निद्रा / याद रहेन',
+            restless: '🌪️ व्यर्थ / साधारण वा हलचल'
+        };
+        return map[String(dreamType || '').trim()] || String(dreamType || '').trim();
+    }
+    function dreamScoreFromRecordV4_(rec) {
+        if (!rec) return null;
+        const t = String(rec.dreamType || '').trim();
+        if (t === 'divine') return 100;
+        if (t === 'peaceful') return 75;
+        if (t === 'deep_sleep') return 50;
+        if (t === 'restless') return 25;
+        if (String(rec.dreamNote || '').trim()) return 60;
+        return null;
+    }
+    function formatFullDreamSummaryV4_(rec) {
+        if (!rec) return '';
+        const tLabel = formatDreamTypeLabelV4_(rec.dreamType);
+        const note = String(rec.dreamNote || '').trim();
+        if (tLabel && note) return tLabel + ' — ' + note;
+        return tLabel || note || '';
+    }
     function renderCalendarReflectionV4_(record) {
         const box = document.getElementById('cal-detail-reflection');
         if (!box) return;
         box.innerHTML = '';
+        const yogaMins = record && Number(record.totalBabaYaadMinutes || 0);
         const entries = [
+            ['🕊️ आज बाबाको यादको कुल समय', yogaMins > 0 ? formatBabaYaadDurationV4(yogaMins) : ''],
             ['🔍 आजको स्वचेकिङ / कमजोरी', record && record.dailyWeakness],
-            ['🌱 भोलिको कमिटमेन्ट', record && record.tomorrowResolution]
+            ['🌱 भोलिको कमिटमेन्ट', record && record.tomorrowResolution],
+            ['🌙 स्वप्न तथा अवचेतन स्थिति', formatFullDreamSummaryV4_(record)]
         ].filter(item => String(item[1] || '').trim());
         if (!entries.length) { box.style.display = 'none'; return; }
         entries.forEach(([label, value]) => {
@@ -4288,6 +4406,8 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
                 addText(panel, 'div', `स्थूल सेवाका प्रकार: ${record.sthoolServiceTypes}`, 'font-size:.82rem;line-height:1.5;padding:5px 0;color:var(--text-color);overflow-wrap:anywhere;');
             }
             addText(panel, 'div', `आज बाबाको याद — जम्मा ${dur(record.totalBabaYaadMinutes)}`, 'margin-top:6px;padding:8px;border-radius:8px;background:rgba(139,92,246,.09);font-weight:900;color:var(--chart-color);');
+            const drmSummary = formatFullDreamSummaryV4_(record);
+            if (drmSummary) addText(panel, 'div', `🌙 स्वप्न स्थिति: ${drmSummary}`, 'margin-top:6px;font-size:.83rem;line-height:1.5;color:var(--text-color);white-space:pre-wrap;overflow-wrap:anywhere;');
         }
         panel.style.display = 'block';
         button.textContent = '🙈 Chart Review बन्द गर्नुहोस्';
@@ -4730,10 +4850,12 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
                 `<div style="margin:7px 0;padding:8px;border-radius:8px;background:rgba(139,92,246,.09);font-weight:900;color:var(--chart-color);">🕊️ बाबाको याद — जम्मा ${duration(user.totalBabaYaadMinutes)}</div>`;
             const weakness = String(user.dailyWeakness || '').trim();
             const resolution = String(user.tomorrowResolution || '').trim();
+            const dreamSummary = formatFullDreamSummaryV4_(user);
             const serviceTypes = String(user.sthoolServiceTypes || '').trim();
             const extras = (serviceTypes ? `<div style="padding:8px;border-bottom:1px solid var(--border-color);font-size:.82rem;overflow-wrap:anywhere;"><b>🪷 स्थूल सेवाका प्रकार:</b> ${esc(serviceTypes)}</div>` : '') +
                 `<div style="padding:8px;border-bottom:1px solid var(--border-color);font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🔍 आजको कमजोरी:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(weakness || 'उल्लेख गरिएको छैन।')}</div></div>` +
-                `<div style="padding:8px;font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🌱 भोलिको कमिटमेन्ट:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(resolution || 'उल्लेख गरिएको छैन।')}</div></div>`;
+                `<div style="padding:8px;border-bottom:1px solid var(--border-color);font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🌱 भोलिको कमिटमेन्ट:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(resolution || 'उल्लेख गरिएको छैन।')}</div></div>` +
+                `<div style="padding:8px;font-size:.82rem;line-height:1.5;overflow-wrap:anywhere;"><b>🌙 स्वप्न तथा अवचेतन स्थिति:</b><div style="margin-top:3px;white-space:pre-wrap;">${esc(dreamSummary || 'उल्लेख गरिएको छैन।')}</div></div>`;
             document.getElementById('cad-details').insertAdjacentHTML('beforeend', timeHtml + extras);
         }
         const modalContent = document.querySelector('#chart-admin-detail-modal .modal-content');
@@ -4800,7 +4922,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.1.3)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.1.4)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
