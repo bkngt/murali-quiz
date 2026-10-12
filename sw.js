@@ -1,5 +1,5 @@
-/* BK Murali Quiz 107.1.3 compatibility shell. Delayed activation protects open exam pages. */
-const CACHE_NAME = "murali-quiz-v107-1-3";
+/* BK Murali Quiz 107.1.4 compatibility shell. Delayed activation protects open exam pages. */
+const CACHE_NAME = "murali-quiz-v107-1-4";
 
 const APP_SHELL = [
     "./",
