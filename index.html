@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.1.4">
+    <link rel="manifest" href="manifest.json?v=107.1.5">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -917,7 +917,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.1.4</div>
+        <div>Version: 107.1.5</div>
     </div>
 </div>
 
@@ -1402,7 +1402,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.1.4"; 
+    const APP_VERSION = "107.1.5"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1604,14 +1604,26 @@
     // Date & Formats
     function parseDateString(dateStr) {
         if(!dateStr) return null;
-        var s = String(dateStr).replace(/['"]/g, '').replace(/T.*/, '').replace(/\s*\(.*?\)\s*/g, '').trim();
+        var raw = String(dateStr).replace(/['"]/g, '').replace(/T.*/, '').trim();
+        var s = raw.replace(/\s*\(.*?\)\s*/g, '').trim();
         var ymd = s.match(/^(\d{4})[\/\.\-](\d{1,2})[\/\.\-](\d{1,2})/); 
-        if (ymd) return new Date(parseInt(ymd[1]), parseInt(ymd[2])-1, parseInt(ymd[3]));
+        if (ymd) return new Date(parseInt(ymd[1],10), parseInt(ymd[2],10)-1, parseInt(ymd[3],10));
         var dmy = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/); 
-        if (dmy) { var y = parseInt(dmy[3]); if(y < 100) y += 2000; return new Date(y, parseInt(dmy[2])-1, parseInt(dmy[1])); }
+        if (dmy) { var y = parseInt(dmy[3],10); if(y < 100) y += 2000; return new Date(y, parseInt(dmy[2],10)-1, parseInt(dmy[1],10)); }
         var dMy = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+(\d{2,4})/i);
-        if (dMy) { var y = parseInt(dMy[3]); if(y < 100) y += 2000; var mStr = dMy[2].toLowerCase(); if(mStr === 'sept') mStr = 'sep'; var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mStr); return new Date(y, mIndex, parseInt(dMy[1])); }
-        
+        if (dMy) { var y = parseInt(dMy[3],10); if(y < 100) y += 2000; var mStr = dMy[2].toLowerCase(); if(mStr === 'sept') mStr = 'sep'; var mIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mStr); return new Date(y, mIndex, parseInt(dMy[1],10)); }
+
+        // Fallback: extract embedded date from Custom/Monthly Mega Quiz labels (e.g. inside parentheses)
+        var anyYmd = raw.match(/(?:^|[^0-9])(\d{4})[\/\.\-](\d{1,2})[\/\.\-](\d{1,2})(?:[^0-9]|$)/);
+        if (anyYmd) return new Date(parseInt(anyYmd[1],10), parseInt(anyYmd[2],10)-1, parseInt(anyYmd[3],10));
+        var anyDmy = raw.match(/(?:^|[^0-9])(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})(?:[^0-9]|$)/);
+        if (anyDmy) { var y2 = parseInt(anyDmy[3],10); if(y2 < 100) y2 += 2000; return new Date(y2, parseInt(anyDmy[2],10)-1, parseInt(anyDmy[1],10)); }
+        var namedMonth = raw.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(20\d{2})\b/i);
+        if (namedMonth) {
+            var mIdx = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(namedMonth[1].slice(0,3).toLowerCase());
+            if (mIdx >= 0) return new Date(parseInt(namedMonth[2],10), mIdx, 1);
+        }
+
         var parsed = new Date(s.replace(/-/g, '/'));
         if (!isNaN(parsed.getTime())) return parsed;
         return null;
@@ -2357,10 +2369,21 @@ function getMegaActivationDateUI(quizDate) {
                     if (!serverMap.has(dateKey(p))) restored.push(p);
                 });
 
-                restored.sort((a,b)=>getValidDate(b).getTime()-getValidDate(a).getTime());
-                localStorage.setItem('murali_progress', JSON.stringify([...restored, ...otherUsers]));
+                restored.sort((a,b)=>{
+                    const da = getValidDate(a), db = getValidDate(b);
+                    return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+                });
+                const combinedProgress = [...restored, ...otherUsers];
+                try {
+                    localStorage.setItem('murali_progress', JSON.stringify(combinedProgress));
+                } catch (quotaErr) {
+                    // If full reviewData exceeds browser localStorage quota, keep reviewData for latest 25 exams and preserve all scores/dates
+                    const slimmed = combinedProgress.map((item, idx) => idx < 25 ? item : Object.assign({}, item, { quizData: null }));
+                    localStorage.setItem('murali_progress', JSON.stringify(slimmed));
+                }
 
-                if (document.getElementById('view-progress')) renderDashboard();
+                if (document.getElementById('view-progress') && document.getElementById('view-progress').style.display === 'block') renderDashboard();
+                if (!isAdminViewActive && document.getElementById('view-generator') && document.getElementById('view-generator').style.display === 'block') loadStudentDashboard();
                 return true;
             }
         } catch(e) {
@@ -4922,7 +4945,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.1.4)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.1.5)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
