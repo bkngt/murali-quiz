@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=107.1.8">
+    <link rel="manifest" href="manifest.json?v=108.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -542,15 +542,12 @@
             <button type="button" id="tab-prog" onclick="switchTab('prog')" style="padding: 0.25rem 0.6rem;"><svg class="icon" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px; width: 14px; height: 14px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> <span id="tab-prog-txt">Stats</span></button>
         </div>
         
-        <div class="toolbar-group" id="toolbar-right-actions">
-            <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="आजको Murali खोल्नुहोस्" title="आजको Murali">📖 <span>Murali</span></a>
-
-            <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding: 0.25rem 0.6rem;">
-                <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 1 1.51-1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Setting
-            </button>
-
-            <button type="button" class="btn-rank-quick" id="btn-rank-quick" onclick="openStudentLeaderboard()" aria-label="Open Exam Rank" title="Exam Rank">🏆 Exam Rank</button>
-        </div>
+        <div class="toolbar-group" id="toolbar-right-actions" style="display:flex; justify-content:space-between; width:100%; gap:4px;">
+        <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="Murali" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">📖 Murali</a>
+        <button type="button" class="btn-rank-quick" onclick="openMemoryTagsModal('today')" style="background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid #d8b4fe; padding:0 8px; font-size:0.75rem; border-radius:8px; height:32px; font-weight:800; display:flex; align-items:center; box-shadow:none;">💎 Tags</button>
+        <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">⚙️ Set</button>
+        <button type="button" class="btn-rank-quick" id="btn-rank-quick" onclick="openStudentLeaderboard()" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">🏆 Rank</button>
+    </div>
     </div>
 
     <!-- Mobile Bottom Navigation -->
@@ -917,7 +914,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.1.8</div>
+        <div>Version: 108.0</div>
     </div>
 </div>
 
@@ -925,6 +922,22 @@
 <!-- ALL MODALS (Settings, Leaderboards, etc.)  -->
 <!-- ========================================== -->
 
+
+    <!-- Memory Tags Modal -->
+    <div id="memory-tags-modal" class="modal-overlay" onclick="if(event.target.id === 'memory-tags-modal') document.getElementById('memory-tags-modal').style.display='none';">
+        <div class="modal-content" style="max-width: 480px; padding: 1.5rem; display:flex; flex-direction:column; max-height:88vh;">
+            <button class="close-modal" onclick="document.getElementById('memory-tags-modal').style.display='none';" style="position:absolute; top:15px; right:15px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; color:var(--text-color);">❌</button>
+            <h3 style="margin-top:0; color: #8b5cf6; font-size: 1.25rem; font-weight: 800; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                💎 <span id="mt-date-title">Memory Tags</span>
+            </h3>
+            <div id="mt-content" style="flex:1; overflow-y:auto; font-size:0.9rem; line-height:1.6; white-space:pre-wrap; padding:15px; background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px; margin-bottom:15px; color:var(--text-color); font-weight:600;"></div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="copyMemoryTags()" style="flex:1; background:var(--success-color); box-shadow:none;">📋 Copy Text</button>
+                <button onclick="shareMemoryTagsWA()" style="flex:1; background:#25D366; box-shadow:none;">💬 Share WA</button>
+            </div>
+        </div>
+    </div>
+    
 <!-- Settings Modal -->
 <div id="settings-modal" class="modal-overlay" aria-hidden="true" onclick="closeSettingsOnOverlay(event)">
     <div class="modal-content">
@@ -1403,7 +1416,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.1.8"; 
+    const APP_VERSION = "108.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1504,7 +1517,58 @@
         animate(); setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); particles = []; }, 4000);
     }
     // Settings Restored Logic
-    window.openSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); try { checkApiStatus(); } catch(e) {} }
+    
+    window.extractSwamanAndTags = function(raw) {
+        let res = { text: raw, tags: "" };
+        try {
+            if (raw && raw.trim().startsWith('{')) {
+                let obj = JSON.parse(raw);
+                if (obj.text !== undefined) {
+                    res.text = obj.text;
+                    res.tags = obj.tags || "";
+                }
+            }
+        } catch(e) {}
+        return res;
+    };
+    window.openMemoryTagsModal = function(dateType) {
+        let targetDate = (dateType === 'today') ? getLocalDateISO() : dateType;
+        let serverQuizzes = safeJSON('murali_server_quizzes', []);
+        
+        let tagsData = "";
+        let displayDate = targetDate;
+        
+        let targetQuiz = serverQuizzes.find(q => {
+            if(q.isMegaQuiz) return false;
+            let d = parseDateString(q.quizDate);
+            return d && dateKeyLocal_(d) === targetDate;
+        });
+        
+        if(targetQuiz) {
+            tagsData = extractSwamanAndTags(targetQuiz.swaman).tags;
+            displayDate = targetQuiz.quizDate;
+        }
+        
+        if (!tagsData) {
+            showToast("यस मितिको Memory Tags उपलब्ध छैन।", "warning");
+            return;
+        }
+        
+        document.getElementById('mt-date-title').innerText = displayDate;
+        document.getElementById('mt-content').innerText = tagsData;
+        document.getElementById('memory-tags-modal').style.display = 'flex';
+    };
+    window.copyMemoryTags = function() {
+        let text = document.getElementById('mt-content').innerText;
+        let temp = document.createElement("textarea"); temp.value = text; document.body.appendChild(temp); temp.select();
+        try { document.execCommand("copy"); showToast("Tags कपी भयो!", "success"); } catch(e) {} document.body.removeChild(temp);
+    };
+    window.shareMemoryTagsWA = function() {
+        let text = document.getElementById('mt-content').innerText;
+        window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    };
+    
+window.openSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); try { checkApiStatus(); } catch(e) {} }
     window.closeSettings = function() { var modal = document.getElementById('settings-modal'); if (!modal) return; modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
     window.closeSettingsOnOverlay = function(e) { if(e && e.target && e.target.id === 'settings-modal') closeSettings(); }
     window.toggleDarkMode = function() { 
@@ -2877,7 +2941,7 @@ function getMegaActivationDateUI(quizDate) {
         try {
             let sIdx = jsonText.indexOf('{'); let eIdx = jsonText.lastIndexOf('}'); if (sIdx !== -1 && eIdx !== -1) jsonText = jsonText.substring(sIdx, eIdx + 1);
             let parsedData = JSON.parse(jsonText); if(!parsedData.quiz || !Array.isArray(parsedData.quiz)) throw new Error("Invalid JSON");
-            currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ""; currentMurliDate = dateStr; 
+            currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ''; window.currentMemoryTags = parsedData.memory_tags || ''; currentMurliDate = dateStr; 
             document.getElementById('custom-json-input').value = ''; document.getElementById('custom-quiz-date').value = ''; saveQuizToServer();
         } catch(e) { showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error"); }
     };
@@ -2952,7 +3016,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
                         break;
                     }
 
-                    usedModel = model; currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || "";
+                    usedModel = model; currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ''; window.currentMemoryTags = parsedData.memory_tags || '';
                     document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate} (${currentDayName})`;
                     renderQuizArea(); showToast(`क्विज तयार भयो! (Model: ${usedModel})`, "success", 8000);
                     document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; document.getElementById('btn-cancel-top').style.display = 'inline-block';
@@ -3091,11 +3155,19 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
 
     // 1. Internet is mandatory to START an exam.
     if (!navigator.onLine) {
-        return showToast(
-            '🌐 परीक्षा सुरु गर्न इन्टरनेट अनिवार्य छ। कृपया Internet जोडेर पुनः प्रयास गर्नुहोस्।',
-            'error',
-            5000
-        );
+        let cached = safeJSON('murali_server_quizzes', []);
+        let targetQuiz = cached.find(q => q.quizDate === dateStr);
+        if (targetQuiz) {
+            showToast("इन्टरनेट छैन। सुरक्षित (Offline) क्वीज खुल्दैछ।", "info", 3000);
+            window.tempCloudState = null;
+            window.tempTargetQuiz = targetQuiz;
+            let existingResult = document.getElementById('result-screen');
+            if (existingResult) existingResult.remove();
+            document.getElementById('pledge-modal').style.display = 'flex';
+            return;
+        } else {
+            return showToast('🌐 इन्टरनेट छैन र यो क्वीज अफलाइन सुरक्षित छैन।', 'error', 5000);
+        }
     }
 
     // 2. Login credentials must exist.
@@ -3236,7 +3308,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
     window.acceptPledgeAndStart = function() { 
         document.getElementById('pledge-modal').style.display = 'none'; 
         let targetQuiz = window.tempTargetQuiz; let cloudState = window.tempCloudState; 
-        currentMurliDate = targetQuiz.quizDate; currentSwaman = targetQuiz.swaman || ""; currentQuizRevision = parseInt(targetQuiz.revision || 1, 10) || 1; currentQuizId = targetQuiz.quizId || (currentMurliDate + "-R" + currentQuizRevision);
+        currentMurliDate = targetQuiz.quizDate; let st = extractSwamanAndTags(targetQuiz.swaman); currentSwaman = st.text; window.currentMemoryTags = st.tags; currentQuizRevision = parseInt(targetQuiz.revision || 1, 10) || 1; currentQuizId = targetQuiz.quizId || (currentMurliDate + "-R" + currentQuizRevision);
         startQuizSession(cloudState, targetQuiz.quizData); 
     }
 
@@ -4024,7 +4096,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         };
         chartData.digitalDetox = getChartOptionValue('chart_digital_detox');
         chartData.totalScore = getChartV4Score();
-        if (chartData.totalScore >= 90) chartData.stage = 'उड्ती कला 🕊️';
+        if (chartData.totalScore >= 90) chartData.stage = 'उड्ती कला     ️';
         else if (chartData.totalScore >= 70) chartData.stage = 'चढ्ती कला 🚶';
         else if (chartData.totalScore >= 50) chartData.stage = 'पुरुषार्थी जीवन 🌱';
         else chartData.stage = 'अझै ध्यान आवश्यक ⚠️';
@@ -4367,6 +4439,36 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
         document.getElementById('cal-detail-date').innerText = record.date; document.getElementById('cal-detail-score').innerText = `${record.score}/${record.total} (${record.percent}%)`;
         let remarkEl = document.getElementById('cal-detail-remark'); let rText = record.percent >= 80 ? 'Excellent' : (record.percent >= 50 ? 'Good' : 'Needs Practice'); let rClass = record.percent >= 80 ? 'remark-excellent' : (record.percent >= 50 ? 'remark-good' : 'remark-poor');
         remarkEl.innerText = rText; remarkEl.className = `prog-remark ${rClass}`;
+
+        let btnTags = document.getElementById('cal-detail-tags-btn');
+        if(!btnTags) {
+            btnTags = document.createElement('button');
+            btnTags.id = 'cal-detail-tags-btn';
+            btnTags.style.cssText = 'width:100%; margin:0 0 10px; background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid #d8b4fe; font-weight:800; padding:0.6rem; border-radius:10px; display:none;';
+            btnTags.innerText = '💎 यस दिनको Memory Tags हेर्नुहोस्';
+            let refBox = document.getElementById('cal-detail-reflection');
+            if(refBox) refBox.parentNode.insertBefore(btnTags, refBox);
+        }
+        let parsedD = parseDateString(record.date);
+        let dateKey = parsedD ? dateKeyLocal_(parsedD) : null;
+        let hasTags = false;
+        if (dateKey) {
+            let serverQuizzes = safeJSON('murali_server_quizzes', []);
+            let tq = serverQuizzes.find(q => {
+                let dx = parseDateString(q.quizDate);
+                return dx && dateKeyLocal_(dx) === dateKey;
+            });
+            if (tq && extractSwamanAndTags(tq.swaman).tags) hasTags = true;
+        }
+        if (btnTags) {
+            if (hasTags) {
+                btnTags.style.display = 'block';
+                btnTags.onclick = () => { document.getElementById('calendar-detail-modal').style.display = 'none'; openMemoryTagsModal(dateKey); };
+            } else {
+                btnTags.style.display = 'none';
+            }
+        }
+    
         renderCalendarReflectionV4_(null);
         const chartReviewBtnV4 = document.getElementById('cal-detail-chart-review-btn'); if (chartReviewBtnV4) chartReviewBtnV4.style.display = 'none';
         const chartReviewBoxV4 = document.getElementById('cal-detail-chart-review-v4'); if (chartReviewBoxV4) { chartReviewBoxV4.style.display = 'none'; chartReviewBoxV4.innerHTML = ''; }
@@ -4964,7 +5066,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 107.1.8)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 108.0)</div></body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
