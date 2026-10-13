@@ -1,5 +1,5 @@
-/* BK Murali Quiz 108.5 offline-first service worker */
-const CACHE_NAME = "murali-quiz-v108-5";
+/* BK Murali Quiz 108.6 offline-first service worker */
+const CACHE_NAME = "murali-quiz-v108-6";
 
 const STATIC_ASSETS = [
     "./",
@@ -63,4 +63,3 @@ self.addEventListener("fetch", event => {
         })
     );
 });
-
