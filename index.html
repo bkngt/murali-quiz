@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=108.6">
+    <link rel="manifest" href="manifest.json?v=109.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -975,7 +975,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 108.6</div>
+        <div>Version: 109.0</div>
     </div>
 </div>
 
@@ -1478,7 +1478,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "108.6"; 
+    const APP_VERSION = "109.0"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -3075,16 +3075,9 @@ window.saveCustomQuiz = function() {
         let difficultyInstruction = "Prompt v67: joyful standard difficulty with plausible BK distractors";
         let parsedDateForDay = parseDateString(currentMurliDate); let dayOfWeek = parsedDateForDay ? parsedDateForDay.getDay() : new Date().getDay(); let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]; let currentDayName = dayNames[dayOfWeek];
 
-        const QUIZ_MODEL_67_0 = "DAILY MURLI — ULTRA COMPACT MEMORY TAG REFINER\nVERSION 2.2 — CONTEXT-COMPLETE ORIGINAL PHRASE\nFINAL MASTER PROMPT\n\nदिइएको ब्रह्माकुमारीज मुरलीबाट केवल अत्यन्त महत्त्वपूर्ण, भगवानुवाचमा आधारित र बारम्बार पढेर सजिलै याद गर्न सकिने अत्यन्त छोटो Memory Sheet तयार गर्नुहोस्।\n\nयो विस्तृत सारांश होइन। यो व्याख्या होइन। यो विश्लेषण होइन।\n\nउद्देश्य:\nहरेक घण्टा १–२ मिनेट हेर्दा तुरुन्त सम्झन सकिने कम बुँदा, छोटो शब्द र मूल भगवानुवाचमा आधारित Memory Tags तयार गर्नु हो।\n\n१. DATE + WEEKDAY: 📅 DD-MM-YYYY [बार]\n२. केवल भगवानुवाच: मुरलीकै सामग्री मात्र।\n३. अत्यन्त महत्त्वपूर्ण — ARROW TEXT = SOURCE-FAITHFUL + CONTEXT-COMPLETE: [Symbol] [छोटो Memory Tag] → [मूल भगवानुवाचको छोटो, स्पष्ट र अर्थपूर्ण अंश]।\n४. ONE IDEA = ONE TIME: नदोहोर्‍याउने।\n५. LESS IS MORE: ठ्याक्कै १० वटा Numbered Memory Tags।\n६. SOURCE STRUCTURE: साकार/अव्यक्त नियम अनिवार्य।\n७. सुरुको महावाक्य — FIXED SYMBOL: 🗣️\n८. प्रश्न–उत्तर — FIXED SYMBOL: ❓\n९. मुख्य भगवानुवाच — MAIN EXPLANATION: विषयअनुसार फरक लोगो।\n१०. धारणा — FIXED SYMBOL + LABEL: 📌 धारणा\n११. वरदान — FIXED SYMBOL + LABEL: 🎁 वरदान\n१२. स्लोगन — FIXED SYMBOL + LABEL: ⭐ स्लोगन\n१३. अव्यक्त इसारा — EXPLANATION ONLY: 🕊️ अव्यक्त इसारा (पहिलो वाक्य पूर्ण निषेध, व्याख्याबाट मात्र)।\n१४. अव्यक्त मुरली — BODY FIRST: सुरुको Headline नलिने।\n१५. SYMBOL RULE: एउटा Tag मा एउटा मात्र लोगो।\n१६. NUMBERING — CONTINUOUS: १ देखि १० सम्म निरन्तर।\n17. ULTRA COMPACT MOBILE RULE: NO BLANK LINE, MINIMUM LINE BREAKS.\n१८. MARKDOWN FORMATTING: Heading प्रयोग नगर्ने।\n१९. MEMORY CHAIN: '🧠 Memory Chain' मा Numbering नराखी छोटो Point राख्ने।\n२०. QUIZ LINK: अन्त्यमा 📝 मुरली Quiz: https://bkngt.github.io/murali-quiz/\n२१. SINGLE COPY CODE BLOCK: सम्पूर्ण Output एउटै Single Copy Code Block भित्र।\n\nAPP INTEGRATION REQUIREMENTS:\n- Return valid JSON with top-level keys: swaman, memory_tags, and quiz.\n- memory_tags MUST contain the exact text output defined by the rules above.";
-        const APP_COMPATIBILITY_RULES = `
-APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract):
-- Return each quiz item with exactly these fields: q, options, answer, explanation, tag, original, is_mega_eligible.
-- options must contain exactly four strings; keep the uploaded prompt's question-writing rules and use the required schema.
-- original must be a verbatim, contiguous quote from the supplied Murali. explanation must be supported only by that quote.
-- Set is_mega_eligible=true for only 2-4 timeless Gyan questions suitable for future revision; set false for all other questions.
-- Do not change the required top-level fields: swaman and quiz.
-`;
-        const promptText = QUIZ_MODEL_67_0 + "\n\n" + APP_COMPATIBILITY_RULES + `\n\nRUNTIME SETTINGS\nDate: ${currentMurliDate}\nDay: ${currentDayName}\nRequested question count: ${qCount}\nLanguage: ${langName}\nMURALI TEXT:\n${text}`;
+        const QUIZ_MODEL_68_0 = "DAILY MURLI — ULTRA COMPACT MEMORY TAG REFINER & QUIZ GENERATOR\nVERSION 68.0 — FINAL MASTER PROMPT\n\nतपाईंको काम दिइएको मुरलीबाट दुईवटा कुरा तयार गर्नु हो:\n१. Memory Tags (अत्यन्त छोटो, भगवानुवाचमा आधारित)\n२. 20 Quiz Questions (World-class, Pure Nepali, Deep Distractors)\n\n[MEMORY TAGS RULES]\n१. DATE + WEEKDAY: 📅 DD-MM-YYYY [बार]\n२. केवल भगवानुवाच: मुरलीकै सामग्री मात्र।\n३. ARROW TEXT = SOURCE-FAITHFUL + CONTEXT-COMPLETE: [Symbol] [छोटो Memory Tag] → [मूल भगवानुवाचको छोटो, स्पष्ट अंश]।\n४. ONE IDEA = ONE TIME: नदोहोर्‍याउने।\n५. LESS IS MORE: ठ्याक्कै १० वटा Numbered Memory Tags।\n६. सुरुको महावाक्य — FIXED SYMBOL: 🗣️\n७. प्रश्न–उत्तर — FIXED SYMBOL: ❓\n८. मुख्य भगवानुवाच — विषयअनुसार फरक लोगो।\n९. धारणा/वरदान/स्लोगन — FIXED SYMBOL: 📌/🎁/⭐\n१०. अव्यक्त इसारा — 🕊️ (पहिलो वाक्य पूर्ण निषेध, व्याख्याबाट मात्र)।\n११. MEMORY CHAIN: '🧠 Memory Chain' मा Numbering नराखी छोटो Point राख्ने।\n\n[QUIZ GENERATION RULES - v68.0]\n1. PURE NEPALI & NO FILLERS: 'आजको मुरलीमा', 'बाबाका अनुसार' जस्ता शब्द नराख्नुहोस्। 'पक्की' जस्ता हिन्दी शब्द नराख्नुहोस्।\n2. DEEP DISTRACTORS: गलत अप्सनहरू (Wrong options) बच्चाले जस्तो नबनाउनुहोस्। ऐतिहासिक मुरलीका गहिरा शब्दहरू राख्नुहोस्।\n3. MID-MURLI COVERAGE: मुरलीको बीच भागबाट पनि धेरै प्रश्न निकाल्नुहोस्।\n4. MEGA ELIGIBILITY: केवल २ देखि ४ वटा प्रश्न (जुन भविष्यको लागि सधैं काम लाग्ने ज्ञान जस्तै आत्मा, परमात्मा, चक्र सम्बन्धी छन्) मा मात्र is_mega_eligible: true राख्नुहोस्। अरु सबैमा false राख्नुहोस्।\n5. FILL IN THE BLANKS: ठ्याक्कै २ वटा प्रश्न '....' खाली ठाउँ भर्ने ढाँचामा हुनुपर्छ।";
+        const APP_COMPATIBILITY_RULES = `APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract):\n- Return valid JSON with top-level keys: swaman, memory_tags, and quiz.\n- memory_tags MUST contain the exact text output defined by the rules above.\n- quiz must contain exactly 20 items with fields: q, options, answer, explanation, tag, original, is_mega_eligible.\n- options must contain exactly four strings.\n- original must be a verbatim quote from the supplied Murali.\n- Set is_mega_eligible=true for ONLY 2-4 timeless Gyan questions. Set false for all others.`;
+        const promptText = QUIZ_MODEL_68_0 + "\n\n" + APP_COMPATIBILITY_RULES + `\n\nRUNTIME SETTINGS\nDate: ${currentMurliDate}\nDay: ${currentDayName}\nRequested question count: ${qCount}\nLanguage: ${langName}\nMURALI TEXT:\n${text}`;
 
         const quizSchema = { type: "object", properties: { swaman: { type: "string" }, memory_tags: { type: "string" }, memory_tags: { type: "string" }, quiz: { type: "array", minItems: Number(qCount), maxItems: Number(qCount), items: { type: "object", properties: { q: { type: "string" }, options: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } }, answer: { type: "string" }, explanation: { type: "string" }, tag: { type: "string" }, original: { type: "string" }, is_mega_eligible: { type: "boolean" } }, required: ["q", "options", "answer", "explanation", "tag", "original", "is_mega_eligible"], additionalProperties: false } } }, required: ["swaman", "memory_tags", "quiz"], additionalProperties: false };
         function buildGenerationConfig(model) { const config = { maxOutputTokens: 12000, responseMimeType: "application/json", responseSchema: quizSchema }; if (!/^gemini-3\./.test(model)) config.temperature = 0.3; return config; }
@@ -5178,7 +5171,7 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 108.6)</div>
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 109.0)</div>
     <!-- Floating Scroll Buttons -->
     <div id="floating-scroll">
         <button class="float-btn" onclick="window.scrollToTop()" aria-label="Scroll to top">⬆️</button>
