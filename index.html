@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=108.5">
+    <link rel="manifest" href="manifest.json?v=108.6">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -469,6 +469,28 @@
         .toolbar-one-line { justify-content: space-between !important; }
     }
     
+
+    /* v108.6 Font Size and Layout Fixes */
+    #toolbar-right-actions > button, #toolbar-right-actions > a {
+        font-size: 0.88rem !important;
+        padding: 0 8px !important;
+        font-weight: 800 !important;
+    }
+    .btn-mega-quick, .btn-rank-quick {
+        font-size: 0.88rem !important;
+    }
+    .btn-small { font-size: 0.88rem !important; }
+    
+    /* Floating Scroll Buttons */
+    #floating-scroll {
+        position: fixed; bottom: 85px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 2500; transition: opacity 0.3s, transform 0.3s; opacity: 0; pointer-events: none; transform: translateY(20px);
+    }
+    #floating-scroll.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .float-btn {
+        background: var(--primary-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-size: 1.2rem; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    html[data-theme="dark"] .float-btn { background: var(--exam-color); color: #0f172a; }
+    
 </style>
 </head>
 <body>
@@ -570,7 +592,7 @@
         </div>
         
         <div class="toolbar-group" id="toolbar-right-actions" style="display:flex; justify-content:space-between; width:100%; gap:4px;">
-        <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" aria-label="Murali" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">📖 Murali</a>
+        <a href="https://www.madhubanmurli.org/#ne" id="murli-link" class="murali-link" target="_blank" rel="noopener noreferrer" aria-label="Murali" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">📖 Murali</a>
         <button type="button" class="btn-rank-quick" onclick="openMemoryTagsModal('today')" style="background:rgba(139,92,246,0.1); color:#8b5cf6; border:1px solid #d8b4fe; padding:0 8px; font-size:0.75rem; border-radius:8px; height:32px; font-weight:800; display:flex; align-items:center; box-shadow:none;">💎 Tags</button>
         <button type="button" class="btn-settings-clear" id="btn-toggle-settings" onclick="openSettings()" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">⚙️ Set</button>
         <button type="button" class="btn-rank-quick" id="btn-rank-quick" onclick="openStudentLeaderboard()" style="padding:0 8px; font-size:0.75rem; height:32px; border-radius:8px;">🏆 Rank</button>
@@ -953,7 +975,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 108.5</div>
+        <div>Version: 108.6</div>
     </div>
 </div>
 
@@ -1001,8 +1023,9 @@
                 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary-color); font-size: 0.85rem; font-weight: 700; text-decoration: none; padding: 2px 8px; border: 1px solid var(--primary-color); border-radius: 6px; background: rgba(2, 132, 199, 0.1);">🔑 Get Free Key</a>
             </div>
             
-            <div style="position: relative; display: flex; align-items: center;">
-                <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0; padding-right: 45px; width: 100%;">
+            <div style="text-align:right; margin-bottom:5px;"><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--primary-color); font-size:0.85rem; font-weight:800; text-decoration:underline;">🔑 Get Free Gemini API Key (यहाँबाट ल्याउनुहोस्)</a></div>
+    <div style="position: relative; display: flex; align-items: center;">
+    <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here..." style="text-align: left; font-family: monospace; font-size: 14px; margin-top:0; padding-right: 45px; width: 100%;">
                 <button type="button" onclick="toggleApiKeyVisibility()" style="position: absolute; right: 5px; background: transparent; border: none; color: #94a3b8; box-shadow: none; width: auto; padding: 5px; cursor: pointer;">
                     <svg id="eye-icon-api" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
@@ -1455,7 +1478,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "108.5"; 
+    const APP_VERSION = "108.6"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1661,7 +1684,12 @@ window.openSettings = function() { var modal = document.getElementById('settings
     window.readQuestion = function(qIndex) {
         if (!('speechSynthesis' in window)) return showToast("तपाईंको डिभाइसमा आवाज सपोर्ट गर्दैन।", "warning");
         if (!nepaliVoice) initVoices(); 
-        if (!nepaliVoice) return showToast("तपाईंको मोबाइलमा नेपाली आवाज (Nepali TTS) इन्स्टल छैन।", "warning");
+        if (!nepaliVoice) {
+        if(confirm("तपाईंको मोबाइलमा नेपाली आवाज (Nepali TTS) भेटिएन।\n\nके तपाईं Play Store बाट 'Speech Services by Google' डाउनलोड/अपडेट गर्न चाहनुहुन्छ?\n\n(नोट: डाउनलोड गरेपछि मोबाइलको Settings भित्र Text-to-Speech मा 'Google' छानी नेपाली भाषा राख्नुहोला।)")) {
+            window.open('https://play.google.com/store/apps/details?id=com.google.android.tts', '_blank');
+        }
+        return;
+    }
         window.speechSynthesis.cancel(); 
         let q = normalizeQuizItem_(currentQuiz[qIndex]);
         const optionLetters = ['ए', 'बी', 'सी', 'डी'];
@@ -5150,7 +5178,24 @@ APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract
             let expHtml = q.explanation ? `<div class="explanation">💡 <strong>Reason:</strong> ${q.explanation} <br><br><em style="color:#64748b;">"${q.original}"</em></div>` : ''; let tagHtml = q.tag ? `<span class="tag">🏷️ ${q.tag}</span>` : '';
             html += `<div class="q-block">${tagHtml}<p class="q-text">Q${i + 1}. ${q.q || q.question || q.questionText || ""}</p><ul class="options">${optsHtml}</ul>${expHtml}</div>`;
         });
-        html += `<div class="footer">Generated by BK Murali Quiz App (Version 108.5)</div></body></html>`; return html;
+        html += `<div class="footer">Generated by BK Murali Quiz App (Version 108.6)</div>
+    <!-- Floating Scroll Buttons -->
+    <div id="floating-scroll">
+        <button class="float-btn" onclick="window.scrollToTop()" aria-label="Scroll to top">⬆️</button>
+        <button class="float-btn" onclick="window.scrollToBottom()" aria-label="Scroll to bottom">⬇️</button>
+    </div>
+    <script>
+    window.addEventListener('scroll', function() {
+        let fs = document.getElementById('floating-scroll');
+        if(fs) {
+            if(window.scrollY > 300) fs.classList.add('visible');
+            else fs.classList.remove('visible');
+        }
+    });
+    window.scrollToTop = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
+    window.scrollToBottom = function() { window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}); };
+    <\/script>
+    </body></html>`; return html;
     }
     function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
     function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
