@@ -1,13 +1,10 @@
-/* BK Murali Quiz 107.1.8 compatibility shell. Delayed activation protects open exam pages. */
-const CACHE_NAME = "murali-quiz-v107-1-8";
-
-const APP_SHELL = [
-    "./",
-    "./index.html",
-    "./manifest.json"
-];
+/* BK Murali Quiz 108.0 offline-first service worker */
+const CACHE_NAME = "murali-quiz-v108-0";
 
 const STATIC_ASSETS = [
+    "./",
+    "./index.html",
+    "./manifest.json",
     "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
     "https://cdn.jsdelivr.net/npm/chart.js",
     "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"
@@ -33,15 +30,13 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
     event.waitUntil(
-        caches.keys()
-            .then(cacheNames => Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName.startsWith("murali-quiz-v") && cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                    return undefined;
-                })
-            ))
+        caches.keys().then(cacheNames => Promise.all(
+            cacheNames.map(cacheName => {
+                if (cacheName.startsWith("murali-quiz-v") && cacheName !== CACHE_NAME) {
+                    return caches.delete(cacheName);
+                }
+            })
+        ))
     );
 });
 
@@ -51,66 +46,20 @@ self.addEventListener("fetch", event => {
     const url = new URL(request.url);
 
     if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
-    if (request.mode === "navigate" && url.origin !== self.location.origin) return;
-
-    if (request.mode === "navigate") {
-        event.respondWith(
-            fetch(request)
+    
+    event.respondWith(
+        caches.match(request).then(cached => {
+            if (cached) return cached;
+            return fetch(request, request.url.includes("cdn-icons-png.flaticon.com") ? { mode: "no-cors" } : undefined)
                 .then(response => {
-                    if (response && response.ok) {
+                    if (response && (response.ok || response.type === "opaque")) {
                         const clone = response.clone();
                         caches.open(CACHE_NAME).then(cache => cache.put(request, clone).catch(() => {})).catch(() => {});
                     }
                     return response;
-                })
-                .catch(() => caches.match(request).then(cached => cached || caches.match("./index.html")))
-        );
-        return;
-    }
-
-    if (url.pathname.endsWith("/manifest.json") || url.pathname.endsWith("manifest.json")) {
-        event.respondWith(
-            fetch(request)
-                .then(response => {
-                    if (response && response.ok) {
-                        const clone = response.clone();
-                        caches.open(CACHE_NAME).then(cache => cache.put(request, clone).catch(() => {})).catch(() => {});
-                    }
-                    return response;
-                })
-                .catch(() => caches.match(request).then(cached => cached || caches.match("./manifest.json")))
-        );
-        return;
-    }
-
-    if (STATIC_ASSETS.includes(request.url)) {
-        event.respondWith(
-            caches.match(request).then(cached => {
-                if (cached) return cached;
-                return fetch(request, request.url.includes("cdn-icons-png.flaticon.com") ? { mode: "no-cors" } : undefined)
-                    .then(response => {
-                        if (response && (response.ok || response.type === "opaque")) {
-                            const clone = response.clone();
-                            caches.open(CACHE_NAME).then(cache => cache.put(request, clone).catch(() => {})).catch(() => {});
-                        }
-                        return response;
-                    });
-            })
-        );
-        return;
-    }
-
-    if (url.origin === self.location.origin) {
-        event.respondWith(
-            fetch(request)
-                .then(response => {
-                    if (response && response.ok) {
-                        const clone = response.clone();
-                        caches.open(CACHE_NAME).then(cache => cache.put(request, clone).catch(() => {})).catch(() => {});
-                    }
-                    return response;
-                })
-                .catch(() => caches.match(request))
-        );
-    }
+                }).catch(() => {
+                    if (request.mode === "navigate") return caches.match("./index.html");
+                });
+        })
+    );
 });
