@@ -1,5 +1,5 @@
-/* BK Murali Quiz 108.4 offline-first service worker */
-const CACHE_NAME = "murali-quiz-v108-4";
+/* BK Murali Quiz 108.5 offline-first service worker */
+const CACHE_NAME = "murali-quiz-v108-5";
 
 const STATIC_ASSETS = [
     "./",
