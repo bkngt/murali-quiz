@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.2">
+    <link rel="manifest" href="manifest.json?v=109.4">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -225,11 +225,12 @@
         }
 
         /* Accordion Chart Design */
-        .accordion-status { display: inline-block; width: 22px; text-align: center; font-size: 1rem; transition: transform 0.3s ease, color 0.3s ease; }
-        .accordion-chevron { display: inline-block; transition: transform 0.3s ease; font-size: 0.8rem; color: var(--muted-text-color); }
-        .chart-title-v2 { cursor: pointer; user-select: none; transition: background 0.2s; padding: 4px 6px; border-radius: 8px; }
+        .accordion-status { display: flex; align-items: center; justify-content: center; width: 24px; font-size: 1rem; transition: transform 0.3s ease, color 0.3s ease; }
+        .accordion-chevron { display: flex; align-items: center; transition: transform 0.3s ease; font-size: 0.8rem; color: var(--muted-text-color); margin-left: auto; }
+        .chart-title-v2 { cursor: pointer; user-select: none; transition: background 0.2s; padding: 6px; border-radius: 8px; margin-bottom: 0 !important; }
         .chart-title-v2:hover { background: rgba(139, 92, 246, 0.08); }
-        .chart-section-v2 { transition: all 0.3s ease; }
+        .chart-section-v2 { transition: all 0.3s ease; overflow: hidden; }
+        .chart-content-v2 { padding-top: 12px; margin-top: 5px; border-top: 1px dashed var(--border-color); }
         /* Chart V3 Styles */
         .chart-topbar-v2 { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
         .chart-date-btn-v2 { flex:1; width:auto; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none; }
@@ -990,7 +991,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.2</div>
+        <div>Version: 109.4</div>
     </div>
 </div>
 
@@ -1493,7 +1494,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.2"; 
+    const APP_VERSION = "109.4"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -3854,27 +3855,27 @@ window.saveCustomQuiz = function() {
             section.classList.add('accordion-initialized');
             const title = section.querySelector('.chart-title-v2');
             if (!title) return;
+            
             title.style.cursor = 'pointer';
             title.addEventListener('click', () => toggleAccordion(section));
+            
             const statusSpan = document.createElement('span');
             statusSpan.className = 'accordion-status';
             statusSpan.innerHTML = '⚪'; 
-            statusSpan.style.marginRight = '8px';
             title.prepend(statusSpan);
+            
+            const titleSpan = title.querySelector('span:not(.accordion-status)');
+            if(titleSpan) { titleSpan.style.flex = '1'; titleSpan.style.marginLeft = '8px'; titleSpan.style.textAlign = 'left'; }
+            
             const chevron = document.createElement('span');
             chevron.className = 'accordion-chevron';
             chevron.innerHTML = '▼';
-            chevron.style.marginLeft = '10px';
             title.appendChild(chevron);
+            
             const contentWrap = document.createElement('div');
             contentWrap.className = 'chart-content-v2';
             contentWrap.style.display = 'none'; 
-            contentWrap.style.paddingTop = '12px';
-            contentWrap.style.marginTop = '10px';
-            contentWrap.style.borderTop = '1px dashed var(--border-color)';
-            while (title.nextSibling) {
-                contentWrap.appendChild(title.nextSibling);
-            }
+            while (title.nextSibling) { contentWrap.appendChild(title.nextSibling); }
             section.appendChild(contentWrap);
         });
     }
@@ -3901,7 +3902,7 @@ window.saveCustomQuiz = function() {
                 content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 250, easing: 'ease-out'});
             }
             if (chevron) chevron.style.transform = 'rotate(180deg)';
-            setTimeout(() => { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+            setTimeout(() => { try { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){} }, 150);
         }
     }
     
@@ -4021,6 +4022,7 @@ window.saveCustomQuiz = function() {
         const timeText = formatBabaYaadDurationV4(getTotalBabaYaadMinutesV4());
         if (liveTimeEl) liveTimeEl.innerText = timeText;
         if (submitTimeEl) submitTimeEl.innerText = timeText;
+        if (typeof updateAccordionStatus === 'function') updateAccordionStatus();
     }
 
     function chartSectionReadyForAutoScrollV4(section) {
@@ -4057,6 +4059,7 @@ window.saveCustomQuiz = function() {
     }
 
     function initChartV3Interactions() {
+        if (typeof initChartAccordion === 'function') { initChartAccordion(); const fs = document.querySelector('.chart-section-v2'); if(fs) toggleAccordion(fs, true); } // Hook2Fix
         document.querySelectorAll('#daily-chart-form input.chart-single-v4').forEach(input => {
             if (input.dataset.chartV4Bound === '1') return;
             input.dataset.chartV4Bound = '1';
