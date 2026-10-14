@@ -685,6 +685,102 @@
             border-top: 1px dashed var(--border-color);
         }
     
+
+        /* Smart Grid Accordion UI Fix v109.6 Final */
+        #chart-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            align-items: start;
+        }
+        @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
+        
+        .chart-section-v2 {
+            padding: 8px !important;
+            margin-bottom: 0 !important;
+            border-radius: 12px !important;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        
+        /* MAGIC: Open section takes FULL WIDTH */
+        .chart-section-v2.accordion-open {
+            grid-column: 1 / -1 !important;
+            background: var(--card-bg);
+            border-color: var(--chart-color) !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
+        }
+        
+        /* Reflection always full width */
+        #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
+
+        .chart-title-v2 {
+            display: flex;
+            align-items: center;
+            padding: 2px !important;
+            margin: 0 !important;
+            cursor: pointer;
+        }
+        
+        .accordion-status {
+            width: 16px;
+            font-size: 0.95rem;
+            margin-right: 6px !important;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        
+        .title-short {
+            font-size: 0.85rem;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        
+        .title-long {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-color);
+            line-height: 1.35;
+        }
+        
+        .chart-title-v2 b {
+            font-size: 0.75rem !important;
+            padding: 2px 6px !important;
+            margin-left: auto;
+            flex-shrink: 0;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--chart-color);
+            border-radius: 50px;
+        }
+        
+        .accordion-chevron {
+            margin-left: 6px;
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            color: var(--muted-text-color);
+        }
+        
+        .chart-content-v2 {
+            padding-top: 12px !important;
+            margin-top: 8px !important;
+            border-top: 1px dashed var(--border-color);
+        }
+        
+        @media (max-width: 480px) {
+            #chart-grid-container { gap: 6px; }
+            .chart-section-v2 { padding: 6px !important; }
+            .title-short { font-size: 0.76rem; }
+            .title-long { font-size: 0.85rem; }
+            .chart-title-v2 b { font-size: 0.7rem !important; min-width: 20px !important; padding: 2px 4px !important;}
+        }
+    
 </style>
 </head>
 <body>
@@ -4030,7 +4126,14 @@ window.saveCustomQuiz = function() {
     const CHART_V3_GROUPS = CHART_V4_GROUPS;
 
     function initChartAccordion() {
-        document.querySelectorAll('.chart-section-v2').forEach(section => {
+        const shortTitles = [
+            "01. अमृतवेला", "02. मुरली क्लास", "03. स्वमान ड्रिल", "04. ट्राफिक कन्ट्रोल",
+            "05. चालचलन", "06. ज्ञान सेवा", "07. स्थूल सेवा", "08. ब्रह्माभोजन",
+            "09. व्यायाम", "10. साँझको योग", "11. गुडनाइट", "12. डिजिटल डिटक्स",
+            "📝 गोप्य अभिलेख"
+        ];
+        
+        document.querySelectorAll('.chart-section-v2').forEach((section, index) => {
             if (section.classList.contains('accordion-initialized')) return;
             section.classList.add('accordion-initialized');
             const title = section.querySelector('.chart-title-v2');
@@ -4044,8 +4147,22 @@ window.saveCustomQuiz = function() {
             statusSpan.innerHTML = '⚪'; 
             title.prepend(statusSpan);
             
-            const titleSpan = title.querySelector('span:not(.accordion-status)');
-            if(titleSpan) { titleSpan.style.flex = '1'; titleSpan.style.marginLeft = '8px'; titleSpan.style.textAlign = 'left'; }
+            const originalSpan = title.querySelector('span:not(.accordion-status):not(.accordion-chevron)');
+            if(originalSpan) {
+                originalSpan.classList.add('title-long');
+                originalSpan.style.display = 'none';
+                
+                const shortSpan = document.createElement('span');
+                shortSpan.className = 'title-short';
+                shortSpan.innerText = shortTitles[index] || ('0' + (index+1)).slice(-2);
+                shortSpan.style.flex = '1';
+                shortSpan.style.marginLeft = '4px';
+                
+                originalSpan.style.flex = '1';
+                originalSpan.style.marginLeft = '4px';
+                
+                title.insertBefore(shortSpan, originalSpan);
+            }
             
             const chevron = document.createElement('span');
             chevron.className = 'accordion-chevron';
@@ -4064,22 +4181,30 @@ window.saveCustomQuiz = function() {
         const isOpen = targetSection.classList.contains('accordion-open');
         document.querySelectorAll('.chart-section-v2').forEach(sec => {
             sec.classList.remove('accordion-open');
-            sec.style.borderColor = 'var(--border-color)';
-            sec.style.boxShadow = 'none';
             const content = sec.querySelector('.chart-content-v2');
             const chevron = sec.querySelector('.accordion-chevron');
+            const tLong = sec.querySelector('.title-long');
+            const tShort = sec.querySelector('.title-short');
+            
             if (content) content.style.display = 'none';
             if (chevron) chevron.style.transform = 'rotate(0deg)';
+            if (tLong) tLong.style.display = 'none';
+            if (tShort) tShort.style.display = 'block';
         });
+        
         if (!isOpen || forceOpen) {
             targetSection.classList.add('accordion-open');
-            targetSection.style.borderColor = 'var(--chart-color)';
-            targetSection.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.15)';
             const content = targetSection.querySelector('.chart-content-v2');
             const chevron = targetSection.querySelector('.accordion-chevron');
+            const tLong = targetSection.querySelector('.title-long');
+            const tShort = targetSection.querySelector('.title-short');
+            
+            if (tLong) tLong.style.display = 'block';
+            if (tShort) tShort.style.display = 'none';
+            
             if (content) {
                 content.style.display = 'block';
-                content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 250, easing: 'ease-out'});
+                content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 200, easing: 'ease-out'});
             }
             if (chevron) chevron.style.transform = 'rotate(180deg)';
             setTimeout(() => { try { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){} }, 150);
@@ -4092,13 +4217,9 @@ window.saveCustomQuiz = function() {
             if (!statusSpan) return;
             const isCompleted = chartSectionReadyForAutoScrollV4(section);
             if (isCompleted) {
-                statusSpan.innerHTML = '✅';
-                statusSpan.style.color = 'var(--success-color)';
-                statusSpan.style.transform = 'scale(1.2)';
+                statusSpan.innerHTML = '🟢';
             } else {
                 statusSpan.innerHTML = '⚪';
-                statusSpan.style.color = 'var(--muted-text-color)';
-                statusSpan.style.transform = 'scale(1)';
             }
         });
     }
