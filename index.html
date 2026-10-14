@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.0">
+    <link rel="manifest" href="manifest.json?v=109.1">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -490,6 +490,15 @@
         background: var(--primary-color); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-size: 1.2rem; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     html[data-theme="dark"] .float-btn { background: var(--exam-color); color: #0f172a; }
+    
+
+    /* v109.1 Readability & Layout Patch */
+    .question-text { font-size: 1.3rem !important; line-height: 1.5 !important; }
+    .option-text { font-size: 1.15rem !important; padding: 0.3rem 0 !important; }
+    .option-container { padding: 1rem 1.2rem !important; border-radius: 16px !important; }
+    .btn-submit { font-size: 1.2rem !important; padding: 0.8rem 1.5rem !important; }
+    .stat-card h3 { font-size: 1.6rem !important; }
+    .cal-day { font-size: 1.1rem !important; }
     
 </style>
 </head>
@@ -975,7 +984,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.0</div>
+        <div>Version: 109.1</div>
     </div>
 </div>
 
@@ -1478,7 +1487,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.0"; 
+    const APP_VERSION = "109.1"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -1958,6 +1967,15 @@ function getMegaActivationDateUI(quizDate) {
     // 4. AUTHENTICATION & PROFILE
     // ==========================================
     function init() {
+        // v109.1 Auto-Cache Buster
+        let savedVersion = localStorage.getItem('murali_app_version');
+        if (savedVersion && savedVersion !== APP_VERSION) {
+            localStorage.setItem('murali_app_version', APP_VERSION);
+            if ('caches' in window) { caches.keys().then(names => names.forEach(n => caches.delete(n))); }
+            setTimeout(() => window.location.reload(true), 500);
+            return;
+        }
+        localStorage.setItem('murali_app_version', APP_VERSION);
         getDeviceId(); initVoices();
         try { updateLanguageUI(); } catch (e) {}
         
@@ -3492,7 +3510,10 @@ window.saveCustomQuiz = function() {
 
         let safeRole = (userRole||"").toString().trim().toLowerCase(); let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
         if (isPrivileged && isAdminViewActive) { document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block'; document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; } 
-        else { loadStudentDashboard(); } window.scrollTo(0, 0); stopTimer(); isTimerStarted = false;
+        else { loadStudentDashboard(); } window.scrollTo(0, 0);
+    // v109.1 Fast UI Update
+    if(typeof loadStudentDashboard === 'function') loadStudentDashboard();
+    if(typeof renderDashboard === 'function') renderDashboard(); stopTimer(); isTimerStarted = false;
     }
 
     function updateStickyBar() { document.getElementById('sb-answered').innerText = `${answeredCount}/${currentQuiz.length}`; }
