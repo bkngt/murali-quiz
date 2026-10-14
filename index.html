@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.7">
+    <link rel="manifest" href="manifest.json?v=109.8">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -782,99 +782,25 @@
         }
     
 
-        /* Clean Accordion UI Fix v109.7 */
-        #chart-grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            align-items: start;
-        }
+        
+        /* Clean Accordion UI Fix v109.8 (Text Wrap Fix) */
+        #chart-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-items: start; }
         @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
-        
-        .chart-section-v2 {
-            padding: 10px !important;
-            margin-bottom: 0 !important;
-            border-radius: 12px !important;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
-        }
-        
-        /* MAGIC: Open section takes FULL WIDTH */
-        .chart-section-v2.accordion-open {
-            grid-column: 1 / -1 !important;
-            border-color: var(--chart-color) !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
-        }
-        
-        /* Reflection always full width */
+        .chart-section-v2 { padding: 10px !important; margin-bottom: 0 !important; border-radius: 12px !important; background: var(--card-bg); border: 1px solid var(--border-color); transition: all 0.2s ease; }
+        .chart-section-v2.accordion-open { grid-column: 1 / -1 !important; border-color: var(--chart-color) !important; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important; }
         #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
-
-        .chart-title-v2 {
-            display: flex;
-            align-items: center;
-            padding: 0 !important;
-            margin: 0 !important;
-            cursor: pointer;
-        }
+        .chart-title-v2 { display: flex; align-items: center; padding: 0 !important; margin: 0 !important; cursor: pointer; }
+        .accordion-status { width: 20px; font-size: 1.1rem; margin-right: 8px !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         
-        .accordion-status {
-            width: 20px;
-            font-size: 1.1rem;
-            margin-right: 8px !important;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* FIX: Allow text to show fully */
+        .title-short { font-size: 0.95rem; font-weight: 800; color: var(--text-color); flex: 1; text-align: left; line-height: 1.25; }
+        .title-long { font-size: 0.95rem; font-weight: 800; color: var(--text-color); line-height: 1.35; flex: 1; }
         
-        .title-short {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--text-color);
-            flex: 1;
-            text-align: left;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .title-long {
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: var(--text-color);
-            line-height: 1.35;
-            flex: 1;
-        }
-        
-        .chart-section-v2:not(.accordion-open) .score-badge {
-            display: none !important;
-        }
-        
-        .score-badge {
-            font-size: 0.75rem !important;
-            padding: 2px 6px !important;
-            margin-left: 8px;
-            flex-shrink: 0;
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--chart-color);
-            border-radius: 50px;
-        }
-        
-        .accordion-chevron {
-            margin-left: auto;
-            font-size: 0.75rem;
-            transition: transform 0.3s ease;
-            color: var(--muted-text-color);
-        }
-        
-        .chart-content-v2 {
-            padding-top: 12px !important;
-            margin-top: 12px !important;
-            border-top: 1px dashed var(--border-color);
-        }
-    
-</style>
+        .chart-section-v2:not(.accordion-open) .score-badge { display: none !important; }
+        .score-badge { font-size: 0.75rem !important; padding: 2px 6px !important; margin-left: 8px; flex-shrink: 0; background: rgba(139, 92, 246, 0.1); color: var(--chart-color); border-radius: 50px; }
+        .accordion-chevron { margin-left: auto; font-size: 0.75rem; transition: transform 0.3s ease; color: var(--muted-text-color); padding-left: 5px; }
+        .chart-content-v2 { padding-top: 12px !important; margin-top: 12px !important; border-top: 1px dashed var(--border-color); }
+    </style>
 </head>
 <body>
 <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
@@ -1360,7 +1286,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.7</div>
+        <div>Version: 109.8</div>
     </div>
 </div>
 
@@ -1863,7 +1789,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.7"; 
+    const APP_VERSION = "109.8"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4240,17 +4166,17 @@ window.saveCustomQuiz = function() {
             statusSpan.innerHTML = '⚪'; 
             title.prepend(statusSpan);
             
-            const originalSpan = title.querySelector('span:not(.accordion-status):not(.accordion-chevron)');
-            if(originalSpan) {
-                originalSpan.classList.add('title-long');
-                originalSpan.style.display = 'none';
-                
-                const shortSpan = document.createElement('span');
-                shortSpan.className = 'title-short';
-                shortSpan.innerText = shortTitles[index] || 'अन्य';
-                
-                title.insertBefore(shortSpan, originalSpan);
-            }
+            // FIX: Target ALL spans that are original to hide them properly
+            const originalSpans = title.querySelectorAll('span:not(.accordion-status):not(.accordion-chevron)');
+            originalSpans.forEach(sp => {
+                sp.classList.add('title-long');
+                sp.style.display = 'none';
+            });
+            
+            const shortSpan = document.createElement('span');
+            shortSpan.className = 'title-short';
+            shortSpan.innerText = shortTitles[index] || 'अन्य';
+            title.insertBefore(shortSpan, originalSpans[0] || null);
             
             const scoreB = title.querySelector('b');
             if(scoreB) { scoreB.classList.add('score-badge'); }
@@ -4274,12 +4200,11 @@ window.saveCustomQuiz = function() {
             sec.classList.remove('accordion-open');
             const content = sec.querySelector('.chart-content-v2');
             const chevron = sec.querySelector('.accordion-chevron');
-            const tLong = sec.querySelector('.title-long');
+            sec.querySelectorAll('.title-long').forEach(el => el.style.display = 'none');
             const tShort = sec.querySelector('.title-short');
             
             if (content) content.style.display = 'none';
             if (chevron) chevron.style.transform = 'rotate(0deg)';
-            if (tLong) tLong.style.display = 'none';
             if (tShort) tShort.style.display = 'block';
         });
         
@@ -4287,12 +4212,10 @@ window.saveCustomQuiz = function() {
             targetSection.classList.add('accordion-open');
             const content = targetSection.querySelector('.chart-content-v2');
             const chevron = targetSection.querySelector('.accordion-chevron');
-            const tLong = targetSection.querySelector('.title-long');
+            targetSection.querySelectorAll('.title-long').forEach(el => el.style.display = 'block');
             const tShort = targetSection.querySelector('.title-short');
             
-            if (tLong) tLong.style.display = 'block';
             if (tShort) tShort.style.display = 'none';
-            
             if (content) {
                 content.style.display = 'block';
                 content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 200, easing: 'ease-out'});
