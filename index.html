@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=110.1">
+    <link rel="manifest" href="manifest.json?v=110.3">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -714,6 +714,52 @@
         
         .chart-section-v2.accordion-open .chart-title-v2 { justify-content: flex-start; }
     
+
+        /* v110.3 Color States UI */
+        .chart-section-v2 {
+            transition: background 0.3s ease, border-color 0.3s ease !important;
+            border-width: 2px !important;
+            border-style: solid !important;
+            text-align: center !important;
+        }
+        
+        /* STATE COLORS (Visible in Light & Dark Mode) */
+        .chart-section-v2.state-empty {
+            background: var(--card-bg) !important;
+            border-color: var(--border-color) !important;
+        }
+        .chart-section-v2.state-partial {
+            background: rgba(245, 158, 11, 0.08) !important;
+            border-color: rgba(245, 158, 11, 0.7) !important; /* Yellowish */
+        }
+        .chart-section-v2.state-complete {
+            background: rgba(16, 185, 129, 0.08) !important;
+            border-color: rgba(16, 185, 129, 0.7) !important; /* Greenish */
+        }
+        
+        /* OPEN SECTION */
+        .chart-section-v2.accordion-open {
+            background: var(--card-bg) !important;
+            border-color: var(--chart-color) !important;
+            text-align: left !important;
+        }
+
+        /* Hide all dots, chevron, and original score badges */
+        .accordion-status, .score-badge, .accordion-chevron { display: none !important; }
+        
+        .chart-title-v2 { justify-content: center !important; }
+        .chart-section-v2.accordion-open .chart-title-v2 { justify-content: flex-start !important; }
+        
+        .title-short { 
+            text-align: center !important; 
+            width: 100% !important; 
+            display: block; 
+            font-size: 1.05rem !important;
+            font-weight: 800;
+        }
+        
+        .chart-section-v2.accordion-open .title-short { display: none !important; }
+    
 </style>
 </head>
 <body>
@@ -1200,7 +1246,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.1</div>
+        <div>Version: 110.3</div>
     </div>
 </div>
 
@@ -1703,7 +1749,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.1"; 
+    const APP_VERSION = "110.3"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4075,6 +4121,11 @@ window.saveCustomQuiz = function() {
             title.style.cursor = 'pointer';
             title.addEventListener('click', () => toggleAccordion(section));
             
+            const oldStatus = title.querySelector('.accordion-status');
+            if(oldStatus) oldStatus.style.display = 'none';
+            const oldChevron = title.querySelector('.accordion-chevron');
+            if(oldChevron) oldChevron.style.display = 'none';
+            
             const originalSpans = title.querySelectorAll('span:not(.accordion-status):not(.accordion-chevron)');
             originalSpans.forEach(sp => {
                 sp.classList.add('title-long');
@@ -4131,16 +4182,22 @@ window.saveCustomQuiz = function() {
     
     function updateAccordionStatus() {
         document.querySelectorAll('.chart-section-v2').forEach(section => {
-            section.classList.remove('state-complete', 'state-partial');
+            section.classList.remove('state-complete', 'state-partial', 'state-empty');
             const isCompleted = chartSectionReadyForAutoScrollV4(section);
             const isPartial = isChartSectionPartiallyFilled(section);
             const isReflection = section.id === 'chart-reflection-section-v4';
             
             if (isReflection) {
                 if (isPartial) section.classList.add('state-complete');
+                else section.classList.add('state-empty');
             } else {
-                if (isCompleted) section.classList.add('state-complete');
-                else if (isPartial) section.classList.add('state-partial');
+                if (isCompleted) {
+                    section.classList.add('state-complete');
+                } else if (isPartial) {
+                    section.classList.add('state-partial');
+                } else {
+                    section.classList.add('state-empty');
+                }
             }
         });
     }
@@ -4567,7 +4624,7 @@ window.saveCustomQuiz = function() {
 
         document.getElementById('daily-chart-form').style.display = 'none';
         const babaTimeText = formatBabaYaadDurationV4(chartData.totalBabaYaadMinutes);
-        const resultHtml = `<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem;color:#94a3b8;">/100</small></div><div style="margin-top:12px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">${babaTimeText}</strong></div><div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।'}</div><div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent;color:var(--danger-color);border:1px solid var(--danger-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;font-weight:800;">❌ बन्द गर्नुहोस् (Cancel)</button></div>`;
+        const resultHtml = `<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem;color:#94a3b8;">/100</small></div><div style="margin-top:12px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">${babaTimeText}</strong></div><div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।'}</div><div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent;color:var(--danger-color);border:2px solid var(--danger-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;font-weight:800;">❌ बन्द गर्नुहोस् (Cancel)</button></div>`;
         const resBox = document.getElementById('chart-result-box');
         resBox.innerHTML = resultHtml; resBox.style.display='block'; resBox.style.textAlign='center'; resBox.style.padding='1.1rem .75rem'; resBox.style.background='var(--card-bg)'; resBox.style.borderRadius='20px'; resBox.style.border='2px solid var(--border-color)';
         updateChartV3Total();
