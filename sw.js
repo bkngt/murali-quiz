@@ -1,13 +1,20 @@
-/* BK Murali Quiz 110.3 Auto-Update Service Worker */
-const CACHE_NAME = "murali-quiz-v110-3";
-const STATIC_ASSETS = ["./", "./index.html", "./manifest.json", "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", "https://cdn.jsdelivr.net/npm/chart.js", "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"];
+/* BK Murali Quiz 110.4 Auto-Update Service Worker */
+const CACHE_NAME = "murali-quiz-v110-4";
+const STATIC_ASSETS = [
+    "./",
+    "./index.html",
+    "./manifest.json",
+    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+    "https://cdn.jsdelivr.net/npm/chart.js",
+    "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"
+];
 
 self.addEventListener("install", event => {
-    self.skipWaiting(); 
+    self.skipWaiting();
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(["./index.html", "./manifest.json"]);
-        try { await cache.add("./"); } catch(e){}
+        try { await cache.add("./"); } catch (e) {}
     })());
 });
 
@@ -17,7 +24,7 @@ self.addEventListener("activate", event => {
             keys.map(key => {
                 if (key !== CACHE_NAME) return caches.delete(key);
             })
-        )).then(() => self.clients.claim()) 
+        )).then(() => self.clients.claim())
     );
 });
 
