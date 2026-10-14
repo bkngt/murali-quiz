@@ -599,6 +599,92 @@
             .chart-title-v2 b { font-size: 0.65rem !important; min-width: 20px !important; padding: 2px 4px !important;}
         }
     
+
+        /* Smart Grid Accordion UI Fix v109.6 */
+        #chart-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            align-items: start;
+        }
+        @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
+        
+        .chart-section-v2 {
+            padding: 8px !important;
+            margin-bottom: 0 !important;
+            border-radius: 12px !important;
+            height: fit-content;
+            transition: all 0.3s ease;
+        }
+        
+        /* MAGIC: Open section takes FULL WIDTH */
+        .chart-section-v2.accordion-open {
+            grid-column: 1 / -1 !important;
+            background: var(--card-bg);
+            border-color: var(--chart-color) !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
+        }
+        
+        /* Reflection always full width */
+        #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
+
+        .chart-title-v2 {
+            display: flex;
+            align-items: center;
+            padding: 4px !important;
+            margin: 0 !important;
+            cursor: pointer;
+        }
+        
+        /* Truncate text when CLOSED to make nice small buttons */
+        .chart-section-v2:not(.accordion-open) .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.82rem;
+            flex: 1;
+            min-width: 0;
+            margin-top: 1px;
+        }
+        
+        /* Full text when OPEN */
+        .chart-section-v2.accordion-open .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) {
+            white-space: normal;
+            font-size: 0.95rem;
+            flex: 1;
+            margin-top: 1px;
+        }
+
+        .accordion-status {
+            width: 18px;
+            font-size: 0.85rem;
+            margin-right: 6px !important;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-title-v2 b {
+            font-size: 0.7rem !important;
+            padding: 2px 6px !important;
+            margin-left: 6px;
+            flex-shrink: 0;
+        }
+        
+        .accordion-chevron {
+            margin-left: auto;
+            font-size: 0.75rem;
+            padding-left: 4px;
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-content-v2 {
+            padding-top: 12px !important;
+            margin-top: 8px !important;
+            border-top: 1px dashed var(--border-color);
+        }
+    
 </style>
 </head>
 <body>
