@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.8">
+    <link rel="manifest" href="manifest.json?v=109.9">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -800,7 +800,28 @@
         .score-badge { font-size: 0.75rem !important; padding: 2px 6px !important; margin-left: 8px; flex-shrink: 0; background: rgba(139, 92, 246, 0.1); color: var(--chart-color); border-radius: 50px; }
         .accordion-chevron { margin-left: auto; font-size: 0.75rem; transition: transform 0.3s ease; color: var(--muted-text-color); padding-left: 5px; }
         .chart-content-v2 { padding-top: 12px !important; margin-top: 12px !important; border-top: 1px dashed var(--border-color); }
-    </style>
+    
+        /* v109.9 Full Text UI Fix */
+        .chart-title-v2 .title-short {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            word-wrap: break-word !important;
+            font-size: 0.95rem !important;
+            line-height: 1.25 !important;
+            padding-right: 4px;
+        }
+        #chart-grid-container {
+            gap: 6px !important;
+        }
+        @media (min-width: 600px) { 
+            #chart-grid-container { gap: 10px !important; } 
+        }
+        .chart-section-v2 {
+            padding: 8px 10px !important;
+        }
+    
+</style>
 </head>
 <body>
 <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
@@ -1286,7 +1307,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.8</div>
+        <div>Version: 109.9</div>
     </div>
 </div>
 
@@ -1789,7 +1810,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.8"; 
+    const APP_VERSION = "109.9"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
