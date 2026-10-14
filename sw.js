@@ -1,5 +1,5 @@
-/* BK Murali Quiz 109.2 offline-first service worker */
-const CACHE_NAME = "murali-quiz-v109-2";
+/* BK Murali Quiz 109.4 offline-first service worker */
+const CACHE_NAME = "murali-quiz-v109-4";
 
 const STATIC_ASSETS = [
     "./",
@@ -15,11 +15,14 @@ self.addEventListener("install", event => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(["./index.html", "./manifest.json"]);
         try { await cache.add("./"); } catch (e) {}
+        
         for (const url of STATIC_ASSETS) {
             try {
                 if (url.includes("cdn-icons-png.flaticon.com")) {
                     const iconResponse = await fetch(url, { mode: "no-cors" });
-                    if (iconResponse && (iconResponse.ok || iconResponse.type === "opaque")) await cache.put(url, iconResponse);
+                    if (iconResponse && (iconResponse.ok || iconResponse.type === "opaque")) {
+                        await cache.put(url, iconResponse);
+                    }
                 } else {
                     await cache.add(url);
                 }
