@@ -1,9 +1,9 @@
-/* BK Murali Quiz 109.8 Auto-Update Service Worker */
-const CACHE_NAME = "murali-quiz-v109-8";
+/* BK Murali Quiz 109.9 Auto-Update Service Worker */
+const CACHE_NAME = "murali-quiz-v109-9";
 const STATIC_ASSETS = ["./", "./index.html", "./manifest.json", "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", "https://cdn.jsdelivr.net/npm/chart.js", "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"];
 
 self.addEventListener("install", event => {
-    self.skipWaiting(); // Force new service worker to activate immediately
+    self.skipWaiting(); 
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(["./index.html", "./manifest.json"]);
@@ -17,7 +17,7 @@ self.addEventListener("activate", event => {
             keys.map(key => {
                 if (key !== CACHE_NAME) return caches.delete(key);
             })
-        )).then(() => self.clients.claim()) // Take control of all open pages
+        )).then(() => self.clients.claim()) 
     );
 });
 
@@ -27,7 +27,6 @@ self.addEventListener("fetch", event => {
     const url = new URL(req.url);
     if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
 
-    // NETWORK-FIRST STRATEGY for HTML/App loads
     if (req.mode === "navigate" || req.url.includes("index.html")) {
         event.respondWith(
             fetch(req).then(res => {
@@ -39,7 +38,6 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // STALE-WHILE-REVALIDATE for other assets
     event.respondWith(
         caches.match(req).then(cached => {
             const networkFetch = fetch(req).then(res => {
