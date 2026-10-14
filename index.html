@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=110.7">
+    <link rel="manifest" href="manifest.json?v=110.8">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -631,6 +631,33 @@
             color: var(--chart-color);
             border: 1px solid rgba(139, 92, 246, 0.25);
         }
+
+        /* v110.8 Badges & Banner CSS */
+        .spiritual-badge-card-v8 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(139, 92, 246, 0.12));
+            border: 1px solid rgba(245, 158, 11, 0.45);
+        }
+        .reminder-banner-v8 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            background: rgba(245, 158, 11, 0.14);
+            border: 1px dashed #f59e0b;
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+    
 </style>
 </head>
 <body>
@@ -873,6 +900,7 @@
         <div class="chart-topbar-v2">
             <button class="chart-date-btn-v2" type="button" onclick="openChartDatePicker()">📅 <span id="chart-date-label">आज</span></button>
             <input type="date" id="chart-date" class="chart-hidden-date" aria-label="चार्ट मिति">
+            <button class="btn-small" type="button" id="btn-chart-reminder-v8" onclick="toggleChartReminderV8()" title="दैनिक चार्ट रिमाइन्डर" style="background:var(--bg-color); color:var(--chart-color); border:1px solid var(--chart-color); padding:.62rem .75rem; font-weight:800; border-radius:10px;">🔔</button>
             <button class="btn-small" type="button" onclick="openChartLeaderboard()" style="background:var(--chart-color); color:#fff; border:none; padding:.62rem .9rem; font-weight:800;">👥 सहभागी</button>
         </div>
 
@@ -1050,7 +1078,9 @@
     </div>
 <!-- Progress View -->
     <div id="view-progress" style="display: none;">
+        <div id="spiritual-badge-banner-v8" style="margin-bottom:10px;"></div>
         <div id="baba-message-container"></div>
+        <div style="margin-bottom:12px;"><button type="button" id="btn-open-blessing-card-v8" onclick="openSpiritualCardModalV8()" style="width:100%; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none; padding:0.75rem 1rem; border-radius:14px; font-weight:800; font-size:0.95rem; box-shadow:0 6px 18px rgba(245,158,11,0.28);">🏅 प्रगति तथा वरदान पत्र (Download)</button></div>
         <div class="dashboard-stats" id="dash-stats"></div>
         
         <div class="progress-tabs" style="margin-bottom: 10px;">
@@ -1118,7 +1148,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.7</div>
+        <div>Version: 110.8</div>
     </div>
 </div>
 
@@ -1142,6 +1172,23 @@
         </div>
     </div>
     
+
+    <!-- Spiritual Progress & Blessing Card Modal (v110.8) -->
+    <div id="spiritual-card-modal-v8" class="modal-overlay" onclick="if(event.target.id === 'spiritual-card-modal-v8') document.getElementById('spiritual-card-modal-v8').style.display='none';">
+        <div class="modal-content" style="max-width: 440px; padding: 1.2rem; text-align: center; background: #0f172a; border-color: #f59e0b;">
+            <button class="close-modal" onclick="document.getElementById('spiritual-card-modal-v8').style.display='none';" style="position:absolute; top:12px; right:12px; border:none; background:transparent; font-size:1.4rem; cursor:pointer; color:#f8fafc;">❌</button>
+            <h3 style="margin-top:0; color:#fde68a; font-size:1.2rem; font-weight:800;">🏅 ईश्वरीय प्रगति तथा वरदान पत्र</h3>
+            <div style="background:#1e293b; padding:8px; border-radius:14px; border:1px solid #334155; margin-bottom:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <canvas id="spiritual-card-canvas-v8" width="900" height="1120" style="width:100%; height:auto; border-radius:10px; display:block;"></canvas>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button type="button" onclick="downloadSpiritualCardV8()" style="flex:1; background:linear-gradient(135deg,#16a34a,#059669); color:#fff; font-weight:800; border:none; border-radius: 12px; padding: 0.8rem;">📥 फोटो सेभ गर्नुहोस्</button>
+                <button type="button" onclick="shareSpiritualCardV8()" style="flex:1; background:linear-gradient(135deg,#0284c7,#2563eb); color:#fff; font-weight:800; border:none; border-radius: 12px; padding: 0.8rem;">💬 सेयर गर्नुहोस्</button>
+            </div>
+            <div id="card-generating-msg" style="display:none; color:#94a3b8; font-size:0.8rem; margin-top:8px;">⏳ कार्ड तयार हुँदैछ...</div>
+        </div>
+    </div>
+
 <!-- Settings Modal -->
 <div id="settings-modal" class="modal-overlay" aria-hidden="true" onclick="closeSettingsOnOverlay(event)">
     <div class="modal-content">
@@ -1621,7 +1668,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.7";
+    const APP_VERSION = "110.8";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -2258,6 +2305,357 @@ function getMegaActivationDateUI(quizDate) {
     // ==========================================
     // 4. AUTHENTICATION & PROFILE
     // ==========================================
+    
+    // ==========================================
+    // 12. SADGURUWAR PREMIUM MODULE (v110.8)
+    // ==========================================
+    function getSpiritualBadgeInfoV8_() {
+        const history = safeJSON('murali_progress', []);
+        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+        const exams = normalizeExamHistoryForStats_(history);
+        const chartItems = validChartHistoryForStats_(charts);
+        const examStreak = currentStreak_(exams);
+        const chartStreak = currentStreak_(chartItems);
+        const bestStreak = Math.max(examStreak, chartStreak);
+        const totalActivity = exams.length + chartItems.length;
+
+        if (bestStreak >= 30 || totalActivity >= 60) {
+            return { icon: '💎', title: 'अष्ट रत्न', subtitle: 'मास्टर सर्वशक्तिमान्', nextGoal: 'सर्वोच्च ईश्वरीय स्थिति कायम राख्नुहोस्!', streak: bestStreak, examStreak, chartStreak };
+        }
+        if (bestStreak >= 21 || totalActivity >= 42) {
+            return { icon: '🕊️', title: 'फरिश्ता स्वरूप', subtitle: 'डबल लाइट योगी', nextGoal: 'अष्ट रत्न बन्न ३० दिनको निरन्तरता पूरा गर्नुहोस्', streak: bestStreak, examStreak, chartStreak };
+        }
+        if (bestStreak >= 15 || totalActivity >= 30) {
+            return { icon: '👑', title: 'मुरली रत्न', subtitle: 'ज्ञान स्वरूप', nextGoal: 'फरिश्ता स्वरूप उपाधिको लागि २१ दिनको निरन्तरता', streak: bestStreak, examStreak, chartStreak };
+        }
+        if (bestStreak >= 7 || totalActivity >= 14) {
+            return { icon: '🌟', title: 'निरन्तर योगी', subtitle: 'सच्चा पुरुषार्थी', nextGoal: 'मुरली रत्न उपाधिको लागि १५ दिनको निरन्तरता', streak: bestStreak, examStreak, chartStreak };
+        }
+        if (bestStreak >= 3 || totalActivity >= 5) {
+            return { icon: '✨', title: 'उत्साही योगी', subtitle: 'नियमित अभ्यासकर्ता', nextGoal: 'निरन्तर योगी बन्न ७ दिन लगातार अभ्यास गर्नुहोस्', streak: bestStreak, examStreak, chartStreak };
+        }
+        return { icon: '🌱', title: 'पुरुषार्थी रत्न', subtitle: 'ईश्वरीय विद्यार्थी', nextGoal: 'नियमित क्वीज र चार्ट भरेर उपाधि प्राप्त गर्नुहोस्', streak: bestStreak, examStreak, chartStreak };
+    }
+
+    function updateSpiritualBadgeUIV8() {
+        try {
+            const info = getSpiritualBadgeInfoV8_();
+            const banner = document.getElementById('spiritual-badge-banner-v8');
+            if (banner) {
+                banner.innerHTML = '<div class="spiritual-badge-card-v8">' +
+                    '<div style="display:flex;align-items:center;gap:10px;text-align:left;">' +
+                        '<div style="font-size:1.9rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));">' + info.icon + '</div>' +
+                        '<div>' +
+                            '<div style="font-size:0.72rem;font-weight:800;color:#d97706;text-transform:uppercase;">ईश्वरीय उपाधि (Spiritual Title)</div>' +
+                            '<div style="font-size:1.05rem;font-weight:900;color:var(--text-color);">' + info.title + ' <span style="font-size:0.75rem;color:var(--muted-text-color);font-weight:700;">(' + info.subtitle + ')</span></div>' +
+                            '<div style="font-size:0.73rem;color:var(--muted-text-color);font-weight:700;">' + info.nextGoal + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="text-align:right;font-weight:900;color:#d97706;font-size:0.85rem;white-space:nowrap;">🔥 ' + info.streak + ' दिन</div>' +
+                '</div>';
+            }
+        } catch (e) {}
+    }
+
+    window.toggleChartReminderV8 = async function() {
+        const current = localStorage.getItem('murali_chart_reminder_v8') === '1';
+        if (current) {
+            localStorage.setItem('murali_chart_reminder_v8', '0');
+            updateReminderBellUIV8();
+            showToast('🔕 दैनिक चार्ट रिमाइन्डर बन्द गरियो।', 'info');
+            return;
+        }
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            try { await Notification.requestPermission(); } catch (e) {}
+        }
+        localStorage.setItem('murali_chart_reminder_v8', '1');
+        updateReminderBellUIV8();
+        showToast('🔔 दैनिक चार्ट रिमाइन्डर सक्रिय भयो! (साँझ ६ बजेपछि सम्झाउनेछ)', 'success');
+        if ('Notification' in window && Notification.permission === 'granted') {
+            try {
+                new Notification('🕊️ BK Murali Quiz', {
+                    body: 'ओम शान्ति! तपाईंको दैनिक आध्यात्मिक चार्ट रिमाइन्डर सक्रिय भएको छ।',
+                    icon: 'https://cdn-icons-png.flaticon.com/512/3176/3176298.png'
+                });
+            } catch (e) {}
+        }
+    };
+
+    function updateReminderBellUIV8() {
+        const enabled = localStorage.getItem('murali_chart_reminder_v8') === '1';
+        const btn = document.getElementById('btn-chart-reminder-v8');
+        if (btn) {
+            btn.innerHTML = enabled ? '🔔 ON' : '🔕';
+            btn.style.background = enabled ? 'rgba(245, 158, 11, 0.16)' : 'var(--bg-color)';
+            btn.style.borderColor = enabled ? '#f59e0b' : 'var(--chart-color)';
+            btn.style.color = enabled ? '#d97706' : 'var(--chart-color)';
+        }
+    }
+
+    function checkEveningChartReminderV8() {
+        try {
+            updateReminderBellUIV8();
+            const enabled = localStorage.getItem('murali_chart_reminder_v8') === '1';
+            const now = new Date();
+            const hr = now.getHours();
+            const todayISO = getLocalDateISO();
+            const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+            const filledToday = charts.some(c => c && c.date === todayISO);
+            
+            const existingBanner = document.getElementById('evening-reminder-banner-v8');
+            if (filledToday && existingBanner) {
+                existingBanner.remove();
+                return;
+            }
+            if (enabled && !filledToday && hr >= 18 && !existingBanner) {
+                const header = document.getElementById('main-header');
+                if (header) {
+                    const div = document.createElement('div');
+                    div.id = 'evening-reminder-banner-v8';
+                    div.className = 'reminder-banner-v8';
+                    div.innerHTML = '<span>🕊️ मीठे बच्चे, आजको आध्यात्मिक चार्ट भर्न बाँकी छ कि?</span>' +
+                        '<button type="button" onclick="switchTab(\'chart\'); this.parentElement.remove();" style="width:auto;padding:5px 12px;font-size:0.78rem;background:#f59e0b;color:#fff;border:none;border-radius:50px;box-shadow:none;">अहिले भर्नुहोस्</button>';
+                    header.insertAdjacentElement('afterend', div);
+                }
+            }
+        } catch (e) {}
+    }
+
+    window.openSpiritualCardModalV8 = function() {
+        const modal = document.getElementById('spiritual-card-modal-v8');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        setTimeout(() => { drawSpiritualProgressCardV8(); }, 100);
+    };
+
+    function drawSpiritualProgressCardV8() {
+        const canvas = document.getElementById('spiritual-card-canvas-v8');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+
+        // Data gathering
+        const history = safeJSON('murali_progress', []);
+        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+        const exams = normalizeExamHistoryForStats_(history);
+        const chartItems = validChartHistoryForStats_(charts);
+        const examAvg = exams.length ? Math.round(exams.reduce((s,x)=>s+x.percent,0)/exams.length) : 0;
+        const chartAvg = chartItems.length ? Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length) : 0;
+        
+        let totalYaadMins = 0;
+        chartItems.forEach(c => { totalYaadMins += Number(c.totalBabaYaadMinutes || 0); });
+        const yaadHrs = Math.floor(totalYaadMins / 60);
+        const yaadText = yaadHrs > 0 ? (yaadHrs + ' घण्टा') : (totalYaadMins + ' मिनेट');
+        
+        const badge = getSpiritualBadgeInfoV8_();
+
+        const blessings = [
+            "नथाकी, नरोकी सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने डबल लाइट फरिश्ता भव!",
+            "सच्चा दिलले प्रतिदिन आफ्नो चार्ट राखी बापदादाको दिलतख्तनशीन राजर्षि भव!",
+            "प्रत्येक संकल्प र कर्ममा बाबाको यादको सुगन्ध फैलाउने सदा हर्षितमुख रत्न भव!",
+            "मुरलीको मनन-चिन्तनद्वारा सर्व शक्तिले सम्पन्न मास्टर सर्वशक्तिमान् भव!"
+        ];
+        const daySeed = new Date().getDate() % blessings.length;
+        const blessingText = blessings[daySeed];
+
+        // 1. Deep Blue/Purple Background
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#0f172a');
+        bgGrad.addColorStop(0.5, '#1e1b4b');
+        bgGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Stars/Sparkles Background Effect
+        ctx.fillStyle = '#ffffff';
+        for(let i=0; i<80; i++) {
+            let r = Math.random() * 2.5;
+            let x = Math.random() * W;
+            let y = Math.random() * H;
+            ctx.globalAlpha = Math.random() * 0.8;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        // 3. Golden Ornamental Borders
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(30, 30, W - 60, H - 60);
+        ctx.strokeStyle = 'rgba(253, 230, 138, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(45, 45, W - 90, H - 90);
+        
+        // Corner Ornaments
+        ctx.fillStyle = '#f59e0b';
+        const drawCorner = (cx, cy) => {
+            ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI*2); ctx.stroke();
+        };
+        drawCorner(45, 45); drawCorner(W-45, 45); drawCorner(45, H-45); drawCorner(W-45, H-45);
+
+        // 4. Divine Glowing Shiv Baba Symbol (Top Center)
+        const cx = W / 2, cy = 160;
+        const glowGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 100);
+        glowGrad.addColorStop(0, '#ffffff');
+        glowGrad.addColorStop(0.2, '#fef08a');
+        glowGrad.addColorStop(0.6, 'rgba(245, 158, 11, 0.6)');
+        glowGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath(); ctx.arc(cx, cy, 100, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨', cx, cy+12); // Shiv Baba Point Representation
+
+        // 5. Header Texts
+        ctx.fillStyle = '#fde68a';
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.fillText('ॐ शान्ति • ब्रह्माकुमारीज NGT, नेपाल', W / 2, 75);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 52px Arial, sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+        ctx.fillText('ईश्वरीय प्रगति तथा वरदान पत्र', W / 2, 280);
+        ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; // reset
+
+        // 6. Name and Address
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 44px Arial, sans-serif';
+        ctx.fillText(userName || 'ईश्वरीय विद्यार्थी', W / 2, 350);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.fillText('📍 सेवा केन्द्र: ' + (userAddress || 'Nepal'), W / 2, 395);
+
+        // 7. Huge Golden Badge in Center
+        const bx = W / 2, by = 550, br = 120;
+        const badgeGrad = ctx.createRadialGradient(bx, by-40, 10, bx, by, br);
+        badgeGrad.addColorStop(0, '#fef08a');
+        badgeGrad.addColorStop(0.5, '#d97706');
+        badgeGrad.addColorStop(1, '#78350f');
+        
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.6)'; ctx.shadowBlur = 30;
+        ctx.fillStyle = badgeGrad;
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0; // reset
+        
+        ctx.strokeStyle = '#fde68a';
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.arc(bx, by, br - 10, 0, Math.PI * 2); ctx.stroke();
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 45px Arial, sans-serif';
+        ctx.fillText(badge.icon, bx, by - 35);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px Arial, sans-serif';
+        ctx.fillText(badge.title, bx, by + 15);
+        ctx.fillStyle = '#fde68a';
+        ctx.font = 'bold 20px Arial, sans-serif';
+        ctx.fillText('🔥 ' + badge.streak + ' दिन लगातार', bx, by + 50);
+
+        // 8. 4 Stats Boxes
+        const drawStatBox = (x, y, label, val) => {
+            const bw = 350, bh = 95;
+            const lg = ctx.createLinearGradient(x, y, x, y + bh);
+            lg.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+            lg.addColorStop(1, 'rgba(217, 119, 6, 0.1)');
+            ctx.fillStyle = lg;
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(x, y, bw, bh, 15); ctx.fill(); ctx.stroke();
+            
+            ctx.fillStyle = '#fde68a';
+            ctx.font = 'bold 22px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x + bw / 2, y + 40);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 32px Arial, sans-serif';
+            ctx.fillText(val, x + bw / 2, y + 80);
+        };
+
+        drawStatBox(80, 715, 'मुरली परीक्षा औसत', examAvg + '%');
+        drawStatBox(470, 715, 'चार्ट औसत', chartAvg + '/100');
+        drawStatBox(80, 830, 'लगातार अभ्यास', badge.streak + ' दिन');
+        drawStatBox(470, 830, 'बाबाको कुल याद', yaadText);
+
+        // 9. Blessing Section (Bottom)
+        ctx.fillStyle = '#fca5a5';
+        ctx.font = 'bold 32px Arial, sans-serif';
+        ctx.fillText('🌸 ईश्वरीय वरदान 🌸', W / 2, 975);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 26px Arial, sans-serif';
+        const words = ('"' + blessingText + '"').split(' ');
+        let line = '', yPos = 1025;
+        words.forEach(w => {
+            const testLine = line + w + ' ';
+            if (ctx.measureText(testLine).width > W - 140) {
+                ctx.fillText(line.trim(), W / 2, yPos);
+                line = w + ' '; yPos += 38;
+            } else {
+                line = testLine;
+            }
+        });
+        if (line.trim()) ctx.fillText(line.trim(), W / 2, yPos);
+
+        // Footer
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 18px Arial, sans-serif';
+        ctx.fillText('bkngt.github.io/murali-quiz', W / 2, 1095);
+    }
+
+    window.downloadSpiritualCardV8 = function() {
+        const canvas = document.getElementById('spiritual-card-canvas-v8');
+        if (!canvas) return;
+        const msg = document.getElementById('card-generating-msg');
+        if (msg) { msg.style.display = 'block'; msg.innerText = '⏳ कार्ड सेभ हुँदैछ...'; }
+        
+        setTimeout(() => {
+            const a = document.createElement('a');
+            a.download = 'BK_Murali_Progress_Card.png';
+            a.href = canvas.toDataURL('image/png', 1.0);
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            if (msg) msg.style.display = 'none';
+            showToast('📥 प्रगति कार्ड ग्यालरीमा सेभ भयो!', 'success');
+        }, 300);
+    };
+
+    window.shareSpiritualCardV8 = function() {
+        const canvas = document.getElementById('spiritual-card-canvas-v8');
+        if (!canvas) return;
+        const msg = document.getElementById('card-generating-msg');
+        if (msg) { msg.style.display = 'block'; msg.innerText = '⏳ तयार हुँदैछ...'; }
+        
+        if (navigator.canShare && canvas.toBlob) {
+            canvas.toBlob(async blob => {
+                try {
+                    const file = new File([blob], 'BK_Murali_Progress_Card.png', { type: 'image/png' });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'मेरो ईश्वरीय प्रगति तथा वरदान पत्र',
+                            text: 'ओम् शान्ति! BK Murali Quiz बाट मेरो ईश्वरीय प्रगति कार्ड हेर्नुहोस्। तपाईं पनि यहाँबाट खेल्न सक्नुहुन्छ: https://bkngt.github.io/murali-quiz/',
+                            files: [file]
+                        });
+                        if (msg) msg.style.display = 'none';
+                        return;
+                    }
+                } catch (e) { console.log("Share failed:", e); }
+                if (msg) msg.style.display = 'none';
+                downloadSpiritualCardV8(); // Fallback
+            }, 'image/png', 1.0);
+        } else {
+            if (msg) msg.style.display = 'none';
+            downloadSpiritualCardV8(); // Fallback
+        }
+    };
+
+
     function init() {
         // v109.1 Auto-Cache Buster
         let savedVersion = localStorage.getItem('murali_app_version');
@@ -2429,7 +2827,7 @@ function getMegaActivationDateUI(quizDate) {
         
         if(navigator.onLine) {
             fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "updateProfile", oldPhone: oldPhone, pin: pin, newName: finalName, newPhone: newPhone, newAddress: newAddress }) })
-            .then(r => r.text()).then(text => { document.getElementById('btn-save-profile').innerText = "Save Profile"; try { let data = JSON.parse(text); if(data.status === "success") { showToast("Profile Synced to Google Sheet! ☁️", "success"); updateProfileBadgeUI(); } else { showToast("Google Sheet Sync Error: " + data.message, "error"); } } catch(e) { showToast("सर्भर व्यस्त छ, तर मोबाइलमा सेभ भयो।", "warning"); } closeSettings(); })
+            .then(r => r.text()).then(text => { document.getElementById('btn-save-profile').innerText = "Save Profile"; try { let data = JSON.parse(text); if(data.status === "success") { showToast("Profile Synced to Google Sheet! ☁️", "success"); updateProfileBadgeUI(); setTimeout(() => { if(typeof checkEveningChartReminderV8 === 'function') checkEveningChartReminderV8(); }, 600); } else { showToast("Google Sheet Sync Error: " + data.message, "error"); } } catch(e) { showToast("सर्भर व्यस्त छ, तर मोबाइलमा सेभ भयो।", "warning"); } closeSettings(); })
             .catch(e => { document.getElementById('btn-save-profile').innerText = "Save Profile"; showToast("Saved Locally. (Server sync failed)", "warning"); closeSettings(); updateProfileBadgeUI(); });
         } else { document.getElementById('btn-save-profile').innerText = "Save Profile"; showToast("Saved Locally! (You are offline)", "success"); closeSettings(); updateProfileBadgeUI(); }
     };
@@ -4696,7 +5094,7 @@ window.saveCustomQuiz = function() {
 
         document.getElementById('daily-chart-form').style.display = 'none';
         const babaTimeText = formatBabaYaadDurationV4(chartData.totalBabaYaadMinutes);
-        const resultHtml = `<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem;color:#94a3b8;">/100</small></div><div style="margin-top:12px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">${babaTimeText}</strong></div><div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।'}</div><div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;"><button type="button" onclick="editChartForm()" style="background:transparent;color:var(--danger-color);border:2px solid var(--danger-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;font-weight:800;">❌ बन्द गर्नुहोस् (Cancel)</button></div>`;
+        const resultHtml = `<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div><div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">${chartData.totalScore}<small style="font-size:1rem;color:#94a3b8;">/100</small></div><div style="margin-top:12px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">${babaTimeText}</strong></div><div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">${chartData.stage}</div><div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">${chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।'}</div><div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;"><button type="button" onclick="openSpiritualCardModalV8()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:50px;padding:.62rem 1.1rem;font-weight:800;box-shadow:0 4px 12px rgba(245,158,11,0.3);">🏅 प्रगति कार्ड</button><button type="button" onclick="editChartForm()" style="background:transparent;color:var(--danger-color);border:2px solid var(--danger-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;font-weight:800;">❌ बन्द गर्नुहोस् (Cancel)</button></div>`;
         const resBox = document.getElementById('chart-result-box');
         resBox.innerHTML = resultHtml; resBox.style.display='block'; resBox.style.textAlign='center'; resBox.style.padding='1.1rem .75rem'; resBox.style.background='var(--card-bg)'; resBox.style.borderRadius='20px'; resBox.style.border='2px solid var(--border-color)';
         updateChartV3Total();
@@ -4734,6 +5132,8 @@ window.saveCustomQuiz = function() {
 
         window.renderDashboard = function() {
         if (isQuizActive) return;
+        if (typeof updateSpiritualBadgeUIV8 === 'function') updateSpiritualBadgeUIV8();
+        if (typeof checkEveningChartReminderV8 === 'function') checkEveningChartReminderV8();
         const isChartTab=document.getElementById('tab-stat-chart').classList.contains('active');
         const noteLegendV4 = document.getElementById('calendar-note-legend-v4');
         if (noteLegendV4) noteLegendV4.style.display = isChartTab ? 'block' : 'none';
