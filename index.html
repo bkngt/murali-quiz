@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.5">
+    <link rel="manifest" href="manifest.json?v=109.6">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -517,6 +517,88 @@
         .chart-title-v2 b { font-size: 0.75rem !important; padding: 2px 6px !important; margin-top: 1px; flex-shrink: 0; }
         .chart-content-v2 { padding-top: 8px !important; margin-top: 4px !important; }
     
+
+        /* 2-Column Grid Layout Fix v109.6 */
+        #chart-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            align-items: start;
+        }
+        
+        .chart-section-v2 {
+            padding: 8px !important;
+            margin-bottom: 0 !important; /* Managed by grid gap */
+            border-radius: 12px !important;
+            height: fit-content;
+        }
+        
+        /* Make reflection section span full width */
+        #chart-reflection-section-v4 {
+            grid-column: 1 / -1;
+        }
+        
+        .chart-title-v2 {
+            display: flex;
+            align-items: flex-start;
+            padding: 4px !important;
+            font-size: 0.85rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) {
+            margin-top: 1px;
+            flex: 1;
+        }
+        
+        .accordion-status {
+            width: 20px;
+            font-size: 0.85rem;
+            margin-right: 4px !important;
+            margin-top: 1px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .accordion-chevron {
+            margin-top: 2px;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-left: 4px;
+        }
+        
+        .chart-title-v2 b {
+            font-size: 0.7rem !important;
+            padding: 2px 5px !important;
+            margin-top: 1px;
+            flex-shrink: 0;
+            min-width: 24px !important;
+        }
+        
+        .chart-content-v2 {
+            padding-top: 8px !important;
+            margin-top: 4px !important;
+        }
+
+        /* Adjust labels and inputs for narrower columns */
+        .chart-option-text-v2 { font-size: 0.8rem; }
+        .chart-time-row-v4 label { font-size: 0.75rem; }
+        .chart-time-input-v4 { height: 32px; font-size: 0.9rem; }
+        .chart-score-v2 { font-size: 0.7rem; min-width: 36px; padding: 3px 6px; }
+        .check-box-v2 { width: 18px; height: 18px; font-size: 12px; flex: 0 0 18px; }
+        .chart-option-v2 { padding: 0.4rem 0.5rem; }
+
+        @media (max-width: 480px) {
+            #chart-grid-container { gap: 6px; }
+            .chart-section-v2 { padding: 6px !important; }
+            .chart-title-v2 { font-size: 0.75rem !important; }
+            .accordion-status { width: 16px; font-size: 0.75rem; }
+            .chart-title-v2 b { font-size: 0.65rem !important; min-width: 20px !important; padding: 2px 4px !important;}
+        }
+    
 </style>
 </head>
 <body>
@@ -659,7 +741,7 @@
         </div>
 
         <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
-            <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>    🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
+            <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>      🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
             <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
                 <option value="10">10 Qs</option><option value="20" selected>20 Qs</option><option value="30">30 Qs</option><option value="50">50 Qs</option><option value="100">100 Qs</option>
             </select>
@@ -774,7 +856,8 @@
         <div class="chart-progress-track-v2"><div id="chart-live-progress" class="chart-progress-fill-v2" style="width:0%"></div></div>
 
         <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
-            <div class="chart-section-v2" data-chart-section="1">
+            <div id="chart-grid-container">
+<div class="chart-section-v2" data-chart-section="1">
                 <div class="chart-title-v2"><span>१. 🌅 अमृतवेला तथा मुरली क्लासअघिपछिको बाबाको याद</span><b>१५</b></div>
                 <div class="chart-time-list-v4">
                     <div class="chart-time-row-v4"><label for="chart-time-amritvela">अमृतवेला</label><input id="chart-time-amritvela" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="अमृतवेलाको बाबाको याद, मिनेट"></div>
@@ -922,6 +1005,7 @@
                 </div>
             </div>
 
+            </div>
             <div class="chart-submit-wrap-v2">
                 <div class="chart-final-score-v2">कुल अङ्क <strong id="chart-submit-score">0</strong> / 100</div>
                 <div class="chart-final-time-v4">🕊️ आज बाबाको याद: <strong id="chart-submit-baba-time">0 मिनेट</strong></div>
@@ -1001,7 +1085,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.5</div>
+        <div>Version: 109.6</div>
     </div>
 </div>
 
@@ -1504,7 +1588,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.5"; 
+    const APP_VERSION = "109.6"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
