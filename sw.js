@@ -1,10 +1,11 @@
-/* BK Murali Quiz 110.6 Auto-Update Service Worker */
-const CACHE_NAME = "murali-quiz-v110-6";
+/* BK Murali Quiz 110.7 Auto-Update Service Worker */
+const CACHE_NAME = "murali-quiz-v110-7";
 const STATIC_ASSETS = [
     "./",
     "./index.html",
     "./manifest.json",
     "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+    "https://cdn.jsdelivr.net/npm/chart.js",
     "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"
 ];
 
@@ -14,9 +15,6 @@ self.addEventListener("install", event => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(["./index.html", "./manifest.json"]);
         try { await cache.add("./"); } catch (e) {}
-        for (const url of STATIC_ASSETS) {
-            try { await cache.add(url); } catch (e) {}
-        }
     })());
 });
 
