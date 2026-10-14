@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=110.3">
+    <link rel="manifest" href="manifest.json?v=110.4">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -508,257 +508,137 @@
     .cal-day { font-size: 1.1rem !important; }
     
 
-        /* Compact Accordion UI Fix v109.5 */
-        .chart-section-v2 { padding: 6px !important; margin-bottom: 5px !important; border-radius: 12px !important; }
-        .chart-title-v2 { display: flex; align-items: flex-start; padding: 4px !important; font-size: 0.88rem !important; line-height: 1.35 !important; margin-bottom: 0 !important; }
-        .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) { margin-top: 1px; }
-        .accordion-status { width: 22px; font-size: 0.9rem; margin-right: 6px !important; margin-top: 1px; flex-shrink: 0; }
-        .accordion-chevron { margin-top: 2px; font-size: 0.75rem; flex-shrink: 0; }
-        .chart-title-v2 b { font-size: 0.75rem !important; padding: 2px 6px !important; margin-top: 1px; flex-shrink: 0; }
-        .chart-content-v2 { padding-top: 8px !important; margin-top: 4px !important; }
-    
-
-        /* 2-Column Grid Layout Fix v109.6 */
+        
+        /* v110.4 Final Smart Grid & Vivid Color States UI */
         #chart-grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             align-items: start;
         }
-        
-        .chart-section-v2 {
-            padding: 8px !important;
-            margin-bottom: 0 !important; /* Managed by grid gap */
-            border-radius: 12px !important;
-            height: fit-content;
+        @media (min-width: 600px) {
+            #chart-grid-container { grid-template-columns: repeat(3, 1fr); }
         }
-        
-        /* Make reflection section span full width */
-        #chart-reflection-section-v4 {
-            grid-column: 1 / -1;
-        }
-        
-        .chart-title-v2 {
-            display: flex;
-            align-items: flex-start;
-            padding: 4px !important;
-            font-size: 0.85rem !important;
-            line-height: 1.3 !important;
-            margin-bottom: 0 !important;
-        }
-        
-        .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) {
-            margin-top: 1px;
-            flex: 1;
-        }
-        
-        .accordion-status {
-            width: 20px;
-            font-size: 0.85rem;
-            margin-right: 4px !important;
-            margin-top: 1px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .accordion-chevron {
-            margin-top: 2px;
-            font-size: 0.7rem;
-            flex-shrink: 0;
-            margin-left: 4px;
-        }
-        
-        .chart-title-v2 b {
-            font-size: 0.7rem !important;
-            padding: 2px 5px !important;
-            margin-top: 1px;
-            flex-shrink: 0;
-            min-width: 24px !important;
-        }
-        
-        .chart-content-v2 {
-            padding-top: 8px !important;
-            margin-top: 4px !important;
-        }
-
-        /* Adjust labels and inputs for narrower columns */
-        .chart-option-text-v2 { font-size: 0.8rem; }
-        .chart-time-row-v4 label { font-size: 0.75rem; }
-        .chart-time-input-v4 { height: 32px; font-size: 0.9rem; }
-        .chart-score-v2 { font-size: 0.7rem; min-width: 36px; padding: 3px 6px; }
-        .check-box-v2 { width: 18px; height: 18px; font-size: 12px; flex: 0 0 18px; }
-        .chart-option-v2 { padding: 0.4rem 0.5rem; }
-
         @media (max-width: 480px) {
-            #chart-grid-container { gap: 6px; }
-            .chart-section-v2 { padding: 6px !important; }
-            .chart-title-v2 { font-size: 0.75rem !important; }
-            .accordion-status { width: 16px; font-size: 0.75rem; }
-            .chart-title-v2 b { font-size: 0.65rem !important; min-width: 20px !important; padding: 2px 4px !important;}
+            #chart-grid-container { gap: 7px; }
         }
-    
 
-        @media (max-width: 480px) {
-            #chart-grid-container { gap: 6px; }
-            .chart-section-v2 { padding: 6px !important; }
-            .title-short { font-size: 0.76rem; }
-            .title-long { font-size: 0.85rem; }
-            .chart-title-v2 b { font-size: 0.7rem !important; min-width: 20px !important; padding: 2px 4px !important;}
-        }
-    
-
-        
-        /* v109.9 Full Text UI Fix */
-        .chart-title-v2 .title-short {
-            white-space: normal !important;
-            overflow: visible !important;
-            text-overflow: clip !important;
-            word-wrap: break-word !important;
-            font-size: 0.95rem !important;
-            line-height: 1.25 !important;
-            padding-right: 4px;
-        }
-        #chart-grid-container {
-            gap: 6px !important;
-        }
-        @media (min-width: 600px) { 
-            #chart-grid-container { gap: 10px !important; } 
-        }
         .chart-section-v2 {
-            padding: 8px 10px !important;
-        }
-    
-
-        /* Color State UI v110.1 */
-        #chart-grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            align-items: start;
-        }
-        @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
-        
-        .chart-section-v2 {
-            padding: 12px 8px !important;
+            padding: 12px 10px !important;
             margin-bottom: 0 !important;
             border-radius: 12px !important;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        /* STATE COLORS */
-        .chart-section-v2.state-partial {
-            background: rgba(245, 158, 11, 0.1) !important;
-            border-color: #f59e0b !important;
-        }
-        .chart-section-v2.state-complete {
-            background: rgba(16, 185, 129, 0.1) !important;
-            border-color: #10b981 !important;
-        }
-        
-        /* Open section takes FULL WIDTH */
-        .chart-section-v2.accordion-open {
-            grid-column: 1 / -1 !important;
             background: var(--card-bg) !important;
-            border-color: var(--chart-color) !important;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
-            text-align: left;
-            padding: 12px !important;
-        }
-        
-        #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
-
-        .chart-title-v2 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 !important;
-            margin: 0 !important;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        /* Hide all dots/checkboxes */
-        .accordion-status, .score-badge, .accordion-chevron { display: none !important; }
-        
-        .title-short {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--text-color);
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-        }
-        
-        .title-long {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--text-color);
-            line-height: 1.35;
-            flex: 1;
-            text-align: left;
-        }
-        
-        .chart-content-v2 {
-            padding-top: 15px !important;
-            margin-top: 15px !important;
-            border-top: 1px dashed var(--border-color);
-            text-align: left;
-        }
-        
-        .chart-section-v2.accordion-open .chart-title-v2 { justify-content: flex-start; }
-    
-
-        /* v110.3 Color States UI */
-        .chart-section-v2 {
-            transition: background 0.3s ease, border-color 0.3s ease !important;
-            border-width: 2px !important;
-            border-style: solid !important;
+            border: 2px solid var(--border-color) !important;
+            transition: all 0.25s ease !important;
             text-align: center !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
         }
-        
-        /* STATE COLORS (Visible in Light & Dark Mode) */
+
+        /* 1. EMPTY STATE (नभरेको - Light & Dark Mode) */
         .chart-section-v2.state-empty {
             background: var(--card-bg) !important;
             border-color: var(--border-color) !important;
         }
+        html[data-theme="dark"] .chart-section-v2.state-empty {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        /* 2. PARTIAL STATE (अधुरो भरेको - Vivid Amber/Yellow) */
         .chart-section-v2.state-partial {
-            background: rgba(245, 158, 11, 0.08) !important;
-            border-color: rgba(245, 158, 11, 0.7) !important; /* Yellowish */
+            background: #fef3c7 !important;
+            border-color: #f59e0b !important;
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.20) !important;
         }
+        .chart-section-v2.state-partial .title-short {
+            color: #92400e !important;
+        }
+        html[data-theme="dark"] .chart-section-v2.state-partial {
+            background: rgba(245, 158, 11, 0.24) !important;
+            border-color: #fbbf24 !important;
+        }
+        html[data-theme="dark"] .chart-section-v2.state-partial .title-short {
+            color: #fde68a !important;
+        }
+
+        /* 3. COMPLETE STATE (पूरा भरेको - Vivid Emerald Green) */
         .chart-section-v2.state-complete {
-            background: rgba(16, 185, 129, 0.08) !important;
-            border-color: rgba(16, 185, 129, 0.7) !important; /* Greenish */
+            background: #dcfce7 !important;
+            border-color: #16a34a !important;
+            box-shadow: 0 3px 10px rgba(22, 163, 74, 0.20) !important;
         }
-        
-        /* OPEN SECTION */
+        .chart-section-v2.state-complete .title-short {
+            color: #166534 !important;
+        }
+        html[data-theme="dark"] .chart-section-v2.state-complete {
+            background: rgba(22, 163, 74, 0.26) !important;
+            border-color: #4ade80 !important;
+        }
+        html[data-theme="dark"] .chart-section-v2.state-complete .title-short {
+            color: #bbf7d0 !important;
+        }
+
+        /* OPEN SECTION: Full width for comfortable filling */
         .chart-section-v2.accordion-open {
+            grid-column: 1 / -1 !important;
             background: var(--card-bg) !important;
             border-color: var(--chart-color) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.18) !important;
+            text-align: left !important;
+            padding: 14px !important;
+        }
+        .chart-section-v2.accordion-open.state-partial {
+            border-color: #f59e0b !important;
+        }
+        .chart-section-v2.accordion-open.state-complete {
+            border-color: #16a34a !important;
+        }
+
+        #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
+
+        .chart-title-v2 {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            cursor: pointer !important;
+            width: 100% !important;
+        }
+        .chart-section-v2.accordion-open .chart-title-v2 {
+            justify-content: flex-start !important;
+        }
+
+        .accordion-status, .score-badge, .accordion-chevron, .chart-section-v2:not(.accordion-open) .chart-title-v2 b, .chart-section-v2:not(.accordion-open) .chart-title-v2 .q-tag {
+            display: none !important;
+        }
+
+        .title-short {
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            color: var(--text-color);
+            text-align: center !important;
+            width: 100% !important;
+            display: block;
+            line-height: 1.3 !important;
+        }
+        .chart-section-v2.accordion-open .title-short { display: none !important; }
+
+        .title-long {
+            font-size: 1.02rem !important;
+            font-weight: 800 !important;
+            color: var(--text-color) !important;
+            line-height: 1.35 !important;
+            flex: 1;
             text-align: left !important;
         }
 
-        /* Hide all dots, chevron, and original score badges */
-        .accordion-status, .score-badge, .accordion-chevron { display: none !important; }
-        
-        .chart-title-v2 { justify-content: center !important; }
-        .chart-section-v2.accordion-open .chart-title-v2 { justify-content: flex-start !important; }
-        
-        .title-short { 
-            text-align: center !important; 
-            width: 100% !important; 
-            display: block; 
-            font-size: 1.05rem !important;
-            font-weight: 800;
+        .chart-content-v2 {
+            padding-top: 14px !important;
+            margin-top: 12px !important;
+            border-top: 1px dashed var(--border-color);
+            text-align: left !important;
         }
-        
-        .chart-section-v2.accordion-open .title-short { display: none !important; }
     
 </style>
 </head>
@@ -1246,7 +1126,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.3</div>
+        <div>Version: 110.4</div>
     </div>
 </div>
 
@@ -1749,7 +1629,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.3"; 
+    const APP_VERSION = "110.4"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -3422,7 +3302,7 @@ window.saveCustomQuiz = function() {
         document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("मेगा") || currentMurliDate.includes("Review");
-        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveQuiz", phone: (localStorage.getItem('murali_phone') || userPhone), pin: (localStorage.getItem('murali_pin') || ''), deviceId: getDeviceId(), quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: currentSwaman, memory_tags: window.currentMemoryTags, createdAt: Date.now(), phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }) })
+        fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveQuiz", phone: (localStorage.getItem('murali_phone') || userPhone), pin: (localStorage.getItem('murali_pin') || ''), deviceId: getDeviceId(), quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: (window.currentMemoryTags ? JSON.stringify({ text: extractSwamanAndTags(currentSwaman).text, tags: window.currentMemoryTags }) : currentSwaman), memory_tags: window.currentMemoryTags, createdAt: Date.now(), phone: userPhone, pin: localStorage.getItem('murali_pin') || '', deviceId: getDeviceId() }) })
         .then(res => res.json()).then(data => { 
             document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
             document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; 
@@ -4109,7 +3989,7 @@ window.saveCustomQuiz = function() {
             "अमृतबेला", "मुरली क्लास", "स्वमान ड्रिल", "ट्राफिक कन्ट्रोल",
             "चालचलन", "ज्ञान सेवा", "स्थूल सेवा", "ब्रह्माभोजन",
             "व्यायाम", "साँझको योग", "गुडनाइट", "डिजिटल डिटक्स",
-            "गोप्य अभिलेख"
+            "📝 गोप्य अभिलेख"
         ];
         
         document.querySelectorAll('.chart-section-v2').forEach((section, index) => {
@@ -4121,31 +4001,34 @@ window.saveCustomQuiz = function() {
             title.style.cursor = 'pointer';
             title.addEventListener('click', () => toggleAccordion(section));
             
-            const oldStatus = title.querySelector('.accordion-status');
-            if(oldStatus) oldStatus.style.display = 'none';
-            const oldChevron = title.querySelector('.accordion-chevron');
-            if(oldChevron) oldChevron.style.display = 'none';
-            
-            const originalSpans = title.querySelectorAll('span:not(.accordion-status):not(.accordion-chevron)');
+            const originalSpans = title.querySelectorAll('span:not(.accordion-status):not(.accordion-chevron):not(.title-short)');
             originalSpans.forEach(sp => {
                 sp.classList.add('title-long');
                 sp.style.display = 'none';
             });
             
-            const shortSpan = document.createElement('span');
-            shortSpan.className = 'title-short';
-            shortSpan.innerText = shortTitles[index] || 'अन्य';
-            title.insertBefore(shortSpan, originalSpans[0] || null);
+            let shortSpan = title.querySelector('.title-short');
+            if (!shortSpan) {
+                shortSpan = document.createElement('span');
+                shortSpan.className = 'title-short';
+                shortSpan.innerText = shortTitles[index] || 'अन्य';
+                title.insertBefore(shortSpan, originalSpans[0] || null);
+            }
             
-            const contentWrap = document.createElement('div');
-            contentWrap.className = 'chart-content-v2';
-            contentWrap.style.display = 'none'; 
-            while (title.nextSibling) { contentWrap.appendChild(title.nextSibling); }
-            section.appendChild(contentWrap);
+            let contentWrap = section.querySelector('.chart-content-v2');
+            if (!contentWrap) {
+                contentWrap = document.createElement('div');
+                contentWrap.className = 'chart-content-v2';
+                contentWrap.style.display = 'none';
+                while (title.nextSibling) { contentWrap.appendChild(title.nextSibling); }
+                section.appendChild(contentWrap);
+            }
         });
+        updateAccordionStatus();
     }
     
     function toggleAccordion(targetSection, forceOpen = false) {
+        if (!targetSection) return;
         const isOpen = targetSection.classList.contains('accordion-open');
         document.querySelectorAll('.chart-section-v2').forEach(sec => {
             sec.classList.remove('accordion-open');
@@ -4164,41 +4047,73 @@ window.saveCustomQuiz = function() {
             if (tShort) tShort.style.display = 'none';
             if (content) {
                 content.style.display = 'block';
-                content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 200, easing: 'ease-out'});
+                try { content.animate([{opacity: 0, transform: 'translateY(-8px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 180, easing: 'ease-out'}); } catch(e){}
             }
-            setTimeout(() => { try { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){} }, 150);
+            setTimeout(() => { try { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){} }, 120);
         }
+        updateAccordionStatus();
     }
 
-    function isChartSectionPartiallyFilled(section) {
-        if (!section) return false;
+    function getChartSectionStateV4(section) {
+        if (!section) return 'empty';
+        if (section.id === 'chart-reflection-section-v4') {
+            const w = (document.getElementById('chart-daily-weakness') && document.getElementById('chart-daily-weakness').value || '').trim();
+            const r = (document.getElementById('chart-tomorrow-resolution') && document.getElementById('chart-tomorrow-resolution').value || '').trim();
+            const dType = !!section.querySelector('input.chart-dream-type-v4:checked');
+            const dNote = (document.getElementById('chart-dream-note') && document.getElementById('chart-dream-note').value || '').trim();
+            const hasDream = dType || dNote !== '';
+            const count = (w ? 1 : 0) + (r ? 1 : 0) + (hasDream ? 1 : 0);
+            if (count === 0) return 'empty';
+            if (count === 3) return 'complete';
+            return 'partial';
+        }
+
+        const sectionNo = Number(section.getAttribute('data-chart-section'));
         const timeInputs = Array.from(section.querySelectorAll('.chart-time-input-v4'));
-        const hasTime = timeInputs.some(el => el.value.trim() !== '');
-        const hasCheck = !!section.querySelector('input[type="checkbox"]:checked, input[type="radio"]:checked');
-        const textareas = Array.from(section.querySelectorAll('textarea'));
-        const hasText = textareas.some(el => el.value.trim() !== '');
-        return hasTime || hasCheck || hasText;
+        const positiveTimes = timeInputs.filter(el => el.value.trim() !== '' && Number(el.value) > 0).length;
+
+        if (sectionNo === 1 || sectionNo === 10) {
+            if (positiveTimes === 0) return 'empty';
+            if (positiveTimes === timeInputs.length) return 'complete';
+            return 'partial';
+        }
+
+        if (sectionNo === 2) {
+            const g1 = !!section.querySelector('input[name="chart_murli"]:checked');
+            const g2 = !!section.querySelector('input[name="chart_murli_manthan"]:checked');
+            if (g1 && g2) return 'complete';
+            if (g1 || g2) return 'partial';
+            return 'empty';
+        }
+
+        if (sectionNo === 7) {
+            const choseNone = !!section.querySelector('.chart-service-none-v4:checked');
+            if (choseNone) return 'complete';
+            const hasService = getSelectedServiceTypesV4().length > 0;
+            const hasTime = positiveTimes > 0;
+            if (hasTime && hasService) return 'complete';
+            if (hasTime || hasService) return 'partial';
+            return 'empty';
+        }
+
+        if (sectionNo === 11) {
+            const checkedOpt = section.querySelector('input[name="chart_goodnight"]:checked');
+            const hasTime = positiveTimes > 0;
+            if (checkedOpt && Number(checkedOpt.value) === 0) return 'complete';
+            if (hasTime && checkedOpt) return 'complete';
+            if (hasTime || checkedOpt) return 'partial';
+            return 'empty';
+        }
+
+        const anyChecked = !!section.querySelector('input[type="checkbox"]:checked');
+        return anyChecked ? 'complete' : 'empty';
     }
     
     function updateAccordionStatus() {
         document.querySelectorAll('.chart-section-v2').forEach(section => {
             section.classList.remove('state-complete', 'state-partial', 'state-empty');
-            const isCompleted = chartSectionReadyForAutoScrollV4(section);
-            const isPartial = isChartSectionPartiallyFilled(section);
-            const isReflection = section.id === 'chart-reflection-section-v4';
-            
-            if (isReflection) {
-                if (isPartial) section.classList.add('state-complete');
-                else section.classList.add('state-empty');
-            } else {
-                if (isCompleted) {
-                    section.classList.add('state-complete');
-                } else if (isPartial) {
-                    section.classList.add('state-partial');
-                } else {
-                    section.classList.add('state-empty');
-                }
-            }
+            const st = getChartSectionStateV4(section);
+            section.classList.add('state-' + st);
         });
     }
     
@@ -4305,20 +4220,8 @@ window.saveCustomQuiz = function() {
     }
 
     function chartSectionReadyForAutoScrollV4(section) {
-        if (!section) return false;
-        const sectionNo = Number(section.getAttribute('data-chart-section'));
-        const touchedTimes = Array.from(section.querySelectorAll('.chart-time-input-v4')).every(el => el.dataset.touched === '1');
-        if (sectionNo === 1 || sectionNo === 10) return touchedTimes;
-        if (sectionNo === 7) {
-            const hasService = getSelectedServiceTypesV4().length > 0;
-            const choseNone = !!section.querySelector('.chart-service-none-v4:checked');
-            return touchedTimes && (hasService || choseNone);
-        }
-        if (sectionNo === 11) {
-            return touchedTimes && !!section.querySelector('input[name="chart_goodnight"]:checked');
-        }
-        const grouped = Array.from(section.querySelectorAll('.chart-options-v2[data-single-group]'));
-        return grouped.length > 0 && grouped.every(group => !!group.querySelector('input:checked'));
+        if (!section || section.id === 'chart-reflection-section-v4') return false;
+        return getChartSectionStateV4(section) === 'complete';
     }
 
     function maybeAutoAdvanceChartSectionV4(section) {
@@ -4418,13 +4321,13 @@ window.saveCustomQuiz = function() {
                     });
                 }
                 const myLab = this.closest('.chart-dream-chip-v4');
-                if (myLab) myLab.classList.toggle('selected-dream-v4', this.checked);
+                if (myLab) myLab.classList.toggle('selected-dream-v4', this.checked); updateAccordionStatus();
             });
         });
         document.querySelectorAll('#daily-chart-form .chart-reflection-input-v4').forEach(input => {
             if (input.dataset.autoGrowBoundV4 !== '1') {
                 input.dataset.autoGrowBoundV4 = '1';
-                input.addEventListener('input', resizeChartReflectionTextareasV4);
+                input.addEventListener('input', () => { resizeChartReflectionTextareasV4(); updateAccordionStatus(); });
             }
         });
         resizeChartReflectionTextareasV4();
@@ -4482,6 +4385,7 @@ window.saveCustomQuiz = function() {
         const charts = safeJSON('murali_daily_charts', []);
         const existingChart = getPreferredChartRecordV4_(charts, dateVal, userPhone);
         if (!existingChart) {
+            updateChartV3Total();
             if (navigator.onLine) syncMyChartsFromServer().then(() => {
                 const fresh = safeJSON('murali_daily_charts', []);
                 if (getPreferredChartRecordV4_(fresh, dateVal, userPhone)) loadChartDataForDate(dateVal);
@@ -4490,7 +4394,8 @@ window.saveCustomQuiz = function() {
         }
         const schemaVersion = Number(existingChart.chartVersion || existingChart.schemaVersion || 3);
         if (schemaVersion < 4) {
-            showToast('यो मितिको पुरानो संस्करणको चार्ट सुरक्षित छ। यसमा बाबाको यादको मिनेट विवरण छैन; नयाँ चार्ट भरेमा नयाँ संस्करणको रेकर्ड बन्नेछ।', 'info', 5000);
+            updateChartV3Total();
+            showToast('यो मितिको पुरानो संस्करणको चार्ट सुरक्षित छ। नयाँ चार्ट भरेमा नयाँ संस्करणको रेकर्ड बन्नेछ।', 'info', 5000);
             return;
         }
 
@@ -4500,7 +4405,13 @@ window.saveCustomQuiz = function() {
             chart_traffic:'traffic', chart_conduct:'conduct', chart_knowledge_sewa:'knowledgeSewa',
             chart_food:'food', chart_exercise:'exercise', chart_goodnight:'goodnight', chart_digital_detox:'digitalDetox'
         };
-        Object.keys(keyMap).forEach(groupName => setChartOptionV4(groupName, existingChart[keyMap[groupName]]));
+        const hasCheckedList = Array.isArray(existingChart.checkedGroups);
+        Object.keys(keyMap).forEach(groupName => {
+            const val = Number(existingChart[keyMap[groupName]]);
+            if (hasCheckedList ? existingChart.checkedGroups.includes(groupName) : (val > 0)) {
+                setChartOptionV4(groupName, val);
+            }
+        });
         const timeMap = {
             'chart-time-amritvela':'amritvelaMinutes', 'chart-time-murli-before':'murliClassBeforeMinutes',
             'chart-time-murli-after':'murliClassAfterMinutes', 'chart-time-sthool-sewa':'sthoolSewaMinutes',
@@ -4509,18 +4420,19 @@ window.saveCustomQuiz = function() {
         };
         Object.keys(timeMap).forEach(id => {
             const input = document.getElementById(id); if (!input) return;
-            if (existingChart[timeMap[id]] !== undefined && existingChart[timeMap[id]] !== null && existingChart[timeMap[id]] !== '') {
-                input.value = String(Number(existingChart[timeMap[id]]) || 0); input.dataset.touched = '1';
+            const numVal = Number(existingChart[timeMap[id]] || 0);
+            if (numVal > 0) {
+                input.value = String(numVal);
+                input.dataset.touched = '1';
             }
         });
-        setChartOptionV4('chart_knowledge_sewa', existingChart.knowledgeSewa);
         const savedTypes = String(existingChart.sthoolServiceTypes || '').split(/[,،]/).map(x => x.trim()).filter(Boolean);
         document.querySelectorAll('#daily-chart-form input.chart-service-multi-v4').forEach(input => {
             input.checked = savedTypes.includes(input.value);
             const label=input.closest('.chart-service-chip-v4'); if(label) label.classList.toggle('selected-service-v4',input.checked);
         });
         const noService = document.querySelector('#daily-chart-form input.chart-service-none-v4');
-        if (noService && !savedTypes.length && !(Number(existingChart.sthoolSewaMinutes) > 0)) {
+        if (noService && existingChart.sthoolNoneChecked === true) {
             noService.checked = true; const label=noService.closest('.chart-service-chip-v4'); if(label) label.classList.add('selected-service-v4');
         }
         const weakness = document.getElementById('chart-daily-weakness'); if (weakness) weakness.value = existingChart.dailyWeakness || '';
@@ -4579,7 +4491,7 @@ window.saveCustomQuiz = function() {
             tomorrowResolution:(document.getElementById('chart-tomorrow-resolution').value || '').trim().slice(0,240),
             dreamType:(document.querySelector('#daily-chart-form input.chart-dream-type-v4:checked') ? document.querySelector('#daily-chart-form input.chart-dream-type-v4:checked').value : ''),
             dreamNote:((document.getElementById('chart-dream-note') && document.getElementById('chart-dream-note').value) || '').trim().slice(0,240),
-            honestyConfirmed:true, synced:false
+            checkedGroups: CHART_V4_GROUPS.filter(g => !!document.querySelector('#daily-chart-form input[name="' + g + '"]:checked')), sthoolNoneChecked: !!document.querySelector('#daily-chart-form input.chart-service-none-v4:checked'), honestyConfirmed:true, synced:false
         };
         chartData.digitalDetox = getChartOptionValue('chart_digital_detox');
         chartData.totalScore = getChartV4Score();
