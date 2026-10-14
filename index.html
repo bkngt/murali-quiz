@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.6">
+    <link rel="manifest" href="manifest.json?v=109.7">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -781,6 +781,99 @@
             .chart-title-v2 b { font-size: 0.7rem !important; min-width: 20px !important; padding: 2px 4px !important;}
         }
     
+
+        /* Clean Accordion UI Fix v109.7 */
+        #chart-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            align-items: start;
+        }
+        @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
+        
+        .chart-section-v2 {
+            padding: 10px !important;
+            margin-bottom: 0 !important;
+            border-radius: 12px !important;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        
+        /* MAGIC: Open section takes FULL WIDTH */
+        .chart-section-v2.accordion-open {
+            grid-column: 1 / -1 !important;
+            border-color: var(--chart-color) !important;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15) !important;
+        }
+        
+        /* Reflection always full width */
+        #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
+
+        .chart-title-v2 {
+            display: flex;
+            align-items: center;
+            padding: 0 !important;
+            margin: 0 !important;
+            cursor: pointer;
+        }
+        
+        .accordion-status {
+            width: 20px;
+            font-size: 1.1rem;
+            margin-right: 8px !important;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .title-short {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-color);
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .title-long {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-color);
+            line-height: 1.35;
+            flex: 1;
+        }
+        
+        .chart-section-v2:not(.accordion-open) .score-badge {
+            display: none !important;
+        }
+        
+        .score-badge {
+            font-size: 0.75rem !important;
+            padding: 2px 6px !important;
+            margin-left: 8px;
+            flex-shrink: 0;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--chart-color);
+            border-radius: 50px;
+        }
+        
+        .accordion-chevron {
+            margin-left: auto;
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+            color: var(--muted-text-color);
+        }
+        
+        .chart-content-v2 {
+            padding-top: 12px !important;
+            margin-top: 12px !important;
+            border-top: 1px dashed var(--border-color);
+        }
+    
 </style>
 </head>
 <body>
@@ -1267,7 +1360,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.6</div>
+        <div>Version: 109.7</div>
     </div>
 </div>
 
@@ -1770,7 +1863,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.6"; 
+    const APP_VERSION = "109.7"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -4127,9 +4220,9 @@ window.saveCustomQuiz = function() {
 
     function initChartAccordion() {
         const shortTitles = [
-            "01. अमृतवेला", "02. मुरली क्लास", "03. स्वमान ड्रिल", "04. ट्राफिक कन्ट्रोल",
-            "05. चालचलन", "06. ज्ञान सेवा", "07. स्थूल सेवा", "08. ब्रह्माभोजन",
-            "09. व्यायाम", "10. साँझको योग", "11. गुडनाइट", "12. डिजिटल डिटक्स",
+            "अमृतबेला", "मुरली अध्ययन", "स्वमान ड्रिल", "ट्राफिक कन्ट्रोल",
+            "चालचलन", "ज्ञान सेवा", "स्थूल सेवा", "ब्रह्माभोजन",
+            "व्यायाम", "साँझको योग", "गुडनाइट", "डिजिटल डिटक्स",
             "📝 गोप्य अभिलेख"
         ];
         
@@ -4154,15 +4247,13 @@ window.saveCustomQuiz = function() {
                 
                 const shortSpan = document.createElement('span');
                 shortSpan.className = 'title-short';
-                shortSpan.innerText = shortTitles[index] || ('0' + (index+1)).slice(-2);
-                shortSpan.style.flex = '1';
-                shortSpan.style.marginLeft = '4px';
-                
-                originalSpan.style.flex = '1';
-                originalSpan.style.marginLeft = '4px';
+                shortSpan.innerText = shortTitles[index] || 'अन्य';
                 
                 title.insertBefore(shortSpan, originalSpan);
             }
+            
+            const scoreB = title.querySelector('b');
+            if(scoreB) { scoreB.classList.add('score-badge'); }
             
             const chevron = document.createElement('span');
             chevron.className = 'accordion-chevron';
@@ -4360,7 +4451,8 @@ window.saveCustomQuiz = function() {
     }
 
     function initChartV3Interactions() {
-        if (typeof initChartAccordion === 'function') { initChartAccordion(); const fs = document.querySelector('.chart-section-v2'); if(fs) toggleAccordion(fs, true); } // Hook2Fix
+        if (typeof initChartAccordion === 'function') { initChartAccordion(); } // Hook2Fix
+        if (typeof initChartAccordion === 'function') { initChartAccordion();  } // Hook2Fix
         document.querySelectorAll('#daily-chart-form input.chart-single-v4').forEach(input => {
             if (input.dataset.chartV4Bound === '1') return;
             input.dataset.chartV4Bound = '1';
