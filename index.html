@@ -28,11 +28,11 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=110.4">
+    <link rel="manifest" href="manifest.json?v=110.5">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -509,19 +509,15 @@
     
 
         
-        /* v110.4 Final Smart Grid & Vivid Color States UI */
+                /* v110.5 Final Smart Grid, Vivid Color States & iOS Graph Polish */
         #chart-grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             align-items: start;
         }
-        @media (min-width: 600px) {
-            #chart-grid-container { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 480px) {
-            #chart-grid-container { gap: 7px; }
-        }
+        @media (min-width: 600px) { #chart-grid-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 480px) { #chart-grid-container { gap: 7px; } }
 
         .chart-section-v2 {
             padding: 12px 10px !important;
@@ -533,8 +529,9 @@
             text-align: center !important;
             box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
         }
+        .chart-section-v2:active:not(.accordion-open) { transform: scale(0.97); }
 
-        /* 1. EMPTY STATE (नभरेको - Light & Dark Mode) */
+        /* 1. EMPTY STATE */
         .chart-section-v2.state-empty {
             background: var(--card-bg) !important;
             border-color: var(--border-color) !important;
@@ -544,41 +541,33 @@
             border-color: #334155 !important;
         }
 
-        /* 2. PARTIAL STATE (अधुरो भरेको - Vivid Amber/Yellow) */
+        /* 2. PARTIAL STATE (Vivid Amber/Yellow) */
         .chart-section-v2.state-partial {
             background: #fef3c7 !important;
             border-color: #f59e0b !important;
             box-shadow: 0 3px 10px rgba(245, 158, 11, 0.20) !important;
         }
-        .chart-section-v2.state-partial .title-short {
-            color: #92400e !important;
-        }
+        .chart-section-v2.state-partial .title-short { color: #92400e !important; }
         html[data-theme="dark"] .chart-section-v2.state-partial {
             background: rgba(245, 158, 11, 0.24) !important;
             border-color: #fbbf24 !important;
         }
-        html[data-theme="dark"] .chart-section-v2.state-partial .title-short {
-            color: #fde68a !important;
-        }
+        html[data-theme="dark"] .chart-section-v2.state-partial .title-short { color: #fde68a !important; }
 
-        /* 3. COMPLETE STATE (पूरा भरेको - Vivid Emerald Green) */
+        /* 3. COMPLETE STATE (Vivid Emerald Green) */
         .chart-section-v2.state-complete {
             background: #dcfce7 !important;
             border-color: #16a34a !important;
             box-shadow: 0 3px 10px rgba(22, 163, 74, 0.20) !important;
         }
-        .chart-section-v2.state-complete .title-short {
-            color: #166534 !important;
-        }
+        .chart-section-v2.state-complete .title-short { color: #166534 !important; }
         html[data-theme="dark"] .chart-section-v2.state-complete {
             background: rgba(22, 163, 74, 0.26) !important;
             border-color: #4ade80 !important;
         }
-        html[data-theme="dark"] .chart-section-v2.state-complete .title-short {
-            color: #bbf7d0 !important;
-        }
+        html[data-theme="dark"] .chart-section-v2.state-complete .title-short { color: #bbf7d0 !important; }
 
-        /* OPEN SECTION: Full width for comfortable filling */
+        /* OPEN SECTION */
         .chart-section-v2.accordion-open {
             grid-column: 1 / -1 !important;
             background: var(--card-bg) !important;
@@ -587,12 +576,8 @@
             text-align: left !important;
             padding: 14px !important;
         }
-        .chart-section-v2.accordion-open.state-partial {
-            border-color: #f59e0b !important;
-        }
-        .chart-section-v2.accordion-open.state-complete {
-            border-color: #16a34a !important;
-        }
+        .chart-section-v2.accordion-open.state-partial { border-color: #f59e0b !important; }
+        .chart-section-v2.accordion-open.state-complete { border-color: #16a34a !important; }
 
         #chart-reflection-section-v4 { grid-column: 1 / -1 !important; }
 
@@ -605,9 +590,7 @@
             cursor: pointer !important;
             width: 100% !important;
         }
-        .chart-section-v2.accordion-open .chart-title-v2 {
-            justify-content: flex-start !important;
-        }
+        .chart-section-v2.accordion-open .chart-title-v2 { justify-content: flex-start !important; }
 
         .accordion-status, .score-badge, .accordion-chevron, .chart-section-v2:not(.accordion-open) .chart-title-v2 b, .chart-section-v2:not(.accordion-open) .chart-title-v2 .q-tag {
             display: none !important;
@@ -639,7 +622,41 @@
             border-top: 1px dashed var(--border-color);
             text-align: left !important;
         }
-    
+
+        /* iOS Canvas & Premium Progress Bar */
+        .chart-container {
+            position: relative !important;
+            width: 100% !important;
+            height: 255px !important;
+            min-height: 255px !important;
+            padding: 12px !important;
+            border-radius: 18px !important;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
+            overflow: hidden;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
+        }
+        .chart-progress-fill-v2 {
+            background: linear-gradient(90deg, #8b5cf6 0%, #0ea5e9 50%, #10b981 100%) !important;
+        }
+        .chart-section-pill-v5 {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            background: rgba(139, 92, 246, 0.10);
+            color: var(--chart-color);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+        }
 </style>
 </head>
 <body>
@@ -890,6 +907,7 @@
                 <div class="chart-progress-label-v2">आजको कुल अङ्क</div>
                 <div class="chart-total-v2"><span id="chart-live-score">0</span><span class="chart-total-max-v2">/100</span></div>
                 <span class="chart-baba-time-v4">🕊️ आज बाबाको याद: <strong id="chart-live-baba-time">0 मिनेट</strong></span>
+                <div id="chart-live-section-pill" class="chart-section-pill-v5">✅ पूरा: <b>0/12</b> • ⏳ अधुरो: <b>0</b></div>
             </div>
             <div class="chart-progress-ring-v2" id="chart-progress-ring"><span id="chart-live-percent">0%</span></div>
         </div>
@@ -1126,7 +1144,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.4</div>
+        <div>Version: 110.5</div>
     </div>
 </div>
 
@@ -1629,7 +1647,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.4"; 
+    const APP_VERSION = "110.5"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -2976,7 +2994,7 @@ function getMegaActivationDateUI(quizDate) {
         if(document.getElementById('nav-gen')) { document.getElementById('nav-gen').classList.toggle('active', tab === 'gen'); document.getElementById('nav-chart').classList.toggle('active', tab === 'chart'); document.getElementById('nav-prog').classList.toggle('active', tab === 'prog'); }
         document.getElementById('view-generator').style.display = tab === 'gen' ? 'block' : 'none'; document.getElementById('view-chart').style.display = tab === 'chart' ? 'block' : 'none'; document.getElementById('view-progress').style.display = tab === 'prog' ? 'block' : 'none';
         
-        if (tab === 'prog') { document.getElementById('sticky-scorebar').style.display = 'none'; renderDashboard(); refreshChartHistoryOnDashboardV4_(); } 
+        if (tab === 'prog') { document.getElementById('sticky-scorebar').style.display = 'none'; setTimeout(() => renderDashboard(), 25); refreshChartHistoryOnDashboardV4_(); if (navigator.onLine && typeof syncMyResults === 'function') syncMyResults(false); } 
         else if (tab === 'chart') { document.getElementById('sticky-scorebar').style.display = 'none'; initChartV3Interactions(); let todayStr = getLocalDateISO(); document.getElementById('chart-date').value = todayStr; updateChartDateLabel(todayStr); loadChartDataForDate(todayStr); } 
         else if (currentQuiz.length > 0 && document.getElementById('quiz-area').style.display === 'block' && document.getElementById('result-screen') === null) { document.getElementById('sticky-scorebar').style.display = 'flex'; }
     }
@@ -4110,11 +4128,21 @@ window.saveCustomQuiz = function() {
     }
     
     function updateAccordionStatus() {
+        let completeCount = 0;
+        let partialCount = 0;
         document.querySelectorAll('.chart-section-v2').forEach(section => {
             section.classList.remove('state-complete', 'state-partial', 'state-empty');
             const st = getChartSectionStateV4(section);
             section.classList.add('state-' + st);
+            if (section.id !== 'chart-reflection-section-v4') {
+                if (st === 'complete') completeCount++;
+                else if (st === 'partial') partialCount++;
+            }
         });
+        const pill = document.getElementById('chart-live-section-pill');
+        if (pill) {
+            pill.innerHTML = '✅ पूरा: <b>' + completeCount + '/12</b> • ⏳ अधुरो: <b>' + partialCount + '</b>';
+        }
     }
     
     function activateNextChartSection(currentSection) {
@@ -4572,8 +4600,50 @@ window.saveCustomQuiz = function() {
     window.switchStatTab = function(tab) { document.getElementById('tab-stat-quiz').classList.toggle('active', tab === 'quiz'); document.getElementById('tab-stat-chart').classList.toggle('active', tab === 'chart'); document.getElementById('stat-quiz-section').style.display = tab === 'quiz' ? 'block' : 'none'; document.getElementById('stat-chart-section').style.display = tab === 'chart' ? 'block' : 'none'; renderDashboard(); }
 
 
+    function drawSvgFallbackChartV5_(canvasId, labels, points, titleText, strokeColor, maxVal) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas || !canvas.parentElement) return;
+        const wrap = canvas.parentElement;
+        canvas.style.display = 'none';
+        let fb = wrap.querySelector('.svg-fallback-v5');
+        if (!fb) {
+            fb = document.createElement('div');
+            fb.className = 'svg-fallback-v5';
+            fb.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;';
+            wrap.appendChild(fb);
+        }
+        const valid = [];
+        points.forEach((v, idx) => {
+            if (v !== null && v !== undefined && isFinite(Number(v))) {
+                valid.push({ idx: idx, day: labels[idx], val: Number(v) });
+            }
+        });
+        if (!valid.length) {
+            fb.innerHTML = '<div style="text-align:center;font-weight:800;font-size:.86rem;color:var(--muted-text-color);margin-top:4px;">' + titleText + '</div><div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted-text-color);font-size:.85rem;font-weight:700;">📊 यो महिनाको ग्राफ डाटा उपलब्ध छैन</div>';
+            return;
+        }
+        const w = 560, h = 175, padL = 34, padR = 16, padT = 18, padB = 26;
+        const plotW = w - padL - padR, plotH = h - padT - padB;
+        const yMax = Math.max(maxVal || 100, Math.max.apply(null, valid.map(p => p.val)), 10);
+        const xFor = i => padL + (labels.length > 1 ? (i / (labels.length - 1)) * plotW : plotW / 2);
+        const yFor = v => padT + plotH - (Math.min(yMax, Math.max(0, v)) / yMax) * plotH;
+        const polyPts = valid.map(p => xFor(p.idx).toFixed(1) + ',' + yFor(p.val).toFixed(1)).join(' ');
+        const areaPts = xFor(valid[0].idx).toFixed(1) + ',' + (padT + plotH).toFixed(1) + ' ' + polyPts + ' ' + xFor(valid[valid.length - 1].idx).toFixed(1) + ',' + (padT + plotH).toFixed(1);
+        const circles = valid.map(p => '<circle cx="' + xFor(p.idx).toFixed(1) + '" cy="' + yFor(p.val).toFixed(1) + '" r="4.5" fill="' + strokeColor + '" stroke="#fff" stroke-width="1.8"><title>गते ' + p.day + ': ' + p.val + '</title></circle>').join('');
+        fb.innerHTML = '<div style="text-align:center;font-weight:800;font-size:.82rem;color:var(--text-color);margin-bottom:2px;">' + titleText + '</div>' +
+            '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:195px;overflow:visible;">' +
+            '<line x1="' + padL + '" y1="' + padT + '" x2="' + (w-padR) + '" y2="' + padT + '" stroke="rgba(148,163,184,0.22)" stroke-dasharray="3,3"/>' +
+            '<line x1="' + padL + '" y1="' + (padT+plotH/2) + '" x2="' + (w-padR) + '" y2="' + (padT+plotH/2) + '" stroke="rgba(148,163,184,0.22)" stroke-dasharray="3,3"/>' +
+            '<line x1="' + padL + '" y1="' + (padT+plotH) + '" x2="' + (w-padR) + '" y2="' + (padT+plotH) + '" stroke="rgba(148,163,184,0.35)"/>' +
+            '<text x="4" y="' + (padT+4) + '" font-size="10" fill="#94a3b8" font-weight="700">' + yMax + '</text>' +
+            '<text x="4" y="' + (padT+plotH/2+4) + '" font-size="10" fill="#94a3b8" font-weight="700">' + Math.round(yMax/2) + '</text>' +
+            '<text x="10" y="' + (padT+plotH+4) + '" font-size="10" fill="#94a3b8" font-weight="700">0</text>' +
+            (valid.length > 1 ? '<polygon points="' + areaPts + '" fill="' + strokeColor + '" fill-opacity="0.15"/><polyline fill="none" stroke="' + strokeColor + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="' + polyPts + '"/>' : '') +
+            circles + '</svg>';
+    }
+
     window.renderDashboard = function() {
-        if (isQuizActive) return; // Never redraw the dashboard while an exam is running.
+        if (isQuizActive) return;
         const isChartTab=document.getElementById('tab-stat-chart').classList.contains('active');
         const noteLegendV4 = document.getElementById('calendar-note-legend-v4');
         if (noteLegendV4) noteLegendV4.style.display = isChartTab ? 'block' : 'none';
@@ -4585,9 +4655,8 @@ window.saveCustomQuiz = function() {
         const now=new Date();
         const currentMonth=(cy===now.getFullYear()&&cm===now.getMonth());
         const theme=makeChartTheme_();
-        const d=dict[lang];
 
-        const sourceStats=authoritativeStatsCache[`${cy}-${cm+1}-${dateKeyLocal_(currentMonth?now:new Date(cy,cm+1,0))}`] || null;
+        const sourceStats=authoritativeStatsCache[cy + '-' + (cm+1) + '-' + dateKeyLocal_(currentMonth?now:new Date(cy,cm+1,0))] || null;
         let examTotal=exams.length, examAvg=exams.length?Math.round(exams.reduce((s,x)=>s+x.percent,0)/exams.length):0;
         let chartTotal=chartItems.length, chartAvg=chartItems.length?Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length):0;
         if(sourceStats&&sourceStats.status==='success'){
@@ -4596,66 +4665,92 @@ window.saveCustomQuiz = function() {
         }
         const streak=isChartTab?currentStreak_(chartItems):currentStreak_(exams);
         document.getElementById('dash-stats').innerHTML=isChartTab
-            ? `<div class="stat-card"><h3>${chartTotal}</h3><p>Total Charts</p></div><div class="stat-card"><h3>${chartAvg}</h3><p>Avg Score</p></div><div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>`
-            : `<div class="stat-card"><h3>${examTotal}</h3><p>Total Exams</p></div><div class="stat-card"><h3>${examAvg}%</h3><p>Avg Score</p></div><div class="stat-card"><h3>${streak} 🔥</h3><p>Day Streak</p></div>`;
+            ? '<div class="stat-card"><h3>'+chartTotal+'</h3><p>Total Charts</p></div><div class="stat-card"><h3>'+chartAvg+'</h3><p>Avg Score</p></div><div class="stat-card"><h3>'+streak+' 🔥</h3><p>Day Streak</p></div>'
+            : '<div class="stat-card"><h3>'+examTotal+'</h3><p>Total Exams</p></div><div class="stat-card"><h3>'+examAvg+'%</h3><p>Avg Score</p></div><div class="stat-card"><h3>'+streak+' 🔥</h3><p>Day Streak</p></div>';
         const msg= isChartTab ? (chartAvg>=90?"✨ मीठे बच्चे, तिम्रो उड्ती कलाको स्थिति धेरै राम्रो छ।":(chartAvg>=70?"🌟 मीठे बच्चे, चढ्ती कला छ, अझै अटेन्सन देऊ।":"🌱 मीठे बच्चे, योग र धारणामा विशेष ध्यान दिनुपर्छ।")) : (examAvg>=80?"✨ मीठे बच्चे, तिम्रो परीक्षा प्रगति धेरै राम्रो छ।":(examAvg>=50?"🌟 मीठे बच्चे, अभ्यास राम्रो छ तर अझै ध्यान देऊ।":"🌱 मीठे बच्चे, ज्ञानको मनन-चिन्तन अझै बढाउनुपर्छ।"));
-        document.getElementById('baba-message-container').innerHTML=((isChartTab?chartTotal:examTotal)>0)?`<div style="background:rgba(2,132,199,.1);border:1px dashed ${isChartTab?'var(--chart-color)':'var(--exam-color)'};padding:10px;border-radius:10px;text-align:center;font-weight:700;color:${isChartTab?'var(--chart-color)':'var(--exam-color)'};margin-bottom:15px;">${msg}</div>`:'';
+        document.getElementById('baba-message-container').innerHTML=((isChartTab?chartTotal:examTotal)>0)?'<div style="background:rgba(2,132,199,.1);border:1px dashed '+(isChartTab?'var(--chart-color)':'var(--exam-color)')+';padding:10px;border-radius:10px;text-align:center;font-weight:700;color:'+(isChartTab?'var(--chart-color)':'var(--exam-color)')+';margin-bottom:15px;">'+msg+'</div>':'';
 
         populateCalendarPickers(cy,cm);
         const daysInMonth=new Date(cy,cm+1,0).getDate(), firstDay=new Date(cy,cm,1).getDay();
         let calHtml=''; for(let i=0;i<firstDay;i++) calHtml+='<div class="cal-day empty"></div>';
         const examMap={}; exams.forEach(h=>{if(h.__date.getFullYear()===cy&&h.__date.getMonth()===cm) examMap[h.__date.getDate()]=h;});
         const chartMap={}; chartItems.forEach(c=>{if(c.__date.getFullYear()===cy&&c.__date.getMonth()===cm) chartMap[c.__date.getDate()]=c;});
+        if(sourceStats&&sourceStats.status==='success'){
+            (sourceStats.exam&&sourceStats.exam.monthly||[]).forEach(m=>{if(m&&m.data&&!examMap[m.day]) examMap[m.day]={id:0,percent:m.data.percent,score:m.data.score,total:m.data.total};});
+            (sourceStats.chart&&sourceStats.chart.monthly||[]).forEach(m=>{if(m&&m.data&&!chartMap[m.day]) chartMap[m.day]={__date:new Date(cy,cm,m.day),totalScore:m.data.score};});
+        }
         for(let day=1;day<=daysInMonth;day++){
             const dt=new Date(cy,cm,day), isToday=sameLocalDate_(dt,now); const border=isToday?(isChartTab?'border:2px dashed var(--chart-color);':'border:2px dashed var(--exam-color);'):'';
-            if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+=`<div class="cal-day has-data ${pct>=80?'excellent':pct>=50?'good':'poor'}" style="${border}" onclick="showCalendarDetail(${h.id})"><span>${day}</span><span style="font-size:.65rem;">${pct}%</span></div>`;}
-            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasRef=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim()),hasDrm=!!(String(c.dreamType||'').trim()||String(c.dreamNote||'').trim()),hasNote=(hasRef||hasDrm),badgeTxt=(hasRef?'📝':'')+(hasDrm?'🌙':''),dateKey=dateKeyLocal_(c.__date);calHtml+=`<div role="button" tabindex="0" class="cal-day has-data ${score>=90?'excellent':score>=70?'good':'poor'} ${hasNote?'has-reflection-v4':''}" style="${border}" title="${hasNote?badgeTxt+' आफ्नो टिपोट/स्वप्न विवरण पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्'}" aria-label="${day} गतेको चार्ट ${hasNote?'टिपोटसहित':''}" onclick="showChartCalendarDetailByDateV4('${dateKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showChartCalendarDetailByDateV4('${dateKey}');}"><span>${day}</span>${hasNote?`<span class="cal-note-indicator-v4" aria-label="टिपोट छ">${badgeTxt}</span>`:''}<span style="font-size:.7rem;display:flex;align-items:center;justify-content:center;gap:3px;">${score}</span></div>`;}
-            else {const past=dt<dateOnlyLocal_(now); calHtml+=`<div class="cal-day" style="${border}${past?'opacity:.5;':''}"><span>${day}</span></div>`;}
+            if(!isChartTab&&examMap[day]){const h=examMap[day],pct=Math.round(h.percent);calHtml+='<div class="cal-day has-data '+(pct>=80?'excellent':pct>=50?'good':'poor')+'" style="'+border+'" '+(h.id?'onclick="showCalendarDetail('+h.id+')"':'')+'><span>'+day+'</span><span style="font-size:.65rem;">'+pct+'%</span></div>';}
+            else if(isChartTab&&chartMap[day]){const c=chartMap[day],score=Math.round(c.totalScore),hasRef=!!(String(c.dailyWeakness||'').trim()||String(c.tomorrowResolution||'').trim()),hasDrm=!!(String(c.dreamType||'').trim()||String(c.dreamNote||'').trim()),hasNote=(hasRef||hasDrm),badgeTxt=(hasRef?'📝':'')+(hasDrm?'🌙':''),dateKey=dateKeyLocal_(c.__date||new Date(cy,cm,day));calHtml+='<div role="button" tabindex="0" class="cal-day has-data '+(score>=90?'excellent':score>=70?'good':'poor')+' '+(hasNote?'has-reflection-v4':'')+'" style="'+border+'" title="'+(hasNote?badgeTxt+' आफ्नो टिपोट/स्वप्न विवरण पढ्न थिच्नुहोस्':'चार्ट विवरण खोल्नुहोस्')+'" aria-label="'+day+' गतेको चार्ट '+(hasNote?'टिपोटसहित':'')+'" onclick="showChartCalendarDetailByDateV4(\''+dateKey+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showChartCalendarDetailByDateV4(\''+dateKey+'\');}"><span>'+day+'</span>'+(hasNote?'<span class="cal-note-indicator-v4" aria-label="टिपोट छ">'+badgeTxt+'</span>':'')+'<span style="font-size:.7rem;display:flex;align-items:center;justify-content:center;gap:3px;">'+score+'</span></div>';}
+            else {const past=dt<dateOnlyLocal_(now); calHtml+='<div class="cal-day" style="'+border+(past?'opacity:.5;':'')+ '"><span>'+day+'</span></div>';}
         }
         document.getElementById('cal-grid-days').innerHTML=calHtml;
 
-        // Main monthly chart, with continuous days and safe gaps.
-        const monthly=sourceStats&&sourceStats.status==='success' ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : (isChartTab?localStatsMonthly_(chartItems,cy,cm):localStatsMonthly_(exams,cy,cm));
-        const labels=monthly.map(x=>x.day), points=monthly.map(x=>x.data?(isChartTab?x.data.score:x.data.percent):null);
-        let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
-        if(isChartTab){
-            if(chartAnalyticsInstance) chartAnalyticsInstance.destroy();
-            const subMode = window._chartAnalyticsModeV4 || 'score';
-            const summaryEl = document.getElementById('chart-submetric-summary-v4');
-            const monthRecords = Object.values(chartMap);
-            if(subMode === 'yoga'){
-                const yogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].totalBabaYaadMinutes || 0) : null);
-                const validYoga = yogaPoints.filter(v => v !== null && v > 0);
-                const sumYoga = validYoga.reduce((a,b)=>a+b, 0);
-                const avgYoga = validYoga.length ? Math.round(sumYoga / validYoga.length) : 0;
-                const maxYoga = validYoga.length ? Math.max(...validYoga) : 0;
-                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(sumYoga)}</b><span>यो महिना कुल याद</span></div><div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(avgYoga)}</b><span>दैनिक औसत याद</span></div><div class="chart-submetric-box-v4"><b>${formatBabaYaadDurationV4(maxYoga)}</b><span>उच्चतम दैनिक याद</span></div>`;
-                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'बाबाको याद (मिनेट)',data:yogaPoints,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.18)',spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'🕊️ दैनिक कुल बाबाको याद (मिनेटमा)',color:theme.text,font:{size:13,family:'Poppins'}},tooltip:{callbacks:{label:function(c){return 'बाबाको याद: '+formatBabaYaadDurationV4(c.parsed.y)+' ('+c.parsed.y+' मिनेट)';}}}},scales:{y:{beginAtZero:true,suggestedMax:Math.max(180,maxYoga+30),ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
-            } else if(subMode === 'dream'){
-                const dreamPoints = labels.map(day => chartMap[day] ? dreamScoreFromRecordV4_(chartMap[day]) : null);
-                const gnYogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].goodnightYogaMinutes || 0) : null);
-                const trackedDays = dreamPoints.filter(v => v !== null).length;
-                const peacefulDays = monthRecords.filter(r => r.dreamType === 'divine' || r.dreamType === 'peaceful').length;
-                const avgGn = monthRecords.length ? Math.round(monthRecords.reduce((s,r)=>s+Number(r.goodnightYogaMinutes||0),0)/monthRecords.length) : 0;
-                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${trackedDays} दिन</b><span>स्वप्न ट्र्याक गरियो</span></div><div class="chart-submetric-box-v4"><b>${peacefulDays} दिन</b><span>🕊️ ईश्वरीय / 🌿 शान्त</span></div><div class="chart-submetric-box-v4"><b>${avgGn} मिनेट</b><span>औसत सुत्नुअघिको याद</span></div>`;
-                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'अवचेतन / स्वप्न स्थिति (%)',data:dreamPoints,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.16)',spanGaps:true,fill:true,tension:.3},{label:'सुत्नुअघिको याद (मिनेट)',data:gnYogaPoints,borderColor:'#0ea5e9',backgroundColor:'rgba(14,165,233,0.10)',borderDash:[4,4],spanGaps:true,fill:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:theme.text,boxWidth:12,font:{size:11}}},title:{display:true,text:'🌙 अवचेतन मन (स्वप्न) र सुत्नुअघिको याद तुलना',color:theme.text,font:{size:13,family:'Poppins'}},tooltip:{callbacks:{label:function(c){if(c.datasetIndex===0){const day=labels[c.dataIndex];const rec=chartMap[day];return 'स्वप्न स्थिति: '+(rec?formatDreamTypeLabelV4_(rec.dreamType)||'टिपोट मात्र':'')+' ('+c.parsed.y+'%)';}return 'सुत्नुअघिको याद: '+c.parsed.y+' मिनेट';}}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
-            } else {
-                const mScores = points.filter(v => v !== null);
-                const mAvg = mScores.length ? Math.round(mScores.reduce((a,b)=>a+b,0)/mScores.length) : 0;
-                const mMax = mScores.length ? Math.max(...mScores) : 0;
-                if(summaryEl) summaryEl.innerHTML = `<div class="chart-submetric-box-v4"><b>${mScores.length} दिन</b><span>यो महिना चार्ट भरियो</span></div><div class="chart-submetric-box-v4"><b>${mAvg}/100</b><span>मासिक औसत अङ्क</span></div><div class="chart-submetric-box-v4"><b>${mMax}/100</b><span>उच्चतम अङ्क</span></div>`;
-                chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Chart Score',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Chart Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
+        const localMonthly = isChartTab ? localStatsMonthly_(chartItems,cy,cm) : localStatsMonthly_(exams,cy,cm);
+        const serverMonthly = (sourceStats && sourceStats.status === 'success') ? (isChartTab ? sourceStats.chart.monthly : sourceStats.exam.monthly) : null;
+        const monthly = (Array.isArray(serverMonthly) && serverMonthly.some(x => x && x.data)) ? serverMonthly : localMonthly;
+        const labels = monthly.map(x => x.day);
+        const points = monthly.map(x => x && x.data ? Number(isChartTab ? x.data.score : x.data.percent) : null);
+
+        const targetCanvasId = isChartTab ? 'chartAnalyticsLine' : 'progressLineChart';
+        const canvasEl = document.getElementById(targetCanvasId);
+        if (canvasEl && canvasEl.parentElement) {
+            const oldFb = canvasEl.parentElement.querySelector('.svg-fallback-v5');
+            if (oldFb) oldFb.remove();
+            canvasEl.style.display = 'block';
+        }
+
+        if (typeof window.Chart === 'undefined') {
+            drawSvgFallbackChartV5_(targetCanvasId, labels, points, isChartTab ? '📊 मासिक चार्ट प्रगति' : '📝 मासिक परीक्षा प्रगति (%)', isChartTab ? '#8b5cf6' : '#0284c7', 100);
+        } else {
+            try {
+                let ctx = canvasEl.getContext('2d');
+                if (isChartTab) {
+                    if (chartAnalyticsInstance) chartAnalyticsInstance.destroy();
+                    const subMode = window._chartAnalyticsModeV4 || 'score';
+                    const summaryEl = document.getElementById('chart-submetric-summary-v4');
+                    const monthRecords = Object.values(chartMap);
+                    if (subMode === 'yoga') {
+                        const yogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].totalBabaYaadMinutes || 0) : null);
+                        const validYoga = yogaPoints.filter(v => v !== null && v > 0);
+                        const sumYoga = validYoga.reduce((a,b)=>a+b, 0);
+                        const avgYoga = validYoga.length ? Math.round(sumYoga / validYoga.length) : 0;
+                        const maxYoga = validYoga.length ? Math.max(...validYoga) : 0;
+                        if(summaryEl) summaryEl.innerHTML = '<div class="chart-submetric-box-v4"><b>'+formatBabaYaadDurationV4(sumYoga)+'</b><span>यो महिना कुल याद</span></div><div class="chart-submetric-box-v4"><b>'+formatBabaYaadDurationV4(avgYoga)+'</b><span>दैनिक औसत याद</span></div><div class="chart-submetric-box-v4"><b>'+formatBabaYaadDurationV4(maxYoga)+'</b><span>उच्चतम दैनिक याद</span></div>';
+                        chartAnalyticsInstance = new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'बाबाको याद (मिनेट)', data:yogaPoints, borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.20)', borderWidth:3, pointRadius:4.5, pointHoverRadius:6.5, pointBackgroundColor:'#8b5cf6', pointBorderColor:'#ffffff', pointBorderWidth:1.5, spanGaps:true, fill:true, tension:0.35}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, title:{display:true, text:'🕊️ दैनिक कुल बाबाको याद (मिनेटमा)', color:theme.text, font:{size:13, weight:'bold'}}, tooltip:{callbacks:{label:function(c){return 'बाबाको याद: '+formatBabaYaadDurationV4(c.parsed.y)+' ('+c.parsed.y+' मिनेट)';}}}}, scales:{y:{beginAtZero:true, suggestedMax:Math.max(180, maxYoga+30), ticks:{color:theme.text}, grid:{color:theme.grid}}, x:{ticks:{color:theme.text}, grid:{display:false}}}}});
+                    } else if (subMode === 'dream') {
+                        const dreamPoints = labels.map(day => chartMap[day] ? dreamScoreFromRecordV4_(chartMap[day]) : null);
+                        const gnYogaPoints = labels.map(day => chartMap[day] ? Number(chartMap[day].goodnightYogaMinutes || 0) : null);
+                        const trackedDays = dreamPoints.filter(v => v !== null).length;
+                        const peacefulDays = monthRecords.filter(r => r.dreamType === 'divine' || r.dreamType === 'peaceful').length;
+                        const avgGn = monthRecords.length ? Math.round(monthRecords.reduce((s,r)=>s+Number(r.goodnightYogaMinutes||0),0)/monthRecords.length) : 0;
+                        if(summaryEl) summaryEl.innerHTML = '<div class="chart-submetric-box-v4"><b>'+trackedDays+' दिन</b><span>स्वप्न ट्र्याक गरियो</span></div><div class="chart-submetric-box-v4"><b>'+peacefulDays+' दिन</b><span>🕊️ ईश्वरीय / 🌿 शान्त</span></div><div class="chart-submetric-box-v4"><b>'+avgGn+' मिनेट</b><span>औसत सुत्नुअघिको याद</span></div>';
+                        chartAnalyticsInstance = new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'अवचेतन / स्वप्न स्थिति (%)', data:dreamPoints, borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,0.18)', borderWidth:3, pointRadius:4, pointBackgroundColor:'#a855f7', spanGaps:true, fill:true, tension:0.35}, {label:'सुत्नुअघिको याद (मिनेट)', data:gnYogaPoints, borderColor:'#0ea5e9', backgroundColor:'rgba(14,165,233,0.10)', borderDash:[4,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#0ea5e9', spanGaps:true, fill:false, tension:0.35}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:true, labels:{color:theme.text, boxWidth:12, font:{size:11}}}, title:{display:true, text:'🌙 अवचेतन मन (स्वप्न) र सुत्नुअघिको याद तुलना', color:theme.text, font:{size:13, weight:'bold'}}}, scales:{y:{beginAtZero:true, max:100, ticks:{color:theme.text}, grid:{color:theme.grid}}, x:{ticks:{color:theme.text}, grid:{display:false}}}}});
+                    } else {
+                        const mScores = points.filter(v => v !== null);
+                        const mAvg = mScores.length ? Math.round(mScores.reduce((a,b)=>a+b,0)/mScores.length) : 0;
+                        const mMax = mScores.length ? Math.max(...mScores) : 0;
+                        if(summaryEl) summaryEl.innerHTML = '<div class="chart-submetric-box-v4"><b>'+mScores.length+' दिन</b><span>यो महिना चार्ट भरियो</span></div><div class="chart-submetric-box-v4"><b>'+mAvg+'/100</b><span>मासिक औसत अङ्क</span></div><div class="chart-submetric-box-v4"><b>'+mMax+'/100</b><span>उच्चतम अङ्क</span></div>';
+                        chartAnalyticsInstance = new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'Chart Score', data:points, borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.20)', borderWidth:3, pointRadius:4.5, pointHoverRadius:6.5, pointBackgroundColor:'#8b5cf6', pointBorderColor:'#ffffff', pointBorderWidth:1.5, spanGaps:true, fill:true, tension:0.35}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, title:{display:true, text:'📊 दैनिक चार्ट प्रगति (Selected Month)', color:theme.text, font:{size:13, weight:'bold'}}}, scales:{y:{beginAtZero:true, max:100, ticks:{color:theme.text}, grid:{color:theme.grid}}, x:{ticks:{color:theme.text}, grid:{display:false}}}}});
+                    }
+                    setTimeout(() => { try { if (chartAnalyticsInstance) chartAnalyticsInstance.resize(); } catch(e){} }, 50);
+                } else {
+                    if (progressChartInstance) progressChartInstance.destroy();
+                    progressChartInstance = new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'Score (%)', data:points, borderColor:'#0284c7', backgroundColor:'rgba(2,132,199,0.20)', borderWidth:3, pointRadius:4.5, pointHoverRadius:6.5, pointBackgroundColor:'#0284c7', pointBorderColor:'#ffffff', pointBorderWidth:1.5, spanGaps:true, fill:true, tension:0.35}]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, title:{display:true, text:'📝 दैनिक परीक्षा प्रगति (Selected Month)', color:theme.text, font:{size:13, weight:'bold'}}}, scales:{y:{beginAtZero:true, max:100, ticks:{color:theme.text}, grid:{color:theme.grid}}, x:{ticks:{color:theme.text}, grid:{display:false}}}}});
+                    setTimeout(() => { try { if (progressChartInstance) progressChartInstance.resize(); } catch(e){} }, 50);
+                }
+            } catch (chartErr) {
+                console.warn('Chart.js fallback triggered:', chartErr);
+                drawSvgFallbackChartV5_(targetCanvasId, labels, points, isChartTab ? '📊 दैनिक चार्ट प्रगति' : '📝 दैनिक परीक्षा प्रगति (%)', isChartTab ? '#8b5cf6' : '#0284c7', 100);
             }
         }
-        else { if(progressChartInstance) progressChartInstance.destroy(); progressChartInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Score (%)',data:points,spanGaps:true,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Daily Quiz Progress (Selected Month)',color:theme.text,font:{size:14,family:'Poppins'}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}}); }
 
-        // Detailed progress button remains available in Exam mode.
         const detailedProgBtn=document.querySelector('button[onclick="openDetailedProgress()"]'); if(detailedProgBtn) detailedProgBtn.style.display='flex';
         const calToggleBtn=document.querySelector('button[onclick="toggleCalendar()"]'); if(calToggleBtn) calToggleBtn.style.gridColumn='auto';
 
-        // Ask the 104.7+ backend for authoritative stats when available; 104.6 safely falls back to local data.
         if(navigator.onLine && !isExamSecurityCheckInProgress){
-            const end=currentMonth?now:new Date(cy,cm+1,0), key=`${cy}-${cm+1}-${dateKeyLocal_(end)}`;
+            const end=currentMonth?now:new Date(cy,cm+1,0), key=cy+'-'+(cm+1)+'-'+dateKeyLocal_(end);
             if(!authoritativeStatsCache[key] && !authoritativeStatsInFlight[key]){
                 fetchAuthoritativeStats_(cy,cm+1,dateKeyLocal_(end)).then(s=>{ if(s && !isQuizActive && currentCalDate.getFullYear()===cy && currentCalDate.getMonth()===cm) renderDashboard(); });
             }
