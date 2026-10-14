@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.4">
+    <link rel="manifest" href="manifest.json?v=109.5">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -507,6 +507,16 @@
     .stat-card h3 { font-size: 1.6rem !important; }
     .cal-day { font-size: 1.1rem !important; }
     
+
+        /* Compact Accordion UI Fix v109.5 */
+        .chart-section-v2 { padding: 6px !important; margin-bottom: 5px !important; border-radius: 12px !important; }
+        .chart-title-v2 { display: flex; align-items: flex-start; padding: 4px !important; font-size: 0.88rem !important; line-height: 1.35 !important; margin-bottom: 0 !important; }
+        .chart-title-v2 span:not(.accordion-status):not(.accordion-chevron) { margin-top: 1px; }
+        .accordion-status { width: 22px; font-size: 0.9rem; margin-right: 6px !important; margin-top: 1px; flex-shrink: 0; }
+        .accordion-chevron { margin-top: 2px; font-size: 0.75rem; flex-shrink: 0; }
+        .chart-title-v2 b { font-size: 0.75rem !important; padding: 2px 6px !important; margin-top: 1px; flex-shrink: 0; }
+        .chart-content-v2 { padding-top: 8px !important; margin-top: 4px !important; }
+    
 </style>
 </head>
 <body>
@@ -649,7 +659,7 @@
         </div>
 
         <div id="quiz-config-tools" style="display: none; justify-content: flex-end; gap: 6px; margin-bottom: 10px;">
-            <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>🇳🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
+            <select id="lang-select" onchange="updateLanguageUI()" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;"><option value="ne" selected>    🇵 नेपाली</option><option value="hi">🇮🇳 हिन्दी</option><option value="en">🇬🇧 English</option></select>
             <select id="q-count" style="padding: 0.2rem 0.4rem; font-size: 0.85rem; border-radius: 50px;">
                 <option value="10">10 Qs</option><option value="20" selected>20 Qs</option><option value="30">30 Qs</option><option value="50">50 Qs</option><option value="100">100 Qs</option>
             </select>
@@ -991,7 +1001,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.4</div>
+        <div>Version: 109.5</div>
     </div>
 </div>
 
@@ -1494,7 +1504,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.4"; 
+    const APP_VERSION = "109.5"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
