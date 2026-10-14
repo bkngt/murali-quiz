@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=109.1">
+    <link rel="manifest" href="manifest.json?v=109.2">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -224,6 +224,12 @@
             .sticky-scorebar { bottom: 80px !important; } 
         }
 
+        /* Accordion Chart Design */
+        .accordion-status { display: inline-block; width: 22px; text-align: center; font-size: 1rem; transition: transform 0.3s ease, color 0.3s ease; }
+        .accordion-chevron { display: inline-block; transition: transform 0.3s ease; font-size: 0.8rem; color: var(--muted-text-color); }
+        .chart-title-v2 { cursor: pointer; user-select: none; transition: background 0.2s; padding: 4px 6px; border-radius: 8px; }
+        .chart-title-v2:hover { background: rgba(139, 92, 246, 0.08); }
+        .chart-section-v2 { transition: all 0.3s ease; }
         /* Chart V3 Styles */
         .chart-topbar-v2 { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
         .chart-date-btn-v2 { flex:1; width:auto; background:var(--glass-bg); color:var(--text-color); border:1px solid var(--border-color); padding:.62rem .9rem; border-radius:10px; font-weight:800; box-shadow:none; }
@@ -984,7 +990,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 109.1</div>
+        <div>Version: 109.2</div>
     </div>
 </div>
 
@@ -1487,7 +1493,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "109.1"; 
+    const APP_VERSION = "109.2"; 
 
     let currentQuiz = []; let currentSwaman = ""; let currentScore = 0; let answeredCount = 0; 
     let currentMurliDate = ""; let currentQuizRevision = 1; let currentQuizId = "";
@@ -3842,12 +3848,84 @@ window.saveCustomQuiz = function() {
     // Retain the old symbol name for any legacy callers; the function now calculates V4.
     const CHART_V3_GROUPS = CHART_V4_GROUPS;
 
+    function initChartAccordion() {
+        document.querySelectorAll('.chart-section-v2').forEach(section => {
+            if (section.classList.contains('accordion-initialized')) return;
+            section.classList.add('accordion-initialized');
+            const title = section.querySelector('.chart-title-v2');
+            if (!title) return;
+            title.style.cursor = 'pointer';
+            title.addEventListener('click', () => toggleAccordion(section));
+            const statusSpan = document.createElement('span');
+            statusSpan.className = 'accordion-status';
+            statusSpan.innerHTML = '⚪'; 
+            statusSpan.style.marginRight = '8px';
+            title.prepend(statusSpan);
+            const chevron = document.createElement('span');
+            chevron.className = 'accordion-chevron';
+            chevron.innerHTML = '▼';
+            chevron.style.marginLeft = '10px';
+            title.appendChild(chevron);
+            const contentWrap = document.createElement('div');
+            contentWrap.className = 'chart-content-v2';
+            contentWrap.style.display = 'none'; 
+            contentWrap.style.paddingTop = '12px';
+            contentWrap.style.marginTop = '10px';
+            contentWrap.style.borderTop = '1px dashed var(--border-color)';
+            while (title.nextSibling) {
+                contentWrap.appendChild(title.nextSibling);
+            }
+            section.appendChild(contentWrap);
+        });
+    }
+    
+    function toggleAccordion(targetSection, forceOpen = false) {
+        const isOpen = targetSection.classList.contains('accordion-open');
+        document.querySelectorAll('.chart-section-v2').forEach(sec => {
+            sec.classList.remove('accordion-open');
+            sec.style.borderColor = 'var(--border-color)';
+            sec.style.boxShadow = 'none';
+            const content = sec.querySelector('.chart-content-v2');
+            const chevron = sec.querySelector('.accordion-chevron');
+            if (content) content.style.display = 'none';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+        });
+        if (!isOpen || forceOpen) {
+            targetSection.classList.add('accordion-open');
+            targetSection.style.borderColor = 'var(--chart-color)';
+            targetSection.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.15)';
+            const content = targetSection.querySelector('.chart-content-v2');
+            const chevron = targetSection.querySelector('.accordion-chevron');
+            if (content) {
+                content.style.display = 'block';
+                content.animate([{opacity: 0, transform: 'translateY(-10px)'}, {opacity: 1, transform: 'translateY(0)'}], {duration: 250, easing: 'ease-out'});
+            }
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+            setTimeout(() => { targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+        }
+    }
+    
+    function updateAccordionStatus() {
+        document.querySelectorAll('.chart-section-v2').forEach(section => {
+            const statusSpan = section.querySelector('.accordion-status');
+            if (!statusSpan) return;
+            const isCompleted = chartSectionReadyForAutoScrollV4(section);
+            if (isCompleted) {
+                statusSpan.innerHTML = '✅';
+                statusSpan.style.color = 'var(--success-color)';
+                statusSpan.style.transform = 'scale(1.2)';
+            } else {
+                statusSpan.innerHTML = '⚪';
+                statusSpan.style.color = 'var(--muted-text-color)';
+                statusSpan.style.transform = 'scale(1)';
+            }
+        });
+    }
+    
     function activateNextChartSection(currentSection) {
         let next = currentSection ? currentSection.nextElementSibling : null;
         if(next && next.classList.contains('chart-section-v2')) {
-            document.querySelectorAll('.chart-section-v2').forEach(s => s.classList.remove('chart-section-active-v2'));
-            next.classList.add('chart-section-active-v2');
-            setTimeout(() => { try { next.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e) { try { next.scrollIntoView(); } catch(e2) {} } }, 80);
+            toggleAccordion(next, true);
         }
     }
 
