@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=110.11">
+    <link rel="manifest" href="manifest.json?v=110.12">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -499,13 +499,25 @@
     html[data-theme="dark"] .float-btn { background: var(--exam-color); color: #0f172a; }
     
 
-    /* v109.1 Readability & Layout Patch */
-    .question-text { font-size: 1.3rem !important; line-height: 1.5 !important; }
-    .option-text { font-size: 1.15rem !important; padding: 0.3rem 0 !important; }
-    .option-container { padding: 1rem 1.2rem !important; border-radius: 16px !important; }
-    .btn-submit { font-size: 1.2rem !important; padding: 0.8rem 1.5rem !important; }
+        /* v110.12 Compact Single-Window Quiz & Readability Patch */
+    .question-block { padding: 0.72rem 0.85rem !important; margin-bottom: 0.4rem !important; }
+    .question-meta { margin-bottom: 4px !important; font-size: 0.72rem !important; }
+    .question-text { font-size: 1.06rem !important; line-height: 1.36 !important; margin: 0 0 0.42rem 0 !important; }
+    .btn-tts { margin-bottom: 6px !important; padding: 3px 9px !important; font-size: 0.76rem !important; }
+    .lock-timer-msg { padding: 4px 8px !important; margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    .options-group { gap: 7px !important; }
+    .option-container { padding: 0.56rem 0.78rem !important; border-radius: 12px !important; }
+    .option-text { font-size: 0.96rem !important; line-height: 1.26 !important; padding: 0.04rem 0 !important; gap: 0.6rem !important; }
+    .option-letter { width: 27px !important; height: 27px !important; font-size: 0.85rem !important; border-radius: 7px !important; }
+    .btn-submit { font-size: 0.98rem !important; padding: 0.5rem 1.15rem !important; }
     .stat-card h3 { font-size: 1.6rem !important; }
     .cal-day { font-size: 1.1rem !important; }
+    body.quiz-mode-active #top-toolbar,
+    body.quiz-mode-active #mobile-bottom-nav { display: none !important; }
+    @media (max-width: 600px) {
+        body.quiz-mode-active .sticky-scorebar { bottom: 10px !important; padding: 0.45rem 0.8rem !important; }
+        body.quiz-mode-active .container { padding-bottom: 68px !important; }
+    }
     
 
         
@@ -886,7 +898,7 @@
                 Processing...
             </div>
             <p id="loading-text" style="color:var(--text-color); opacity: 0.8; font-size:1.05rem; margin:0.6rem 0 0;">Please wait...</p>
-            <button onclick="cancelGeneration()" style="margin-top: 25px; background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); border-radius: 50px; padding: 0.5rem 1.4rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: none;">❌ Cancel Generation</button>
+            <button id="btn-cancel-gen" onclick="cancelGeneration()" style="margin-top: 25px; background: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); border-radius: 50px; padding: 0.5rem 1.4rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: none;">❌ Cancel Generation</button>
         </div>
     </div>
 
@@ -1156,7 +1168,7 @@
     <div style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 15px; border-top: 1px dashed var(--border-color); margin-top: 25px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.11</div>
+        <div>Version: 110.12</div>
     </div>
 </div>
 
@@ -1678,7 +1690,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.11";
+    const APP_VERSION = "110.12";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -3696,12 +3708,12 @@ window.saveCustomQuiz = function() {
         let langName = "Nepali";
 
         document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none';
-        document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = `AI is drafting the quiz using ${selectedModel}... (कृपया पर्खनुहोस्)`;
+        const cancelGenBtn = document.getElementById('btn-cancel-gen'); if (cancelGenBtn) cancelGenBtn.style.display = 'inline-flex'; document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = `AI is drafting the quiz using ${selectedModel}... (कृपया पर्खनुहोस्)`;
 
         let difficultyInstruction = "Prompt v67: joyful standard difficulty with plausible BK distractors";
         let parsedDateForDay = parseDateString(currentMurliDate); let dayOfWeek = parsedDateForDay ? parsedDateForDay.getDay() : new Date().getDay(); let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]; let currentDayName = dayNames[dayOfWeek];
 
-        const QUIZ_MODEL_68_0 = "DAILY MURLI — ULTRA COMPACT MEMORY TAG REFINER & QUIZ GENERATOR\nVERSION 68.0 — FINAL MASTER PROMPT\n\nतपाईंको काम दिइएको मुरलीबाट दुईवटा कुरा तयार गर्नु हो:\n१. Memory Tags (अत्यन्त छोटो, भगवानुवाचमा आधारित)\n२. 20 Quiz Questions (World-class, Pure Nepali, Deep Distractors)\n\n[MEMORY TAGS RULES]\n१. DATE + WEEKDAY: 📅 DD-MM-YYYY [बार]\n२. केवल भगवानुवाच: मुरलीकै सामग्री मात्र।\n३. ARROW TEXT = SOURCE-FAITHFUL + CONTEXT-COMPLETE: [Symbol] [छोटो Memory Tag] → [मूल भगवानुवाचको छोटो, स्पष्ट अंश]।\n४. ONE IDEA = ONE TIME: नदोहोर्‍याउने।\n५. LESS IS MORE: ठ्याक्कै १० वटा Numbered Memory Tags।\n६. सुरुको महावाक्य — FIXED SYMBOL: 🗣️\n७. प्रश्न–उत्तर — FIXED SYMBOL: ❓\n८. मुख्य भगवानुवाच — विषयअनुसार फरक लोगो।\n९. धारणा/वरदान/स्लोगन — FIXED SYMBOL: 📌/🎁/⭐\n१०. अव्यक्त इसारा — 🕊️ (पहिलो वाक्य पूर्ण निषेध, व्याख्याबाट मात्र)।\n११. MEMORY CHAIN: '🧠 Memory Chain' मा Numbering नराखी छोटो Point राख्ने।\n\n[QUIZ GENERATION RULES - v68.0]\n1. PURE NEPALI & NO FILLERS: 'आजको मुरलीमा', 'बाबाका अनुसार' जस्ता शब्द नराख्नुहोस्। 'पक्की' जस्ता हिन्दी शब्द नराख्नुहोस्।\n2. DEEP DISTRACTORS: गलत अप्सनहरू (Wrong options) बच्चाले जस्तो नबनाउनुहोस्। ऐतिहासिक मुरलीका गहिरा शब्दहरू राख्नुहोस्।\n3. MID-MURLI COVERAGE: मुरलीको बीच भागबाट पनि धेरै प्रश्न निकाल्नुहोस्।\n4. MEGA ELIGIBILITY: केवल २ देखि ४ वटा प्रश्न (जुन भविष्यको लागि सधैं काम लाग्ने ज्ञान जस्तै आत्मा, परमात्मा, चक्र सम्बन्धी छन्) मा मात्र is_mega_eligible: true राख्नुहोस्। अरु सबैमा false राख्नुहोस्।\n5. FILL IN THE BLANKS: ठ्याक्कै २ वटा प्रश्न '....' खाली ठाउँ भर्ने ढाँचामा हुनुपर्छ।";
+        const QUIZ_MODEL_68_0 = "<prompt_version>\nVersion: 68.0 UNIFIED MASTER - Ultra Compact Memory Tags (v2.2) + Joyful BK Quiz (v68.0)\n</prompt_version>\n\n<system_role>\nYou are an encouraging, joyful, and highly expert Brahma Kumaris spiritual facilitator AND an Ultra-Compact Memory Tag Refiner.\nYour task is to read the provided Murali text and generate TWO things in a SINGLE JSON output:\n1. A highly refined, ultra-compact \"Memory Tags\" text.\n2. Exactly 20 high-quality, deep, and joyful Quiz Questions.\nDo not compromise on the strict rules of either section.\n</system_role>\n\n<memory_tags_rules>\n━━━━━━━━━━━━━━━━━━━━\nPART A: MEMORY TAGS RULES (ULTRA COMPACT REFINER)\n━━━━━━━━━━━━━━━━━━━━\nदिइएको मुरलीबाट केवल अत्यन्त महत्त्वपूर्ण, भगवानुवाचमा आधारित र बारम्बार पढेर सजिलै याद गर्न सकिने अत्यन्त छोटो Memory Sheet तयार गर्नुहोस्। यो विस्तृत सारांश वा व्याख्या होइन।\n\n१. DATE + WEEKDAY: 📅 DD-MM-YYYY [बार] (मुरलीकै मितिबाट सही बार निकाल्नुहोस्)।\n२. केवल भगवानुवाच: मुरलीकै सामग्री मात्र। आफ्नै व्याख्या वा बाहिरी ज्ञान नथप्नुहोस्।\n३. ARROW TEXT (SOURCE-FAITHFUL + CONTEXT-COMPLETE): \n   ढाँचा: [Symbol] [छोटो Memory Tag] → [मूल भगवानुवाचको छोटो, स्पष्ट र अर्थपूर्ण अंश]।\n   (यदि छोटो वाक्यांशले कर्ता/सन्दर्भ अस्पष्ट पार्छ भने स्रोतको नजिकै स्पष्ट भएको कर्ता/सन्दर्भ न्यूनतम रूपमा पुनः जोड्नुहोस्। तर दुई स्वतन्त्र विचार नजोड्नुहोस्।)\n४. ONE IDEA = ONE TIME: एउटै विचारलाई दोहोर्‍याएर नलेख्नुहोस्।\n५. LESS IS MORE: सम्भव भएसम्म ठ्याक्कै १० वटा Numbered Memory Tags बनाउनुहोस्।\n६. SOURCE STRUCTURE & FIXED SYMBOLS:\n   - सुरुको महावाक्य: 🗣️\n   - प्रश्न–उत्तर: ❓\n   - मुख्य भगवानुवाच: विषयअनुसार फरक लोगो (जस्तै: 🏃, 🧘, 🔥, 🪢)।\n   - धारणा: 📌 धारणा\n   - वरदान: 🎁 वरदान\n   - स्लोगन: ⭐ स्लोगन\n   - अव्यक्त इसारा: 🕊️ अव्यक्त इसारा\n७. अव्यक्त इसारा (STRICT BAN): शीर्षकसँगै आएको पहिलो पूरा वाक्य/स्थायी Theme लाई पूर्ण रूपमा छोड्नुहोस्। त्यसपछिको व्याख्यात्मक अनुच्छेदबाट मात्र Point लिनुहोस्।\n८. ULTRA COMPACT MOBILE RULE: NO BLANK LINE, MINIMUM LINE BREAKS. एउटै Section भित्र Blank Line पूर्ण निषेध।\n९. MEMORY CHAIN: '🧠 Memory Chain' मा Numbering नराखी मुख्य Tags का अत्यन्त छोटा स्मरणीय Point मात्र राख्नुहोस् (स्लोगन र अव्यक्त इसाराबाट १-१ वास्तविक Point अनिवार्य)।\n१०. QUIZ LINK: अन्त्यमा \"📝 मुरली Quiz: https://bkngt.github.io/murali-quiz/\" राख्नुहोस्।\n</memory_tags_rules>\n\n<quiz_generation_rules>\n━━━━━━━━━━━━━━━━━━━━\nPART B: QUIZ GENERATION RULES (v68.0)\n━━━━━━━━━━━━━━━━━━━━\nGenerate exactly 20 high-quality, source-grounded, natural, joyful, and DEEPLY THOUGHT-PROVOKING quiz questions.\n\n1. ABSOLUTE SOURCE RULE: The `answer` MUST strictly match the exact words used in the `original` quote.\n2. PURE NEPALI, NO FILLERS & COMPACT QUESTION LENGTH (CRITICAL):\n   - Frame most questions naturally using WH words (के, कुन, किन, कसरी, को, कहाँ).\n   - Strictly avoid Hindi words (e.g., DO NOT use \"पक्की\", use \"दृढ\" वा \"बलियो\").\n   - NEVER use phrases like \"आजको मुरलीमा\", \"बाबाका अनुसार\", \"वरदान अनुसार\". Ask the question directly!\n   - Default target length: 6–10 words strictly (must fit in 1–2 short lines on mobile).\n3. DEEP, HISTORICAL DISTRACTORS & 100% MURLI VOCABULARY (CRITICAL):\n   - DO NOT BE LAZY. Never invent childish, silly, or obvious opposite distractors (e.g., BAD: \"पवित्र नबनी स्वर्ग गइन्छ\").\n   - Every distractor MUST be a DEEP, PLAUSIBLE BK term from historical Murlis or today's Murli.\n   - STRICT BAN ON NON-MURLI WORDS: Never invent external or decorative adjectives that Baba does not speak in the Murli (e.g., DO NOT invent phrases like \"चम्किलो सुनजस्तै\", \"कालो सुनजस्तै\"). Use authentic BK Murli terms only.\n   - AVOID GENERIC LISTS: If the answer is \"सङ्गमयुग\", DO NOT use \"सत्ययुग, त्रेतायुग, कलियुग\". Use plausible states like \"कल्याणकारी समय\", \"वानप्रस्थ अवस्था\".\n4. EXACTLY 2 FILL-IN-THE-BLANKS: Out of the 20 questions, EXACTLY 2 questions MUST be \"Fill in the blanks\" (खाली ठाउँ भर्ने) using \"....\". Do NOT create True/False questions.\n5. MID-MURALI COVERAGE: At least 7-12 questions MUST come from the substantive middle portion of the Murli.\n6. OPTION BALANCE & SINGLE-LINE COMPACTNESS: Keep all options extremely concise (1 to 4 words strictly, max 35 characters) and of similar length so each option fits on a single line. Strictly AVOID boring combinations like \"1 र 2\", \"A र B दुवै\".\n7. \"यी सबै\" LIMIT: Maximum 1 to 2 times per quiz.\n8. LIGHT-HINT TAG SYSTEM: Each question MUST have exactly one tag (2-3 words max) that acts as a hint without revealing the answer.\n9. MEGA ELIGIBILITY: Only 2–4 questions may have `is_mega_eligible=true` (for timeless Gyan like Soul, Cycle, Karma, Paramdham). Others must be false.\n</quiz_generation_rules>\n\n<swaman_rule>\n━━━━━━━━━━━━━━━━━━━━\nPART C: SWAMAN\n━━━━━━━━━━━━━━━━━━━━\nCreate a short emoji title, ending with “भव:!”, exactly 2 short, powerful sentences based on the Vardan.\n</swaman_rule>\n\n<strict_audit>\n━━━━━━━━━━━━━━━━━━━━\nPART D: STRICT QUALITY AUDIT (DO NOT SKIP)\n━━━━━━━━━━━━━━━━━━━━\nBefore generating the JSON, silently verify:\n1. Memory Tags: Are there exactly 10 points? Are there NO blank lines between points? Is the Avyakt Ishara first sentence skipped?\n2. Quiz: Are there exactly 20 questions? Is every question 6–10 words and every option 1–4 words? Are distractors deep, plausible, and 100% authentic Murli terms without invented adjectives? Are Hindi words and filler phrases (\"आजको मुरलीमा\") completely removed? Are there exactly 2 fill-in-the-blanks? Are only 2-4 questions marked `is_mega_eligible: true`?\nIf any rule fails, rewrite before outputting.\n</strict_audit>\n\n<output_format>\n━━━━━━━━━━━━━━━━━━━━\nPART E: OUTPUT FORMAT\n━━━━━━━━━━━━━━━━━━━━\nOutput ONE valid JSON code block containing \"swaman\", \"memory_tags\", and \"quiz\".\nThe `memory_tags` value MUST be a single formatted string containing the ultra-compact text (use \\n for line breaks).\n\nJSON schema example:\n{\n  \"swaman\": \"🌟 ... भव:! ...\",\n  \"memory_tags\": \"📅 07-10-2026 बुधबार\\n१. 🗣️ [Tag] → [Text]\\n२. ❓ [Tag] → [Text]\\n...\\n🧠 Memory Chain\\n→ [Point]\\n📝 मुरली Quiz: https://bkngt.github.io/murali-quiz/\",\n  \"quiz\": [\n    {\n      \"q\": \"तकदिर उच्च बनाउन कस्तो बन्नुपर्छ?\",\n      \"options\": [\n        \"पूरा निश्चयबुद्धि\",\n        \"सदा हर्षितमुख\",\n        \"निरन्तर योगी\",\n        \"विश्व कल्याणकारी\"\n      ],\n      \"answer\": \"पूरा निश्चयबुद्धि\",\n      \"explanation\": \"मुरलीले उच्च तकदिरका लागि पूरा निश्चयबुद्धि बन्न निर्देशन दिन्छ।\",\n      \"tag\": \"सफलताको आधार\",\n      \"original\": \"आफ्नो तकदिर उच्च बनाउनको लागि पूरा पूरा निश्चयबुद्धि बन्नु छ।\",\n      \"is_mega_eligible\": false\n    }\n  ]\n}\n</output_format>";
         const APP_COMPATIBILITY_RULES = `APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract):\n- Return valid JSON with top-level keys: swaman, memory_tags, and quiz.\n- memory_tags MUST contain the exact text output defined by the rules above.\n- quiz must contain exactly 20 items with fields: q, options, answer, explanation, tag, original, is_mega_eligible.\n- options must contain exactly four strings.\n- original must be a verbatim quote from the supplied Murali.\n- Set is_mega_eligible=true for ONLY 2-4 timeless Gyan questions. Set false for all others.`;
         const promptText = QUIZ_MODEL_68_0 + "\n\n" + APP_COMPATIBILITY_RULES + `\n\nRUNTIME SETTINGS\nDate: ${currentMurliDate}\nDay: ${currentDayName}\nRequested question count: ${qCount}\nLanguage: ${langName}\nMURALI TEXT:\n${text}`;
 
@@ -3914,8 +3926,9 @@ window.saveCustomQuiz = function() {
     const loadingText = document.getElementById('loading-text');
     const quizArea = document.getElementById('quiz-area');
 
+    const cancelGenBtn = document.getElementById('btn-cancel-gen'); if (cancelGenBtn) cancelGenBtn.style.display = 'none';
     if (loadingBox) loadingBox.style.display = 'block';
-    if (loadingText) loadingText.innerText = 'परीक्षा स्थिति र नयाँ प्रश्नपत्र जाँच हुँदैछ...';
+    if (loadingText) loadingText.innerText = 'परीक्षा स्थिति जाँच हुँदैछ...';
     if (quizArea) quizArea.style.display = 'none';
 
     let existingResult = document.getElementById('result-screen');
@@ -4089,7 +4102,7 @@ window.saveCustomQuiz = function() {
             });
         }
 
-        focusedOptionIndex = -1; isTimerStarted = true; isQuizActive = true; startTimer();
+        focusedOptionIndex = -1; isTimerStarted = true; isQuizActive = true; document.body.classList.add('quiz-mode-active'); startTimer();
         activeStateSeq++; const initialState = makeActiveStateObject({qIndex:activeQuestionIndex});
         localStorage.setItem('murali_active_quiz_state', JSON.stringify(initialState));
         // Always flush the canonical resumed state. For an old Mega state
@@ -4112,7 +4125,7 @@ window.saveCustomQuiz = function() {
     window.cancelQuiz = function() { if(confirm("के तपाईं यो परीक्षा रद्द गर्न चाहनुहुन्छ?")) { localStorage.removeItem('murali_active_quiz_state'); clearInterval(qLockInterval); resetToGenerator(); } }
 
     function resetToGenerator() {
-        isQuizActive = false; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none'; document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
+        isQuizActive = false; document.body.classList.remove('quiz-mode-active'); document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none'; document.getElementById('active-quiz-info').style.display = 'none'; document.getElementById('online-quiz-actions').style.display = 'none'; document.getElementById('btn-save-top').style.display = 'none'; document.getElementById('btn-export-top').style.display = 'none';
         let existingResult = document.getElementById('result-screen'); if(existingResult) existingResult.remove();
         document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
 
@@ -4210,6 +4223,7 @@ window.saveCustomQuiz = function() {
     stopTimer();
     clearInterval(qLockInterval);
     isQuizActive = false;
+    document.body.classList.remove('quiz-mode-active');
     // 107.0: Stop queued ActiveStates retries as soon as submission begins.
     // An already in-flight request is guarded again by the Backend completion check.
     if (activeStateSaveTimer) { clearTimeout(activeStateSaveTimer); activeStateSaveTimer = null; }
