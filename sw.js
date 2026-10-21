@@ -1,5 +1,5 @@
-/* BK Murali Quiz 110.15 Auto-Update Service Worker */
-const CACHE_NAME = "murali-quiz-v110-15";
+/* BK Murali Quiz 110.16 Auto-Update Service Worker */
+const CACHE_NAME = "murali-quiz-v110-16";
 const STATIC_ASSETS = [
     "./",
     "./index.html",
