@@ -1,5 +1,5 @@
-/* BK Murali Quiz 110.21 Service Worker - Exam-Safe */
-const CACHE_NAME = "murali-quiz-v110-21";
+/* BK Murali Quiz 110.22 Service Worker - Exam-Safe */
+const CACHE_NAME = "murali-quiz-v110-22";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
