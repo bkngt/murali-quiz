@@ -1,60 +1,99 @@
-/* BK Murali Quiz 110.16 Auto-Update Service Worker */
-const CACHE_NAME = "murali-quiz-v110-16";
-const STATIC_ASSETS = [
-    "./",
-    "./index.html",
-    "./manifest.json",
-    "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
-    "https://cdn.jsdelivr.net/npm/chart.js",
-    "https://cdn-icons-png.flaticon.com/512/3176/3176298.png"
-];
+/* BK Murali Quiz 110.17 Service Worker - Minimal Safe Update */
+
+const CACHE_NAME = "murali-quiz-v110-17";
+const CACHE_PREFIX = "murali-quiz-v";
+const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
 self.addEventListener("install", event => {
-    self.skipWaiting();
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(["./index.html", "./manifest.json"]);
-        try { await cache.add("./"); } catch (e) {}
+
+        try {
+            await cache.add("./");
+        } catch (e) {}
+
+        // No skipWaiting(): don't take over a running exam immediately.
     })());
 });
 
 self.addEventListener("activate", event => {
-    event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.map(key => {
-                if (key !== CACHE_NAME) return caches.delete(key);
-            })
-        )).then(() => self.clients.claim())
-    );
+    event.waitUntil((async () => {
+        const keys = await caches.keys();
+
+        await Promise.all(
+            keys
+                .filter(key =>
+                    key.startsWith(CACHE_PREFIX) &&
+                    key !== CACHE_NAME
+                )
+                .map(key => caches.delete(key))
+        );
+
+        // No clients.claim(): existing pages keep their current controller.
+    })());
 });
 
 self.addEventListener("fetch", event => {
     const req = event.request;
-    if (req.method !== "GET") return;
-    const url = new URL(req.url);
-    if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
 
-    if (req.mode === "navigate" || req.url.includes("index.html")) {
-        event.respondWith(
-            fetch(req).then(res => {
-                const clone = res.clone();
-                caches.open(CACHE_NAME).then(c => c.put(req, clone));
-                return res;
-            }).catch(() => caches.match(req).then(cached => cached || caches.match("./index.html")))
-        );
+    if (req.method !== "GET") return;
+
+    const url = new URL(req.url);
+
+    // Do not intercept Google Apps Script backend requests.
+    if (
+        url.hostname.includes("script.google.com") ||
+        url.hostname.includes("googleusercontent.com")
+    ) {
         return;
     }
 
-    event.respondWith(
-        caches.match(req).then(cached => {
-            const networkFetch = fetch(req).then(res => {
-                if (res && (res.ok || res.type === "opaque")) {
-                    const clone = res.clone();
-                    caches.open(CACHE_NAME).then(c => c.put(req, clone));
+    event.respondWith((async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        const isPage =
+            req.mode === "navigate" ||
+            url.pathname.endsWith("/index.html");
+
+        // HTML pages: network first, cache as fallback.
+        if (isPage) {
+            try {
+                const response = await fetch(req);
+
+                if (response && response.ok) {
+                    cache.put(req, response.clone()).catch(() => {});
                 }
-                return res;
-            }).catch(() => {});
-            return cached || networkFetch;
-        })
-    );
+
+                return response;
+            } catch (e) {
+                return (
+                    (await cache.match(req)) ||
+                    (await cache.match(APP_SHELL)) ||
+                    Response.error()
+                );
+            }
+        }
+
+        // Other files: cache first, refresh from network.
+        const cached = await cache.match(req);
+
+        const network = fetch(req).then(response => {
+            if (
+                response &&
+                (response.ok || response.type === "opaque")
+            ) {
+                cache.put(req, response.clone()).catch(() => {});
+            }
+
+            return response;
+        });
+
+        if (cached) {
+            network.catch(() => {});
+            return cached;
+        }
+
+        return network;
+    })());
 });
