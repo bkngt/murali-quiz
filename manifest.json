@@ -2,7 +2,7 @@
   "id": "./",
   "name": "BK Murali Quiz",
   "short_name": "Murali Quiz",
-  "start_url": "./index.html?v=110.22",
+  "start_url": "./index.html?v=110.23",
   "scope": "./",
   "display": "standalone",
   "background_color": "#fffdf8",
@@ -24,5 +24,5 @@
       "purpose": "maskable"
     }
   ],
-  "version": "110.22"
+  "version": "110.23"
 }
