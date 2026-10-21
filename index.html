@@ -3747,8 +3747,7 @@ function getMegaActivationDateUI(quizDate) {
                 quizDate: dateStr,
                 quizData: existingQuiz.quizData,
                 isMegaQuiz: existingQuiz.isMegaQuiz,
-                swaman: newSwamanStr,
-                createdAt: Date.now() })
+                swaman: newSwamanStr, createdAt: Date.now(), phone: (localStorage.getItem('murali_phone') || userPhone), pin: (localStorage.getItem('murali_pin') || ''), deviceId: getDeviceId() })
         }).then(r => r.json()).then(data => {
             document.getElementById('loading-box').style.display = 'none';
             if(data.status === "success") {
@@ -6056,19 +6055,45 @@ window.saveCustomQuiz = function() {
     });
     window.scrollToTop = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
     window.scrollToBottom = function() { window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}); };
-    <\/script>
-    
+    <\/script><\/body><\/html>`; return html;
+    }
+    function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
+    function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
+
+    window.exportAllSavedQuizzes = async function() {
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
+        if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरूको Q&A List एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
+        if (typeof JSZip === 'undefined') return showToast("इन्टरनेट कनेक्सन छैन। ZIP फाइल बनाउन इन्टरनेट चाहिन्छ।", "error");
+        showToast("ZIP फाइल बन्दैछ, कृपया एकछिन पर्खनुहोस्...", "info"); let zip = new JSZip();
+        serverQuizzes.forEach(sq => { if (!sq.quizData) return; let html = generateQnAHtml(sq.quizData, sq.quizDate); let filename = getSafeFilename(sq.quizDate); zip.file(filename, html); });
+        zip.generateAsync({type:"blob"}).then(function(content) { let a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = "BK_Murali_QnA_Collection.zip"; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success"); });
+    };
+
+    window.exportSelectedSavedQuiz = function() {
+        let select = document.getElementById('saved-quiz-select'); let idx = select.value; if(idx === "") return showToast("कृपया क्वीज छान्नुहोस्।", "error");
+        let serverQuizzes = safeJSON('murali_server_quizzes', []); let sq = serverQuizzes[idx]; if(!sq || !sq.quizData) return showToast("Quiz data not found!", "error");
+        let html = generateQnAHtml(sq.quizData, sq.quizDate); let b = new Blob([html], { type: 'text/html;charset=utf-8' }); let filename = getSafeFilename(sq.quizDate); triggerDownload(b, filename);
+    };
+
+    window.exportStandaloneHTML = function() {
+        if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
+        let html = generateQnAHtml(currentQuiz, currentMurliDate); let b = new Blob([html], { type: 'text/html;charset=utf-8' }); let filename = getSafeFilename(currentMurliDate); let file = new File([b], filename, { type: "text/html" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'BK Murali Q&A List', text: 'Q&A List HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); }); } 
+        else { triggerDownload(b, filename); }
+    }
+
+    // Startup
+    window.onload = function() { init(); };
+</script>
+
 <!-- ======================================================== -->
 <!-- v110.16 SMART CHART UX, SYNC & LEADERBOARD PATCH MODULE -->
 <!-- ======================================================== -->
 <style id="v110-16-smart-chart-styles">
-    /* Fix sticky positioning by removing vertical overflow clip on .container */
     .container {
         overflow-x: hidden !important;
         overflow-y: visible !important;
     }
-
-    /* Show live score badge and chevron on collapsed & open chart cards */
     #view-chart .chart-section-v2:not(.accordion-open) .chart-title-v2 {
         display: flex !important;
         align-items: center !important;
@@ -6106,8 +6131,6 @@ window.saveCustomQuiz = function() {
         color: #ffffff !important;
         border-color: #f59e0b !important;
     }
-
-    /* Quick-Select Minute Chips */
     .chart-quick-mins-v16 {
         display: flex;
         flex-wrap: wrap;
@@ -6133,8 +6156,6 @@ window.saveCustomQuiz = function() {
         color: #ffffff !important;
         border-color: var(--chart-color) !important;
     }
-
-    /* Always-Visible Compact Sticky Submit Bar */
     #view-chart .chart-submit-wrap-v2 {
         position: fixed !important;
         left: 50% !important;
@@ -6184,8 +6205,6 @@ window.saveCustomQuiz = function() {
         white-space: nowrap !important;
         box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35) !important;
     }
-
-    /* Hide any post-chart reward card canvas/buttons inside #chart-result-box (Stats tab keeps its own) */
     #chart-result-box canvas,
     #chart-result-box [onclick*="SpiritualCard"],
     #chart-result-box [onclick*="RewardCard"] {
@@ -6195,7 +6214,6 @@ window.saveCustomQuiz = function() {
 
 <script id="v110-16-smart-chart-script">
 (function() {
-    // 1. Repair any cached localStorage charts that mistakenly stored chartVersion: 110.15
     function sanitizeLocalChartsVersionV16() {
         try {
             let charts = safeJSON('murali_daily_charts', []);
@@ -6207,7 +6225,7 @@ window.saveCustomQuiz = function() {
                     if (cv !== 3 && cv !== 4) {
                         c.chartVersion = 4;
                         c.chartSchema = 'CHART_V4_12P_100_ALL_IN_ONE';
-                        c.synced = false; // Force re-sync to Google Sheets!
+                        c.synced = false;
                         modified = true;
                     }
                 }
@@ -6221,7 +6239,6 @@ window.saveCustomQuiz = function() {
         } catch (e) {}
     }
 
-    // 2. Restructure Sticky Submit Bar for 1-line compact layout & add Quick-Select Minute Chips
     function enhanceChartFormUXV16() {
         const submitWrap = document.querySelector('#view-chart .chart-submit-wrap-v2');
         if (submitWrap && !submitWrap.dataset.v16Enhanced) {
@@ -6239,7 +6256,6 @@ window.saveCustomQuiz = function() {
             }
         }
 
-        // Inject Quick-Select Minute Chips under every .chart-time-row-v4
         const presets = [0, 15, 30, 45, 60];
         document.querySelectorAll('#view-chart .chart-time-row-v4').forEach(row => {
             if (row.dataset.v16Chips) return;
@@ -6278,7 +6294,6 @@ window.saveCustomQuiz = function() {
         });
     }
 
-    // 3. Live Score Badges on Collapsed Cards
     const sectionMaxMapV16 = {1:15, 2:15, 3:10, 4:5, 5:10, 6:5, 7:5, 8:5, 9:5, 10:10, 11:5, 12:10};
     function getSectionEarnedScoreV16(secNum) {
         const numVal = id => {
@@ -6346,7 +6361,6 @@ window.saveCustomQuiz = function() {
         });
     }
 
-    // 4. Clean Post-Chart Result Box (Remove Reward Card Download after Chart Submit)
     function renderCleanChartSavedBoxV16(record) {
         const box = document.getElementById('chart-result-box');
         if (!box) return;
@@ -6354,16 +6368,14 @@ window.saveCustomQuiz = function() {
         const mins = Number(record && record.totalBabaYaadMinutes || 0);
         const stage = (record && record.stage) || (score >= 90 ? 'उड्ती कला 🕊️' : (score >= 70 ? 'चढ्ती कला 🚶' : (score >= 50 ? 'पुरुषार्थी जीवन 🌱' : 'अझै ध्यान आवश्यक ⚠️')));
         box.style.display = 'block';
-        box.innerHTML = `
-            <div style="margin-top:14px;padding:16px;border-radius:16px;background:var(--success-bg);border:1.5px solid var(--success-border);text-align:center;">
-                <div style="font-size:1.1rem;font-weight:900;color:var(--success-color);margin-bottom:4px;">✅ आजको चार्ट सफलतापूर्वक सेभ भयो!</div>
-                <div style="font-size:0.95rem;font-weight:800;color:var(--text-color);">कुल प्राप्ताङ्क: <strong style="color:var(--chart-color);font-size:1.2rem;">${score}/100</strong> • ${stage}</div>
-                <div style="font-size:0.84rem;font-weight:700;color:var(--muted-text-color);margin-top:3px;">🕊️ बाबाको याद: ${mins} मिनेट</div>
-                <button type="button" onclick="openChartLeaderboard()" style="margin-top:10px;width:auto;padding:8px 18px;background:var(--chart-color);color:#fff;border-radius:999px;font-size:0.88rem;font-weight:800;">👥 सहभागी सूची हेर्नुहोस्</button>
-            </div>`;
+        box.innerHTML = '<div style="margin-top:14px;padding:16px;border-radius:16px;background:var(--success-bg);border:1.5px solid var(--success-border);text-align:center;">' +
+            '<div style="font-size:1.1rem;font-weight:900;color:var(--success-color);margin-bottom:4px;">✅ आजको चार्ट सफलतापूर्वक सेभ भयो!</div>' +
+            '<div style="font-size:0.95rem;font-weight:800;color:var(--text-color);">कुल प्राप्ताङ्क: <strong style="color:var(--chart-color);font-size:1.2rem;">' + score + '/100</strong> • ' + stage + '</div>' +
+            '<div style="font-size:0.84rem;font-weight:700;color:var(--muted-text-color);margin-top:3px;">🕊️ बाबाको याद: ' + mins + ' मिनेट</div>' +
+            '<button type="button" onclick="openChartLeaderboard()" style="margin-top:10px;width:auto;padding:8px 18px;background:var(--chart-color);color:#fff;border-radius:999px;font-size:0.88rem;font-weight:800;">👥 सहभागी सूची हेर्नुहोस्</button>' +
+            '</div>';
     }
 
-    // Observe #chart-result-box so if legacy code injects a Reward Card after chart submit, it immediately replaces it with the clean summary
     const resBox = document.getElementById('chart-result-box');
     if (resBox && typeof MutationObserver !== 'undefined') {
         let cleaning = false;
@@ -6381,7 +6393,6 @@ window.saveCustomQuiz = function() {
         obs.observe(resBox, { childList: true, subtree: true });
     }
 
-    // 5. Reliable Chart Participant List & Admin Detail Modal
     window.lastChartLeaderboardRecordsV16 = [];
 
     window.openChartLeaderboard = function(optionalDate) {
@@ -6409,7 +6420,6 @@ window.saveCustomQuiz = function() {
         if (loadingEl) loadingEl.style.display = 'block';
         if (contentEl) contentEl.style.display = 'none';
 
-        // First flush any pending local charts so today's chart is guaranteed on the server
         if (navigator.onLine && typeof syncPendingCharts === 'function') {
             try { await syncPendingCharts(); } catch (e) {}
         }
@@ -6436,7 +6446,6 @@ window.saveCustomQuiz = function() {
 
             let list = Array.isArray(res.records) ? res.records : (Array.isArray(res.participants) ? res.participants : []);
 
-            // Fallback: if current user filled today's chart locally and it's not yet in server list, show it
             const localCharts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
             const myLocalForDate = localCharts.find(c => c && String(c.date).trim() === targetDate);
             if (myLocalForDate && !list.some(r => String(r.name || '').trim().toLowerCase() === String(userName || '').trim().toLowerCase())) {
@@ -6540,7 +6549,6 @@ window.saveCustomQuiz = function() {
         if (modal) modal.style.display = 'none';
     };
 
-    // Initialize enhancements on DOM ready and whenever chart form changes
     function initV16ChartModule() {
         sanitizeLocalChartsVersionV16();
         enhanceChartFormUXV16();
@@ -6568,37 +6576,6 @@ window.saveCustomQuiz = function() {
         };
     }
 })();
-</script>
-
-</body></html>`; return html;
-    }
-    function getSafeFilename(dateStr) { return `Murali_QnA_${String(dateStr).replace(/T.*/, '').replace(/[\/\\]/g, '-').replace(/[^a-zA-Z0-9\- ]/g, '').trim()}.html`; }
-    function triggerDownload(blob, filename) { let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Q&A List Downloaded", "success"); }
-
-    window.exportAllSavedQuizzes = async function() {
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); if(serverQuizzes.length === 0) return showToast("कुनै पनि क्वीज छैन।", "error");
-        if(!confirm(`तपाईं ${serverQuizzes.length} वटा क्वीजहरूको Q&A List एउटै ZIP फाइलमा डाउनलोड गर्दै हुनुहुन्छ। अगाडि बढ्ने?`)) return;
-        if (typeof JSZip === 'undefined') return showToast("इन्टरनेट कनेक्सन छैन। ZIP फाइल बनाउन इन्टरनेट चाहिन्छ।", "error");
-        showToast("ZIP फाइल बन्दैछ, कृपया एकछिन पर्खनुहोस्...", "info"); let zip = new JSZip();
-        serverQuizzes.forEach(sq => { if (!sq.quizData) return; let html = generateQnAHtml(sq.quizData, sq.quizDate); let filename = getSafeFilename(sq.quizDate); zip.file(filename, html); });
-        zip.generateAsync({type:"blob"}).then(function(content) { let a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = "BK_Murali_QnA_Collection.zip"; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("ZIP फाइल सफलतापूर्वक डाउनलोड भयो!", "success"); });
-    };
-
-    window.exportSelectedSavedQuiz = function() {
-        let select = document.getElementById('saved-quiz-select'); let idx = select.value; if(idx === "") return showToast("कृपया क्वीज छान्नुहोस्।", "error");
-        let serverQuizzes = safeJSON('murali_server_quizzes', []); let sq = serverQuizzes[idx]; if(!sq || !sq.quizData) return showToast("Quiz data not found!", "error");
-        let html = generateQnAHtml(sq.quizData, sq.quizDate); let b = new Blob([html], { type: 'text/html;charset=utf-8' }); let filename = getSafeFilename(sq.quizDate); triggerDownload(b, filename);
-    };
-
-    window.exportStandaloneHTML = function() {
-        if(currentQuiz.length === 0) return showToast("कुनै प्रश्न छैन।", "error");
-        let html = generateQnAHtml(currentQuiz, currentMurliDate); let b = new Blob([html], { type: 'text/html;charset=utf-8' }); let filename = getSafeFilename(currentMurliDate); let file = new File([b], filename, { type: "text/html" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'BK Murali Q&A List', text: 'Q&A List HTML File' }).then(() => showToast("फाइल सफलतापूर्वक सेयर भयो!", "success")).catch(e => { if (e.name !== 'AbortError') triggerDownload(b, filename); }); } 
-        else { triggerDownload(b, filename); }
-    }
-
-    // Startup
-    window.onload = function() { init(); };
 </script>
 </body>
 </html>
