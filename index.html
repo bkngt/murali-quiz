@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v110.27">
+    <link rel="manifest" href="manifest.json?v=v110.28">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1250,7 +1250,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.27</div>
+        <div>Version: 110.28</div>
     </div>
 </div>
 
@@ -1761,7 +1761,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v110.27').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v110.28').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1772,12 +1772,12 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.27";
+    const APP_VERSION = "110.28";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
     // ==========================================
-    if (typeof window.Chart === 'undefined' || typeof window.ResizeObserver === 'undefined') {
+    if (true) { /* Patched v110.28: Universal SVG Graph Engine Active on All Devices */
         window.Chart = function(ctxOrCanvas, config) {
             this.ctx = ctxOrCanvas;
             this.canvas = (ctxOrCanvas && ctxOrCanvas.canvas) ? ctxOrCanvas.canvas : ctxOrCanvas;
@@ -2782,6 +2782,7 @@ function getMegaActivationDateUI(quizDate) {
         // v109.1 Auto-Cache Buster
         let savedVersion = localStorage.getItem('murali_app_version');
         if (savedVersion && savedVersion !== APP_VERSION) {
+            localStorage.setItem('murali_just_updated_v28', '1');
             localStorage.setItem('murali_app_version', APP_VERSION);
             if ('caches' in window) { caches.keys().then(names => names.forEach(n => caches.delete(n))); }
             setTimeout(() => window.location.reload(true), 500);
@@ -2997,10 +2998,7 @@ function getMegaActivationDateUI(quizDate) {
             // 104.0: cache तुरुन्त नमेट्ने; background बाट refresh हुन्छ।
             let isNewVersion = false;
             let savedVersion = localStorage.getItem('murali_app_version');
-            if(savedVersion !== APP_VERSION) {
-                localStorage.setItem('murali_app_version', APP_VERSION);
-                isNewVersion = true;
-            }
+            if (savedVersion !== APP_VERSION || localStorage.getItem('murali_just_updated_v28') === '1') { localStorage.setItem('murali_app_version', APP_VERSION); localStorage.removeItem('murali_just_updated_v28'); isNewVersion = true; }
 
             document.getElementById('lock-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
@@ -3573,7 +3571,7 @@ function getMegaActivationDateUI(quizDate) {
             if (!pendingResultSyncInProgress) await syncPendingResults();
             if (isQuizActive || isExamSecurityCheckInProgress) return;
             if (!pendingChartSyncInProgress) await syncPendingCharts();
-            // पूरा Result History, Review Data र Chart History म्यानुअल Refresh मा मात्र।
+            await syncMyChartsFromServer();
         } catch(e) {} finally {
             backgroundSyncInProgress = false;
         }
@@ -7200,524 +7198,7 @@ window.saveCustomQuiz = function() {
 <!-- END v110.24 SLIM SINGLE-ROW CHECKLIST MODULE             -->
 <!-- ======================================================== -->
 
-<!-- ======================================================== -->
-<!-- v110.27 ROYAL AWARD CARD + CHART AUTO-RECOVERY PATCH     -->
-<!-- ======================================================== -->
-<script id="v110-27-royal-card-and-chart-recovery">
-(function() {
-    function toNepaliDigitsCard_(val) {
-    const map = ['०','१','२','३','४','५','६','७','८','९'];
-    return String(val == null ? '' : val).replace(/[0-9]/g, d => map[Number(d)]);
-}
-    function formatNepaliDateCard_(d) {
-    const months = ['जनवरी','फेब्रुअरी','मार्च','अप्रिल','मे','जुन','जुलाई','अगस्ट','सेप्टेम्बर','अक्टोबर','नोभेम्बर','डिसेम्बर'];
-    const dt = d instanceof Date ? d : new Date();
-    return toNepaliDigitsCard_(dt.getDate()) + ' ' + months[dt.getMonth()] + ' ' + toNepaliDigitsCard_(dt.getFullYear());
-}
-    function fitTextCanvas_(ctx, text, maxWidth, startSize, minSize, fontFamily, weight) {
-    let size = startSize;
-    const w = weight || 'bold';
-    while (size > minSize) {
-        ctx.font = w + ' ' + size + 'px ' + fontFamily;
-        if (ctx.measureText(text).width <= maxWidth) break;
-        size -= 1;
-    }
-    return size;
-}
-    function drawAuthenticShivBabaJyoti_(ctx, cx, cy) {
-    ctx.save();
-
-    // १. बाहिरी परमधाम सुनौलो-केशरी आभा (Warm Paramdham Brahm Aura)
-    const outerAura = ctx.createRadialGradient(cx, cy, 4, cx, cy, 130);
-    outerAura.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
-    outerAura.addColorStop(0.32, 'rgba(251, 146, 60, 0.55)');
-    outerAura.addColorStop(0.65, 'rgba(220, 38, 38, 0.18)');
-    outerAura.addColorStop(1, 'rgba(220, 38, 38, 0)');
-    ctx.fillStyle = outerAura;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 130, 0, Math.PI * 2);
-    ctx.fill();
-
-    // २. ३२ सूक्ष्म दिव्य किरणहरू (32 Delicate Tapered Divine Rays)
-    for (let i = 0; i < 32; i++) {
-        const angle = (i * Math.PI * 2) / 32;
-        const isLong = i % 2 === 0;
-        const innerR = 12;
-        const outerR = isLong ? 105 : 74;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angle);
-        const rayGrad = ctx.createLinearGradient(0, -innerR, 0, -outerR);
-        rayGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-        rayGrad.addColorStop(0.4, isLong ? 'rgba(245, 158, 11, 0.45)' : 'rgba(234, 88, 12, 0.35)');
-        rayGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-        ctx.fillStyle = rayGrad;
-        ctx.beginPath();
-        ctx.moveTo(-2.2, -innerR);
-        ctx.lineTo(0, -outerR);
-        ctx.lineTo(2.2, -innerR);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    }
-
-    // ३. शिवबाबाको पवित्र अण्डाकार लाल-सुवर्ण स्वरूप (Sacred Vertical Oval Aura)
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(0.76, 1.14);
-    const ovalGrad = ctx.createRadialGradient(0, 0, 3, 0, 0, 72);
-    ovalGrad.addColorStop(0, '#ffffff');
-    ovalGrad.addColorStop(0.16, '#fef08a');
-    ovalGrad.addColorStop(0.42, '#f97316');
-    ovalGrad.addColorStop(0.72, '#dc2626');
-    ovalGrad.addColorStop(0.90, 'rgba(185, 28, 28, 0.35)');
-    ovalGrad.addColorStop(1, 'rgba(185, 28, 28, 0)');
-    ctx.fillStyle = ovalGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 72, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // ४. ज्योति बिन्दुको चारैतिर हिरा जस्तो सूक्ष्म प्रकाश-किरण (Starburst Flare)
-    for (let j = 0; j < 4; j++) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate((j * Math.PI) / 4);
-        const len = (j % 2 === 0) ? 46 : 28;
-        const g = ctx.createLinearGradient(0, -len, 0, len);
-        g.addColorStop(0, 'rgba(255,255,255,0)');
-        g.addColorStop(0.42, 'rgba(255,250,220,0.85)');
-        g.addColorStop(0.5, '#ffffff');
-        g.addColorStop(0.58, 'rgba(255,250,220,0.85)');
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.strokeStyle = g;
-        ctx.lineWidth = (j % 2 === 0) ? 2.6 : 1.6;
-        ctx.beginPath();
-        ctx.moveTo(0, -len);
-        ctx.lineTo(0, len);
-        ctx.stroke();
-        ctx.restore();
-    }
-
-    // ५. केन्द्रको दिव्य सेतो ज्योतिर्बिन्दु (The Supreme Point of Light)
-    const coreHalo = ctx.createRadialGradient(cx, cy, 1, cx, cy, 22);
-    coreHalo.addColorStop(0, '#ffffff');
-    coreHalo.addColorStop(0.38, '#fffbeb');
-    coreHalo.addColorStop(0.7, 'rgba(254, 240, 138, 0.65)');
-    coreHalo.addColorStop(1, 'rgba(254, 240, 138, 0)');
-    ctx.fillStyle = coreHalo;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 22, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(cx, cy, 6.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-}
-    function drawRoyalCardOnCanvas_(canvas, data) {
-    if (!canvas) return;
-    canvas.width = 900;
-    canvas.height = 1180;
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-
-    const displayFont = "'Yatra One', 'Rozha One', 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif";
-    const serifFont = "'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Poppins', serif";
-    const sansFont = "'Poppins', 'Noto Sans Devanagari', sans-serif";
-
-    // १. उज्यालो र पवित्र स्वर्णिम-केशरी पृष्ठभूमि (Warm Celestial Ivory & Saffron Gradient)
-    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-    bgGrad.addColorStop(0, '#fff2cc');
-    bgGrad.addColorStop(0.26, '#fffbf0');
-    bgGrad.addColorStop(0.60, '#fffdf7');
-    bgGrad.addColorStop(1, '#fde6a8');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    // २. पृष्ठभूमिमा हल्का मण्डला आभा र सुनौला कणहरू (Subtle Mandala Watermark)
-    ctx.save();
-    ctx.strokeStyle = 'rgba(217, 119, 6, 0.07)';
-    ctx.lineWidth = 1.5;
-    [220, 310, 400].forEach(rad => {
-        ctx.beginPath();
-        ctx.arc(W / 2, 520, rad, 0, Math.PI * 2);
-        ctx.stroke();
-    });
-    for (let i = 0; i < 36; i++) {
-        const x = 60 + ((i * 197) % (W - 120));
-        const y = 60 + ((i * 263) % (H - 120));
-        const r = (i % 3) + 1.2;
-        ctx.fillStyle = i % 2 === 0 ? 'rgba(245, 158, 11, 0.22)' : 'rgba(234, 88, 12, 0.14)';
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    ctx.restore();
-
-    // ३. रोयल ट्रिपल बोर्डर र कुनाका कमल बुट्टाहरू (Ornate Royal Temple Borders)
-    ctx.strokeStyle = '#9a3412';
-    ctx.lineWidth = 6;
-    strokeRoundRectSafe(ctx, 26, 26, W - 52, H - 52, 24);
-
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2.5;
-    strokeRoundRectSafe(ctx, 38, 38, W - 76, H - 76, 18);
-
-    ctx.strokeStyle = 'rgba(180, 83, 9, 0.45)';
-    ctx.lineWidth = 1.2;
-    strokeRoundRectSafe(ctx, 46, 46, W - 92, H - 92, 14);
-
-    const drawCornerOrnament = (cx, cy) => {
-        ctx.save();
-        ctx.fillStyle = '#b45309';
-        ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(cx, cy, 17, 0, Math.PI * 2); ctx.stroke();
-        ctx.fillStyle = '#fef08a';
-        ctx.beginPath(); ctx.arc(cx, cy, 4.5, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-    };
-    drawCornerOrnament(44, 44);
-    drawCornerOrnament(W - 44, 44);
-    drawCornerOrnament(44, H - 44);
-    drawCornerOrnament(W - 44, H - 44);
-
-    // ४. माथिको संस्था ब्यानर पिल (Top Institution Pill)
-    ctx.fillStyle = 'rgba(254, 243, 199, 0.92)';
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 1.8;
-    fillRoundRectSafe(ctx, W / 2 - 235, 54, 470, 38, 19);
-    strokeRoundRectSafe(ctx, W / 2 - 235, 54, 470, 38, 19);
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#7c2d12';
-    ctx.font = 'bold 21px ' + serifFont;
-    ctx.fillText('ॐ शान्ति  •  ब्रह्माकुमारीज NGT, नेपाल', W / 2, 80);
-
-    // ५. वास्तविक शिवबाबाको ज्योति बिन्दु (Authentic Shiv Baba Jyoti Bindu)
-    drawAuthenticShivBabaJyoti_(ctx, W / 2, 175);
-
-    // ६. मुख्य प्रमाणपत्र शीर्षक र नाम (Main Heading & Student Name)
-    ctx.save();
-    ctx.shadowColor = 'rgba(251, 191, 36, 0.55)';
-    ctx.shadowBlur = 8;
-    ctx.fillStyle = '#881337';
-    fitTextCanvas_(ctx, 'ईश्वरीय प्रगति तथा वरदान पत्र', W - 140, 48, 34, displayFont, 'bold');
-    ctx.fillText('ईश्वरीय प्रगति तथा वरदान पत्र', W / 2, 302);
-    ctx.restore();
-
-    // सुनौलो सजावटी रेखा (Ornamental Divider)
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(W / 2 - 190, 318);
-    ctx.lineTo(W / 2 + 190, 318);
-    ctx.stroke();
-    ctx.fillStyle = '#b45309';
-    ctx.font = 'bold 18px ' + sansFont;
-    ctx.fillText('❖', W / 2, 324);
-
-    // विद्यार्थीको नाम
-    ctx.fillStyle = '#1e3a8a';
-    fitTextCanvas_(ctx, data.userName || 'ईश्वरीय विद्यार्थी', W - 150, 42, 28, sansFont, '800');
-    ctx.fillText(data.userName || 'ईश्वरीय विद्यार्थी', W / 2, 370);
-
-    // सेवा केन्द्र
-    ctx.fillStyle = '#78350f';
-    fitTextCanvas_(ctx, '📍 सेवा केन्द्र: ' + (data.userAddress || 'Nepal'), W - 160, 23, 18, sansFont, '700');
-    ctx.fillText('📍 सेवा केन्द्र: ' + (data.userAddress || 'Nepal'), W / 2, 408);
-
-    // ७. रोयल कमल मेडल र चौडा उपाधि ब्यानर (Royal Lotus Medallion + Wide Scroll Banner)
-    const mx = W / 2, my = 500, mr = 68;
-
-    // बाहिरी २४-पत्तिको सुनौलो कमल-चक्र (24-Petal Sunburst Medallion Ring)
-    ctx.save();
-    ctx.translate(mx, my);
-    for (let p = 0; p < 24; p++) {
-        ctx.save();
-        ctx.rotate((p * Math.PI * 2) / 24);
-        ctx.fillStyle = p % 2 === 0 ? '#d97706' : '#f59e0b';
-        ctx.beginPath();
-        ctx.moveTo(-8, -mr + 6);
-        ctx.quadraticCurveTo(0, -mr - 18, 8, -mr + 6);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    }
-    ctx.restore();
-
-    // मेडलको मुख्य गोलो रत्न चक्र
-    const medalGrad = ctx.createRadialGradient(mx, my - 18, 8, mx, my, mr);
-    medalGrad.addColorStop(0, '#fffbeb');
-    medalGrad.addColorStop(0.55, '#fbbf24');
-    medalGrad.addColorStop(1, '#b45309');
-    ctx.fillStyle = medalGrad;
-    ctx.beginPath();
-    ctx.arc(mx, my, mr, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = '#78350f';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(mx, my, mr - 6, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // मेडलभित्रको आइकन (Icon inside Medallion)
-    ctx.fillStyle = '#7c2d12';
-    ctx.font = 'bold 50px ' + sansFont;
-    ctx.fillText(data.badge.icon || '🪷', mx, my + 12);
-
-    // बायाँ र दायाँ रिबनको पुच्छर (Left & Right Ornate Ribbon Tails)
-    ctx.fillStyle = '#7c2d12';
-    ctx.beginPath();
-    ctx.moveTo(125, 572);
-    ctx.lineTo(175, 572);
-    ctx.lineTo(175, 636);
-    ctx.lineTo(125, 636);
-    ctx.lineTo(145, 604);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(W - 125, 572);
-    ctx.lineTo(W - 175, 572);
-    ctx.lineTo(W - 175, 636);
-    ctx.lineTo(W - 125, 636);
-    ctx.lineTo(W - 145, 604);
-    ctx.closePath();
-    ctx.fill();
-
-    // मुख्य चौडा उपाधि ब्यानर (580px Wide Royal Title Plaque — लामो उपाधि १००% अट्ने)
-    const rbx = 160, rby = 556, rbw = 580, rbh = 82;
-    const ribGrad = ctx.createLinearGradient(rbx, rby, rbx + rbw, rby);
-    ribGrad.addColorStop(0, '#7f1d1d');
-    ribGrad.addColorStop(0.5, '#991b1b');
-    ribGrad.addColorStop(1, '#7f1d1d');
-    ctx.fillStyle = ribGrad;
-    fillRoundRectSafe(ctx, rbx, rby, rbw, rbh, 41);
-
-    ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 4.5;
-    strokeRoundRectSafe(ctx, rbx, rby, rbw, rbh, 41);
-
-    ctx.strokeStyle = 'rgba(254, 243, 199, 0.7)';
-    ctx.lineWidth = 1.5;
-    strokeRoundRectSafe(ctx, rbx + 7, rby + 7, rbw - 14, rbh - 14, 34);
-
-    // उपाधिको नाम (Auto-Scaling Font inside 530px Safe Width)
-    ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-    ctx.shadowBlur = 6;
-    ctx.fillStyle = '#fffbeb';
-    const titleStr = String(data.badge.title || 'आज्ञाकारी');
-    fitTextCanvas_(ctx, titleStr, 520, 40, 24, displayFont, 'bold');
-    ctx.fillText(titleStr, W / 2, rby + 53);
-    ctx.restore();
-
-    // लगातार दिनको सुनौलो पिल (Streak Pill Below Ribbon)
-    const streakText = '🔥 ' + data.badge.streak + ' दिन लगातार अभ्यास';
-    ctx.fillStyle = '#fef3c7';
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2;
-    fillRoundRectSafe(ctx, W / 2 - 155, 650, 310, 38, 19);
-    strokeRoundRectSafe(ctx, W / 2 - 155, 650, 310, 38, 19);
-    ctx.fillStyle = '#9a3412';
-    ctx.font = '800 20px ' + sansFont;
-    ctx.fillText(streakText, W / 2, 676);
-
-    // ८. ४ वटा प्रगति विवरण बक्सहरू (4 Royal Stat Cards)
-    const drawStatBox = (x, y, label, val, iconTxt) => {
-        const bw = 360, bh = 96;
-        const lg = ctx.createLinearGradient(x, y, x, y + bh);
-        lg.addColorStop(0, '#ffffff');
-        lg.addColorStop(1, '#fef3c7');
-        ctx.fillStyle = lg;
-        ctx.strokeStyle = '#d97706';
-        ctx.lineWidth = 2.5;
-        fillRoundRectSafe(ctx, x, y, bw, bh, 16);
-        strokeRoundRectSafe(ctx, x, y, bw, bh, 16);
-
-        ctx.strokeStyle = 'rgba(217, 119, 6, 0.28)';
-        ctx.lineWidth = 1;
-        strokeRoundRectSafe(ctx, x + 5, y + 5, bw - 10, bh - 10, 12);
-
-        ctx.fillStyle = '#9a3412';
-        ctx.font = '700 21px ' + sansFont;
-        ctx.textAlign = 'center';
-        ctx.fillText(iconTxt + ' ' + label, x + bw / 2, y + 36);
-
-        ctx.fillStyle = '#1e293b';
-        ctx.font = '900 32px ' + sansFont;
-        ctx.fillText(val, x + bw / 2, y + 78);
-    };
-
-    drawStatBox(75, 710, 'मुरली परीक्षा औसत', data.examAvg + '%', '📝');
-    drawStatBox(465, 710, 'दैनिक चार्ट औसत', data.chartAvg + '/100', '📊');
-    drawStatBox(75, 822, 'लगातार अभ्यास', data.badge.streak + ' दिन', '🔥');
-    drawStatBox(465, 822, 'बाबाको कुल याद', data.yaadText, '🕊️');
-
-    // ९. ईश्वरीय वरदान बक्स (Ornate Blessing Box — No Border Overlap)
-    const bx = 68, by = 938, bw = W - 136, bh = 148;
-    const blessGrad = ctx.createLinearGradient(bx, by, bx, by + bh);
-    blessGrad.addColorStop(0, '#fff7ed');
-    blessGrad.addColorStop(1, '#ffedd5');
-    ctx.fillStyle = blessGrad;
-    ctx.strokeStyle = '#ea580c';
-    ctx.lineWidth = 2.5;
-    fillRoundRectSafe(ctx, bx, by, bw, bh, 20);
-    strokeRoundRectSafe(ctx, bx, by, bw, bh, 20);
-
-    ctx.strokeStyle = 'rgba(234, 88, 12, 0.35)';
-    ctx.lineWidth = 1.2;
-    strokeRoundRectSafe(ctx, bx + 6, by + 6, bw - 12, bh - 12, 15);
-
-    ctx.fillStyle = '#9a3412';
-    ctx.font = 'bold 27px ' + displayFont;
-    ctx.fillText('🌸 ईश्वरीय वरदान 🌸', W / 2, by + 38);
-
-    // वरदानको वाक्यलाई स्वतः लाइनमा मिलाउने
-    ctx.fillStyle = '#431407';
-    ctx.font = 'bold 23px ' + serifFont;
-    const words = ('“' + data.blessingText + '”').split(' ');
-    const lines = [];
-    let curLine = '';
-    const maxLineW = bw - 56;
-    words.forEach(w => {
-        const testLine = curLine + w + ' ';
-        if (ctx.measureText(testLine).width > maxLineW && curLine.trim() !== '') {
-            lines.push(curLine.trim());
-            curLine = w + ' ';
-        } else {
-            curLine = testLine;
-        }
-    });
-    if (curLine.trim()) lines.push(curLine.trim());
-
-    if (lines.length > 2) {
-        ctx.font = 'bold 19px ' + serifFont;
-    }
-    const lineSpacing = lines.length > 2 ? 27 : 33;
-    let startY = lines.length === 1 ? (by + 92) : (lines.length === 2 ? (by + 78) : (by + 70));
-    lines.slice(0, 3).forEach((ln, idx) => {
-        ctx.fillText(ln, W / 2, startY + idx * lineSpacing);
-    });
-
-    // १०. फुटर मिति र वेबसाइट (Clean Footer Inside Frame)
-    const todayStr = formatNepaliDateCard_(new Date());
-    ctx.fillStyle = '#78350f';
-    ctx.font = '700 18.5px ' + sansFont;
-    ctx.fillText('📅 मिति: ' + todayStr + '   •   🌐 bkngt.github.io/murali-quiz', W / 2, 1120);
-}
-
-    // १. नयाँ ईश्वरीय प्रगति तथा वरदान पत्र ड्रइङ ओभरराइड
-    window.drawSpiritualProgressCardV11 = function() {
-        const canvas = document.getElementById('spiritual-card-canvas-v11');
-        if (!canvas) return;
-        const history = safeJSON('murali_progress', []);
-        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
-        const exams = normalizeExamHistoryForStats_(history);
-        const chartItems = validChartHistoryForStats_(charts);
-        const examAvg = exams.length ? Math.round(exams.reduce((s,x)=>s+x.percent,0)/exams.length) : 0;
-        const chartAvg = chartItems.length ? Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length) : 0;
-
-        let totalYaadMins = 0;
-        chartItems.forEach(c => { totalYaadMins += Number(c.totalBabaYaadMinutes || 0); });
-        const yaadHrs = Math.floor(totalYaadMins / 60);
-        const yaadText = yaadHrs > 0 ? (yaadHrs + ' घण्टा') : (totalYaadMins + ' मिनेट');
-        const badge = getSpiritualBadgeInfoV11_();
-        const blessings = [
-            "सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बाबा समान भव!",
-            "सच्चा दिलले प्रतिदिन आफ्नो चार्ट राखी बापदादाको दिलतख्तनशीन राजर्षि भव!",
-            "प्रत्येक संकल्प र कर्ममा बाबाको यादको सुगन्ध फैलाउने सदा हर्षितमुख रत्न भव!",
-            "मुरलीको मनन-चिन्तनद्वारा सर्व शक्तिले सम्पन्न मास्टर सर्वशक्तिमान् भव!"
-        ];
-        const blessingText = badge.blessing || blessings[new Date().getDate() % blessings.length];
-
-        drawRoyalCardOnCanvas_(canvas, {
-            userName: userName || 'ईश्वरीय विद्यार्थी',
-            userAddress: userAddress || 'Nepal',
-            examAvg: examAvg,
-            chartAvg: chartAvg,
-            yaadText: yaadText,
-            badge: badge,
-            blessingText: blessingText
-        });
-    };
-
-    window.openSpiritualCardModalV11 = function() {
-        const modal = document.getElementById('spiritual-card-modal-v11');
-        if (!modal) return;
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            window.drawSpiritualProgressCardV11();
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(() => window.drawSpiritualProgressCardV11());
-            }
-        }, 80);
-    };
-
-    // २. हिजो/आज localStorage मा 110.26 भएर अड्किएका चार्टहरूको स्वतः उद्धार र सिंक
-    window.repairAndSyncLocalChartsV27_ = async function() {
-        try {
-            let charts = safeJSON('murali_daily_charts', []);
-            if (!Array.isArray(charts) || !charts.length) return;
-            let modified = false;
-            const dedupMap = new Map();
-
-            charts.forEach(c => {
-                if (!c || typeof c !== 'object') return;
-                if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4 || String(c.chartSchema || '').indexOf('CHART_V4') === 0) {
-                    if (c.chartVersion !== 4 || c.schemaVersion !== 4) {
-                        c.chartVersion = 4;
-                        c.schemaVersion = 4;
-                        modified = true;
-                    }
-                }
-                const ver = Number(c.chartVersion || c.schemaVersion || 3) >= 4 ? 4 : 3;
-                const key = String(c.phone || '') + '|' + String(c.date || '') + '|V' + ver;
-                const prev = dedupMap.get(key);
-                if (!prev || Number(c.totalScore || 0) >= Number(prev.totalScore || 0)) {
-                    dedupMap.set(key, c);
-                } else {
-                    modified = true;
-                }
-            });
-
-            if (modified) {
-                const cleaned = Array.from(dedupMap.values());
-                localStorage.setItem('murali_daily_charts', JSON.stringify(cleaned));
-            }
-
-            if (navigator.onLine) {
-                const syncedNow = await syncPendingCharts();
-                if (syncedNow && typeof authoritativeStatsCache === 'object') {
-                    authoritativeStatsCache = {};
-                }
-                await syncMyChartsFromServer();
-                if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display === 'block') {
-                    renderDashboard();
-                }
-            }
-        } catch (e) {
-            console.warn('repairAndSyncLocalChartsV27_ error:', e);
-        }
-    };
-
-    // चार्ट लिडरबोर्ड खोल्नुअघि पेन्डिङ चार्ट सिंक गर्ने
-    const origOpenChartLb = window.openChartLeaderboard;
-    if (typeof origOpenChartLb === 'function') {
-        window.openChartLeaderboard = async function() {
-            await window.repairAndSyncLocalChartsV27_();
-            return origOpenChartLb.apply(this, arguments);
-        };
-    }
-
-    setTimeout(() => { window.repairAndSyncLocalChartsV27_(); }, 900);
-})();
-</script>
+<!-- Removed duplicate v110-27-royal-card-and-chart-recovery block -->
 
 
 <!-- ======================================================== -->
@@ -8185,5 +7666,224 @@ window.saveCustomQuiz = function() {
 })();
 </script>
 
+
+<!-- ======================================================== -->
+<!-- v110.28 UNIFIED CHART DOWNLOAD, GRAPH & CARD RECOVERY -->
+<!-- ======================================================== -->
+<script id="v110-28-unified-chart-and-graph-fix">
+(function() {
+    // १. फोन नम्बर सामान्यीकरण (+977 वा 977 हटाएर १० अंकमा रूपान्तरण)
+    window.normalizePhoneForChartV28_ = function(phone) {
+        var p = String(phone || '').replace(/^'/, '').replace(/\D/g, '').trim();
+        if (p.length > 10 && p.indexOf('977') === 0) p = p.substring(3);
+        return p;
+    };
+
+    // २. मिति सामान्यीकरण (YYYY-MM-DD ढाँचा सुनिश्चित गर्ने)
+    window.normalizeChartDateISO_ = function(dateStr) {
+        var raw = String(dateStr || '').replace(/^'/, '').trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+        if (typeof parseDateString === 'function' && typeof dateKeyLocal_ === 'function') {
+            var d = parseDateString(raw);
+            if (d && !isNaN(d.getTime())) return dateKeyLocal_(d);
+        }
+        return raw;
+    };
+
+    // ३. पुरानो र नयाँ दुवै चार्ट रेकर्ड नहराउने गरी प्रयोगकर्ता पहिचान फङ्सन सुधार
+    window.chartRecordBelongsToCurrentUserV4_ = function(record) {
+        if (!record || typeof record !== 'object') return false;
+        var minePhone = window.normalizePhoneForChartV28_(typeof userPhone !== 'undefined' ? userPhone : localStorage.getItem('murali_phone'));
+        var recPhone = window.normalizePhoneForChartV28_(record.phone);
+        if (minePhone && recPhone) return minePhone === recPhone;
+        // सर्भरबाट आएको वा पुरानो लोकल रेकर्डमा phone खाली छ भने यो डिभाइसको सक्रिय प्रयोगकर्ताकै मान्ने
+        if (!recPhone) return true;
+        return false;
+    };
+
+    // ४. मिति र फोन मिलाएर चार्ट खोज्ने फङ्सन सुधार
+    window.getPreferredChartRecordV4_ = function(charts, dateVal, phone) {
+        var targetDate = window.normalizeChartDateISO_(dateVal);
+        var targetPhone = window.normalizePhoneForChartV28_(phone || (typeof userPhone !== 'undefined' ? userPhone : localStorage.getItem('murali_phone')));
+        var matches = (Array.isArray(charts) ? charts : []).filter(function(c) {
+            if (!c || typeof c !== 'object') return false;
+            var cDate = window.normalizeChartDateISO_(c.date);
+            if (cDate !== targetDate) return false;
+            var cPhone = window.normalizePhoneForChartV28_(c.phone);
+            return (!cPhone || !targetPhone || cPhone === targetPhone);
+        });
+        matches.sort(function(a, b) {
+            var av = Number(a.chartVersion || a.schemaVersion || 3);
+            var bv = Number(b.chartVersion || b.schemaVersion || 3);
+            if (bv !== av) return bv - av;
+            var at = Number(a.timestamp || a.updatedAt || a.createdAt || 0) || Date.parse(a.timestamp || a.updatedAt || a.createdAt || '') || 0;
+            var bt = Number(b.timestamp || b.updatedAt || b.createdAt || 0) || Date.parse(b.timestamp || b.updatedAt || b.createdAt || '') || 0;
+            return bt - at;
+        });
+        return matches[0] || null;
+    };
+
+    // ५. सर्भरबाट चार्ट डाउनलोड गर्दा Safety Guard र Date/Phone Normalization सहितको सुधार
+    window.syncMyChartsFromServer = async function(forceRefresh) {
+        var activePhone = window.normalizePhoneForChartV28_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var activePin = localStorage.getItem('murali_pin') || '';
+        if (!navigator.onLine || !activePhone || !activePin) return false;
+        if (typeof myChartsSyncInProgress !== 'undefined' && myChartsSyncInProgress && !forceRefresh) return false;
+        if (typeof myChartsSyncInProgress !== 'undefined') myChartsSyncInProgress = true;
+
+        try {
+            var data = await apiPostJSON({
+                action: 'fetchMyCharts',
+                phone: activePhone,
+                pin: activePin,
+                deviceId: typeof getDeviceId === 'function' ? getDeviceId() : 'Unknown',
+                chartVersion: 4
+            }, { retries: 2, timeoutMs: 18000 });
+
+            if (data && data.status === 'success' && Array.isArray(data.charts)) {
+                var localCharts = safeJSON('murali_daily_charts', []);
+                var otherUsers = localCharts.filter(function(c) {
+                    var cp = window.normalizePhoneForChartV28_(c && c.phone);
+                    return cp && cp !== activePhone;
+                });
+                var mineExisting = localCharts.filter(function(c) {
+                    var cp = window.normalizePhoneForChartV28_(c && c.phone);
+                    return !cp || cp === activePhone;
+                });
+
+                // Safety Guard: सर्भरबाट ० चार्ट आउँदा लोकलमा पहिले नै डाटा छ भने नमेट्ने
+                if (data.charts.length === 0 && mineExisting.length > 0) {
+                    return false;
+                }
+
+                var serverMap = new Map();
+                // पहिले लोकलका रेकर्डहरू राख्ने (ताकि कुनै पनि पुरानो लोकल रेकर्ड नहराओस्)
+                mineExisting.forEach(function(loc) {
+                    if (!loc || !loc.date) return;
+                    var dKey = window.normalizeChartDateISO_(loc.date);
+                    serverMap.set(dKey, Object.assign({}, loc, {
+                        date: dKey,
+                        phone: activePhone
+                    }));
+                });
+
+                // सर्भरका रेकर्डहरू मर्ज गर्ने
+                data.charts.forEach(function(srv) {
+                    if (!srv || !srv.date) return;
+                    var dKey = window.normalizeChartDateISO_(srv.date);
+                    var normalizedSrv = Object.assign({}, srv, {
+                        date: dKey,
+                        phone: activePhone,
+                        name: srv.name || (typeof userName !== 'undefined' ? userName : ''),
+                        address: srv.address || (typeof userAddress !== 'undefined' ? userAddress : ''),
+                        synced: true
+                    });
+                    var prev = serverMap.get(dKey);
+                    if (!prev) {
+                        serverMap.set(dKey, normalizedSrv);
+                    } else {
+                        var prevPending = (prev.synced === false);
+                        var prevVer = Number(prev.chartVersion || prev.schemaVersion || 3);
+                        var srvVer = Number(normalizedSrv.chartVersion || normalizedSrv.schemaVersion || 3);
+                        if (!prevPending && (srvVer >= prevVer || Number(normalizedSrv.totalScore || 0) >= Number(prev.totalScore || 0))) {
+                            serverMap.set(dKey, normalizedSrv);
+                        }
+                    }
+                });
+
+                var mergedMine = Array.from(serverMap.values());
+                mergedMine.sort(function(a, b) {
+                    return String(b.date).localeCompare(String(a.date)) || Number(b.chartVersion || 3) - Number(a.chartVersion || 3);
+                });
+                localStorage.setItem('murali_daily_charts', JSON.stringify(mergedMine.concat(otherUsers)));
+                return true;
+            }
+        } catch (e) {
+            console.warn('syncMyChartsFromServer v28 error:', e);
+        } finally {
+            if (typeof myChartsSyncInProgress !== 'undefined') myChartsSyncInProgress = false;
+        }
+        return false;
+    };
+
+    // ६. ट्याब परिवर्तन गर्दा (Chart र Stats दुवैमा) सर्भरबाट स्वतः चार्ट/रिजल्ट सिंक गरी ग्राफ रि-रेन्डर गर्ने
+    var prevSwitchTabV28 = window.switchTab;
+    if (typeof prevSwitchTabV28 === 'function') {
+        window.switchTab = function(tab) {
+            prevSwitchTabV28.apply(this, arguments);
+            if (tab === 'chart' && navigator.onLine) {
+                window.syncMyChartsFromServer().then(function(updated) {
+                    if (updated && typeof loadChartDataForDate === 'function') {
+                        var cd = document.getElementById('chart-date');
+                        var dt = (cd && cd.value) ? cd.value : (typeof getLocalDateISO === 'function' ? getLocalDateISO() : '');
+                        if (dt) loadChartDataForDate(dt);
+                    }
+                });
+            } else if (tab === 'prog') {
+                setTimeout(function() {
+                    if (typeof renderDashboard === 'function') renderDashboard();
+                }, 60);
+                if (navigator.onLine) {
+                    Promise.all([
+                        window.syncMyChartsFromServer(),
+                        (typeof syncMyResults === 'function' ? syncMyResults(false) : Promise.resolve(false))
+                    ]).then(function(res) {
+                        if ((res[0] || res[1]) && typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display !== 'none') {
+                            renderDashboard();
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+    // ७. एप खुल्दा userPhone तयार भएपछि स्वतः पेन्डिङ चार्ट अपलोड र सर्भरबाट पुराना चार्ट डाउनलोड गर्ने
+    window.runStartupChartAndResultSyncV28_ = async function() {
+        var phone = window.normalizePhoneForChartV28_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var pin = localStorage.getItem('murali_pin') || '';
+        if (!phone || !pin) return;
+
+        try {
+            // पहिले लोकल चार्टको फोन र मिति ढाँचा सफा गर्ने
+            var charts = safeJSON('murali_daily_charts', []);
+            if (Array.isArray(charts) && charts.length > 0) {
+                var changed = false;
+                charts.forEach(function(c) {
+                    if (!c || typeof c !== 'object') return;
+                    var normD = window.normalizeChartDateISO_(c.date);
+                    if (normD && c.date !== normD) { c.date = normD; changed = true; }
+                    if (!c.phone) { c.phone = phone; changed = true; }
+                    if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4) {
+                        c.chartVersion = 4; c.schemaVersion = 4; c.synced = false; changed = true;
+                    }
+                });
+                if (changed) localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+            }
+
+            if (navigator.onLine) {
+                if (typeof syncPendingCharts === 'function') await syncPendingCharts();
+                if (typeof authoritativeStatsCache === 'object') authoritativeStatsCache = {};
+                await window.syncMyChartsFromServer(true);
+                if (typeof syncMyResults === 'function' && safeJSON('murali_progress', []).length === 0) {
+                    await syncMyResults(true);
+                }
+                if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display !== 'none') {
+                    renderDashboard();
+                }
+            }
+        } catch (err) {
+            console.warn('Startup chart sync v28:', err);
+        }
+    };
+
+    if (document.readyState === 'complete') {
+        setTimeout(window.runStartupChartAndResultSyncV28_, 600);
+    } else {
+        window.addEventListener('load', function() {
+            setTimeout(window.runStartupChartAndResultSyncV28_, 600);
+        });
+    }
+})();
+</script>
 </body>
 </html>
