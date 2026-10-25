@@ -1,13 +1,17 @@
-/* BK Murali Quiz 110.29 Service Worker - Exam-Safe */
-const CACHE_NAME = "murali-quiz-v110-29";
+/* BK Murali Quiz 110.30 Service Worker - Exam-Safe & Instant Cache Bust */
+const CACHE_NAME = "murali-quiz-v110-30";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
 self.addEventListener("install", event => {
+    self.skipWaiting();
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
-        await cache.addAll(["./index.html", "./manifest.json"]);
-        try { await cache.add("./"); } catch (e) {}
+        await Promise.all([
+            cache.add(new Request("./index.html", { cache: "reload" })),
+            cache.add(new Request("./manifest.json", { cache: "reload" }))
+        ]);
+        try { await cache.add(new Request("./", { cache: "reload" })); } catch (e) {}
     })());
 });
 
@@ -15,6 +19,7 @@ self.addEventListener("activate", event => {
     event.waitUntil((async () => {
         const keys = await caches.keys();
         await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key)));
+        await self.clients.claim();
     })());
 });
 
@@ -28,7 +33,7 @@ self.addEventListener("fetch", event => {
         const isPage = req.mode === "navigate" || url.pathname.endsWith("/index.html");
         if (isPage) {
             try {
-                const response = await fetch(req);
+                const response = await fetch(req, { cache: "no-store" });
                 if (response && response.ok) cache.put(req, response.clone()).catch(() => {});
                 return response;
             } catch (e) {
