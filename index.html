@@ -2485,9 +2485,9 @@ function getMegaActivationDateUI(quizDate) {
             return {
                 icon: '🕊️',
                 title: 'डबल लाइट फरिश्ता',
-                subtitle: 'बापसमान न्यारा र प्यारा कर्मातीत स्थिति',
+                subtitle: 'बाबा समान न्यारा र प्यारा कर्मातीत स्थिति',
                 streak: bestStreak,
-                blessing: 'नथाकी, नरोकी सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बापसमान डबल लाइट फरिश्ता भव!'
+                blessing: 'सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बाबा समान भव!'
             };
         }
         if (bestStreak >= 45) {
@@ -2610,7 +2610,7 @@ function getMegaActivationDateUI(quizDate) {
         const badge = getSpiritualBadgeInfoV11_();
 
         const blessings = [
-            "नथाकी, नरोकी सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने डबल लाइट फरिश्ता भव!",
+            "सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बाबा समान भव!",
             "सच्चा दिलले प्रतिदिन आफ्नो चार्ट राखी बापदादाको दिलतख्तनशीन राजर्षि भव!",
             "प्रत्येक संकल्प र कर्ममा बाबाको यादको सुगन्ध फैलाउने सदा हर्षितमुख रत्न भव!",
             "मुरलीको मनन-चिन्तनद्वारा सर्व शक्तिले सम्पन्न मास्टर सर्वशक्तिमान् भव!"
@@ -5285,7 +5285,7 @@ window.saveCustomQuiz = function() {
         let chartTotal=chartItems.length, chartAvg=chartItems.length?Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length):0;
         if(sourceStats&&sourceStats.status==='success'){
             if(!isChartTab){ examTotal=Number(sourceStats.exam.totalExams||examTotal); examAvg=Number(sourceStats.exam.averageScore||0); }
-            else { chartTotal=Number(sourceStats.chart.totalCharts||chartTotal); chartAvg=Number(sourceStats.chart.averageScore||0); }
+            else { chartTotal=Math.max(chartTotal, Number(sourceStats.chart.totalCharts||0)); chartAvg=chartItems.length ? chartAvg : Number(sourceStats.chart.averageScore||0); }
         }
         const streak=isChartTab?currentStreak_(chartItems):currentStreak_(exams);
         document.getElementById('dash-stats').innerHTML=isChartTab
@@ -5307,7 +5307,12 @@ window.saveCustomQuiz = function() {
         }
         document.getElementById('cal-grid-days').innerHTML=calHtml;
 
-        const monthly=sourceStats&&sourceStats.status==='success' ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : (isChartTab?localStatsMonthly_(chartItems,cy,cm):localStatsMonthly_(exams,cy,cm));
+        const localMonthlyArr = isChartTab ? localStatsMonthly_(chartItems,cy,cm) : localStatsMonthly_(exams,cy,cm);
+        const serverMonthlyArr = (sourceStats&&sourceStats.status==='success') ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : null;
+        const monthly = serverMonthlyArr ? localMonthlyArr.map((locDay, idx) => {
+            const srvDay = serverMonthlyArr[idx];
+            return (locDay && locDay.data) ? locDay : (srvDay || locDay);
+        }) : localMonthlyArr;
         const labels=monthly.map(x=>x.day), points=monthly.map(x=>x.data?(isChartTab?x.data.score:x.data.percent):null);
         let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
         if(isChartTab){
@@ -7624,7 +7629,7 @@ window.saveCustomQuiz = function() {
         const yaadText = yaadHrs > 0 ? (yaadHrs + ' घण्टा') : (totalYaadMins + ' मिनेट');
         const badge = getSpiritualBadgeInfoV11_();
         const blessings = [
-            "नथाकी, नरोकी सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बापसमान डबल लाइट फरिश्ता भव!",
+            "सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बाबा समान भव!",
             "सच्चा दिलले प्रतिदिन आफ्नो चार्ट राखी बापदादाको दिलतख्तनशीन राजर्षि भव!",
             "प्रत्येक संकल्प र कर्ममा बाबाको यादको सुगन्ध फैलाउने सदा हर्षितमुख रत्न भव!",
             "मुरलीको मनन-चिन्तनद्वारा सर्व शक्तिले सम्पन्न मास्टर सर्वशक्तिमान् भव!"
@@ -7711,6 +7716,472 @@ window.saveCustomQuiz = function() {
     }
 
     setTimeout(() => { window.repairAndSyncLocalChartsV27_(); }, 900);
+})();
+</script>
+
+
+<!-- ======================================================== -->
+<!-- v110.27 DIVINE CARD + CHART SYNC & GRAPH RECOVERY PATCH  -->
+<!-- ======================================================== -->
+<script id="v110-27-divine-card-and-chart-recovery">
+(function() {
+    function fitTextCanvas_(ctx, text, maxWidth, startSize, minSize, fontFamily, weight) {
+    let size = startSize;
+    const w = weight || 'bold';
+    while (size > minSize) {
+        ctx.font = w + ' ' + size + 'px ' + fontFamily;
+        if (ctx.measureText(text).width <= maxWidth) break;
+        size -= 1;
+    }
+    return size;
+}
+    function wrapTextLinesCanvas_(ctx, text, maxWidth) {
+    const words = String(text || '').trim().split(/\s+/);
+    const lines = [];
+    let cur = '';
+    words.forEach(w => {
+        const test = cur ? (cur + ' ' + w) : w;
+        if (ctx.measureText(test).width > maxWidth && cur) {
+            lines.push(cur);
+            cur = w;
+        } else {
+            cur = test;
+        }
+    });
+    if (cur) lines.push(cur);
+    return lines;
+}
+    function drawCircularShivBabaJyoti_(ctx, cx, cy) {
+    ctx.save();
+
+    // १. बाहिरी मुलायम गोलाकार आभा
+    const ambient = ctx.createRadialGradient(cx, cy, 10, cx, cy, 135);
+    ambient.addColorStop(0, 'rgba(234, 88, 12, 0.45)');
+    ambient.addColorStop(0.55, 'rgba(185, 28, 28, 0.18)');
+    ambient.addColorStop(1, 'rgba(185, 28, 28, 0)');
+    ctx.fillStyle = ambient;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 135, 0, Math.PI * 2);
+    ctx.fill();
+
+    // २. मुख्य पूर्ण गोलाकार लाल-सुवर्ण ज्योति मण्डल
+    const sphereR = 96;
+    const sphereGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, sphereR);
+    sphereGrad.addColorStop(0, '#ffffff');
+    sphereGrad.addColorStop(0.12, '#fef08a');
+    sphereGrad.addColorStop(0.28, '#f59e0b');
+    sphereGrad.addColorStop(0.58, '#ea580c');
+    sphereGrad.addColorStop(0.84, '#b91c1c');
+    sphereGrad.addColorStop(0.96, '#7f1d1d');
+    sphereGrad.addColorStop(1, 'rgba(127, 29, 29, 0)');
+    ctx.fillStyle = sphereGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, sphereR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ३. दुईवटा गोलाकार प्रकाश-घेरा (Two Concentric Halo Rings)
+    const innerRing = ctx.createRadialGradient(cx, cy, 48, cx, cy, 64);
+    innerRing.addColorStop(0, 'rgba(255, 237, 213, 0)');
+    innerRing.addColorStop(0.5, 'rgba(255, 237, 213, 0.52)');
+    innerRing.addColorStop(1, 'rgba(255, 237, 213, 0)');
+    ctx.fillStyle = innerRing;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 66, 0, Math.PI * 2);
+    ctx.fill();
+
+    const outerRing = ctx.createRadialGradient(cx, cy, 83, cx, cy, 100);
+    outerRing.addColorStop(0, 'rgba(254, 215, 170, 0)');
+    outerRing.addColorStop(0.5, 'rgba(251, 146, 60, 0.42)');
+    outerRing.addColorStop(1, 'rgba(154, 52, 18, 0)');
+    ctx.fillStyle = outerRing;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 102, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ४. केन्द्रबाट निस्किएका तीखा किरणहरू
+    const rayAngles = [
+        [0, 128, 2.2], [12, 82, 1.1], [24, 108, 1.6], [37, 74, 1.0],
+        [48, 134, 2.3], [61, 86, 1.2], [73, 114, 1.7], [85, 78, 1.0],
+        [96, 126, 2.0], [109, 84, 1.1], [122, 118, 1.8], [135, 76, 1.0],
+        [147, 132, 2.2], [160, 88, 1.2], [172, 110, 1.6], [184, 80, 1.0],
+        [196, 136, 2.3], [208, 84, 1.1], [221, 116, 1.7], [233, 76, 1.0],
+        [246, 128, 2.1], [258, 86, 1.2], [270, 118, 1.8], [283, 78, 1.0],
+        [295, 134, 2.2], [308, 88, 1.2], [321, 112, 1.6], [334, 80, 1.0],
+        [347, 124, 1.9]
+    ];
+    rayAngles.forEach(([deg, len, w]) => {
+        const rad = (deg * Math.PI) / 180;
+        const x2 = cx + Math.cos(rad) * len;
+        const y2 = cy + Math.sin(rad) * len;
+        const rg = ctx.createLinearGradient(cx, cy, x2, y2);
+        rg.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        rg.addColorStop(0.28, 'rgba(254, 240, 138, 0.80)');
+        rg.addColorStop(0.65, 'rgba(251, 146, 60, 0.40)');
+        rg.addColorStop(1, 'rgba(251, 146, 60, 0)');
+        ctx.strokeStyle = rg;
+        ctx.lineWidth = w;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    });
+
+    // ५. सूक्ष्म तारामण्डल कणहरू (Starlight Sparkles)
+    for (let s = 0; s < 42; s++) {
+        const angle = (s * 137.5 * Math.PI) / 180;
+        const dist = 24 + ((s * 19) % 78);
+        const sx = cx + Math.cos(angle) * dist;
+        const sy = cy + Math.sin(angle) * dist;
+        const sr = (s % 3 === 0) ? 1.8 : 1.1;
+        ctx.fillStyle = (s % 2 === 0) ? 'rgba(255, 255, 255, 0.85)' : 'rgba(254, 240, 138, 0.75)';
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // ६. केन्द्रको दिव्य ज्योतिर्बिन्दु
+    const centerBurst = ctx.createRadialGradient(cx, cy, 1, cx, cy, 28);
+    centerBurst.addColorStop(0, '#ffffff');
+    centerBurst.addColorStop(0.30, '#fef9c3');
+    centerBurst.addColorStop(0.65, 'rgba(251, 191, 36, 0.55)');
+    centerBurst.addColorStop(1, 'rgba(251, 191, 36, 0)');
+    ctx.fillStyle = centerBurst;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+    function drawRoyalCardOnCanvas_(canvas, data) {
+    if (!canvas) return;
+    canvas.width = 900;
+    canvas.height = 1160;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    const displayFont = "'Yatra One', 'Noto Serif Devanagari', 'Noto Sans Devanagari', serif";
+    const serifFont = "'Noto Serif Devanagari', 'Noto Sans Devanagari', serif";
+    const sansFont = "'Poppins', 'Noto Sans Devanagari', sans-serif";
+
+    // १. उज्यालो स्वर्णिम-क्रिम पृष्ठभूमि
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#fff5d6');
+    bgGrad.addColorStop(0.25, '#fffcf2');
+    bgGrad.addColorStop(0.70, '#fffdf7');
+    bgGrad.addColorStop(1, '#fdead0');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // २. बोर्डर र कुनाका बुट्टाहरू
+    ctx.strokeStyle = '#991b1b';
+    ctx.lineWidth = 6;
+    strokeRoundRectSafe(ctx, 26, 26, W - 52, H - 52, 22);
+
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2.2;
+    strokeRoundRectSafe(ctx, 38, 38, W - 76, H - 76, 16);
+
+    const drawCorner = (x, y) => {
+        ctx.save();
+        ctx.fillStyle = '#991b1b';
+        ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#d97706'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#fde68a';
+        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    };
+    drawCorner(42, 42); drawCorner(W - 42, 42);
+    drawCorner(42, H - 42); drawCorner(W - 42, H - 42);
+
+    // ३. माथि शिवबाबाको पूर्ण गोलाकार ज्योति
+    drawCircularShivBabaJyoti_(ctx, W / 2, 152);
+
+    // ४. मुख्य शीर्षक: दिव्य पुरुषार्थ तथा ईश्वरीय वरदान पत्र
+    const topicText = 'दिव्य पुरुषार्थ तथा ईश्वरीय वरदान पत्र';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#7f1d1d';
+    fitTextCanvas_(ctx, topicText, W - 130, 44, 28, displayFont, 'bold');
+    ctx.fillText(topicText, W / 2, 310);
+
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 170, 325);
+    ctx.lineTo(W / 2 + 170, 325);
+    ctx.stroke();
+
+    // विद्यार्थीको नाम र सेवा केन्द्र
+    ctx.fillStyle = '#1e3a8a';
+    fitTextCanvas_(ctx, data.userName || 'ईश्वरीय विद्यार्थी', W - 140, 42, 28, sansFont, '800');
+    ctx.fillText(data.userName || 'ईश्वरीय विद्यार्थी', W / 2, 372);
+
+    ctx.fillStyle = '#78350f';
+    fitTextCanvas_(ctx, '📍 सेवा केन्द्र: ' + (data.userAddress || 'Nepal'), W - 160, 22, 18, sansFont, '700');
+    ctx.fillText('📍 सेवा केन्द्र: ' + (data.userAddress || 'Nepal'), W / 2, 408);
+
+    // ५. मेडल र चौडा रातो-सुनौलो रिबन ब्यानर
+    const rbx = 160, rby = 486, rbw = 580, rbh = 82;
+
+    ctx.fillStyle = '#7f1d1d';
+    ctx.beginPath();
+    ctx.moveTo(118, rby + 16);
+    ctx.lineTo(175, rby + 16);
+    ctx.lineTo(175, rby + 78);
+    ctx.lineTo(118, rby + 78);
+    ctx.lineTo(142, rby + 47);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(W - 118, rby + 16);
+    ctx.lineTo(W - 175, rby + 16);
+    ctx.lineTo(W - 175, rby + 78);
+    ctx.lineTo(W - 118, rby + 78);
+    ctx.lineTo(W - 142, rby + 47);
+    ctx.closePath();
+    ctx.fill();
+
+    const ribGrad = ctx.createLinearGradient(rbx, rby, rbx, rby + rbh);
+    ribGrad.addColorStop(0, '#b91c1c');
+    ribGrad.addColorStop(0.5, '#991b1b');
+    ribGrad.addColorStop(1, '#7f1d1d');
+    ctx.fillStyle = ribGrad;
+    fillRoundRectSafe(ctx, rbx, rby, rbw, rbh, 22);
+
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 4;
+    strokeRoundRectSafe(ctx, rbx, rby, rbw, rbh, 22);
+
+    const mx = W / 2, my = rby - 18, mr = 38;
+    const medalGrad = ctx.createRadialGradient(mx, my - 8, 4, mx, my, mr);
+    medalGrad.addColorStop(0, '#fffbeb');
+    medalGrad.addColorStop(0.6, '#fbbf24');
+    medalGrad.addColorStop(1, '#b45309');
+    ctx.fillStyle = medalGrad;
+    ctx.beginPath();
+    ctx.arc(mx, my, mr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(mx, my, mr - 4, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#7c2d12';
+    ctx.font = 'bold 32px ' + sansFont;
+    ctx.fillText(data.badge.icon || '🪷', mx, my + 11);
+
+    ctx.fillStyle = '#ffffff';
+    const titleStr = String(data.badge.title || 'आज्ञाकारी');
+    fitTextCanvas_(ctx, titleStr, 520, 40, 24, displayFont, 'bold');
+    ctx.fillText(titleStr, W / 2, rby + 58);
+
+    // लगातार अभ्यास पिल
+    ctx.fillStyle = '#fef3c7';
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2;
+    fillRoundRectSafe(ctx, W / 2 - 155, 582, 310, 38, 19);
+    strokeRoundRectSafe(ctx, W / 2 - 155, 582, 310, 38, 19);
+    ctx.fillStyle = '#9a3412';
+    ctx.font = '800 20px ' + sansFont;
+    ctx.fillText('🔥 ' + data.badge.streak + ' दिन लगातार अभ्यास', W / 2, 608);
+
+    // ६. ४ वटा प्रगति कार्ड बक्सहरू
+    const drawStatBox = (x, y, label, val, ic) => {
+        const bw = 360, bh = 94;
+        const lg = ctx.createLinearGradient(x, y, x, y + bh);
+        lg.addColorStop(0, '#ffffff');
+        lg.addColorStop(1, '#fef3c7');
+        ctx.fillStyle = lg;
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 2.2;
+        fillRoundRectSafe(ctx, x, y, bw, bh, 15);
+        strokeRoundRectSafe(ctx, x, y, bw, bh, 15);
+
+        ctx.fillStyle = '#9a3412';
+        ctx.font = '700 21px ' + sansFont;
+        ctx.fillText(ic + ' ' + label, x + bw / 2, y + 35);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '900 31px ' + sansFont;
+        ctx.fillText(val, x + bw / 2, y + 76);
+    };
+
+    drawStatBox(75, 640, 'मुरली परीक्षा औसत', data.examAvg + '%', '📝');
+    drawStatBox(465, 640, 'दैनिक चार्ट औसत', data.chartAvg + '/100', '📊');
+    drawStatBox(75, 750, 'लगातार अभ्यास', data.badge.streak + ' दिन', '🔥');
+    drawStatBox(465, 750, 'बाबाको कुल याद', data.yaadText, '🕊️');
+
+    // ७. ईश्वरीय वरदान बक्स (कोठाअनुसार अक्षर ठूलो र बीचमा सन्तुलित)
+    const bx = 75, by = 862, bw = W - 150, bh = 154;
+    const blessGrad = ctx.createLinearGradient(bx, by, bx, by + bh);
+    blessGrad.addColorStop(0, '#fff7ed');
+    blessGrad.addColorStop(1, '#ffedd5');
+    ctx.fillStyle = blessGrad;
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 2.5;
+    fillRoundRectSafe(ctx, bx, by, bw, bh, 18);
+    strokeRoundRectSafe(ctx, bx, by, bw, bh, 18);
+
+    ctx.fillStyle = '#9a3412';
+    ctx.font = 'bold 28px ' + displayFont;
+    ctx.fillText('🌸 ईश्वरीय वरदान 🌸', W / 2, by + 38);
+
+    // कोठाको चौडाइ र उचाइअनुसार स्वतः ठूलो फन्ट साइज छान्ने (Auto-Scale 32px -> 25px)
+    const rawBlessing = String(data.blessingText || '')
+        .replace(/^नथाकी,\s*नरोकी\s*/g, '')
+        .replace(/बापसमान\s*डबल\s*लाइट\s*फरिश्ता\s*भव!/g, 'बाबा समान भव!')
+        .replace(/बापसमान/g, 'बाबा समान');
+    const quoteStr = '“' + rawBlessing + '”';
+    const maxTextW = bw - 56;
+
+    let chosenFontSize = 31;
+    let wrappedLines = [];
+    for (let sz = 31; sz >= 24; sz--) {
+        ctx.font = '800 ' + sz + 'px ' + serifFont;
+        wrappedLines = wrapTextLinesCanvas_(ctx, quoteStr, maxTextW);
+        // यदि १ लाइन छ लेकिन चौडाइ ५२० भन्दा सानो छ भने २ लाइनमा सन्तुलित वा ठूलो राख्ने
+        if (wrappedLines.length <= 2) {
+            chosenFontSize = sz;
+            break;
+        }
+    }
+    ctx.fillStyle = '#431407';
+    ctx.font = '800 ' + chosenFontSize + 'px ' + serifFont;
+    const lineHeight = Math.round(chosenFontSize * 1.34);
+
+    if (wrappedLines.length === 1) {
+        ctx.fillText(wrappedLines[0], W / 2, by + 104);
+    } else if (wrappedLines.length === 2) {
+        ctx.fillText(wrappedLines[0], W / 2, by + 84);
+        ctx.fillText(wrappedLines[1], W / 2, by + 84 + lineHeight);
+    } else {
+        ctx.font = '800 23px ' + serifFont;
+        wrappedLines.slice(0, 3).forEach((ln, idx) => {
+            ctx.fillText(ln, W / 2, by + 74 + idx * 29);
+        });
+    }
+
+    // ८. तल सानो र सुहाउँदो आकारमा Brahmakumaris Narayangarh Nepal र मिति/लिंक
+    ctx.fillStyle = '#7c2d12';
+    ctx.font = '700 21px ' + serifFont;
+    ctx.fillText('Brahmakumaris Narayangarh Nepal', W / 2, 1054);
+
+    const todayStr = new Date().toLocaleDateString('ne-NP', { year: 'numeric', month: 'long', day: 'numeric' });
+    ctx.fillStyle = '#78350f';
+    ctx.font = '600 17.5px ' + sansFont;
+    ctx.fillText('📅 मिति: ' + todayStr + '   •   🌐 bkngt.github.io/murali-quiz', W / 2, 1094);
+}
+
+    window.drawSpiritualProgressCardV11 = function() {
+        const canvas = document.getElementById('spiritual-card-canvas-v11');
+        if (!canvas) return;
+        const history = safeJSON('murali_progress', []);
+        const charts = safeJSON('murali_daily_charts', []).filter(chartRecordBelongsToCurrentUserV4_);
+        const exams = normalizeExamHistoryForStats_(history);
+        const chartItems = validChartHistoryForStats_(charts);
+        const examAvg = exams.length ? Math.round(exams.reduce((s,x)=>s+x.percent,0)/exams.length) : 0;
+        const chartAvg = chartItems.length ? Math.round(chartItems.reduce((s,x)=>s+x.totalScore,0)/chartItems.length) : 0;
+
+        let totalYaadMins = 0;
+        chartItems.forEach(c => { totalYaadMins += Number(c.totalBabaYaadMinutes || 0); });
+        const yaadHrs = Math.floor(totalYaadMins / 60);
+        const yaadText = yaadHrs > 0 ? (yaadHrs + ' घण्टा') : (totalYaadMins + ' मिनेट');
+        const badge = getSpiritualBadgeInfoV11_();
+        const blessings = [
+            "सदा उमंग-उत्साहका साथ उड्ती कलामा उड्ने बाबा समान भव!",
+            "सच्चा दिलले प्रतिदिन आफ्नो चार्ट राखी बापदादाको दिलतख्तनशीन राजर्षि भव!",
+            "प्रत्येक संकल्प र कर्ममा बाबाको यादको सुगन्ध फैलाउने सदा हर्षितमुख रत्न भव!",
+            "मुरलीको मनन-चिन्तनद्वारा सर्व शक्तिले सम्पन्न मास्टर सर्वशक्तिमान् भव!"
+        ];
+        const blessingText = badge.blessing || blessings[new Date().getDate() % blessings.length];
+
+        drawRoyalCardOnCanvas_(canvas, {
+            userName: userName || 'ईश्वरीय विद्यार्थी',
+            userAddress: userAddress || 'Nepal',
+            examAvg: examAvg,
+            chartAvg: chartAvg,
+            yaadText: yaadText,
+            badge: badge,
+            blessingText: blessingText
+        });
+    };
+
+    window.openSpiritualCardModalV11 = function() {
+        const modal = document.getElementById('spiritual-card-modal-v11');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            window.drawSpiritualProgressCardV11();
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => window.drawSpiritualProgressCardV11());
+            }
+        }, 80);
+    };
+
+    // हिजो (24-Oct) वा आज localStorage मा 110.26 भएर अड्किएका चार्टहरूको स्वतः उद्धार र सर्भर सिंक
+    window.repairAndSyncLocalChartsV27_ = async function() {
+        try {
+            let charts = safeJSON('murali_daily_charts', []);
+            if (Array.isArray(charts) && charts.length > 0) {
+                let modified = false;
+                const dedupMap = new Map();
+
+                charts.forEach(c => {
+                    if (!c || typeof c !== 'object') return;
+                    if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4 || String(c.chartSchema || '').indexOf('CHART_V4') === 0) {
+                        if (c.chartVersion !== 4 || c.schemaVersion !== 4) {
+                            c.chartVersion = 4;
+                            c.schemaVersion = 4;
+                            c.synced = false; // सर्भरमा पठाउन बाँकी फ्ल्याग
+                            modified = true;
+                        }
+                    }
+                    const ver = Number(c.chartVersion || c.schemaVersion || 3) >= 4 ? 4 : 3;
+                    const key = String(c.phone || '') + '|' + String(c.date || '') + '|V' + ver;
+                    const prev = dedupMap.get(key);
+                    if (!prev || Number(c.totalScore || 0) >= Number(prev.totalScore || 0)) {
+                        dedupMap.set(key, c);
+                    } else {
+                        modified = true;
+                    }
+                });
+
+                if (modified) {
+                    localStorage.setItem('murali_daily_charts', JSON.stringify(Array.from(dedupMap.values())));
+                }
+            }
+
+            if (navigator.onLine) {
+                await syncPendingCharts();
+                if (typeof authoritativeStatsCache === 'object') {
+                    authoritativeStatsCache = {};
+                }
+                await syncMyChartsFromServer();
+                if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display === 'block') {
+                    renderDashboard();
+                }
+            }
+        } catch (e) {
+            console.warn('repairAndSyncLocalChartsV27_ error:', e);
+        }
+    };
+
+    const origOpenChartLb = window.openChartLeaderboard;
+    if (typeof origOpenChartLb === 'function') {
+        window.openChartLeaderboard = async function() {
+            await window.repairAndSyncLocalChartsV27_();
+            return origOpenChartLb.apply(this, arguments);
+        };
+    }
+
+    setTimeout(() => { window.repairAndSyncLocalChartsV27_(); }, 700);
 })();
 </script>
 
