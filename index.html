@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v110.29">
+    <link rel="manifest" href="manifest.json?v=v110.30">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1250,7 +1250,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.29</div>
+        <div>Version: 110.30</div>
     </div>
 </div>
 
@@ -1761,7 +1761,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v110.29').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v110.30').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1772,7 +1772,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.29";
+    const APP_VERSION = "110.30";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -7669,13 +7669,15 @@ window.saveCustomQuiz = function() {
 
 
 
+
+
 <!-- ======================================================== -->
-<!-- v110.29 MASTER CHART STATS, NaN FIX & GRAPH ENGINE    -->
+<!-- v110.30 MASTER CHART STATS, NaN FIX & SYNC ENGINE     -->
 <!-- ======================================================== -->
-<script id="v110-29-master-chart-and-graph-fix">
+<script id="v110-30-master-chart-and-graph-fix">
 (function() {
     // १. फोन नम्बर सामान्यीकरण (+977 वा 977 हटाएर १० अंकमा रूपान्तरण)
-    window.normalizePhoneForChartV29_ = function(phone) {
+    window.normalizePhoneForChartV30_ = function(phone) {
         var p = String(phone || '').replace(/^'/, '').replace(/\D/g, '').trim();
         if (p.length > 10 && p.indexOf('977') === 0) p = p.substring(3);
         return p;
@@ -7695,8 +7697,8 @@ window.saveCustomQuiz = function() {
     // ३. प्रयोगकर्ताको चार्ट पहिचान (पुराना र नयाँ सबै रेकर्ड स्वीकार गर्ने)
     window.chartRecordBelongsToCurrentUserV4_ = function(record) {
         if (!record || typeof record !== 'object') return false;
-        var minePhone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
-        var recPhone = window.normalizePhoneForChartV29_(record.phone);
+        var minePhone = window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var recPhone = window.normalizePhoneForChartV30_(record.phone);
         if (minePhone && recPhone) return minePhone === recPhone;
         if (!recPhone) return true;
         return false;
@@ -7705,12 +7707,12 @@ window.saveCustomQuiz = function() {
     // ४. मितिअनुसार चार्ट खोज्ने फङ्सन
     window.getPreferredChartRecordV4_ = function(charts, dateVal, phone) {
         var targetDate = window.normalizeChartDateISO_(dateVal);
-        var targetPhone = window.normalizePhoneForChartV29_(phone || ((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone')));
+        var targetPhone = window.normalizePhoneForChartV30_(phone || ((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone')));
         var matches = (Array.isArray(charts) ? charts : []).filter(function(c) {
             if (!c || typeof c !== 'object') return false;
             var cDate = window.normalizeChartDateISO_(c.date);
             if (cDate !== targetDate) return false;
-            var cPhone = window.normalizePhoneForChartV29_(c.phone);
+            var cPhone = window.normalizePhoneForChartV30_(c.phone);
             return (!cPhone || !targetPhone || cPhone === targetPhone);
         });
         matches.sort(function(a, b) {
@@ -7724,7 +7726,136 @@ window.saveCustomQuiz = function() {
         return matches[0] || null;
     };
 
-    // ५. मुख्य बग फिक्स: चार्ट रेकर्डमा totalScore सँगै score र percent दुवै सेट गर्ने (NaN/100 र खाली ग्राफको जड समाधान)
+    // ५. लोकलमा अड्किएका (v110.26 वा अन-सिंक) चार्टहरूलाई मर्मत गर्ने फङ्सन
+    window.sanitizeLocalChartRecordsV30_ = function() {
+        var activePhone = window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var charts = safeJSON('murali_daily_charts', []);
+        if (!Array.isArray(charts) || !charts.length) return [];
+        var modified = false;
+        var dedupMap = new Map();
+
+        charts.forEach(function(c) {
+            if (!c || typeof c !== 'object') return;
+            var normD = window.normalizeChartDateISO_(c.date);
+            if (normD && c.date !== normD) { c.date = normD; modified = true; }
+            var normP = window.normalizePhoneForChartV30_(c.phone) || activePhone;
+            if (normP && c.phone !== normP) { c.phone = normP; modified = true; }
+
+            var rawSc = (c.totalScore !== undefined && c.totalScore !== null && c.totalScore !== '') ? c.totalScore : c.score;
+            var cleanSc = isFinite(Number(rawSc)) ? Math.round(Number(rawSc)) : 0;
+            if (c.totalScore !== cleanSc || c.score !== cleanSc || c.percent !== cleanSc) {
+                c.totalScore = cleanSc;
+                c.score = cleanSc;
+                c.percent = cleanSc;
+                modified = true;
+            }
+
+            if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4 || String(c.chartSchema || '').indexOf('CHART_V4') === 0) {
+                if (c.chartVersion !== 4 || c.schemaVersion !== 4) {
+                    c.chartVersion = 4;
+                    c.schemaVersion = 4;
+                    c.synced = false; // २४ अक्टोबरमा अड्किएको चार्ट पुनः सर्भरमा पठाउन
+                    modified = true;
+                }
+            }
+
+            var ver = Number(c.chartVersion || c.schemaVersion || 3) >= 4 ? 4 : 3;
+            var key = String(c.phone || '') + '|' + String(c.date || '') + '|V' + ver;
+            var prev = dedupMap.get(key);
+            if (!prev || Number(c.totalScore || 0) >= Number(prev.totalScore || 0) || c.synced === false) {
+                dedupMap.set(key, c);
+            } else {
+                modified = true;
+            }
+        });
+
+        var cleaned = Array.from(dedupMap.values());
+        if (modified || cleaned.length !== charts.length) {
+            localStorage.setItem('murali_daily_charts', JSON.stringify(cleaned));
+        }
+        return cleaned;
+    };
+
+    // ६. पेन्डिङ चार्ट अपलोड फङ्सन (अपलोड अघि स्वतः मर्मतसहित)
+    window.syncPendingCharts = async function() {
+        if (!navigator.onLine || (typeof pendingChartSyncInProgress !== 'undefined' && pendingChartSyncInProgress)) return false;
+        var activePhone = window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var activePin = localStorage.getItem('murali_pin') || '';
+        if (!activePhone || !activePin) return false;
+
+        var charts = window.sanitizeLocalChartRecordsV30_();
+        var pendingData = charts.filter(function(item) { return item && item.synced !== true; });
+        if (!pendingData.length) return false;
+
+        if (typeof pendingChartSyncInProgress !== 'undefined') pendingChartSyncInProgress = true;
+        var anySynced = false;
+        try {
+            for (var i = 0; i < pendingData.length; i++) {
+                var data = pendingData[i];
+                try {
+                    var cVer = Number(data.chartVersion || data.schemaVersion || 4);
+                    if (cVer !== 3) cVer = 4;
+                    var result = await apiPostJSON({
+                        action: 'saveChart',
+                        chartVersion: cVer,
+                        chartSchema: data.chartSchema || (cVer === 4 ? 'CHART_V4_12P_100_ALL_IN_ONE' : 'CHART_V3_12P_100'),
+                        name: data.name || (typeof userName !== 'undefined' ? userName : ''),
+                        address: data.address || (typeof userAddress !== 'undefined' ? userAddress : ''),
+                        phone: window.normalizePhoneForChartV30_(data.phone) || activePhone,
+                        pin: activePin,
+                        date: window.normalizeChartDateISO_(data.date),
+                        totalScore: data.totalScore,
+                        stage: data.stage,
+                        amritvela: data.amritvela,
+                        murli: data.murli,
+                        murliManthan: data.murliManthan,
+                        swamanDrill: data.swamanDrill,
+                        traffic: data.traffic,
+                        conduct: data.conduct,
+                        sewa: data.sewa,
+                        food: data.food,
+                        exercise: data.exercise,
+                        eveningYoga: data.eveningYoga,
+                        goodnight: data.goodnight,
+                        digitalDetox: data.digitalDetox,
+                        amritvelaMinutes: data.amritvelaMinutes,
+                        murliClassBeforeMinutes: data.murliClassBeforeMinutes,
+                        murliClassAfterMinutes: data.murliClassAfterMinutes,
+                        amritvelaGroupMinutes: data.amritvelaGroupMinutes,
+                        daytimeYogaMinutes: data.daytimeYogaMinutes,
+                        eveningYogaMinutes: data.eveningYogaMinutes,
+                        eveningGroupMinutes: data.eveningGroupMinutes,
+                        goodnightYogaMinutes: data.goodnightYogaMinutes,
+                        totalBabaYaadMinutes: data.totalBabaYaadMinutes,
+                        knowledgeSewa: data.knowledgeSewa,
+                        sthoolSewa: data.sthoolSewa,
+                        sthoolSewaMinutes: data.sthoolSewaMinutes,
+                        sthoolServiceTypes: data.sthoolServiceTypes,
+                        dailyWeakness: data.dailyWeakness,
+                        tomorrowResolution: data.tomorrowResolution,
+                        dreamType: data.dreamType || '',
+                        dreamNote: data.dreamNote || '',
+                        honestyConfirmed: data.honestyConfirmed !== false,
+                        deviceId: typeof getDeviceId === 'function' ? getDeviceId() : 'Unknown'
+                    }, { retries: 3, timeoutMs: 14000 });
+
+                    if (result && result.status === 'success') {
+                        data.synced = true;
+                        anySynced = true;
+                        localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+                    }
+                } catch (e) {}
+            }
+            if (anySynced && typeof authoritativeStatsCache === 'object') {
+                authoritativeStatsCache = {};
+            }
+            return anySynced;
+        } finally {
+            if (typeof pendingChartSyncInProgress !== 'undefined') pendingChartSyncInProgress = false;
+        }
+    };
+
+    // ७. चार्ट रेकर्डमा totalScore सँगै score र percent दुवै सेट गर्ने (NaN/100 समाधान)
     window.validChartHistoryForStats_ = function(charts) {
         var map = new Map();
         (Array.isArray(charts) ? charts : []).forEach(function(c) {
@@ -7753,7 +7884,7 @@ window.saveCustomQuiz = function() {
         return Array.from(map.values()).sort(function(a, b) { return a.__date - b.__date; });
     };
 
-    // ६. मासिक, साप्ताहिक र वार्षिक ग्राफ डाटा प्रोसेसरमा score र totalScore दुवै सपोर्ट गर्ने
+    // ८. मासिक, साप्ताहिक र वार्षिक ग्राफ डाटा प्रोसेसरमा score र totalScore दुवै सपोर्ट गर्ने
     window.localStatsMonthly_ = function(items, cy, cm) {
         var days = new Date(cy, cm + 1, 0).getDate();
         var map = {};
@@ -7846,11 +7977,15 @@ window.saveCustomQuiz = function() {
         return months;
     };
 
-    // ७. सर्भरबाट चार्ट डाउनलोड गर्दा प्रत्येक रेकर्डमा score र totalScore दुवै सुरक्षित गर्ने
+    // ९. सर्भरबाट चार्ट डाउनलोड गर्नुअघि पेन्डिङ चार्ट अपलोड गर्ने र डाउनलोडपछि पूर्ण मर्ज गर्ने
     window.syncMyChartsFromServer = async function(forceRefresh) {
-        var activePhone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var activePhone = window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
         var activePin = localStorage.getItem('murali_pin') || '';
         if (!navigator.onLine || !activePhone || !activePin) return false;
+
+        // पहिले लोकलमा अड्किएको चार्ट मर्मत र सर्भरमा अपलोड गर्ने
+        await window.syncPendingCharts();
+
         if (typeof myChartsSyncInProgress !== 'undefined' && myChartsSyncInProgress && !forceRefresh) return false;
         if (typeof myChartsSyncInProgress !== 'undefined') myChartsSyncInProgress = true;
 
@@ -7864,13 +7999,13 @@ window.saveCustomQuiz = function() {
             }, { retries: 2, timeoutMs: 18000 });
 
             if (data && data.status === 'success' && Array.isArray(data.charts)) {
-                var localCharts = safeJSON('murali_daily_charts', []);
+                var localCharts = window.sanitizeLocalChartRecordsV30_();
                 var otherUsers = localCharts.filter(function(c) {
-                    var cp = window.normalizePhoneForChartV29_(c && c.phone);
+                    var cp = window.normalizePhoneForChartV30_(c && c.phone);
                     return cp && cp !== activePhone;
                 });
                 var mineExisting = localCharts.filter(function(c) {
-                    var cp = window.normalizePhoneForChartV29_(c && c.phone);
+                    var cp = window.normalizePhoneForChartV30_(c && c.phone);
                     return !cp || cp === activePhone;
                 });
 
@@ -7929,18 +8064,18 @@ window.saveCustomQuiz = function() {
                 return true;
             }
         } catch (e) {
-            console.warn('syncMyChartsFromServer v29 error:', e);
+            console.warn('syncMyChartsFromServer v30 error:', e);
         } finally {
             if (typeof myChartsSyncInProgress !== 'undefined') myChartsSyncInProgress = false;
         }
         return false;
     };
 
-    // ८. ट्याब परिवर्तन र स्टार्टअप सिंक
-    var prevSwitchTabV29 = window.switchTab;
-    if (typeof prevSwitchTabV29 === 'function') {
+    // १०. ट्याब परिवर्तन र स्टार्टअप सिंक
+    var prevSwitchTabV30 = window.switchTab;
+    if (typeof prevSwitchTabV30 === 'function') {
         window.switchTab = function(tab) {
-            prevSwitchTabV29.apply(this, arguments);
+            prevSwitchTabV30.apply(this, arguments);
             if (tab === 'chart' && navigator.onLine) {
                 window.syncMyChartsFromServer().then(function(updated) {
                     if (updated && typeof loadChartDataForDate === 'function') {
@@ -7967,38 +8102,18 @@ window.saveCustomQuiz = function() {
         };
     }
 
-    window.runStartupChartAndResultSyncV29_ = async function() {
-        var phone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+    window.runStartupChartAndResultSyncV30_ = async function() {
+        var phone = window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
         var pin = localStorage.getItem('murali_pin') || '';
         if (!phone || !pin) return;
 
         try {
-            var charts = safeJSON('murali_daily_charts', []);
-            if (Array.isArray(charts) && charts.length > 0) {
-                var changed = false;
-                charts.forEach(function(c) {
-                    if (!c || typeof c !== 'object') return;
-                    var normD = window.normalizeChartDateISO_(c.date);
-                    if (normD && c.date !== normD) { c.date = normD; changed = true; }
-                    if (!c.phone) { c.phone = phone; changed = true; }
-                    var sc = Number(c.totalScore !== undefined ? c.totalScore : (c.score || 0));
-                    var cleanSc = isFinite(sc) ? Math.round(sc) : 0;
-                    if (c.score !== cleanSc || c.percent !== cleanSc || c.totalScore !== cleanSc) {
-                        c.totalScore = cleanSc; c.score = cleanSc; c.percent = cleanSc; changed = true;
-                    }
-                    if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4) {
-                        c.chartVersion = 4; c.schemaVersion = 4; c.synced = false; changed = true;
-                    }
-                });
-                if (changed) localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
-            }
-
+            window.sanitizeLocalChartRecordsV30_();
             if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display !== 'none') {
                 renderDashboard();
             }
-
             if (navigator.onLine) {
-                if (typeof syncPendingCharts === 'function') await syncPendingCharts();
+                await window.syncPendingCharts();
                 if (typeof authoritativeStatsCache === 'object') authoritativeStatsCache = {};
                 await window.syncMyChartsFromServer(true);
                 if (typeof syncMyResults === 'function' && safeJSON('murali_progress', []).length === 0) {
@@ -8009,15 +8124,15 @@ window.saveCustomQuiz = function() {
                 }
             }
         } catch (err) {
-            console.warn('Startup chart sync v29:', err);
+            console.warn('Startup chart sync v30:', err);
         }
     };
 
     if (document.readyState === 'complete') {
-        setTimeout(window.runStartupChartAndResultSyncV29_, 350);
+        setTimeout(window.runStartupChartAndResultSyncV30_, 300);
     } else {
         window.addEventListener('load', function() {
-            setTimeout(window.runStartupChartAndResultSyncV29_, 350);
+            setTimeout(window.runStartupChartAndResultSyncV30_, 300);
         });
     }
 })();
