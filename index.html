@@ -28,7 +28,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v110.28">
+    <link rel="manifest" href="manifest.json?v=v110.29">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1250,7 +1250,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.28</div>
+        <div>Version: 110.29</div>
     </div>
 </div>
 
@@ -1761,7 +1761,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v110.28').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v110.29').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1772,7 +1772,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.28";
+    const APP_VERSION = "110.29";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -2355,7 +2355,7 @@ function getMegaActivationDateUI(quizDate) {
         (Array.isArray(charts)?charts:[]).forEach(c=>{
             const d = getValidDate(c); const score = Number(c && c.totalScore);
             if (!d || isNaN(d.getTime()) || !isFinite(score) || score < 0 || score > 100) return;
-            const key=dateKeyLocal_(d); const item=Object.assign({},c,{__date:d,totalScore:score});
+            const key=dateKeyLocal_(d); const item=Object.assign({},c,{__date:d,totalScore:score,score:score,percent:score});
             const prev=map.get(key);
             const itemVersion=Number(item.chartVersion || item.schemaVersion || 3);
             const prevVersion=prev ? Number(prev.chartVersion || prev.schemaVersion || 3) : 0;
@@ -2367,13 +2367,13 @@ function getMegaActivationDateUI(quizDate) {
     function localStatsMonthly_(items, cy, cm) {
         const days = new Date(cy, cm + 1, 0).getDate();
         const map = {}; (items||[]).forEach(h=>{if(h.__date.getFullYear()===cy && h.__date.getMonth()===cm) map[h.__date.getDate()]=h;});
-        const arr=[]; for(let day=1;day<=days;day++){ const h=map[day]; arr.push({day,date:dateKeyLocal_(new Date(cy,cm,day)),data:h?{score:h.score,total:h.total,percent:Math.round(h.percent),timeTaken:h.timeTaken}:null}); }
+        const arr=[]; for(let day=1;day<=days;day++){ const h=map[day]; arr.push({day,date:dateKeyLocal_(new Date(cy,cm,day)),data:h?{score:Number.isFinite(Number(h.score))?Number(h.score):Number(h.totalScore||0),totalScore:Number.isFinite(Number(h.totalScore))?Number(h.totalScore):Number(h.score||0),total:h.total||100,percent:Math.round(Number.isFinite(Number(h.percent))?Number(h.percent):(Number.isFinite(Number(h.score))?Number(h.score):Number(h.totalScore||0))),timeTaken:h.timeTaken||''}:null}); }
         return arr;
     }
 
     function localStatsWeekly_(items, endDate) {
         const map={}; (items||[]).forEach(h=>map[dateKeyLocal_(h.__date)]=h); const end=dateOnlyLocal_(endDate), out=[];
-        for(let i=6;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);const h=map[dateKeyLocal_(d)];out.push({date:dateKeyLocal_(d),label:`${d.getDate()}/${d.getMonth()+1}`,data:h?{score:h.score,total:h.total,percent:Math.round(h.percent),timeTaken:h.timeTaken}:null});}
+        for(let i=6;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);const h=map[dateKeyLocal_(d)];out.push({date:dateKeyLocal_(d),label:`${d.getDate()}/${d.getMonth()+1}`,data:h?{score:Number.isFinite(Number(h.score))?Number(h.score):Number(h.totalScore||0),totalScore:Number.isFinite(Number(h.totalScore))?Number(h.totalScore):Number(h.score||0),total:h.total||100,percent:Math.round(Number.isFinite(Number(h.percent))?Number(h.percent):(Number.isFinite(Number(h.score))?Number(h.score):Number(h.totalScore||0))),timeTaken:h.timeTaken||''}:null});}
         return out;
     }
 
@@ -2381,7 +2381,7 @@ function getMegaActivationDateUI(quizDate) {
         const months=[];
         for(let m=0;m<12;m++){
             const a=(items||[]).filter(h=>h.__date.getFullYear()===year&&h.__date.getMonth()===m);
-            months.push({month:m+1,label:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m],count:a.length,average:a.length?Math.round(a.reduce((s,x)=>s+x.percent,0)/a.length):0});
+            months.push({month:m+1,label:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m],count:a.length,average:a.length?Math.round(a.reduce((s,x)=>s+(Number.isFinite(Number(x.percent))?Number(x.percent):Number(x.totalScore??x.score??0)),0)/a.length):0});
         }
         return months;
     }
@@ -5309,9 +5309,9 @@ window.saveCustomQuiz = function() {
         const serverMonthlyArr = (sourceStats&&sourceStats.status==='success') ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : null;
         const monthly = serverMonthlyArr ? localMonthlyArr.map((locDay, idx) => {
             const srvDay = serverMonthlyArr[idx];
-            return (locDay && locDay.data) ? locDay : (srvDay || locDay);
+            return (locDay && locDay.data && Number.isFinite(Number(isChartTab ? (locDay.data.score ?? locDay.data.totalScore) : locDay.data.percent))) ? locDay : (srvDay || locDay);
         }) : localMonthlyArr;
-        const labels=monthly.map(x=>x.day), points=monthly.map(x=>x.data?(isChartTab?x.data.score:x.data.percent):null);
+        const labels=monthly.map(x=>x.day), points=monthly.map(x=>{if(!x||!x.data)return null;const v=isChartTab?(x.data.score!==undefined?x.data.score:x.data.totalScore):x.data.percent;return (v!==null&&v!==undefined&&Number.isFinite(Number(v)))?Math.round(Number(v)):null;});
         let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
         if(isChartTab){
             if(chartAnalyticsInstance) chartAnalyticsInstance.destroy();
@@ -5335,7 +5335,7 @@ window.saveCustomQuiz = function() {
                 if(summaryEl) summaryEl.innerHTML = '<div class="chart-submetric-box-v4"><b>'+trackedDays+' दिन</b><span>स्वप्न ट्र्याक गरियो</span></div><div class="chart-submetric-box-v4"><b>'+peacefulDays+' दिन</b><span>🕊️ ईश्वरीय / 🌿 शान्त</span></div><div class="chart-submetric-box-v4"><b>'+avgGn+' मिनेट</b><span>औसत सुत्नु अघिको याद</span></div>';
                 chartAnalyticsInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'अवचेतन / स्वप्न स्थिति (%)',data:dreamPoints,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.16)',spanGaps:true,fill:true,tension:.3},{label:'सुत्नु अघिको याद (मिनेट)',data:gnYogaPoints,borderColor:'#0ea5e9',backgroundColor:'rgba(14,165,233,0.10)',borderDash:[4,4],spanGaps:true,fill:false,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:theme.text,boxWidth:12,font:{size:11}}},title:{display:true,text:'🌙 अवचेतन मन (स्वप्न) र सुत्नु अघिको याद तुलना',color:theme.text,font:{size:13,family:'Poppins'}},tooltip:{callbacks:{label:function(c){if(c.datasetIndex===0){const day=labels[c.dataIndex];const rec=chartMap[day];return 'स्वप्न स्थिति: '+(rec?formatDreamTypeLabelV4_(rec.dreamType)||'टिपोट मात्र':'')+' ('+c.parsed.y+'%)';}return 'सुत्नु अघिको याद: '+c.parsed.y+' मिनेट';}}}},scales:{y:{beginAtZero:true,max:100,ticks:{color:theme.text},grid:{color:theme.grid}},x:{ticks:{color:theme.text},grid:{display:false}}}}});
             } else {
-                const mScores = points.filter(v => v !== null);
+                const mScores = points.filter(v => v !== null && v !== undefined && Number.isFinite(Number(v)));
                 const mAvg = mScores.length ? Math.round(mScores.reduce((a,b)=>a+b,0)/mScores.length) : 0;
                 const mMax = mScores.length ? Math.max(...mScores) : 0;
                 if(summaryEl) summaryEl.innerHTML = '<div class="chart-submetric-box-v4"><b>'+mScores.length+' दिन</b><span>यो महिना चार्ट भरियो</span></div><div class="chart-submetric-box-v4"><b>'+mAvg+'/100</b><span>मासिक औसत अङ्क</span></div><div class="chart-submetric-box-v4"><b>'+mMax+'/100</b><span>उच्चतम अङ्क</span></div>';
@@ -7662,24 +7662,26 @@ window.saveCustomQuiz = function() {
         };
     }
 
-    setTimeout(() => { window.repairAndSyncLocalChartsV27_(); }, 700);
+    /* Handled by v110.29 Master Sync */
 })();
 </script>
 
 
+
+
 <!-- ======================================================== -->
-<!-- v110.28 UNIFIED CHART DOWNLOAD, GRAPH & CARD RECOVERY -->
+<!-- v110.29 MASTER CHART STATS, NaN FIX & GRAPH ENGINE    -->
 <!-- ======================================================== -->
-<script id="v110-28-unified-chart-and-graph-fix">
+<script id="v110-29-master-chart-and-graph-fix">
 (function() {
     // १. फोन नम्बर सामान्यीकरण (+977 वा 977 हटाएर १० अंकमा रूपान्तरण)
-    window.normalizePhoneForChartV28_ = function(phone) {
+    window.normalizePhoneForChartV29_ = function(phone) {
         var p = String(phone || '').replace(/^'/, '').replace(/\D/g, '').trim();
         if (p.length > 10 && p.indexOf('977') === 0) p = p.substring(3);
         return p;
     };
 
-    // २. मिति सामान्यीकरण (YYYY-MM-DD ढाँचा सुनिश्चित गर्ने)
+    // २. मिति सामान्यीकरण (जुनसुकै मितिलाई YYYY-MM-DD ढाँचामा ल्याउने)
     window.normalizeChartDateISO_ = function(dateStr) {
         var raw = String(dateStr || '').replace(/^'/, '').trim();
         if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
@@ -7690,26 +7692,25 @@ window.saveCustomQuiz = function() {
         return raw;
     };
 
-    // ३. पुरानो र नयाँ दुवै चार्ट रेकर्ड नहराउने गरी प्रयोगकर्ता पहिचान फङ्सन सुधार
+    // ३. प्रयोगकर्ताको चार्ट पहिचान (पुराना र नयाँ सबै रेकर्ड स्वीकार गर्ने)
     window.chartRecordBelongsToCurrentUserV4_ = function(record) {
         if (!record || typeof record !== 'object') return false;
-        var minePhone = window.normalizePhoneForChartV28_(typeof userPhone !== 'undefined' ? userPhone : localStorage.getItem('murali_phone'));
-        var recPhone = window.normalizePhoneForChartV28_(record.phone);
+        var minePhone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var recPhone = window.normalizePhoneForChartV29_(record.phone);
         if (minePhone && recPhone) return minePhone === recPhone;
-        // सर्भरबाट आएको वा पुरानो लोकल रेकर्डमा phone खाली छ भने यो डिभाइसको सक्रिय प्रयोगकर्ताकै मान्ने
         if (!recPhone) return true;
         return false;
     };
 
-    // ४. मिति र फोन मिलाएर चार्ट खोज्ने फङ्सन सुधार
+    // ४. मितिअनुसार चार्ट खोज्ने फङ्सन
     window.getPreferredChartRecordV4_ = function(charts, dateVal, phone) {
         var targetDate = window.normalizeChartDateISO_(dateVal);
-        var targetPhone = window.normalizePhoneForChartV28_(phone || (typeof userPhone !== 'undefined' ? userPhone : localStorage.getItem('murali_phone')));
+        var targetPhone = window.normalizePhoneForChartV29_(phone || ((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone')));
         var matches = (Array.isArray(charts) ? charts : []).filter(function(c) {
             if (!c || typeof c !== 'object') return false;
             var cDate = window.normalizeChartDateISO_(c.date);
             if (cDate !== targetDate) return false;
-            var cPhone = window.normalizePhoneForChartV28_(c.phone);
+            var cPhone = window.normalizePhoneForChartV29_(c.phone);
             return (!cPhone || !targetPhone || cPhone === targetPhone);
         });
         matches.sort(function(a, b) {
@@ -7723,9 +7724,131 @@ window.saveCustomQuiz = function() {
         return matches[0] || null;
     };
 
-    // ५. सर्भरबाट चार्ट डाउनलोड गर्दा Safety Guard र Date/Phone Normalization सहितको सुधार
+    // ५. मुख्य बग फिक्स: चार्ट रेकर्डमा totalScore सँगै score र percent दुवै सेट गर्ने (NaN/100 र खाली ग्राफको जड समाधान)
+    window.validChartHistoryForStats_ = function(charts) {
+        var map = new Map();
+        (Array.isArray(charts) ? charts : []).forEach(function(c) {
+            if (!c || typeof c !== 'object') return;
+            var d = typeof getValidDate === 'function' ? getValidDate(c) : null;
+            var rawVal = (c.totalScore !== undefined && c.totalScore !== null && c.totalScore !== '') ? c.totalScore : c.score;
+            var score = Number(rawVal);
+            if (!d || isNaN(d.getTime()) || !isFinite(score) || score < 0 || score > 100) return;
+            var key = dateKeyLocal_(d);
+            var rounded = Math.round(score);
+            var item = Object.assign({}, c, {
+                __date: d,
+                date: key,
+                totalScore: rounded,
+                score: rounded,
+                percent: rounded,
+                total: 100
+            });
+            var prev = map.get(key);
+            var itemVersion = Number(item.chartVersion || item.schemaVersion || 3);
+            var prevVersion = prev ? Number(prev.chartVersion || prev.schemaVersion || 3) : 0;
+            if (!prev || itemVersion > prevVersion || (itemVersion === prevVersion && item.totalScore >= prev.totalScore)) {
+                map.set(key, item);
+            }
+        });
+        return Array.from(map.values()).sort(function(a, b) { return a.__date - b.__date; });
+    };
+
+    // ६. मासिक, साप्ताहिक र वार्षिक ग्राफ डाटा प्रोसेसरमा score र totalScore दुवै सपोर्ट गर्ने
+    window.localStatsMonthly_ = function(items, cy, cm) {
+        var days = new Date(cy, cm + 1, 0).getDate();
+        var map = {};
+        (items || []).forEach(function(h) {
+            if (h && h.__date && h.__date.getFullYear() === cy && h.__date.getMonth() === cm) {
+                map[h.__date.getDate()] = h;
+            }
+        });
+        var arr = [];
+        for (var day = 1; day <= days; day++) {
+            var h = map[day];
+            var dObj = null;
+            if (h) {
+                var rawScore = (h.score !== undefined && h.score !== null && isFinite(Number(h.score))) ? Number(h.score) : Number(h.totalScore);
+                var rawPct = (h.percent !== undefined && h.percent !== null && isFinite(Number(h.percent))) ? Number(h.percent) : rawScore;
+                if (isFinite(rawScore) || isFinite(rawPct)) {
+                    var finalScore = isFinite(rawScore) ? Math.round(rawScore) : Math.round(rawPct);
+                    var finalPct = isFinite(rawPct) ? Math.round(rawPct) : finalScore;
+                    dObj = {
+                        score: finalScore,
+                        totalScore: finalScore,
+                        total: isFinite(Number(h.total)) && Number(h.total) > 0 ? Number(h.total) : 100,
+                        percent: finalPct,
+                        timeTaken: h.timeTaken || ''
+                    };
+                }
+            }
+            arr.push({
+                day: day,
+                date: dateKeyLocal_(new Date(cy, cm, day)),
+                data: dObj
+            });
+        }
+        return arr;
+    };
+
+    window.localStatsWeekly_ = function(items, endDate) {
+        var map = {};
+        (items || []).forEach(function(h) {
+            if (h && h.__date) map[dateKeyLocal_(h.__date)] = h;
+        });
+        var end = dateOnlyLocal_(endDate), out = [];
+        for (var i = 6; i >= 0; i--) {
+            var d = new Date(end);
+            d.setDate(end.getDate() - i);
+            var h = map[dateKeyLocal_(d)];
+            var dObj = null;
+            if (h) {
+                var rawScore = (h.score !== undefined && h.score !== null && isFinite(Number(h.score))) ? Number(h.score) : Number(h.totalScore);
+                var rawPct = (h.percent !== undefined && h.percent !== null && isFinite(Number(h.percent))) ? Number(h.percent) : rawScore;
+                if (isFinite(rawScore) || isFinite(rawPct)) {
+                    var finalScore = isFinite(rawScore) ? Math.round(rawScore) : Math.round(rawPct);
+                    var finalPct = isFinite(rawPct) ? Math.round(rawPct) : finalScore;
+                    dObj = {
+                        score: finalScore,
+                        totalScore: finalScore,
+                        total: isFinite(Number(h.total)) && Number(h.total) > 0 ? Number(h.total) : 100,
+                        percent: finalPct,
+                        timeTaken: h.timeTaken || ''
+                    };
+                }
+            }
+            out.push({
+                date: dateKeyLocal_(d),
+                label: d.getDate() + '/' + (d.getMonth() + 1),
+                data: dObj
+            });
+        }
+        return out;
+    };
+
+    window.localStatsYearly_ = function(items, year) {
+        var months = [];
+        var mNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        for (var m = 0; m < 12; m++) {
+            var a = (items || []).filter(function(h) {
+                return h && h.__date && h.__date.getFullYear() === year && h.__date.getMonth() === m;
+            });
+            var validVals = a.map(function(x) {
+                var v = (x.percent !== undefined && isFinite(Number(x.percent))) ? Number(x.percent) : (x.totalScore !== undefined ? Number(x.totalScore) : Number(x.score));
+                return isFinite(v) ? v : null;
+            }).filter(function(v) { return v !== null; });
+            months.push({
+                month: m + 1,
+                label: mNames[m],
+                count: validVals.length,
+                average: validVals.length ? Math.round(validVals.reduce(function(s, v) { return s + v; }, 0) / validVals.length) : 0
+            });
+        }
+        return months;
+    };
+
+    // ७. सर्भरबाट चार्ट डाउनलोड गर्दा प्रत्येक रेकर्डमा score र totalScore दुवै सुरक्षित गर्ने
     window.syncMyChartsFromServer = async function(forceRefresh) {
-        var activePhone = window.normalizePhoneForChartV28_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+        var activePhone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
         var activePin = localStorage.getItem('murali_pin') || '';
         if (!navigator.onLine || !activePhone || !activePin) return false;
         if (typeof myChartsSyncInProgress !== 'undefined' && myChartsSyncInProgress && !forceRefresh) return false;
@@ -7743,39 +7866,46 @@ window.saveCustomQuiz = function() {
             if (data && data.status === 'success' && Array.isArray(data.charts)) {
                 var localCharts = safeJSON('murali_daily_charts', []);
                 var otherUsers = localCharts.filter(function(c) {
-                    var cp = window.normalizePhoneForChartV28_(c && c.phone);
+                    var cp = window.normalizePhoneForChartV29_(c && c.phone);
                     return cp && cp !== activePhone;
                 });
                 var mineExisting = localCharts.filter(function(c) {
-                    var cp = window.normalizePhoneForChartV28_(c && c.phone);
+                    var cp = window.normalizePhoneForChartV29_(c && c.phone);
                     return !cp || cp === activePhone;
                 });
 
-                // Safety Guard: सर्भरबाट ० चार्ट आउँदा लोकलमा पहिले नै डाटा छ भने नमेट्ने
                 if (data.charts.length === 0 && mineExisting.length > 0) {
                     return false;
                 }
 
                 var serverMap = new Map();
-                // पहिले लोकलका रेकर्डहरू राख्ने (ताकि कुनै पनि पुरानो लोकल रेकर्ड नहराओस्)
                 mineExisting.forEach(function(loc) {
                     if (!loc || !loc.date) return;
                     var dKey = window.normalizeChartDateISO_(loc.date);
+                    var sc = Number(loc.totalScore !== undefined ? loc.totalScore : (loc.score || 0));
+                    var cleanSc = isFinite(sc) ? Math.round(sc) : 0;
                     serverMap.set(dKey, Object.assign({}, loc, {
                         date: dKey,
-                        phone: activePhone
+                        phone: activePhone,
+                        totalScore: cleanSc,
+                        score: cleanSc,
+                        percent: cleanSc
                     }));
                 });
 
-                // सर्भरका रेकर्डहरू मर्ज गर्ने
                 data.charts.forEach(function(srv) {
                     if (!srv || !srv.date) return;
                     var dKey = window.normalizeChartDateISO_(srv.date);
+                    var sc = Number(srv.totalScore !== undefined ? srv.totalScore : (srv.score || 0));
+                    var cleanSc = isFinite(sc) ? Math.round(sc) : 0;
                     var normalizedSrv = Object.assign({}, srv, {
                         date: dKey,
                         phone: activePhone,
                         name: srv.name || (typeof userName !== 'undefined' ? userName : ''),
                         address: srv.address || (typeof userAddress !== 'undefined' ? userAddress : ''),
+                        totalScore: cleanSc,
+                        score: cleanSc,
+                        percent: cleanSc,
                         synced: true
                     });
                     var prev = serverMap.get(dKey);
@@ -7785,7 +7915,7 @@ window.saveCustomQuiz = function() {
                         var prevPending = (prev.synced === false);
                         var prevVer = Number(prev.chartVersion || prev.schemaVersion || 3);
                         var srvVer = Number(normalizedSrv.chartVersion || normalizedSrv.schemaVersion || 3);
-                        if (!prevPending && (srvVer >= prevVer || Number(normalizedSrv.totalScore || 0) >= Number(prev.totalScore || 0))) {
+                        if (!prevPending && (srvVer >= prevVer || cleanSc >= Number(prev.totalScore || 0))) {
                             serverMap.set(dKey, normalizedSrv);
                         }
                     }
@@ -7799,18 +7929,18 @@ window.saveCustomQuiz = function() {
                 return true;
             }
         } catch (e) {
-            console.warn('syncMyChartsFromServer v28 error:', e);
+            console.warn('syncMyChartsFromServer v29 error:', e);
         } finally {
             if (typeof myChartsSyncInProgress !== 'undefined') myChartsSyncInProgress = false;
         }
         return false;
     };
 
-    // ६. ट्याब परिवर्तन गर्दा (Chart र Stats दुवैमा) सर्भरबाट स्वतः चार्ट/रिजल्ट सिंक गरी ग्राफ रि-रेन्डर गर्ने
-    var prevSwitchTabV28 = window.switchTab;
-    if (typeof prevSwitchTabV28 === 'function') {
+    // ८. ट्याब परिवर्तन र स्टार्टअप सिंक
+    var prevSwitchTabV29 = window.switchTab;
+    if (typeof prevSwitchTabV29 === 'function') {
         window.switchTab = function(tab) {
-            prevSwitchTabV28.apply(this, arguments);
+            prevSwitchTabV29.apply(this, arguments);
             if (tab === 'chart' && navigator.onLine) {
                 window.syncMyChartsFromServer().then(function(updated) {
                     if (updated && typeof loadChartDataForDate === 'function') {
@@ -7822,7 +7952,7 @@ window.saveCustomQuiz = function() {
             } else if (tab === 'prog') {
                 setTimeout(function() {
                     if (typeof renderDashboard === 'function') renderDashboard();
-                }, 60);
+                }, 40);
                 if (navigator.onLine) {
                     Promise.all([
                         window.syncMyChartsFromServer(),
@@ -7837,14 +7967,12 @@ window.saveCustomQuiz = function() {
         };
     }
 
-    // ७. एप खुल्दा userPhone तयार भएपछि स्वतः पेन्डिङ चार्ट अपलोड र सर्भरबाट पुराना चार्ट डाउनलोड गर्ने
-    window.runStartupChartAndResultSyncV28_ = async function() {
-        var phone = window.normalizePhoneForChartV28_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
+    window.runStartupChartAndResultSyncV29_ = async function() {
+        var phone = window.normalizePhoneForChartV29_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'));
         var pin = localStorage.getItem('murali_pin') || '';
         if (!phone || !pin) return;
 
         try {
-            // पहिले लोकल चार्टको फोन र मिति ढाँचा सफा गर्ने
             var charts = safeJSON('murali_daily_charts', []);
             if (Array.isArray(charts) && charts.length > 0) {
                 var changed = false;
@@ -7853,11 +7981,20 @@ window.saveCustomQuiz = function() {
                     var normD = window.normalizeChartDateISO_(c.date);
                     if (normD && c.date !== normD) { c.date = normD; changed = true; }
                     if (!c.phone) { c.phone = phone; changed = true; }
+                    var sc = Number(c.totalScore !== undefined ? c.totalScore : (c.score || 0));
+                    var cleanSc = isFinite(sc) ? Math.round(sc) : 0;
+                    if (c.score !== cleanSc || c.percent !== cleanSc || c.totalScore !== cleanSc) {
+                        c.totalScore = cleanSc; c.score = cleanSc; c.percent = cleanSc; changed = true;
+                    }
                     if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4) {
                         c.chartVersion = 4; c.schemaVersion = 4; c.synced = false; changed = true;
                     }
                 });
                 if (changed) localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+            }
+
+            if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display !== 'none') {
+                renderDashboard();
             }
 
             if (navigator.onLine) {
@@ -7872,15 +8009,15 @@ window.saveCustomQuiz = function() {
                 }
             }
         } catch (err) {
-            console.warn('Startup chart sync v28:', err);
+            console.warn('Startup chart sync v29:', err);
         }
     };
 
     if (document.readyState === 'complete') {
-        setTimeout(window.runStartupChartAndResultSyncV28_, 600);
+        setTimeout(window.runStartupChartAndResultSyncV29_, 350);
     } else {
         window.addEventListener('load', function() {
-            setTimeout(window.runStartupChartAndResultSyncV28_, 600);
+            setTimeout(window.runStartupChartAndResultSyncV29_, 350);
         });
     }
 })();
