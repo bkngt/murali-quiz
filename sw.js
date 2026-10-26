@@ -1,17 +1,25 @@
-/* BK Murali Quiz 110.30 Service Worker - Exam-Safe & Instant Cache Bust */
-const CACHE_NAME = "murali-quiz-v110-30";
+/* BK Murali Quiz 106.31 Service Worker - iPad iOS 12.8 (Safari 12) Safe & Instant Cache Bust */
+const CACHE_NAME = "murali-quiz-v106-31";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
+
+async function safeCacheAdd_(cache, url) {
+    try {
+        await cache.add(new Request(url, { cache: "reload" }));
+    } catch (e) {
+        try { await cache.add(url); } catch (_) {}
+    }
+}
 
 self.addEventListener("install", event => {
     self.skipWaiting();
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await Promise.all([
-            cache.add(new Request("./index.html", { cache: "reload" })),
-            cache.add(new Request("./manifest.json", { cache: "reload" }))
+            safeCacheAdd_(cache, "./index.html"),
+            safeCacheAdd_(cache, "./manifest.json")
         ]);
-        try { await cache.add(new Request("./", { cache: "reload" })); } catch (e) {}
+        await safeCacheAdd_(cache, "./");
     })());
 });
 
@@ -30,17 +38,24 @@ self.addEventListener("fetch", event => {
     if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);
-        const isPage = req.mode === "navigate" || url.pathname.endsWith("/index.html");
+        const isPage = req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/");
         if (isPage) {
             try {
-                const response = await fetch(req, { cache: "no-store" });
-                if (response && response.ok) cache.put(req, response.clone()).catch(() => {});
+                // iOS 12.8 Fix: Never pass a 'navigate' Request object with non-empty RequestInit to fetch()
+                const response = await fetch(req.url, { cache: "no-store" }).catch(() => fetch(req));
+                if (response && response.ok) {
+                    cache.put("./index.html", response.clone()).catch(() => {});
+                    cache.put(req, response.clone()).catch(() => {});
+                }
                 return response;
             } catch (e) {
-                return (await cache.match(req)) || (await cache.match(APP_SHELL)) || Response.error();
+                const cachedPage = (await cache.match(req, { ignoreSearch: true })) ||
+                                   (await cache.match(APP_SHELL, { ignoreSearch: true })) ||
+                                   (await cache.match("./index.html", { ignoreSearch: true }));
+                return cachedPage || fetch(req);
             }
         }
-        const cached = await cache.match(req);
+        const cached = await cache.match(req, { ignoreSearch: true });
         const network = fetch(req).then(response => {
             if (response && (response.ok || response.type === "opaque")) cache.put(req, response.clone()).catch(() => {});
             return response;
