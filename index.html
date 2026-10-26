@@ -11,6 +11,112 @@
     <meta name="apple-mobile-web-app-title" content="BK Murali Quiz">
     <meta name="application-name" content="BK Murali Quiz">
     <meta name="format-detection" content="telephone=no">
+    <!-- iOS 12.8 Safari Compatibility Polyfill Block (Patched v106.31) -->
+    <script id="ios12-8-safari-polyfills">
+        (function() {
+            try {
+                if (typeof window.globalThis === "undefined") { window.globalThis = window; }
+                if (!String.prototype.replaceAll) {
+                    String.prototype.replaceAll = function(search, replacement) {
+                        if (search instanceof RegExp) {
+                            if (!search.global) {
+                                throw new TypeError("String.prototype.replaceAll called with a non-global RegExp");
+                            }
+                            return this.replace(search, replacement);
+                        }
+                        return this.split(String(search)).join(String(replacement));
+                    };
+                }
+                if (!Object.fromEntries) {
+                    Object.fromEntries = function(entries) {
+                        if (!entries || !entries[Symbol.iterator]) {
+                            throw new TypeError("Object.fromEntries requires an iterable");
+                        }
+                        var obj = {};
+                        for (var pair of entries) {
+                            if (Object(pair) !== pair) throw new TypeError("iterable for fromEntries should yield objects");
+                            obj[pair[0]] = pair[1];
+                        }
+                        return obj;
+                    };
+                }
+                if (!Promise.allSettled) {
+                    Promise.allSettled = function(promises) {
+                        return Promise.all(Array.from(promises, function(p) {
+                            return Promise.resolve(p).then(
+                                function(value) { return { status: "fulfilled", value: value }; },
+                                function(reason) { return { status: "rejected", reason: reason }; }
+                            );
+                        }));
+                    };
+                }
+                if (!Array.prototype.flat) {
+                    Array.prototype.flat = function(depth) {
+                        var d = depth === undefined ? 1 : Number(depth);
+                        var result = [];
+                        (function flatten(arr, curDepth) {
+                            for (var i = 0; i < arr.length; i++) {
+                                if (Array.isArray(arr[i]) && curDepth > 0) flatten(arr[i], curDepth - 1);
+                                else result.push(arr[i]);
+                            }
+                        })(this, d);
+                        return result;
+                    };
+                }
+                if (!Array.prototype.flatMap) {
+                    Array.prototype.flatMap = function(fn, thisArg) {
+                        return this.map(fn, thisArg).flat(1);
+                    };
+                }
+                if (!Array.prototype.at) {
+                    Array.prototype.at = function(n) {
+                        var i = Math.trunc(n) || 0;
+                        if (i < 0) i += this.length;
+                        return (i < 0 || i >= this.length) ? undefined : this[i];
+                    };
+                }
+                if (!String.prototype.at) {
+                    String.prototype.at = function(n) {
+                        var i = Math.trunc(n) || 0;
+                        if (i < 0) i += this.length;
+                        return (i < 0 || i >= this.length) ? undefined : this.charAt(i);
+                    };
+                }
+                if (typeof window.AbortController === "undefined") {
+                    window.AbortController = function() {
+                        this.signal = { aborted: false, addEventListener: function() {}, removeEventListener: function() {} };
+                        this.abort = function() { this.signal.aborted = true; };
+                    };
+                }
+                var origWinScrollTo = window.scrollTo;
+                if (typeof origWinScrollTo === "function") {
+                    window.scrollTo = function(a, b) {
+                        try {
+                            if (a && typeof a === "object") {
+                                origWinScrollTo.call(window, Number(a.left || 0), Number(a.top || 0));
+                            } else {
+                                origWinScrollTo.call(window, a, b);
+                            }
+                        } catch (e) {
+                            try { origWinScrollTo.call(window, 0, (a && typeof a === "object") ? Number(a.top || 0) : Number(b || 0)); } catch (_) {}
+                        }
+                    };
+                }
+                if (typeof Element !== "undefined" && Element.prototype) {
+                    var origScrollIntoView = Element.prototype.scrollIntoView;
+                    if (typeof origScrollIntoView === "function") {
+                        Element.prototype.scrollIntoView = function(arg) {
+                            try {
+                                origScrollIntoView.call(this, arg);
+                            } catch (e) {
+                                try { origScrollIntoView.call(this, true); } catch (_) {}
+                            }
+                        };
+                    }
+                }
+            } catch (polyErr) {}
+        })();
+    </script>
     
     <script>
         try {
@@ -28,7 +134,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v110.30">
+    <link rel="manifest" href="manifest.json?v=v106.31">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -107,13 +213,13 @@
         @keyframes divineSpin { 0% { transform: rotate(0deg) scale(1.02); } 50% { transform: rotate(180deg) scale(1.02); } 100% { transform: rotate(360deg) scale(1.02); } }
         .baba-logo-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative; animation:divineSpin 30s linear infinite; transform-origin:center center; -webkit-transform-origin:center center; }
         .baba-jyoti { position:relative; width:72%; height:72%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fffde0 10%, #ffe66d 24%, #ffb300 42%, rgba(255,120,0,.48) 62%, rgba(255,70,0,0) 78%); box-shadow:0 0 10px rgba(255,193,7,.58), 0 0 24px rgba(255,122,0,.30); }
-        .baba-jyoti-rays { position:absolute; inset:-18%; pointer-events:none; }
+        .baba-jyoti-rays { position:absolute; top:-18%; right:-18%; bottom:-18%; left:-18%; inset:-18%; pointer-events:none; }
         .baba-jyoti-rays i { position:absolute; top:50%; left:50%; width:2px; height:100%; border-radius:999px; transform-origin:center center; background:linear-gradient(to bottom, rgba(255,244,160,0), rgba(255,244,160,.95) 45%, rgba(255,193,7,1) 50%, rgba(255,244,160,.95) 55%, rgba(255,244,160,0)); }
         .baba-jyoti-rays i:nth-child(1) { transform:translate(-50%,-50%) rotate(0deg); }
         .baba-jyoti-rays i:nth-child(2) { transform:translate(-50%,-50%) rotate(45deg); }
         .baba-jyoti-rays i:nth-child(3) { transform:translate(-50%,-50%) rotate(90deg); }
         .baba-jyoti-rays i:nth-child(4) { transform:translate(-50%,-50%) rotate(135deg); }
-        .baba-jyoti-core { position:absolute; inset:34%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fff59d 46%, #ffca28 72%, rgba(255,170,0,0) 100%); box-shadow:0 0 8px rgba(255,255,255,.95); }
+        .baba-jyoti-core { position:absolute; top:34%; right:34%; bottom:34%; left:34%; inset:34%; border-radius:50%; background:radial-gradient(circle, #fff 0%, #fff59d 46%, #ffca28 72%, rgba(255,170,0,0) 100%); box-shadow:0 0 8px rgba(255,255,255,.95); }
         .murali-link { min-width:72px; height:32px; width:auto; padding:0 9px; gap:5px; border:1px solid var(--primary-color); border-radius:999px; background:rgba(2,132,199,.10); color:var(--primary-color); text-decoration:none; box-shadow:0 2px 5px rgba(0,0,0,.10); display:inline-flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:800; line-height:1; white-space:nowrap; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
         .murali-link:hover { background:var(--primary-color); color:#fff; }
         #install-pwa-btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -438,8 +544,8 @@
         #toolbar-right-actions > .murali-link,
         #toolbar-right-actions > #btn-toggle-settings,
         #toolbar-right-actions > #btn-rank-quick { height:32px !important; min-height:32px !important; max-height:32px !important; box-sizing:border-box !important; align-self:center; border-width:1px !important; border-style:solid; line-height:1 !important; padding-top:0 !important; padding-bottom:0 !important; }
-        .mega-modal-overlay { position:fixed; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
-        .mega-modal-card { width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
+        .mega-modal-overlay { position:fixed; top:0; right:0; bottom:0; left:0; inset:0; z-index:10020; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(15,23,42,.56); backdrop-filter:blur(4px); }
+        .mega-modal-card { width:100%; max-width:460px; max-height:82vh; width:min(100%,460px); max-height:min(82dvh,720px); overflow:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:20px; box-shadow:0 18px 60px rgba(0,0,0,.28); padding:16px; }
         .mega-modal-top { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
         .mega-modal-title { font-size:1.08rem; font-weight:900; color:#b45309; }
         .mega-modal-close { flex:0 0 auto; border:0; border-radius:50%; width:36px; height:36px; font-size:1.2rem; font-weight:900; background:var(--bg-color); color:var(--text-color); cursor:pointer; }
@@ -1250,7 +1356,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 110.30</div>
+        <div>Version: 106.31</div>
     </div>
 </div>
 
@@ -1761,7 +1867,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v110.30').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v106.31').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1772,7 +1878,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "110.30";
+    const APP_VERSION = "106.31";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -2381,7 +2487,7 @@ function getMegaActivationDateUI(quizDate) {
         const months=[];
         for(let m=0;m<12;m++){
             const a=(items||[]).filter(h=>h.__date.getFullYear()===year&&h.__date.getMonth()===m);
-            months.push({month:m+1,label:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m],count:a.length,average:a.length?Math.round(a.reduce((s,x)=>s+(Number.isFinite(Number(x.percent))?Number(x.percent):Number(x.totalScore??x.score??0)),0)/a.length):0});
+            months.push({month:m+1,label:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m],count:a.length,average:a.length?Math.round(a.reduce((s,x)=>s+(Number.isFinite(Number(x.percent))?Number(x.percent):Number(x.totalScore !== undefined && x.totalScore !== null ? x.totalScore : (x.score !== undefined && x.score !== null ? x.score : 0))),0)/a.length):0});
         }
         return months;
     }
@@ -2785,8 +2891,7 @@ function getMegaActivationDateUI(quizDate) {
             localStorage.setItem('murali_just_updated_v28', '1');
             localStorage.setItem('murali_app_version', APP_VERSION);
             if ('caches' in window) { caches.keys().then(names => names.forEach(n => caches.delete(n))); }
-            setTimeout(() => window.location.reload(true), 500);
-            return;
+            if (sessionStorage.getItem('murali_reload_guard_v') !== APP_VERSION) { sessionStorage.setItem('murali_reload_guard_v', APP_VERSION); setTimeout(() => window.location.reload(), 500); return; }
         }
         localStorage.setItem('murali_app_version', APP_VERSION);
         getDeviceId(); initVoices();
@@ -5309,7 +5414,7 @@ window.saveCustomQuiz = function() {
         const serverMonthlyArr = (sourceStats&&sourceStats.status==='success') ? (isChartTab?sourceStats.chart.monthly:sourceStats.exam.monthly) : null;
         const monthly = serverMonthlyArr ? localMonthlyArr.map((locDay, idx) => {
             const srvDay = serverMonthlyArr[idx];
-            return (locDay && locDay.data && Number.isFinite(Number(isChartTab ? (locDay.data.score ?? locDay.data.totalScore) : locDay.data.percent))) ? locDay : (srvDay || locDay);
+            return (locDay && locDay.data && Number.isFinite(Number(isChartTab ? ((locDay.data.score !== undefined && locDay.data.score !== null) ? locDay.data.score : locDay.data.totalScore) : locDay.data.percent))) ? locDay : (srvDay || locDay);
         }) : localMonthlyArr;
         const labels=monthly.map(x=>x.day), points=monthly.map(x=>{if(!x||!x.data)return null;const v=isChartTab?(x.data.score!==undefined?x.data.score:x.data.totalScore):x.data.percent;return (v!==null&&v!==undefined&&Number.isFinite(Number(v)))?Math.round(Number(v)):null;});
         let ctx=document.getElementById(isChartTab?'chartAnalyticsLine':'progressLineChart').getContext('2d');
@@ -8135,6 +8240,34 @@ window.saveCustomQuiz = function() {
             setTimeout(window.runStartupChartAndResultSyncV30_, 300);
         });
     }
+})();
+</script>
+
+<!-- iOS 12.8 Startup Blank-Screen Watchdog (v106.31) -->
+<script id="ios12-8-startup-watchdog">
+(function() {
+    function ensureScreenVisibleIOS12_() {
+        try {
+            var lockEl = document.getElementById('lock-screen');
+            var appEl = document.getElementById('main-app');
+            if (!lockEl || !appEl) return;
+            var lockHidden = lockEl.style.display === 'none' || window.getComputedStyle(lockEl).display === 'none';
+            var appHidden = appEl.style.display === 'none' || window.getComputedStyle(appEl).display === 'none';
+            if (lockHidden && appHidden) {
+                if (typeof window.init === 'function') {
+                    try { window.init(); } catch (e) { lockEl.style.display = 'flex'; }
+                } else {
+                    lockEl.style.display = 'flex';
+                }
+            }
+        } catch (err) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { setTimeout(ensureScreenVisibleIOS12_, 1800); });
+    } else {
+        setTimeout(ensureScreenVisibleIOS12_, 1800);
+    }
+    window.addEventListener('error', function() { setTimeout(ensureScreenVisibleIOS12_, 600); });
 })();
 </script>
 </body>
