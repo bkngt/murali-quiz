@@ -1,5 +1,5 @@
-/* BK Murali Quiz 106.31 Service Worker - iPad iOS 12.8 (Safari 12) Safe & Instant Cache Bust */
-const CACHE_NAME = "murali-quiz-v106-31";
+/* BK Murali Quiz 107.0 Service Worker - iPad iOS 12.8 Safe + AdGuard/Userscript Cache Poisoning Guard */
+const CACHE_NAME = "murali-quiz-v107-0";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
@@ -9,6 +9,14 @@ async function safeCacheAdd_(cache, url) {
     } catch (e) {
         try { await cache.add(url); } catch (_) {}
     }
+}
+
+function isValidHtmlResponse_(response, reqUrl) {
+    if (!response || !response.ok || response.status !== 200) return false;
+    const lowerUrl = String(reqUrl || "").toLowerCase();
+    if (lowerUrl.includes("adguard") || lowerUrl.includes("userscript") || lowerUrl.endsWith(".js")) return false;
+    const ct = (response.headers && response.headers.get("content-type")) || "";
+    return ct.toLowerCase().includes("text/html");
 }
 
 self.addEventListener("install", event => {
@@ -36,28 +44,35 @@ self.addEventListener("fetch", event => {
     if (req.method !== "GET") return;
     const url = new URL(req.url);
     if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
+    // Ignore injected adblocker / userscript wrapper requests completely
+    if (url.hostname.includes("adguard") || url.href.toLowerCase().includes("userscript")) return;
+
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);
-        const isPage = req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/");
+        const isPage = (req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/")) &&
+                       !url.pathname.endsWith(".js") && !url.pathname.endsWith(".json");
         if (isPage) {
             try {
-                // iOS 12.8 Fix: Never pass a 'navigate' Request object with non-empty RequestInit to fetch()
+                // iOS 12.8 Fix: Fetch by URL string to avoid Safari 12 navigate RequestInit TypeError
                 const response = await fetch(req.url, { cache: "no-store" }).catch(() => fetch(req));
-                if (response && response.ok) {
+                if (isValidHtmlResponse_(response, req.url)) {
                     cache.put("./index.html", response.clone()).catch(() => {});
-                    cache.put(req, response.clone()).catch(() => {});
+                    cache.put(APP_SHELL, response.clone()).catch(() => {});
                 }
-                return response;
+                if (response && response.ok) return response;
+                throw new Error("Non-OK page response");
             } catch (e) {
-                const cachedPage = (await cache.match(req, { ignoreSearch: true })) ||
+                const cachedPage = (await cache.match("./index.html", { ignoreSearch: true })) ||
                                    (await cache.match(APP_SHELL, { ignoreSearch: true })) ||
-                                   (await cache.match("./index.html", { ignoreSearch: true }));
+                                   (await cache.match(req));
                 return cachedPage || fetch(req);
             }
         }
-        const cached = await cache.match(req, { ignoreSearch: true });
+        const cached = await cache.match(req);
         const network = fetch(req).then(response => {
-            if (response && (response.ok || response.type === "opaque")) cache.put(req, response.clone()).catch(() => {});
+            if (response && (response.ok || response.type === "opaque")) {
+                cache.put(req, response.clone()).catch(() => {});
+            }
             return response;
         });
         if (cached) { network.catch(() => {}); return cached; }
