@@ -134,7 +134,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v107.1">
+    <link rel="manifest" href="manifest.json?v=v111.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1356,7 +1356,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 107.1</div>
+        <div>Version: 111.0</div>
     </div>
 </div>
 
@@ -1867,7 +1867,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v107.1').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v111.0').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1878,7 +1878,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "107.1";
+    const APP_VERSION = "111.0";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -2436,8 +2436,12 @@ function getMegaActivationDateUI(quizDate) {
 
     function currentStreak_(items) {
         const keys = new Set((items||[]).map(x=>dateKeyLocal_(x.__date || getValidDate(x))).filter(Boolean));
+        if (typeof window.computeGraceStreakFromDateKeysV111_ === 'function') {
+            return window.computeGraceStreakFromDateKeysV111_(keys);
+        }
         if (!keys.size) return 0;
         let d = dateOnlyLocal_(new Date());
+        if (!keys.has(dateKeyLocal_(d))) d.setDate(d.getDate()-1);
         if (!keys.has(dateKeyLocal_(d))) d.setDate(d.getDate()-1);
         let run = 0;
         while (keys.has(dateKeyLocal_(d))) { run++; d.setDate(d.getDate()-1); }
@@ -5353,11 +5357,12 @@ window.saveCustomQuiz = function() {
     // 10. DASHBOARD, STATS & CALENDAR
     // ==========================================
     function calculateStreak(history) {
-        if (!history.length) return 0; let uniqueDays = new Set(); history.forEach(h => { let d = getValidDate(h); if(d) uniqueDays.add(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()); });
-        let sortedDays = Array.from(uniqueDays).sort((a,b) => b - a); if (sortedDays.length === 0) return 0;
-        let streak = 0; let todayTime = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime(); let expectedTime = todayTime;
-        if (sortedDays[0] === todayTime) { } else if (sortedDays[0] === todayTime - 86400000) { expectedTime = todayTime - 86400000; } else { return 0; }
-        for (let time of sortedDays) { if (time === expectedTime) { streak++; expectedTime -= 86400000; } else if (time > expectedTime) { continue; } else { break; } } return streak;
+        if (!history.length) return 0;
+        const keys = new Set((history||[]).map(h => { let d = getValidDate(h); return d ? dateKeyLocal_(d) : ''; }).filter(Boolean));
+        if (typeof window.computeGraceStreakFromDateKeysV111_ === 'function') {
+            return window.computeGraceStreakFromDateKeysV111_(keys);
+        }
+        return currentStreak_(history);
     }
 
     window.toggleCalendar = function() { let cal = document.getElementById('calendar-wrapper'); let txt = document.getElementById('cal-toggle-text'); if (cal.style.display === 'none') { cal.style.display = 'block'; txt.innerText = 'क्यालेन्डर लुकाउनुहोस्'; } else { cal.style.display = 'none'; txt.innerText = 'क्यालेन्डर'; } };
@@ -7723,11 +7728,15 @@ window.saveCustomQuiz = function() {
 
                 charts.forEach(c => {
                     if (!c || typeof c !== 'object') return;
-                    if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4 || String(c.chartSchema || '').indexOf('CHART_V4') === 0) {
+                    if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4) {
+                        c.chartVersion = 4;
+                        c.schemaVersion = 4;
+                        c.synced = false;
+                        modified = true;
+                    } else if (String(c.chartSchema || '').indexOf('CHART_V4') === 0 || Number(c.chartVersion) === 4) {
                         if (c.chartVersion !== 4 || c.schemaVersion !== 4) {
                             c.chartVersion = 4;
                             c.schemaVersion = 4;
-                            c.synced = false; // सर्भरमा पठाउन बाँकी फ्ल्याग
                             modified = true;
                         }
                     }
@@ -7857,11 +7866,15 @@ window.saveCustomQuiz = function() {
                 modified = true;
             }
 
-            if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4 || String(c.chartSchema || '').indexOf('CHART_V4') === 0) {
+            if (Number(c.chartVersion) > 4 || Number(c.schemaVersion) > 4) {
+                c.chartVersion = 4;
+                c.schemaVersion = 4;
+                c.synced = false;
+                modified = true;
+            } else if (String(c.chartSchema || '').indexOf('CHART_V4') === 0 || Number(c.chartVersion) === 4) {
                 if (c.chartVersion !== 4 || c.schemaVersion !== 4) {
                     c.chartVersion = 4;
                     c.schemaVersion = 4;
-                    c.synced = false; // २४ अक्टोबरमा अड्किएको चार्ट पुनः सर्भरमा पठाउन
                     modified = true;
                 }
             }
@@ -8148,6 +8161,8 @@ window.saveCustomQuiz = function() {
                         totalScore: cleanSc,
                         score: cleanSc,
                         percent: cleanSc,
+                        chartVersion: Number(srv.chartVersion || 4),
+                        schemaVersion: Number(srv.chartVersion || 4),
                         synced: true
                     });
                     var prev = serverMap.get(dKey);
@@ -8625,6 +8640,368 @@ window.saveCustomQuiz = function() {
             return origSyncPendingChartsV1071.apply(this, arguments);
         };
     }
+})();
+</script>
+
+<!-- v111.0 Direct Instant Chart Cloud Save + 48h Streak Grace + Hybrid Speed Engine -->
+<script id="v111-0-direct-chart-save-and-streak-grace">
+(function() {
+    // =========================================================================
+    // १. ४८-घण्टे प्रतीक्षा नियम (48-Hour Window Grace for 75+ Day Streak & Award)
+    // हिजोको क्वीज/चार्टको ४८ घण्टाको म्याद रहुन्जेल (आज राति १२ बजेसम्म) पुरानो Streak र
+    // "🕊️ डबल लाइट फरिश्ता" उपाधि कहिल्यै घट्दैन; हिजोको पूरा गर्नासाथ +१ थपिन्छ!
+    // =========================================================================
+    window.computeGraceStreakFromDateKeysV111_ = function(dateKeySet) {
+        if (!dateKeySet || !dateKeySet.size) return 0;
+        var today = dateOnlyLocal_(new Date());
+        var yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+        var dayBefore = new Date(today); dayBefore.setDate(today.getDate() - 2);
+
+        var tKey = dateKeyLocal_(today);
+        var yKey = dateKeyLocal_(yesterday);
+        var dbKey = dateKeyLocal_(dayBefore);
+
+        var hasToday = dateKeySet.has(tKey);
+        var hasYesterday = dateKeySet.has(yKey);
+        var hasDayBefore = dateKeySet.has(dbKey);
+
+        var run = 0;
+        var cursor = null;
+
+        if (hasToday && hasYesterday) {
+            cursor = new Date(today);
+        } else if (hasToday && !hasYesterday && hasDayBefore) {
+            // आजको पूरा भयो तर हिजोको ४८-घण्टे समय अझै बाँकी छ र अस्तिको पूरा छ:
+            run = 1;
+            cursor = new Date(dayBefore);
+        } else if (!hasToday && hasYesterday) {
+            cursor = new Date(yesterday);
+        } else if (!hasToday && !hasYesterday && hasDayBefore) {
+            // आज र हिजो दुवैको ४८-घण्टे समय अझै बाँकी छ र अस्तिको पूरा छ (Waiting/Grace Mode):
+            cursor = new Date(dayBefore);
+        } else {
+            return hasToday ? 1 : 0;
+        }
+
+        while (cursor && dateKeySet.has(dateKeyLocal_(cursor))) {
+            run++;
+            cursor.setDate(cursor.getDate() - 1);
+        }
+        return run;
+    };
+
+    window.currentStreak_ = function(items) {
+        var keys = new Set((items || []).map(function(x) {
+            var d = (x && x.__date) ? x.__date : (typeof getValidDate === 'function' ? getValidDate(x) : null);
+            return d ? dateKeyLocal_(d) : '';
+        }).filter(Boolean));
+        return window.computeGraceStreakFromDateKeysV111_(keys);
+    };
+
+    window.calculateStreak = function(history) {
+        var keys = new Set((history || []).map(function(h) {
+            var d = typeof getValidDate === 'function' ? getValidDate(h) : null;
+            return d ? dateKeyLocal_(d) : '';
+        }).filter(Boolean));
+        return window.computeGraceStreakFromDateKeysV111_(keys);
+    };
+
+    // =========================================================================
+    // २. पुरानो गलत synced=false लाम सफा गर्ने र Direct 1-Second Chart Cloud Save
+    // =========================================================================
+    window.cleanFalselyUnsyncedChartBacklogV111_ = function() {
+        try {
+            var charts = (typeof safeJSON === 'function') ? safeJSON('murali_daily_charts', []) : [];
+            if (!Array.isArray(charts) || !charts.length) return;
+            var todayISO = (typeof getLocalDateISO === 'function') ? getLocalDateISO() : '';
+            var changed = false;
+            charts.forEach(function(c) {
+                if (!c || typeof c !== 'object') return;
+                if (Number(c.chartVersion) === 4 && c.schemaVersion !== 4) {
+                    c.schemaVersion = 4;
+                    changed = true;
+                }
+                // आजभन्दा पुराना चार्टहरू जसमा पहिले नै सर्भरको timestamp वा डेटा छ तर v110.30 बगले synced=false बनाएको थियो:
+                var dStr = String(c.date || '').trim();
+                if (c.synced === false && dStr && dStr < todayISO && Number(c.chartVersion) === 4 && !c._userEditedUnsyncedV111) {
+                    c.synced = true;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+            }
+        } catch (e) {}
+    };
+    window.cleanFalselyUnsyncedChartBacklogV111_();
+
+    // सिधै एउटै चार्ट गुगल सिटमा पठाउने फङ्सन (कुनै pendingChartSyncInProgress लकले नरोक्ने!)
+    window.directSaveSingleChartToCloudV111_ = async function(chartData) {
+        if (!navigator.onLine || !chartData) return false;
+        var activePhone = (typeof window.normalizePhoneForChartV30_ === 'function')
+            ? window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'))
+            : (userPhone || localStorage.getItem('murali_phone') || '');
+        var activePin = localStorage.getItem('murali_pin') || '';
+        if (!activePhone || !activePin) return false;
+
+        var cVer = Number(chartData.chartVersion || chartData.schemaVersion || 4);
+        if (cVer !== 3) cVer = 4;
+        var targetDateISO = (typeof window.normalizeChartDateISO_ === 'function')
+            ? window.normalizeChartDateISO_(chartData.date)
+            : String(chartData.date || '').trim();
+
+        try {
+            var result = await apiPostJSON({
+                action: 'saveChart',
+                chartVersion: cVer,
+                chartSchema: chartData.chartSchema || (cVer === 4 ? 'CHART_V4_12P_100_ALL_IN_ONE' : 'CHART_V3_12P_100'),
+                name: chartData.name || (typeof userName !== 'undefined' ? userName : ''),
+                address: chartData.address || (typeof userAddress !== 'undefined' ? userAddress : ''),
+                phone: activePhone,
+                pin: activePin,
+                date: targetDateISO,
+                totalScore: chartData.totalScore,
+                stage: chartData.stage,
+                amritvela: chartData.amritvela,
+                murli: chartData.murli,
+                murliManthan: chartData.murliManthan,
+                swamanDrill: chartData.swamanDrill,
+                traffic: chartData.traffic,
+                conduct: chartData.conduct,
+                sewa: chartData.sewa,
+                food: chartData.food,
+                exercise: chartData.exercise,
+                eveningYoga: chartData.eveningYoga,
+                goodnight: chartData.goodnight,
+                digitalDetox: chartData.digitalDetox,
+                amritvelaMinutes: chartData.amritvelaMinutes,
+                murliClassBeforeMinutes: chartData.murliClassBeforeMinutes,
+                murliClassAfterMinutes: chartData.murliClassAfterMinutes,
+                amritvelaGroupMinutes: chartData.amritvelaGroupMinutes,
+                daytimeYogaMinutes: chartData.daytimeYogaMinutes,
+                eveningYogaMinutes: chartData.eveningYogaMinutes,
+                eveningGroupMinutes: chartData.eveningGroupMinutes,
+                goodnightYogaMinutes: chartData.goodnightYogaMinutes,
+                totalBabaYaadMinutes: chartData.totalBabaYaadMinutes,
+                knowledgeSewa: chartData.knowledgeSewa,
+                sthoolSewa: chartData.sthoolSewa,
+                sthoolSewaMinutes: chartData.sthoolSewaMinutes,
+                sthoolServiceTypes: chartData.sthoolServiceTypes,
+                dailyWeakness: chartData.dailyWeakness,
+                tomorrowResolution: chartData.tomorrowResolution,
+                dreamType: chartData.dreamType || '',
+                dreamNote: chartData.dreamNote || '',
+                honestyConfirmed: chartData.honestyConfirmed !== false,
+                deviceId: typeof getDeviceId === 'function' ? getDeviceId() : 'Unknown'
+            }, { retries: 2, timeoutMs: 12000 });
+
+            if (result && result.status === 'success') {
+                var latestList = (typeof safeJSON === 'function') ? safeJSON('murali_daily_charts', []) : [];
+                if (Array.isArray(latestList)) {
+                    latestList.forEach(function(item) {
+                        if (!item) return;
+                        var itemDate = (typeof window.normalizeChartDateISO_ === 'function') ? window.normalizeChartDateISO_(item.date) : String(item.date || '').trim();
+                        if (itemDate === targetDateISO && Number(item.chartVersion || item.schemaVersion || 4) === cVer) {
+                            item.synced = true;
+                            delete item._userEditedUnsyncedV111;
+                        }
+                    });
+                    localStorage.setItem('murali_daily_charts', JSON.stringify(latestList));
+                }
+                if (typeof authoritativeStatsCache === 'object') authoritativeStatsCache = {};
+                return true;
+            }
+        } catch (err) {
+            console.warn('Direct chart save error:', err);
+        }
+        return false;
+    };
+
+    // चार्ट सबमिट हुँदा सिधै Direct Save चलाउने (कुनै Background Queue ले रोक्न नपाउने)
+    window.saveDailyChartV4_ = function(chartData) {
+        window._chartFormDirtyV107 = false;
+        window._lastLocalChartSaveMsV107 = Date.now();
+        chartData.updatedAtMs = Date.now();
+        chartData.timestamp = new Date().toISOString();
+        chartData.chartVersion = 4;
+        chartData.schemaVersion = 4;
+        chartData.synced = false;
+        chartData._userEditedUnsyncedV111 = true;
+
+        var charts = (typeof safeJSON === 'function') ? safeJSON('murali_daily_charts', []) : [];
+        var activePh = (typeof window.normalizePhoneForChartV30_ === 'function')
+            ? window.normalizePhoneForChartV30_((typeof userPhone !== 'undefined' && userPhone !== 'N/A') ? userPhone : localStorage.getItem('murali_phone'))
+            : userPhone;
+
+        charts = (Array.isArray(charts) ? charts : []).filter(function(c) {
+            if (!c) return false;
+            var cPh = (typeof window.normalizePhoneForChartV30_ === 'function') ? window.normalizePhoneForChartV30_(c.phone) : c.phone;
+            var sameUser = (!cPh || !activePh || cPh === activePh);
+            var sameDate = String(c.date || '').trim() === String(chartData.date || '').trim();
+            var isV4 = Number(c.chartVersion || c.schemaVersion || 3) === 4;
+            return !(sameUser && sameDate && isV4);
+        });
+        charts.unshift(chartData);
+        charts.sort(function(a, b) {
+            return String(b.date).localeCompare(String(a.date)) || Number(b.chartVersion || 3) - Number(a.chartVersion || 3);
+        });
+        localStorage.setItem('murali_daily_charts', JSON.stringify(charts));
+
+        var formEl = document.getElementById('daily-chart-form');
+        if (formEl) formEl.style.display = 'none';
+
+        var babaTimeText = (typeof formatBabaYaadDurationV4 === 'function')
+            ? formatBabaYaadDurationV4(chartData.totalBabaYaadMinutes)
+            : (Number(chartData.totalBabaYaadMinutes || 0) + ' मिनेट');
+
+        var resultHtml = '<div class="chart-result-title-v2" style="font-weight:900;color:var(--text-color);margin-bottom:7px;">आजको चार्ट पूरा भयो ✅</div>' +
+            '<div class="chart-result-total-v2" style="font-size:clamp(2.6rem,12vw,3.2rem);font-weight:900;line-height:1;color:var(--chart-color);">' + chartData.totalScore + '<small style="font-size:1rem;color:#94a3b8;">/100</small></div>' +
+            '<div id="chart-cloud-sync-status-v107" style="margin-top:10px;padding:8px 12px;border-radius:10px;background:rgba(2,132,199,0.1);color:var(--primary-color);font-weight:800;font-size:0.86rem;">⏳ मोबाइलमा सुरक्षित भयो। गुगल सिटमा सिधै पठाउँदैछ...</div>' +
+            '<div style="margin-top:10px;padding:12px;border-radius:13px;background:rgba(139,92,246,.09);font-weight:850;color:var(--text-color);">🕊️ आज बाबाको याद: <strong style="color:var(--chart-color);">' + babaTimeText + '</strong></div>' +
+            '<div class="chart-result-stage-v2" style="margin-top:10px;font-weight:850;color:var(--chart-color);">' + chartData.stage + '</div>' +
+            '<div class="chart-result-msg-v2" style="margin-top:4px;color:var(--muted-text-color);font-size:.9rem;font-weight:650;">' + (chartData.totalScore >= 80 ? 'आजको पुरुषार्थलाई निरन्तरता दिनुहोस्।' : 'आजको समीक्षा भोलिको सुधारको आधार बनोस्।') + '</div>' +
+            '<div class="chart-result-actions-v2" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;">' +
+            '<button type="button" onclick="openChartLeaderboard()" style="background:var(--chart-color);color:#fff;border:none;border-radius:50px;padding:.62rem 1.1rem;font-weight:800;">👥 सहभागी सूची</button>' +
+            '<button type="button" onclick="openSpiritualCardModalV11()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:50px;padding:.62rem 1.1rem;font-weight:800;box-shadow:0 4px 12px rgba(245,158,11,0.3);">🏅 प्रगति कार्ड</button>' +
+            '<button type="button" onclick="editChartForm()" style="background:transparent;color:var(--danger-color);border:2px solid var(--danger-color);border-radius:50px;padding:.62rem 1rem;box-shadow:none;font-weight:800;">❌ बन्द गर्नुहोस्</button>' +
+            '</div>';
+
+        var resBox = document.getElementById('chart-result-box');
+        if (resBox) {
+            resBox.innerHTML = resultHtml;
+            resBox.style.display = 'block';
+            resBox.style.textAlign = 'center';
+            resBox.style.padding = '1.1rem .75rem';
+            resBox.style.background = 'var(--card-bg)';
+            resBox.style.borderRadius = '20px';
+            resBox.style.border = '2px solid var(--border-color)';
+        }
+        if (typeof updateChartV3Total === 'function') updateChartV3Total();
+        if (chartData.totalScore >= 90 && typeof fireConfetti === 'function') fireConfetti();
+        if (typeof updateSpiritualBadgeUIV11 === 'function') updateSpiritualBadgeUIV11();
+
+        // Direct Instant Cloud Upload (कुनै पुरानो Queue ले नरोक्ने!)
+        window._lastChartSyncPromiseV107 = (async function() {
+            var ok = await window.directSaveSingleChartToCloudV111_(chartData);
+            var stEl = document.getElementById('chart-cloud-sync-status-v107');
+            if (stEl) {
+                if (ok) {
+                    stEl.innerHTML = '☁️ तपाईंको चार्ट गुगल सिटमा सुरक्षित भयो! (सहभागी सूचीमा अपडेट भयो)';
+                    stEl.style.background = 'var(--success-bg)';
+                    stEl.style.color = 'var(--success-color)';
+                } else {
+                    stEl.innerHTML = navigator.onLine
+                        ? '⚠️ सर्भर व्यस्त छ; सहभागी सूची थिच्दा पुनः पठाइनेछ।'
+                        : '📱 चार्ट मोबाइलमा सुरक्षित छ; नेट आएपछि गुगल सिटमा जानेछ।';
+                    stEl.style.background = 'var(--warning-bg)';
+                    stEl.style.color = 'var(--warning-color)';
+                }
+            }
+            if (typeof renderDashboard === 'function' && document.getElementById('view-progress') && document.getElementById('view-progress').style.display !== 'none') {
+                renderDashboard();
+            }
+            return ok;
+        })();
+
+        setTimeout(function() { try { if (resBox) resBox.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 80);
+    };
+
+    // 👥 सहभागी सूची खोल्दा क्वीजको Rank जस्तै सिधै आजको चार्ट सिंक सुनिश्चित गरी तुरुन्त खोल्ने
+    window.openChartLeaderboard = async function() {
+        var modal = document.getElementById('chart-leaderboard-modal');
+        var loading = document.getElementById('cl-loading');
+        var content = document.getElementById('cl-content');
+        var dateVal = (document.getElementById('chart-date') && document.getElementById('chart-date').value) || (typeof getLocalDateISO === 'function' ? getLocalDateISO() : '');
+        if (document.getElementById('cl-date-select') && dateVal) {
+            document.getElementById('cl-date-select').value = dateVal;
+        }
+        if (modal) modal.style.display = 'flex';
+        if (loading) {
+            loading.style.display = 'block';
+            loading.textContent = '⏳ सहभागी सूची लोड हुँदैछ...';
+        }
+        if (content) content.style.display = 'none';
+
+        try {
+            if (window._lastChartSyncPromiseV107) {
+                await window._lastChartSyncPromiseV107;
+            }
+            // यदि छानिएको मितिको चार्ट अझै synced === false छ भने सिधै पठाउने:
+            var localCharts = (typeof safeJSON === 'function') ? safeJSON('murali_daily_charts', []) : [];
+            var unsyncedForDate = Array.isArray(localCharts) && localCharts.find(function(c) {
+                return c && String(c.date || '').trim() === String(dateVal || '').trim() && c.synced === false;
+            });
+            if (unsyncedForDate && navigator.onLine) {
+                await window.directSaveSingleChartToCloudV111_(unsyncedForDate);
+            }
+        } catch (e) {}
+
+        if (typeof window.fetchChartLeaderboardData === 'function') {
+            return window.fetchChartLeaderboardData();
+        }
+    };
+
+    // =========================================================================
+    // ३. Smart Hybrid Quiz Start (३.८ सेकेन्ड) र प्रत्येक ४-प्रश्न ActiveState सिंक
+    // =========================================================================
+    var prevStartSpecificQuizV111 = window.startSpecificQuiz;
+    if (typeof prevStartSpecificQuizV111 === 'function') {
+        window.startSpecificQuiz = async function(dateStr) {
+            var cachedList = (typeof safeJSON === 'function') ? safeJSON('murali_server_quizzes', []) : [];
+            var hasLocalCopy = Array.isArray(cachedList) && cachedList.some(function(q) {
+                return q && String(q.quizDate || '').trim() === String(dateStr || '').trim() && Array.isArray(q.quizData) && q.quizData.length > 0;
+            });
+
+            if (!navigator.onLine && hasLocalCopy && typeof window.tryOpenCachedQuizOfflineV107_ === 'function') {
+                if (window.tryOpenCachedQuizOfflineV107_(dateStr, '📱 अफलाइन मोड: डाउनलोड भइसकेको क्वीज तुरुन्तै खुल्दैछ।')) return;
+            }
+
+            if (hasLocalCopy && navigator.onLine && typeof window.tryOpenCachedQuizOfflineV107_ === 'function') {
+                var fastCheckTimedOut = false;
+                var fastTimer = setTimeout(function() {
+                    fastCheckTimedOut = true;
+                    isExamSecurityCheckInProgress = false;
+                    window.tryOpenCachedQuizOfflineV107_(dateStr, '⚡ सर्भर व्यस्त छ — डाउनलोड भइसकेको क्वीज तुरुन्तै खोलियो!');
+                }, 3800);
+
+                try {
+                    var res = await prevStartSpecificQuizV111.apply(this, arguments);
+                    clearTimeout(fastTimer);
+                    return res;
+                } catch (err) {
+                    clearTimeout(fastTimer);
+                    if (!fastCheckTimedOut) {
+                        window.tryOpenCachedQuizOfflineV107_(dateStr, '📱 डाउनलोड भइसकेको क्वीज खोलियो।');
+                    }
+                    return;
+                }
+            }
+            return prevStartSpecificQuizV111.apply(this, arguments);
+        };
+    }
+
+    window.saveStateToCloud = function(stateObj, forceImmediateCloud) {
+        if (!stateObj) return Promise.resolve(false);
+        activeStateSeq = Math.max(activeStateSeq, Number(stateObj.stateSeq || 0));
+        var safeState = Object.assign({}, stateObj, { stateSeq: activeStateSeq, deviceId: getDeviceId() });
+        localStorage.setItem('murali_active_quiz_state', JSON.stringify(safeState));
+        pendingActiveState = safeState;
+
+        var qIdx = Number(safeState.qIndex || 0);
+        var totalQs = (Array.isArray(currentQuiz) && currentQuiz.length) ? currentQuiz.length : 20;
+        var shouldSyncCloudNow = forceImmediateCloud === true || qIdx <= 1 || (qIdx % 4 === 0) || (qIdx >= totalQs - 1);
+        if (shouldSyncCloudNow) {
+            scheduleActiveStateFlush(200);
+            return flushActiveStateSave();
+        }
+        return Promise.resolve(true);
+    };
+
+    window.addEventListener('pagehide', function() {
+        if (pendingActiveState && navigator.onLine) {
+            try { flushActiveStateSave(); } catch (e) {}
+        }
+    });
 })();
 </script>
 </body>
