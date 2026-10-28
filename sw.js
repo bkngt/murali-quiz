@@ -1,5 +1,5 @@
-/* BK Murali Quiz 107.1 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
-const CACHE_NAME = "murali-quiz-v107-1";
+/* BK Murali Quiz 111.0 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
+const CACHE_NAME = "murali-quiz-v111-0";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
@@ -61,7 +61,6 @@ self.addEventListener("fetch", event => {
                 }
                 return response;
             });
-            // Offline-First (Stale-While-Revalidate): क्यासमा भए ०.१ सेकेन्डमै खोल्ने र पछाडि अपडेट गर्ने!
             if (cachedPage) {
                 networkFetch.catch(() => {});
                 return cachedPage;
