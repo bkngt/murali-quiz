@@ -1,5 +1,5 @@
-/* BK Murali Quiz 111.0 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
-const CACHE_NAME = "murali-quiz-v111-0";
+/* BK Murali Quiz 113.0 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
+const CACHE_NAME = "murali-quiz-v113-0";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
@@ -20,7 +20,7 @@ function isValidHtmlResponse_(response, reqUrl) {
 }
 
 self.addEventListener("install", event => {
-    self.skipWaiting();
+    // Do not force a new Service Worker to take over an exam already in progress.
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await Promise.all([
@@ -35,7 +35,7 @@ self.addEventListener("activate", event => {
     event.waitUntil((async () => {
         const keys = await caches.keys();
         await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key)));
-        await self.clients.claim();
+        // Existing pages keep their original controller until the next navigation.
     })());
 });
 
@@ -43,42 +43,35 @@ self.addEventListener("fetch", event => {
     const req = event.request;
     if (req.method !== "GET") return;
     const url = new URL(req.url);
-    if (url.hostname.includes("script.google.com") || url.hostname.includes("googleusercontent.com")) return;
-    if (url.hostname.includes("adguard") || url.href.toLowerCase().includes("userscript")) return;
-
+    if (url.origin !== self.location.origin) return; // never intercept AdGuard/Google/CDN responses
+    const isPage = req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/");
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);
-        const isPage = (req.mode === "navigate" || url.pathname.endsWith("/index.html") || url.pathname.endsWith("/")) &&
-                       !url.pathname.endsWith(".js") && !url.pathname.endsWith(".json");
         if (isPage) {
-            const cachedPage = (await cache.match("./index.html", { ignoreSearch: true })) ||
-                               (await cache.match(APP_SHELL, { ignoreSearch: true })) ||
-                               (await cache.match(req));
-            const networkFetch = fetch(req.url, { cache: "no-store" }).catch(() => fetch(req)).then(response => {
-                if (isValidHtmlResponse_(response, req.url)) {
-                    cache.put("./index.html", response.clone()).catch(() => {});
-                    cache.put(APP_SHELL, response.clone()).catch(() => {});
+            const cached = (await cache.match("./index.html",{ignoreSearch:true})) || await cache.match(req,{ignoreSearch:true});
+            const fromNet = fetch(req,{cache:"no-store"}).then(async response => {
+                if (isValidHtmlResponse_(response,req.url)) {
+                    try { await cache.put("./index.html",response.clone()); } catch (_) {}
                 }
                 return response;
             });
-            if (cachedPage) {
-                networkFetch.catch(() => {});
-                return cachedPage;
+            // Prefer the latest HTML. Offline/slow network still uses the app shell.
+            if (cached) {
+                const outcome = await Promise.race([
+                    fromNet.then(r=>({ok:true,r}),()=>({ok:false})),
+                    new Promise(resolve=>setTimeout(()=>resolve({ok:false}),2600))
+                ]);
+                if(outcome.ok && outcome.r && outcome.r.ok) return outcome.r;
+                fromNet.catch(()=>{});
+                return cached;
             }
-            try {
-                const netResp = await networkFetch;
-                if (netResp && netResp.ok) return netResp;
-            } catch (e) {}
-            return cachedPage || fetch(req);
+            try { return await fromNet; } catch(e) { return fetch(req); }
         }
-        const cached = await cache.match(req);
-        const network = fetch(req).then(response => {
-            if (response && (response.ok || response.type === "opaque")) {
-                cache.put(req, response.clone()).catch(() => {});
-            }
-            return response;
-        });
-        if (cached) { network.catch(() => {}); return cached; }
-        return network;
+        const cached=await cache.match(req);
+        try {
+            const response=await fetch(req);
+            if(response && response.ok) { cache.put(req,response.clone()).catch(()=>{}); return response; }
+            return cached||response;
+        } catch(e) { if(cached)return cached;throw e; }
     })());
 });
