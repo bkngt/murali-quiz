@@ -84,8 +84,17 @@
                 }
                 if (typeof window.AbortController === "undefined") {
                     window.AbortController = function() {
-                        this.signal = { aborted: false, addEventListener: function() {}, removeEventListener: function() {} };
-                        this.abort = function() { this.signal.aborted = true; };
+                        var listeners=[];
+                        this.signal={
+                            aborted:false,
+                            addEventListener:function(type,fn){if(type==='abort' && typeof fn==='function')listeners.push(fn);},
+                            removeEventListener:function(type,fn){if(type==='abort'){var i=listeners.indexOf(fn);if(i>=0)listeners.splice(i,1);}}
+                        };
+                        this.abort=function(){
+                            if(this.signal.aborted)return;
+                            this.signal.aborted=true;
+                            listeners.slice().forEach(function(fn){try{fn();}catch(_) {}});
+                        };
                     };
                 }
                 var origWinScrollTo = window.scrollTo;
@@ -134,11 +143,105 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v111.0">
+    <link rel="manifest" href="manifest.json?v=v113.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+    <!-- Small in-page fallbacks: charts and ZIP export still work if an ad blocker blocks their CDN. -->
+    <script id="mq-v112-local-vendor-fallbacks">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart.js is preferred. A minimal canvas renderer supports the same line/bar
+        // data shape used by this website if CDN, network or AdGuard blocks it.
+        if (typeof window.Chart === 'undefined') {
+            window.Chart = function(ctx, cfg) {
+                if (!ctx || !ctx.canvas) return;
+                this.ctx = ctx; this.canvas = ctx.canvas;
+                this.config = cfg || {};
+                this.render = function() {
+                    var c=this.ctx, el=this.canvas, bounds=el.getBoundingClientRect();
+                    var w=Math.max(300,Math.round(bounds.width || el.clientWidth || 360));
+                    var h=Math.max(160,Math.round(bounds.height || el.clientHeight || 230));
+                    el.width=w;el.height=h;
+                    var data=this.config.data||{}, labels=data.labels||[], sets=data.datasets||[];
+                    var graph={l:44,r:w-10,t:24,b:h-34},gw=graph.r-graph.l,gh=graph.b-graph.t;
+                    var vals=[];sets.forEach(function(set){(set.data||[]).forEach(function(v){if(v!==null&&v!==undefined&&Number.isFinite(Number(v))) vals.push(Number(v));});});
+                    var optY=(((this.config.options||{}).scales||{}).y||{});
+                    var ymax=Number(optY.max)||Number(optY.suggestedMax)||Math.max(100,...vals,1);
+                    var ymin=Number(optY.min)||0;if(ymax<=ymin)ymax=ymin+1;
+                    var text=getComputedStyle(el).color||'#64748b';
+                    c.clearRect(0,0,w,h);c.lineWidth=1;c.strokeStyle='rgba(140,150,160,.3)';
+                    c.font='11px sans-serif';c.fillStyle=text;c.textAlign='right';
+                    for(var n=0;n<=4;n++){var val=ymin+(ymax-ymin)*(4-n)/4,y=graph.t+gh*n/4;c.beginPath();c.moveTo(graph.l,y);c.lineTo(graph.r,y);c.stroke();c.fillText(String(Math.round(val)),graph.l-5,y+4);}
+                    var gap=gw/Math.max(labels.length,1);
+                    c.textAlign='center';
+                    labels.forEach(function(label,i){
+                        if(i%Math.max(1,Math.ceil(labels.length/9))!==0)return;
+                        c.fillStyle=text;c.fillText(String(label).slice(0,7),graph.l+gap*(i+.5),h-10);
+                    });
+                    sets.forEach(function(set,k){
+                        var points=set.data||[],color=set.borderColor||['#0284c7','#8b5cf6','#10b981'][k%3];
+                        c.strokeStyle=color;c.fillStyle=color;c.lineWidth=2;
+                        if((cfg||{}).type==='bar') {
+                            points.forEach(function(val,i){if(val===null||!Number.isFinite(Number(val)))return;
+                                var x=graph.l+(i+.5)*gap, y=graph.b-gh*(Number(val)-ymin)/(ymax-ymin);
+                                c.fillRect(x-Math.max(1,gap/(sets.length+2)/2)+k*2,y,Math.max(3,gap/(sets.length+2)),graph.b-y);
+                            });
+                        } else {
+                            c.beginPath();var active=false;
+                            points.forEach(function(val,i){if(val===null||!Number.isFinite(Number(val))){active=false;return;}
+                                var x=graph.l+(i+.5)*gap,y=graph.b-gh*(Number(val)-ymin)/(ymax-ymin);
+                                if(!active)c.moveTo(x,y);else c.lineTo(x,y);
+                                active=true;
+                            });c.stroke();
+                        }
+                    });
+                };
+                this.destroy=function(){try{this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);}catch(_){}};
+                this.render();
+            };
+            window.Chart._mqOfflineFallbackV112=true;
+        }
+        // JSZip-compatible stored ZIP fallback, only for text HTML exports used here.
+        if (typeof window.JSZip === 'undefined') {
+            window.JSZip = function() {
+                var files=[];
+                this.file=function(name,content){files.push({name:String(name),content:String(content)});return this;};
+                this.generateAsync=function(opts){
+                    if(!opts||opts.type!=='blob')return Promise.reject(new Error('Unsupported ZIP output type'));
+                    var encoder=window.TextEncoder?new TextEncoder():null;
+                    function utf8(s){if(encoder)return encoder.encode(s);
+                        var raw=unescape(encodeURIComponent(s)),a=new Uint8Array(raw.length);
+                        for(var z=0;z<raw.length;z++)a[z]=raw.charCodeAt(z);return a;}
+                    var t=Array.from({length:256},function(_,i){var c=i;for(var j=0;j<8;j++)c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1);return c>>>0;});
+                    function crc(b){var c=0xffffffff;for(var i=0;i<b.length;i++)c=(c>>>8)^t[(c^b[i])&255];return (c^0xffffffff)>>>0;}
+                    function u16(a,n){a.push(n&255,(n>>>8)&255);}
+                    function u32(a,n){a.push(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255);}
+                    var body=[],central=[],offset=0;
+                    files.forEach(function(item){
+                        var name=utf8(item.name),content=utf8(item.content),check=crc(content);
+                        if(name.length>65535||content.length>0xffffffff)throw new Error('ZIP file too large');
+                        var local=[];u32(local,0x04034b50);u16(local,20);u16(local,0x0800);u16(local,0);u16(local,0);u16(local,0);
+                        u32(local,check);u32(local,content.length);u32(local,content.length);u16(local,name.length);u16(local,0);
+                        body.push(new Uint8Array(local),name,content);
+                        var dir=[];u32(dir,0x02014b50);u16(dir,20);u16(dir,20);u16(dir,0x0800);u16(dir,0);
+                        u16(dir,0);u16(dir,0);u32(dir,check);u32(dir,content.length);u32(dir,content.length);
+                        u16(dir,name.length);u16(dir,0);u16(dir,0);u16(dir,0);u16(dir,0);u32(dir,0);u32(dir,offset);
+                        central.push(new Uint8Array(dir),name);
+                        offset+=local.length+name.length+content.length;
+                    });
+                    var centralSize=central.reduce(function(sum,a){return sum+a.length;},0);
+                    var end=[];u32(end,0x06054b50);u16(end,0);u16(end,0);u16(end,files.length);u16(end,files.length);
+                    u32(end,centralSize);u32(end,offset);u16(end,0);
+                    return Promise.resolve(new Blob(body.concat(central,[new Uint8Array(end)]),{type:'application/zip'}));
+                };
+            };
+            window.JSZip._mqOfflineFallbackV112=true;
+        }
+    });
+    </script>
+
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Noto+Serif+Devanagari:wght@600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Rozha+One&family=Yatra+One&display=swap');
@@ -858,6 +961,47 @@
             color: var(--text-color);
         }
     
+
+/* v112 concise chart, existing 12-topic /100-point model unchanged */
+.chart-easy-toolbar-v112 { padding:10px 11px;margin:12px 0 8px;border:1px solid var(--border-color);border-radius:14px;background:var(--glass-bg); }
+.chart-easy-heading-v112 { font-size:.95rem;font-weight:850;color:var(--chart-color); }
+.chart-easy-actions-v112 { display:flex;flex-wrap:wrap;gap:7px;margin:8px 0; }
+.chart-easy-actions-v112 button { width:auto;flex:1 1 auto;min-width:85px;padding:8px 10px;font-size:.82rem;box-shadow:none;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-color); }
+.chart-easy-actions-v112 button.active { background:var(--chart-color);color:white; }
+.chart-easy-hint-v112 {font-size:.77rem;color:var(--muted-text-color);line-height:1.5;}
+.chart-zero-btn-v112 {width:auto;max-width:100%;margin-top:8px;background:var(--bg-color);color:var(--muted-text-color);border:1px dashed var(--border-color);box-shadow:none;font-size:.78rem;padding:6px 10px;}
+.chart-easy-mode-v112 .chart-time-note-v4 { display:none; }
+.chart-easy-mode-v112 #chart-reflection-section-v4 { display:none; }
+.chart-easy-mode-v112 .chart-time-row-v4 {padding:5px 8px;}
+.chart-easy-mode-v112 .chart-option-v2 {margin-bottom:4px;}
+@media(max-width:480px){.chart-easy-actions-v112 button{font-size:.76rem;min-width:70px;padding:7px}.chart-easy-hint-v112{font-size:.72rem}}
+
+
+/* v112 optional feedback: light on mobile and desktop, never blocks quiz next-question timer */
+#mq-feedback-trigger-v112{position:fixed;z-index:995;bottom:93px;left:50%;transform:translateX(-50%);width:min(540px,calc(100% - 18px));display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid var(--border-color);border-radius:13px;background:var(--card-bg);box-shadow:0 6px 24px rgba(0,0,0,.20);color:var(--text-color)}
+#mq-feedback-trigger-v112>span{font-size:.72rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#mq-feedback-trigger-v112>button{width:auto;padding:7px 8px;font-size:.72rem;box-shadow:none;white-space:nowrap;}
+#mq-feedback-trigger-v112>button:last-child{background:var(--bg-color);color:var(--text-color);border:1px solid var(--border-color)}
+.mq-feedback-dialog-v112{position:relative;width:min(460px,calc(100vw - 24px));max-height:90vh;overflow:auto;padding:18px!important;background:var(--card-bg)!important;color:var(--text-color)}
+.mq-feedback-close-v112{position:absolute;top:8px;right:8px;width:auto!important;box-shadow:none!important;background:transparent!important;color:var(--text-color)!important;padding:7px!important}
+.mq-feedback-dialog-v112 h3,.mq-admin-feedback-dialog-v112 h3{font-size:1.12rem;margin:3px 28px 8px 0;color:var(--chart-color)}
+.mq-feedback-question-v112{font-size:.9rem;font-weight:700;line-height:1.4;margin:5px 0 12px}
+.mq-feedback-types-v112{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mq-feedback-types-v112 label{background:var(--bg-color);border:1px solid var(--border-color);border-radius:9px;padding:10px 7px;display:flex;align-items:flex-start;gap:6px;font-size:.82rem;cursor:pointer}
+.mq-feedback-types-v112 label:has(input:checked){border-color:var(--chart-color);background:rgba(139,92,246,.1)}
+.mq-feedback-types-v112 input{flex:0 0 auto;margin-top:3px}
+.mq-feedback-comment-label-v112{display:block;margin:11px 0;font-size:.83rem;font-weight:700}
+.mq-feedback-comment-label-v112 textarea{width:100%;background:var(--bg-color);color:var(--text-color);padding:8px;border:1px solid var(--border-color);border-radius:9px;resize:vertical;margin-top:6px}
+.mq-feedback-modal-actions-v112{display:flex;gap:7px}.mq-feedback-modal-actions-v112 button{flex:1;padding:8px;font-size:.82rem}.mq-feedback-modal-actions-v112 button:first-child{background:var(--bg-color);color:var(--text-color);border:1px solid var(--border-color);box-shadow:none}
+#mq-feedback-status-v112{font-size:.8rem;margin-top:7px;min-height:15px}
+.mq-admin-feedback-dialog-v112{position:relative;max-width:740px;max-height:90vh;overflow:auto;padding:18px!important;background:var(--card-bg)!important;color:var(--text-color)}
+.mq-admin-feedback-filter-v112{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.mq-admin-feedback-filter-v112 select,.mq-admin-feedback-filter-v112 input{background:var(--bg-color);color:var(--text-color);border:1px solid var(--border-color);border-radius:8px;padding:8px;min-width:0}
+.mq-admin-feedback-filter-v112 button{padding:7px}.mq-admin-feedback-count-v112{color:var(--muted-text-color);font-size:.78rem;margin-bottom:8px}
+.mq-admin-feedback-item-v112{border:1px solid var(--border-color);padding:10px;border-radius:10px;margin-bottom:9px;background:var(--bg-color)}
+.mq-admin-feedback-item-v112 select{width:auto;background:var(--card-bg);color:var(--text-color);padding:5px;border:1px solid var(--border-color);border-radius:8px}
+@media(max-width:420px){#mq-feedback-trigger-v112>span{display:none}.mq-feedback-types-v112{grid-template-columns:1fr}.mq-feedback-dialog-v112{padding:12px!important}.mq-admin-feedback-filter-v112{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -1040,25 +1184,15 @@
         <div id="custom-import-section" style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed var(--border-color); display: none;">
             <p style="font-size: 0.95rem; color: var(--primary-color); font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                Import Custom Quiz (AI Studio)
+                पूर्ण JSON Import (Quiz + Memory Tags + Swaman)
             </p>
-            <textarea id="custom-json-input" placeholder="AI Studio बाट प्राप्त JSON कोड यहाँ पेस्ट गर्नुहोस्..." style="height: 120px; min-height: 100px; font-family: monospace; font-size: 13px;"></textarea>
+            <textarea id="custom-json-input" placeholder="पूर्ण JSON (swaman, memory_tags, quiz) एउटै बाकसमा पेस्ट गर्नुहोस्..." style="height: 120px; min-height: 100px; font-family: monospace; font-size: 13px;"></textarea>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
                 <input type="date" id="custom-quiz-date" class="input-field" style="margin: 0; flex: 1; font-size: 0.9rem; cursor: pointer;" onclick="if(this.showPicker) this.showPicker();">
                 <button onclick="saveCustomQuiz()" style="background: var(--success-color); flex: 1; padding: 0.6rem;">☁️ Save to Server</button>
             </div>
         
 
-    <div id="manual-tags-section" style="margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color); display: block;">
-        <p style="font-size: 0.95rem; color: #8b5cf6; font-weight: 800; margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
-            💎 Update Memory Tags Only
-        </p>
-        <textarea id="manual-tags-input" placeholder="एडमिनले म्यानुअल रूपमा बनाएको Memory Tags यहाँ पेस्ट गर्नुहोस्..." style="height: 100px; min-height: 80px; font-family: inherit; font-size: 13px; width: 100%; border: 2px solid var(--border-color); border-radius: 12px; padding: 10px; background: var(--bg-color); color: var(--text-color); outline:none;"></textarea>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <input type="date" id="manual-tags-date" class="input-field" style="margin: 0; flex: 1; font-size: 0.9rem; cursor: pointer;" onclick="if(this.showPicker) this.showPicker();">
-            <button onclick="saveOnlyMemoryTags()" style="background: #8b5cf6; flex: 1; padding: 0.6rem; border-radius: 12px; color: white; font-weight: bold; border: none; cursor: pointer;">☁️ Update Tags</button>
-        </div>
-    </div>
     </div>
 
         <div id="export-saved-section" style="display:none; margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color);">
@@ -1068,6 +1202,7 @@
                     Export Q&A List
                 </span>
                 <span style="display:flex; gap:6px;">
+                    <button class="admin-dashboard-only-btn" onclick="openQuizFeedbackAdminV112()" style="width:auto;background:#64748b;color:white;padding:.3rem .8rem;border-radius:8px;font-size:.8rem;box-shadow:none;font-weight:800;">📝 Feedback</button>
                     <button class="admin-dashboard-only-btn" onclick="openLeaderboardModal()" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">🏆 Dashboard</button>
                     <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 ZIP</button>
                 </span>
@@ -1114,6 +1249,17 @@
 
         <div class="chart-progress-track-v2"><div id="chart-live-progress" class="chart-progress-fill-v2" style="width:0%"></div></div>
 
+
+        <div class="chart-easy-toolbar-v112" id="chart-easy-toolbar-v112" role="group" aria-label="चार्ट भर्ने सुविधा">
+          <div class="chart-easy-heading-v112">🌿 सहज दैनिक चार्ट <span style="font-weight:500;font-size:.78rem;">(१२ खण्ड / १०० अङ्क जस्ताको तस्तै)</span></div>
+          <div class="chart-easy-actions-v112">
+            <button type="button" id="chart-easy-btn-v112" onclick="setChartEasyModeV112(true)">⚡ सजिलो</button>
+            <button type="button" id="chart-detail-btn-v112" onclick="setChartEasyModeV112(false)">📋 विस्तृत</button>
+            <button type="button" onclick="openNextIncompleteChartV112()">➡️ अर्को अधुरो</button>
+          </div>
+          <div class="chart-easy-hint-v112">एउटा खण्ड खोल्नुहोस्, आफ्नो अभ्यास छान्नुहोस्। नगरेको भए ‘आज भएन (०)’ थिच्नुहोस्। स्वतः स्क्रोल हुँदैन।</div>
+        </div>
+
         <form id="daily-chart-form" onsubmit="event.preventDefault(); submitDailyChart();">
             <div id="chart-grid-container">
 <div class="chart-section-v2" data-chart-section="1">
@@ -1123,7 +1269,7 @@
                     <div class="chart-time-row-v4"><label for="chart-time-murli-before">मुरली क्लास अघि</label><input id="chart-time-murli-before" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="मुरली क्लास अघि बाबाको याद, मिनेट"></div>
                     <div class="chart-time-row-v4"><label for="chart-time-murli-after">मुरली क्लास पछि</label><input id="chart-time-murli-after" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="मुरली क्लास पछि बाबाको याद, मिनेट"></div>
                 </div>
-                <div class="chart-time-note-v4">समय मिनेटमा लेख्नुहोस् (१ घण्टा = ६० मिनेट)। तीनै समय जोडेर अङ्क स्वतः निर्धारण हुन्छ। अन्तिम फिल्ड पूरा गरेपछि अर्को बुँदामा अटो-स्क्रोल हुन्छ।</div>
+                <div class="chart-time-note-v4">समय मिनेटमा लेख्नुहोस् (१ घण्टा = ६० मिनेट)। तीनै समय जोडेर अङ्क स्वतः निर्धारण हुन्छ। आफूले चाहेपछि अर्को खण्ड खोल्न सकिन्छ।</div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="2">
@@ -1220,7 +1366,7 @@
                     <div class="chart-time-row-v4"><label for="chart-time-daytime-yoga">दिउँसो एकान्तमा</label><input id="chart-time-daytime-yoga" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="दिउँसो एकान्तमा बाबाको यादको अवधि मिनेटमा"></div>
                     <div class="chart-time-row-v4"><label for="chart-time-evening-yoga">साँझको योग</label><input id="chart-time-evening-yoga" class="chart-time-input-v4" type="number" min="0" max="1440" step="1" inputmode="numeric" placeholder="मिनेट" aria-label="साँझको बाबाको यादको अवधि मिनेटमा"></div>
                 </div>
-                <div class="chart-time-note-v4">दिउँसो र साँझको समय जोडिन्छ: ६० मिनेट वा बढी = १० अङ्क, ३०–५९ मिनेट = ५ अङ्क, ३० मिनेटभन्दा कम = ०। अन्तिम फिल्ड पूरा गरेपछि अर्को बुँदामा अटो-स्क्रोल हुन्छ।</div>
+                <div class="chart-time-note-v4">दिउँसो र साँझको समय जोडिन्छ: ६० मिनेट वा बढी = १० अङ्क, ३०–५९ मिनेट = ५ अङ्क, ३० मिनेटभन्दा कम = ०। आफूले चाहेपछि अर्को खण्ड खोल्न सकिन्छ।</div>
             </div>
 
             <div class="chart-section-v2" data-chart-section="11">
@@ -1356,7 +1502,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 111.0</div>
+        <div>Version: 113.0</div>
     </div>
 </div>
 
@@ -1867,7 +2013,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v111.0').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v113.0').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -1878,7 +2024,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "111.0";
+    const APP_VERSION = "113.0";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -2954,6 +3100,8 @@ function getMegaActivationDateUI(quizDate) {
     }
 
     window.handleForgotPIN = function() {
+        alert('सुरक्षाका लागि फोन र महिनाबाट PIN देखाउने पुरानो व्यवस्था बन्द गरिएको छ। परिचय पुष्टि गरी Admin सँग PIN पुनःसेट गराउनुहोस्।');
+        return;
         isRecoveryMode = true; document.getElementById('pin-msg').innerText = `कृपया आफ्नो फोन नम्बर र अलौकिक जन्म महिना भर्नुहोस्।`;
         document.getElementById('reg-fields').style.display = 'none'; document.getElementById('warning-msg').style.display = 'none';
         document.getElementById('phone-input').style.display = 'block'; document.getElementById('month-select').style.display = 'block'; document.getElementById('month-select').value = "";
@@ -3138,7 +3286,7 @@ function getMegaActivationDateUI(quizDate) {
             if (isPrivileged && isAdminViewActive) {
                 document.getElementById('murali-text').style.display = 'block';
                 document.getElementById('generator-actions').style.display = 'flex';
-                document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block';
+                document.getElementById('custom-import-section').style.display = 'block';
                 document.getElementById('btn-monthly-mega').style.display = 'block';
                 document.getElementById('btn-custom-mega').style.display = 'block';
                 document.getElementById('quiz-config-tools').style.display = 'flex';
@@ -3151,7 +3299,7 @@ function getMegaActivationDateUI(quizDate) {
             } else {
                 document.getElementById('murali-text').style.display = 'none';
                 document.getElementById('generator-actions').style.display = 'none';
-                document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none';
+                document.getElementById('custom-import-section').style.display = 'none';
                 document.getElementById('btn-monthly-mega').style.display = 'none';
                 document.getElementById('btn-custom-mega').style.display = 'none';
                 document.getElementById('quiz-config-tools').style.display = 'none';
@@ -3218,23 +3366,41 @@ function getMegaActivationDateUI(quizDate) {
     // 5. DATA SYNCING LOGIC (104.0 FAST)
     // ==========================================
     async function apiPostJSON(payload, options = {}) {
-        const retries = Number(typeof options.retries !== 'undefined' ? options.retries : 1);
-        const timeoutMs = Number(typeof options.timeoutMs !== 'undefined' ? options.timeoutMs : 9000);
+        const retries = Math.max(0, Number(typeof options.retries !== 'undefined' ? options.retries : 1) || 0);
+        const timeoutMs = Math.max(1500, Number(typeof options.timeoutMs !== 'undefined' ? options.timeoutMs : 9000) || 9000);
         let lastError = null;
         for (let attempt = 0; attempt <= retries; attempt++) {
-            let controller = null, timer = null;
+            let controller = null, timeoutId = null;
             try {
-                controller = new AbortController();
-                timer = setTimeout(() => controller.abort(), timeoutMs);
-                const response = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), signal:controller.signal, cache:'no-store' });
-                const text = await response.text();
-                let data; try { data = JSON.parse(text); } catch(e) { throw new Error('Invalid server response'); }
-                if (data && data.status === 'error' && data.retryable && attempt < retries) { await new Promise(r => setTimeout(r, 350)); continue; }
+                // iOS 12 and older Android might have a legacy AbortController shim.
+                // Use the native signal only where AbortSignal really exists.
+                const canAbort = typeof AbortController === 'function' && typeof AbortSignal !== 'undefined';
+                if (canAbort) controller = new AbortController();
+                const requestOptions = { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), cache:'no-store' };
+                if (controller) requestOptions.signal = controller.signal;
+                const deadline = new Promise((resolve,reject) => {
+                    timeoutId = setTimeout(() => {
+                        try { if(controller) controller.abort(); } catch(_) {}
+                        const err = new Error('सर्भरबाट समयमा प्रतिक्रिया आएन। नेटवर्क जाँचेर पुनः प्रयास गर्नुहोस्।');
+                        err.code = 'REQUEST_TIMEOUT';
+                        reject(err);
+                    }, timeoutMs);
+                });
+                const request = fetch(API_URL, requestOptions).then(r => r.text());
+                const raw = await Promise.race([request, deadline]);
+                let data;
+                try { data = JSON.parse(raw); } catch(e) { throw new Error('Invalid server response'); }
+                if (data && data.status === 'error' && data.retryable && attempt < retries) {
+                    await new Promise(r => setTimeout(r, 450));
+                    continue;
+                }
                 return data;
             } catch(e) {
                 lastError = e;
-                if (attempt < retries) await new Promise(r => setTimeout(r, 350));
-            } finally { if (timer) clearTimeout(timer); }
+                if(attempt < retries) await new Promise(r => setTimeout(r, 450));
+            } finally {
+                if (timeoutId) clearTimeout(timeoutId);
+            }
         }
         throw lastError || new Error('Request failed');
     }
@@ -3262,34 +3428,68 @@ function getMegaActivationDateUI(quizDate) {
     function makeActiveStateObject(overrides = {}) {
         return Object.assign({ date: currentMurliDate, qIndex: activeQuestionIndex, score: currentScore, time: totalTimeSec,
             answeredCount: answeredCount, quizData: currentQuiz, quizRevision: currentQuizRevision, quizId: currentQuizId,
-            stateSeq: activeStateSeq, deviceId: getDeviceId() }, overrides || {});
+            stateSeq: activeStateSeq, deviceId: getDeviceId(), updatedAtMs: Date.now() }, overrides || {});
+    }
+
+    function mqStateAnswerCountV113_(state) {
+        if(!state || !Array.isArray(state.quizData)) return -1;
+        let n=0;
+        state.quizData.forEach(q => { if(q && Number.isInteger(q.userSelectedIndex) && q.userSelectedIndex >= 0 && q.userSelectedIndex < 4) n++; });
+        return n;
+    }
+    function mqCompareActiveStatesV113_(a, b) {
+        // >0 means a has more actual answers, or equal answers with a newer update.
+        if(!a) return b ? -1 : 0;
+        if(!b) return 1;
+        const aa=mqStateAnswerCountV113_(a),bb=mqStateAnswerCountV113_(b);
+        if(aa!==bb) return aa>bb ? 1 : -1;
+        const as=Number(a.stateSeq||0),bs=Number(b.stateSeq||0);
+        if(as!==bs) return as>bs ? 1 : -1;
+        const at=Number(a.updatedAtMs||0),bt=Number(b.updatedAtMs||0);
+        if(at&&bt&&at!==bt) return at>bt ? 1 : -1;
+        return 0;
+    }
+    function mqRequeueNewestStateV113_(st) {
+        if(!st || !isQuizActive) return;
+        if(!pendingActiveState || mqCompareActiveStatesV113_(st,pendingActiveState)>0) pendingActiveState=st;
     }
 
     async function flushActiveStateSave() {
-        if (activeStateSaveInFlight || !pendingActiveState || !navigator.onLine || !userPhone || userPhone === 'N/A') return false;
+        if (activeStateSaveInFlight || !pendingActiveState || !navigator.onLine || !userPhone || userPhone === 'N/A' || !isQuizActive) return false;
         activeStateSaveInFlight = true;
-        const stateObj = pendingActiveState; pendingActiveState = null;
+        let backoff = false;
+        const sent = pendingActiveState;
+        pendingActiveState = null;
         try {
-            const data = await apiPostJSON({ action:'saveActiveState', phone:userPhone, pin:(localStorage.getItem('murali_pin') || ''), date:stateObj.date, stateData:stateObj,
-                quizRevision:stateObj.quizRevision || currentQuizRevision, quizId:stateObj.quizId || currentQuizId,
-                stateSeq:stateObj.stateSeq || 0, deviceId:getDeviceId() }, {retries:3, timeoutMs:10000});
-
-            // 107.0: A late state-save response must not resurrect a finished
-            // quiz locally, or overwrite the state of a different quiz session.
-            const stateQuizId = String(stateObj.quizId || '');
-            const sameCurrentQuiz = !stateQuizId || !currentQuizId || stateQuizId === String(currentQuizId);
-            const storedState = safeJSON('murali_active_quiz_state', null);
-            const storedMatches = storedState && (!stateQuizId || !storedState.quizId || String(storedState.quizId) === stateQuizId);
-            if ((data && data.completed === true) || !isQuizActive || !sameCurrentQuiz) {
-                if (storedMatches) localStorage.removeItem('murali_active_quiz_state');
-                if (pendingActiveState && (!stateQuizId || !pendingActiveState.quizId || String(pendingActiveState.quizId) === stateQuizId)) pendingActiveState = null;
-                return !!(data && data.status === 'success');
+            const resp = await apiPostJSON({action:'saveActiveState', phone:userPhone, pin:(localStorage.getItem('murali_pin')||''),
+                date:sent.date, stateData:sent, quizRevision:sent.quizRevision||currentQuizRevision,
+                quizId:sent.quizId||currentQuizId, stateSeq:sent.stateSeq||0, deviceId:getDeviceId()},
+                {retries:1, timeoutMs:12000});
+            if(!resp || resp.status!=='success') {
+                backoff = true;
+                mqRequeueNewestStateV113_(sent);
+                return false;
             }
-            if (!data || data.status !== 'success') { pendingActiveState = stateObj; scheduleActiveStateFlush(data && data.retryable ? 1200 : 1800); return false; }
-            localStorage.setItem('murali_active_quiz_state', JSON.stringify(stateObj));
+            if(resp.completed === true) {
+                const onDisk=safeJSON('murali_active_quiz_state',null);
+                if(onDisk && String(onDisk.quizId||'')===String(sent.quizId||'')) localStorage.removeItem('murali_active_quiz_state');
+                if(pendingActiveState && String(pendingActiveState.quizId||'')===String(sent.quizId||'')) pendingActiveState=null;
+                return true;
+            }
+            if(resp.staleIgnored) {
+                // A later state is already on the server; NEVER replay this old state.
+                return true;
+            }
+            // Do not put `sent` back in localStorage: it may be several questions old.
             return true;
-        } catch(e) { pendingActiveState = stateObj; scheduleActiveStateFlush(1800); return false; }
-        finally { activeStateSaveInFlight = false; if (pendingActiveState && navigator.onLine) scheduleActiveStateFlush(250); }
+        } catch(e) {
+            backoff = true;
+            mqRequeueNewestStateV113_(sent);
+            return false;
+        } finally {
+            activeStateSaveInFlight=false;
+            if(pendingActiveState && isQuizActive && navigator.onLine) scheduleActiveStateFlush(backoff ? 2800 : 350);
+        }
     }
 
     function scheduleActiveStateFlush(delay = 250) {
@@ -3939,49 +4139,30 @@ function getMegaActivationDateUI(quizDate) {
     function extractDate(text) { let m = text.match(/\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{2,4}/i); return m ? m[0] : new Date().toLocaleDateString('en-GB'); }
 
     
-    window.saveOnlyMemoryTags = function() {
-        let tags = document.getElementById('manual-tags-input').value.trim();
-        let rawDate = document.getElementById('manual-tags-date').value;
-        if(!tags) return showToast("कृपया Memory Tags पेस्ट गर्नुहोस्।", "error");
-        if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
-        
-        let parts = rawDate.split('-'); 
-        let dateStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        
-        let cached = safeJSON('murali_server_quizzes', []);
-        let existingQuiz = cached.find(q => q.quizDate === dateStr);
-        if(!existingQuiz) return showToast("यस मितिको क्वीज सर्भरमा छैन। पहिले क्वीज बनाउनुहोस्।", "error");
-        
-        let oldSwaman = extractSwamanAndTags(existingQuiz.swaman).text;
-        let newSwamanStr = JSON.stringify({ text: oldSwaman, tags: tags });
-        
-        document.getElementById('loading-box').style.display = 'block';
-        document.getElementById('loading-text').innerText = "Memory Tags सर्भरमा अपडेट हुँदैछ...";
-        
-        fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                action: "saveQuiz",
-                quizDate: dateStr,
-                quizData: existingQuiz.quizData,
-                isMegaQuiz: existingQuiz.isMegaQuiz,
-                swaman: newSwamanStr, createdAt: Date.now(), phone: (localStorage.getItem('murali_phone') || userPhone), pin: (localStorage.getItem('murali_pin') || ''), deviceId: getDeviceId() })
-        }).then(r => r.json()).then(data => {
-            document.getElementById('loading-box').style.display = 'none';
-            if(data.status === "success") {
-                showToast("Memory Tags सफलतापूर्वक अपडेट भयो! ☁️", "success");
-                document.getElementById('manual-tags-input').value = '';
-                syncServerQuizzes(false, true); // force full refresh
-            } else {
-                showToast("समस्या आयो: " + data.message, "error");
-            }
-        }).catch(e => {
-            document.getElementById('loading-box').style.display = 'none';
-            showToast("इन्टरनेट समस्या!", "error");
-        });
-    };
-    
+
+    // v75.2 hard structural gate. Semantic one-right-answer judgement remains with an Admin.
+    function validateUnifiedQuiz75_2_(data) {
+        if (!data || !Array.isArray(data.quiz) || data.quiz.length !== 20) return 'ठीक २० प्रश्न आवश्यक छन्।';
+        if (typeof data.swaman !== 'string' || !data.swaman.trim() || typeof data.memory_tags !== 'string' || !data.memory_tags.trim()) return 'swaman र memory_tags दुवै आवश्यक छन्।';
+        var blankCount=0, eligible=0;
+        for(var i=0;i<data.quiz.length;i++) {
+            var q=data.quiz[i];
+            if (!q || typeof q.q!=='string' || !q.q.trim() || !Array.isArray(q.options) || q.options.length!==4 ||
+                q.options.some(function(v){return typeof v!=='string'||!v.trim();}) || new Set(q.options.map(function(v){return v.trim();})).size!==4)
+                return 'प्रश्न '+(i+1)+': प्रश्न वा चार फरक विकल्प अपूरा छन्।';
+            if (typeof q.answer!=='string' || !q.answer.trim() || typeof q.original!=='string' || !q.original.includes(q.answer) ||
+                q.options.filter(function(x){return x.trim()===q.answer.trim();}).length!==1)
+                return 'प्रश्न '+(i+1)+': सही उत्तर original र options सँग मिलेन।';
+            if (typeof q.explanation!=='string' || !q.explanation.trim() || typeof q.tag!=='string' ||
+                typeof q.is_mega_eligible!=='boolean') return 'प्रश्न '+(i+1)+': विवरण/Tag/Mega flag अपूरो छ।';
+            if(q.q.indexOf('....')!==-1) blankCount++;
+            if(q.is_mega_eligible) eligible++;
+        }
+        if(blankCount!==2) return 'ठीक २ रिक्तस्थान (....) प्रश्न हुनुपर्छ; भेटियो '+blankCount;
+        if(eligible<3 || eligible>5) return 'Mega-eligible प्रश्न ३–५ हुनुपर्छ; भेटियो '+eligible;
+        return '';
+    }
+
 window.saveCustomQuiz = function() {
         let jsonText = document.getElementById('custom-json-input').value.trim(); let rawDate = document.getElementById('custom-quiz-date').value;
         if(!jsonText) return showToast("कृपया JSON कोड पेस्ट गर्नुहोस्।", "error"); if(!rawDate) return showToast("कृपया मिति छान्नुहोस्।", "error");
@@ -3989,9 +4170,10 @@ window.saveCustomQuiz = function() {
         try {
             let sIdx = jsonText.indexOf('{'); let eIdx = jsonText.lastIndexOf('}'); if (sIdx !== -1 && eIdx !== -1) jsonText = jsonText.substring(sIdx, eIdx + 1);
             let parsedData = JSON.parse(jsonText); if(!parsedData.quiz || !Array.isArray(parsedData.quiz)) throw new Error("Invalid JSON");
+            const quizError = validateUnifiedQuiz75_2_(parsedData); if(quizError) throw new Error(quizError);
             currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ''; window.currentMemoryTags = parsedData.memory_tags || ''; currentMurliDate = dateStr; 
-            document.getElementById('custom-json-input').value = ''; document.getElementById('custom-quiz-date').value = ''; saveQuizToServer();
-        } catch(e) { showToast("JSON कोड मिलेन! कृपया सही कोड राख्नुहोस्।", "error"); }
+            window._mqPendingImportV112 = true; saveQuizToServer();
+        } catch(e) { showToast("JSON जाँच: " + (e && e.message || "गलत JSON"), "error", 7000); }
     };
     
     window.generateQuizWithAI = async function() {
@@ -3999,21 +4181,21 @@ window.saveCustomQuiz = function() {
         const text = document.getElementById('murali-text').value.trim(); if(text.length < 50) return showToast("मुरलीको पाठ धेरै छोटो भयो।", "error");
         
         currentMurliDate = extractDate(text); 
-        let qCount = "20"; // Prompt v67 requires exactly 20 questions; ignore legacy count selector. 
+        let qCount = "20"; // Prompt v75.2 requires exactly 20 questions; ignore legacy count selector. 
         let selectedModel = document.getElementById('ai-model').value || 'gemini-3.6-flash'; 
         let level = document.getElementById('quiz-level').value;
-        let uiLang = "ne"; // Prompt v67 is the pure-Nepali generator.
+        let uiLang = "ne"; // Prompt v75.2 is the pure-Nepali generator.
         let langName = "Nepali";
 
-        document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none';
+        document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none';
         const cancelGenBtn = document.getElementById('btn-cancel-gen'); if (cancelGenBtn) cancelGenBtn.style.display = 'inline-flex'; document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = `AI is drafting the quiz using ${selectedModel}... (कृपया पर्खनुहोस्)`;
 
-        let difficultyInstruction = "Prompt v67: joyful standard difficulty with plausible BK distractors";
+        let difficultyInstruction = "Prompt v75.2: adaptive source-faithful difficulty and strong BK distractors";
         let parsedDateForDay = parseDateString(currentMurliDate); let dayOfWeek = parsedDateForDay ? parsedDateForDay.getDay() : new Date().getDay(); let dayNames = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]; let currentDayName = dayNames[dayOfWeek];
 
-        const QUIZ_MODEL_68_0 = "<prompt_version>\nQuiz Generator Version: 110.26 UNIFIED MASTER (v73.0) - Ultra Compact Memory Tags (v2.3 Central Focus Middle 2-4 Points) + Dominant Theme Supremacy & Twin-Mahavakya Distractor Engine\n</prompt_version>\n\n<system_role>\nतपाईं एक उत्साहवर्धक, आनन्ददायी र ब्रह्माकुमारीज ईश्वरीय ज्ञानका उच्च विशेषज्ञ सहजकर्ता (Spiritual Facilitator) तथा अल्ट्रा-कम्प्याक्ट मेमोरी ट्याग रिफाइनर हुनुहुन्छ।\nतपाईंको कार्य दिइएको मुरलीको पाठ (Text) गहिराइपूर्वक अध्ययन गरी एउटै वैध JSON कोड ब्लक (Single Valid JSON Code Block) भित्र तीनवटा कुराहरू तयार गर्नु हो:\n१. वरदानमा आधारित शक्तिशाली \"swaman\" (स्वमान)।\n२. अत्यन्त संक्षिप्त र परिष्कृत \"memory_tags\" (मेमोरी ट्याग र मेमोरी चेन — जसमा बीचका २–४ मुख्य बुँदाहरू अनिवार्य रूपमा बाबाले सारा मुरलीमा जोड दिनुभएको मुख्य विषयबाटै लिइएको होस्)।\n३. ठ्याक्कै २० वटा उच्च गुणस्तरीय, मुरलीको मुख्य सार र दोहोरिएका प्रसंग (जस्तै: गीता, रामायण, महाभारत, दृष्टान्त आदि) नछुट्ने, १००% स्वाभाविक नेपाली व्याकरणमा आधारित प्रश्नहरू र चारवटै विकल्प साँचो बी.के. महावाक्य जस्तै लाग्ने \"quiz\" (प्रश्नोत्तरहरू)।\nमेमोरी ट्याग र क्वीज दुवै खण्डका विस्तृत नियमहरूमा रत्तिभर सम्झौता नगर्नुहोस्।\n</system_role>\n\n<memory_tags_rules>\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPART A: MEMORY TAGS RULES (DAILY MURLI — ULTRA COMPACT MEMORY TAG REFINER v2.3 - FULL RULES)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nदिइएको ब्रह्माकुमारीज मुरलीबाट केवल अत्यन्त महत्त्वपूर्ण, भगवानुवाचमा आधारित र बारम्बार पढेर सजिलै याद गर्न सकिने अत्यन्त छोटो Memory Sheet तयार गर्नुहोस्।\n• यो विस्तृत सारांश होइन।\n• यो व्याख्या होइन।\n• यो विश्लेषण होइन।\n\nउद्देश्य: हरेक घण्टा १–२ मिनेट हेर्दा तुरुन्त सम्झन सकिने कम बुँदा, छोटो शब्द र मूल भगवानुवाचमा आधारित Memory Tags तयार गर्नु हो।\n\n१. DATE + WEEKDAY\nस्रोत मुरलीको सुरुमा दिइएको मिति पहिचान गर्नुहोस्। त्यही मितिको Gregorian Calendar अनुसार सही बार निकाल्नुहोस्।\nOutput को सुरुमा:\n📅 DD-MM-YYYY [बार]\nउदाहरण:\n📅 07-10-2026 बुधबार\nनियम:\n• “मिति:” शब्द नलेख्नुहोस्।\n• स्रोतको मिति मात्र प्रयोग गर्नुहोस्।\n• Current Date र Current Time प्रयोग नगर्नुहोस्।\n• Output बनाएको दिनलाई आधार नबनाउनुहोस्।\n• पुरानो मुरली भए पनि त्यसै मितिको बार लेख्नुहोस्।\n• बार calendar calculation बाट निश्चित गर्नुहोस्, अनुमान नगर्नुहोस्।\n\n२. केवल भगवानुवाच\n• स्रोत मुरलीकै सामग्री मात्र प्रयोग गर्नुहोस्।\n• बाबाले भन्नुभएको ज्ञान, निर्देशन, पुरुषार्थ, धारणा, सावधानी, वरदान, स्लोगन र अव्यक्त इसाराबाट मात्र Memory Points निकाल्नुहोस्।\n• आफ्नै व्याख्या र आफ्नै निष्कर्ष नगर्नुहोस्।\n• बाहिरी ज्ञान र आधुनिक उदाहरण नदिनुहोस्।\n• मूल आध्यात्मिक शब्दावली, भाव र आशय नबिगार्नुहोस्।\n\n३. अत्यन्त महत्त्वपूर्ण — ARROW TEXT = SOURCE-FAITHFUL + CONTEXT-COMPLETE\nप्रत्येक Memory Tag को ढाँचा (JSON भित्र एउटै वा दुई लाइनमा तर बिना कुनै खाली लाइन):\n[Symbol] [छोटो Memory Tag]\n→ [मूल भगवानुवाचको छोटो, स्पष्ट र अर्थपूर्ण अंश]\nवा: [Symbol] [छोटो Memory Tag] → [मूल भगवानुवाचको छोटो, स्पष्ट र अर्थपूर्ण अंश]\n\n“→” पछिको भागमा कडा नियम:\n• स्रोत मुरलीको मूल भगवानुवाचलाई नै आधार बनाउनुहोस्।\n• छोटो मूल वाक्यांशलाई प्राथमिकता दिनुहोस्; तर त्यो अंश एक्लै पढ्दा कर्ता, कसलाई भनिएको हो वा आशय अस्पष्ट हुन्छ भने अर्थ पूरा गर्न आवश्यक न्यूनतम सन्दर्भ खुलाउनुहोस्।\n• कर्ता/सन्दर्भ स्रोतको त्यही व्याख्यात्मक अनुच्छेद वा त्यसको ठीक अघिल्लो/पछिल्लो वाक्यमा स्पष्ट छ भने मात्र त्यही मूल शब्दबाट छुटेको कर्ता वा सन्दर्भ पुनः जोड्न सकिन्छ।\n• उदाहरण: “जसरी बाबाले स्वयंको समय पनि सेवामा दिनुभयो। स्वयं निर्मान बनेर बच्चाहरूलाई मान दिनुभयो।” बाट “बाबाले स्वयं निर्मान बनेर बच्चाहरूलाई मान दिनुभयो” लेख्न सकिन्छ, किनकि “बाबाले” स्रोतकै नजिकको वाक्यमा स्पष्ट छ।\n• यसरी कर्ता स्पष्ट पार्नु नयाँ विचार थप्नु वा वाक्यको अर्थ बदल्नु होइन; मूल स्रोतमा स्पष्ट भएको सन्दर्भ पुनःस्थापना गर्नु हो।\n• स्रोतमा स्पष्ट नभएको कर्ता, कारण, नतिजा वा विवरण आफैँ नबनाउनुहोस्।\n• अस्पष्ट अंशलाई आफ्नै व्याख्या, अनुमान वा पर्यायवाचीले नभरौं; सन्दर्भले अर्थ निश्चित नगरे अर्को स्पष्ट बुँदा छान्नुहोस्।\n• दुई स्वतन्त्र विचारलाई जोडेर नयाँ वाक्य नबनाउनुहोस् र दुई अलग ठाउँका विचार मिसाएर नयाँ अर्थ नबनाउनुहोस्।\n• मूल शब्दावली, भाव र आशय नबिगार्नुहोस्; अनावश्यक शब्द हटाउन सकिन्छ, तर पुनर्लेखन गरेर अर्थ बदल्न पाइँदैन।\n• अर्थ स्पष्ट हुन आवश्यक भए छोटो पूर्ण वाक्य प्रयोग गर्न सकिन्छ; अस्पष्ट वाक्यांशलाई छोटो राख्नु मात्र लक्ष्य होइन।\nमुख्य नियम: “Tag = छोटो स्मरणीय शीर्षक। Arrow Text = मूल भगवानुवाचमा आधारित, सन्दर्भसहित स्पष्ट र छोटो अंश।”\n\n४. ONE IDEA = ONE TIME\n• एउटै विचारलाई दोहोर्‍याएर नलेख्नुहोस्।\n• मुख्य व्याख्यामा आएको कुरा फेरि धारणा, वरदान, स्लोगन वा अव्यक्त इसारामा उही अर्थमा नदोहोर्‍याउनुहोस्।\n• एउटै विचार = एकपटक मात्र।\n• MASTER MEMORY CHAIN मा भने त्यसैको अत्यन्त छोटो स्मरणीय रूप पुनः राख्न सकिन्छ।\n\n५. LESS IS MORE — कम तर अत्यन्त महत्त्वपूर्ण\nमुरलीमा धेरै कुरा भए पनि सबै कुरा Memory Tags मा ल्याउनु हुँदैन। केवल:\n• आज बाबाले सारा मुरलीभरि मुख्य जोड दिनुभएको केन्द्रीय विषय (Central Theme), मुख्य शिक्षा, अत्यन्त महत्त्वपूर्ण ज्ञान, मुख्य पुरुषार्थ, विशेष चेतावनी र मुरलीको Unique / Special Point मात्र छान्नुहोस्।\n• सम्भव भएसम्म ठ्याक्कै १० वटा Numbered Memory Tags बनाउनुहोस्।\n• १० वटा पूरा गर्न कमजोर, गौण, दोहोरिएका वा मुरलीको मूल भावभन्दा कम महत्त्वका कुरा नथप्नुहोस्।\n• यदि १० भन्दा कम मात्र वास्तविक र महत्त्वपूर्ण भगवानुवाच उपलब्ध छन् भने बनावटी कुरा थप्नु हुँदैन।\n\n६. SOURCE STRUCTURE + MURLI TYPE — अनिवार्य\nपहिले स्रोतको वास्तविक प्रकार र खण्ड पहिचान गर्नुहोस्। आइतबार भएको कारणले मात्र अव्यक्त मुरली नठहराउनुहोस्; शीर्षक र वास्तविक सामग्री जाँच्नुहोस्।\nA. साकार / प्रातः मुरलीको प्राथमिकता क्रम (जम्मा १० बुँदा):\n  १. 📅 Date + Weekday\n  २. 🗣️ सुरुको “मीठे बच्चे…” महावाक्य — यो लोगो सधैँ स्थायी\n  ३. ❓ प्रश्न–उत्तर — स्रोतमा भए र नयाँ महत्त्वपूर्ण ज्ञान भए मात्र\n  ४. मुख्य व्याख्या (बीचका २ देखि ४ मुख्य बुँदाहरू) — बाबाले सारा मुरलीमा चर्चा र जोड दिनुभएको मुख्य विषयबाट (विषयअनुसार फरक लोगो)\n  ५. 📌 धारणा — नयाँ र महत्त्वपूर्ण कुरा भए मात्र; “धारणा” शब्द लेख्ने\n  ६. 🎁 वरदान — वास्तविक वरदान भए “वरदान” शब्द लेख्ने\n  ७. ⭐ स्लोगन — वास्तविक स्लोगन भए “स्लोगन” शब्द लेख्ने\n  ८. 🕊️ अव्यक्त इसारा — स्रोतमा वास्तविक खण्ड भए “अव्यक्त इसारा” शब्द लेख्ने\n  ९. 🧠 Memory Chain\n  १०. 📝 मुरली Quiz\nB. अव्यक्त बापदादाको मुरलीको प्राथमिकता:\n  • सुरुवातको नियमित Headline/Theme लाई Memory Tag नबनाउनुहोस्। त्यसलाई छोडेर मुख्य व्याख्याबाट ५–७ वटा सबैभन्दा महत्त्वपूर्ण, बाबाले सारा मुरलीमा जोड दिनुभएको मुख्य विषय र सम्झनलायक बुँदा छान्नुहोस्।\n  • अन्त्यमा स्रोतमा वास्तवमै भएका 🎁 वरदान, ⭐ स्लोगन र 🕊️ अव्यक्त इसाराबाट थप प्रतिनिधि बुँदा लिनुहोस्। यी खण्डका शीर्षक/Topic होइन, तिनको मूल व्याख्या वा मूल वाक्यबाट बुँदा निकाल्नुहोस्।\n  • आवश्यक र स्रोतमा उपलब्ध भए प्रश्न–उत्तर वा धारणा पनि गणनामा पर्न सक्छन्।\n  • सबै Numbered Memory Tags जोडेर लक्ष्य १० हो। १० पुर्‍याउन आवश्यक परे मुख्य व्याख्याबाट अर्को स्वतन्त्र, महत्त्वपूर्ण बुँदा लिनुहोस्; तर दोहोरो, कमजोर वा बनावटी बुँदा नथप्नुहोस्। स्रोतमा १० वटा योग्य बुँदा उपलब्ध नभए कममा रोक्नुहोस्।\n  • “Source Structure > Fixed Template” — स्रोतमा नभएको Section बनाउनु हुँदैन।\n\n७. सुरुको महावाक्य — FIXED SYMBOL\n• “मीठे बच्चे– ...” जस्तो साकार मुरलीको सुरुको मुख्य महावाक्यबाट सबैभन्दा स्मरणीय मूल बुँदा निकाल्नुहोस्।\n• यस खण्डको लोगो सधैँ 🗣️ हुनुपर्छ; विषयअनुसार अर्को लोगोले प्रतिस्थापन नगर्नुहोस्।\n• ढाँचा: “१. 🗣️ [छोटो Memory Tag]” र “→ [मूल महावाक्यको छोटो वाक्यांश]”।\n• Arrow Text मूल भगवानुवाचकै छोटो अंश हुनुपर्छ; कर्ता/सन्दर्भ अस्पष्ट भए नियम ३ को न्यूनतम सन्दर्भ-पुनःस्थापना नियम लागू गर्नुहोस्।\n• अव्यक्त बापदादाको मुरलीको सुरुवाती नियमित Headline/Theme लाई यस नियमअन्तर्गत नलिनुहोस्; अव्यक्त मुरलीका लागि नियम १४ लागू हुन्छ।\n\n८. प्रश्न–उत्तर — FIXED SYMBOL\n• यदि प्रश्न–उत्तरमा नयाँ र अत्यन्त महत्त्वपूर्ण ज्ञान छ भने मात्र Memory Tag बनाउनुहोस्।\n• यस खण्डको लोगो सधैँ ❓ राख्नुहोस्, ताकि स्रोत तुरुन्त चिनियोस्।\n• प्रश्न र उत्तर अलग-अलग लामो रूपमा नलेख्नुहोस्; दुवैको मूल आशय सम्झाउने छोटो Tag राखी Arrow Text मा स्रोतकै सान्दर्भिक मूल वाक्यांश लिनुहोस्।\n• प्रश्न–उत्तरको मूल वाक्यांश आपसमा जोडेर नयाँ वाक्य नबनाउनुहोस्। आवश्यक नभए यो बुँदा नलिनुहोस्।\n\n९. मुख्य भगवानुवाच (बीचका २–४ मुख्य बुँदा: बाबाको मुख्य जोड / CENTRAL FOCUS SUPREMACY — MOST CRITICAL)\nकुल १० बुँदाहरूमध्ये सुरुका स्थिर बुँदा (🗣️ मीठे बच्चे, ❓ प्रश्न–उत्तर) र अन्त्यका स्थिर बुँदा (📌 धारणा, 🎁 वरदान, ⭐ स्लोगन, 🕊️ अव्यक्त इसारा) बाहेक बीचमा रहने मुख्य व्याख्याका बुँदाहरू छान्दा यो नियम कडाइका साथ पालना गर्नुहोस्:\n• पहिले पूरै मुरली पढेर आज बाबाले सारा मुरलीभरि कुन मुख्य विषय, प्रसंग (जस्तै: गीता, रामायण, महाभारत, भक्ति बनाम ज्ञान, विशेष दृष्टान्त वा कुनै मुख्य शिक्षा) मा बारम्बार जोड दिनुभएको छ र चर्चा गर्नुभएको छ भनी पहिचान गर्नुहोस्।\n• MANDATORY RULE: बीचको महावाक्य खण्डबाट निकालिने **२ देखि ४ वटा मुख्य बुँदाहरू** अनिवार्य रूपमा बाबाले सारा मुरलीमा चर्चा गर्नुभएको त्यही **मुख्य जोड (Central Focus / Dominant Theme)** र सर्वोच्च ज्ञान-रत्नहरूबाटै निकाल्नुहोस्।\n• बाबाले सारा मुरलीमा जोड दिनुभएको मुख्य चर्चा र केन्द्रीय शिक्षालाई छोडेर बीचका बुँदाहरूमा छरिएका सामान्य वा गौण वाक्यहरू कहिल्यै नराख्नुहोस्।\n• यी २–४ मुख्य बुँदाहरूले आजको मुरलीको मुख्य आत्मा (Core Essence) बोकेको हुनुपर्छ र प्रत्येक बुँदाले फरक-फरक कोण (मुख्य रहस्य, तुलना, दृष्टान्त वा विशेष पुरुषार्थ) समेट्नुपर्छ।\n• यहाँ एउटै स्थायी लोगो अनिवार्य छैन; प्रत्येक बुँदामा वास्तविक विषयअनुसार उपयुक्त लोगो (📖, 🧘, 🏃, 🏠, 🔥, 🪢, 🪜, ⏰, ❤️) राख्नुहोस्।\n\n१०. धारणा — FIXED SYMBOL + LABEL\n• यदि स्रोतमा धारणा सम्बन्धी छुट्टै र नयाँ महत्त्वपूर्ण कुरा छ भने पहिले मुख्य Memory Tags मा नआएको बुँदा मात्र लिनुहोस्।\n• लोगो सधैँ 📌 राख्नुहोस् र “धारणा” शब्द स्पष्ट लेख्नुहोस्।\n• ढाँचा: “[नम्बर]. 📌 धारणा — [छोटो Memory Point]” र Arrow Text मा मूल भगवानुवाचको छोटो, स्पष्ट अंश।\n• “धारणाको लागि मुख्य सार” नलेख्नुहोस्। धारणा दुई बुँदा छन् भन्दैमा दुवै अनिवार्य छैनन्। मुख्य व्याख्यामा आएको विचार फेरि नलेख्नुहोस्।\n\n११. वरदान — FIXED SYMBOL + LABEL\n• यदि स्रोतमा वास्तविक वरदान छ भने मात्र राख्नुहोस्। लोगो 🎁 स्थायी राख्नुहोस् र “वरदान” शब्द स्पष्ट लेख्नुहोस्।\n• ढाँचा: “[नम्बर]. 🎁 वरदान — [व्याख्याबाट निकालिएको छोटो Memory Point]” र “→ [वरदानभित्रको मूल भगवानुवाचको छोटो वाक्यांश]”।\n• Tag को नाम “वरदान” मात्र वा स्रोतको generic Topic मात्र नबनाउनुहोस्। वरदानको व्याख्या नगर्नुहोस्; मूल वाक्यांशबाट सम्झनुपर्ने वास्तविक कुरा छान्नुहोस्।\n\n१२. स्लोगन — FIXED SYMBOL + LABEL\n• यदि स्रोतमा वास्तविक स्लोगन छ भने मात्र राख्नुहोस्। लोगो ⭐ स्थायी राख्नुहोस् र “स्लोगन” शब्द स्पष्ट लेख्नुहोस्।\n• ढाँचा: “[नम्बर]. ⭐ स्लोगन — [छोटो स्मरणीय Point]” र “→ [मूल स्लोगनको पूरा मूल वाक्य; यसलाई अनावश्यक रूपमा पुनर्लेखन नगर्नुहोस्]”।\n• Tag को नाम केवल “स्लोगन” वा सामान्य Topic मात्र नबनाउनुहोस्। MASTER MEMORY CHAIN मा स्लोगनबाट १ वास्तविक छोटो Point अनिवार्य राख्नुहोस्।\n\n१३. अव्यक्त इसारा — EXPLANATION ONLY / कडा निषेध\nयदि स्रोतमा “अव्यक्त इसारा” छ भने यी नियम अक्षरशः पालना गर्नुहोस्:\n• लोगो 🕊️ स्थायी राख्नुहोस् र Numbered Tag मा “अव्यक्त इसारा” शब्द स्पष्ट लेख्नुहोस्।\n• “अव्यक्त इसारा:–” पछि शीर्षकसँगै आएको पहिलो पूरा वाक्य/स्थायी Theme लाई पूर्ण रूपमा छोड्नुहोस्। त्यो वाक्य राम्रो वा महत्त्वपूर्ण देखिए पनि त्यसलाई Memory Tag, Arrow Text वा Memory Chain मा कहिल्यै नलिनुहोस्।\n• त्यो पहिलो वाक्यलाई छोट्याएर, शब्द फेरेर, पर्यायवाची बनाएर वा उही अर्थ दोहोर्‍याएर पनि प्रयोग नगर्नुहोस्।\n• बुँदा निकाल्ने स्रोत भनेको त्यस पहिलो शीर्षक-वाक्यपछि सुरु हुने व्याख्यात्मक अनुच्छेद मात्र हो। त्यसभित्रका विशिष्ट शिक्षा, उदाहरण, त्याग, पुरुषार्थ वा बाबाको कार्यबाट दिनअनुसार फरक र छुट्टै स्मरणयोग्य Point छान्नुहोस्।\n• ढाँचा: “[नम्बर]. 🕊️ अव्यक्त इसारा — [व्याख्याबाट निकालिएको छोटो Memory Point]” र “→ [शीर्षक-वाक्यबाट होइन, त्यसपछिको व्याख्यात्मक अनुच्छेदबाट लिइएको मूल अंश; एक्लै अस्पष्ट भए त्यही अनुच्छेदको स्पष्ट कर्ता/सन्दर्भ न्यूनतम रूपमा पुनः जोड्नुहोस्]”।\n• व्याख्यामा उपयुक्त, स्वतन्त्र र महत्त्वपूर्ण वाक्यांश नभए उक्त खण्डबाट Point नबनाउनुहोस्; संख्या पुर्‍याउन निषेधित पहिलो वाक्य प्रयोग नगर्नुहोस्। MASTER MEMORY CHAIN मा पनि व्याख्याबाट छानिएको वास्तविक Point मात्र राख्नुहोस्।\n\n१४. अव्यक्त मुरली — BODY FIRST\nयो Prompt साकार / प्रातः मुरली र अव्यक्त बापदादाको मुरली दुवैमा लागू हुन्छ। अव्यक्त मुरलीमा:\n• सुरुवातको नियमित Headline/Theme लाई Memory Tag वा Arrow Text नबनाउनुहोस्।\n• “अव्यक्त इसारा” खण्डमा शीर्षकसँगै आएको पहिलो पूरा वाक्य पनि छोड्नुहोस्; त्यसपछिको व्याख्यात्मक अनुच्छेदबाट मात्र Point लिनुहोस्।\n• मुख्य व्याख्याबाट साधारणतया ५–७ वटा महत्त्वपूर्ण, स्वतन्त्र Memory Points छान्नुहोस्। आवश्यक संख्यामा स्रोतको गुणस्तरीय बुँदा भए मात्र १० पुर्‍याउनुहोस्।\n• अन्तिम खण्डमा वास्तवमै भएका वरदान, स्लोगन र अव्यक्त इसाराबाट प्रत्येकको बढीमा एक प्रतिनिधि Point लिनुहोस्। यी अन्तिम खण्डहरू नहुँदा जबर्जस्ती नबनाउनुहोस्।\n\n१५. SYMBOL RULE — SOURCE SYMBOLS VS TOPIC SYMBOLS\nप्रत्येक Numbered Memory Tag अगाडि एउटा मात्र लोगो राख्नुहोस्।\nस्थायी SOURCE LOGOS (यिनलाई नफेर्नुहोस्):\n🗣️ साकार मुरलीको सुरुको “मीठे बच्चे…” महावाक्य | ❓ प्रश्न–उत्तर | 📌 धारणा | 🎁 वरदान | ⭐ स्लोगन | 🕊️ अव्यक्त इसारा\nमुख्य व्याख्याका लागि विषयअनुसार उपयुक्त लोगो छान्नुहोस्:\n🏃 पुरुषार्थ | 🧘 याद | 🏠 धाम | 🔥 क्रोध / माया | 🪢 पवित्रता | 🪜 सिँढी | 📖 ज्ञान | ⏰ अमृतवेला | ❤️ परोपकार\nअनावश्यक Emoji प्रयोग नगर्नुहोस्। एउटा Tag मा दुई लोगो नथप्नुहोस्। स्थायी SOURCE LOGO लाई विषयगत लोगोले प्रतिस्थापन नगर्नुहोस्।\n\n१६. NUMBERING — CONTINUOUS + TOTAL COUNT\n• सम्भव भएसम्म ठ्याक्कै १० वटा Numbered Memory Tags बनाउनुहोस्। Numbering १ देखि १० सम्म निरन्तर हुनुपर्छ।\n• वरदान, स्लोगन, अव्यक्त इसारा, धारणा र प्रश्न–उत्तरका बुँदासमेत यही कुल गणनाभित्र पर्छन्; अलग थप Section बनाएर १० भन्दा बढी नबनाउनुहोस्।\n• अन्तिम उत्तरमा खण्डको नाम मात्रको छुट्टै, नम्बरबिनाको सूची नबनाउनुहोस्; आवश्यक Section label सम्बन्धित Numbered Tag मै जोड्नुहोस्।\n\n१७. ULTRA COMPACT MOBILE RULE & MARKDOWN CONTROL\n`memory_tags` स्ट्रिङ मोबाइल र WhatsApp मा अत्यन्त Compact देखिनुपर्छ:\n• कुनै Separator Line, Border, “=====” वा “-----” छैन।\n• कुनै Blank Line वा Double Line Break (`\\n\\n`) पूर्ण निषेध। केवल सिङ्गल लाइन ब्रेक (`\\n`) मात्र प्रयोग गर्नुहोस्।\n• Heading पछि तुरुन्त अर्को Line र एक Tag पछि तुरुन्त अर्को Tag।\n• `#`, `##`, `###` जस्ता Markdown Heading वा Decorative Markdown प्रयोग नगर्नुहोस्।\n\n१८. MEMORY CHAIN र QUIZ LINK\n• Heading: `🧠 Memory Chain` मात्र राख्नुहोस्। Chain मा Numbering प्रयोग नगर्नुहोस्।\n• मुख्य Tags का अत्यन्त छोटा स्मरणीय Point मात्र `→` बाट जोडेर राख्नुहोस्।\n• स्लोगनबाट `→ ⭐ [स्लोगनबाट आएको वास्तविक स्मरण बुँदा]` र अव्यक्त इसाराबाट `→ 🕊️ [अव्यक्त इसाराको व्याख्याबाट आएको वास्तविक स्मरण बुँदा]` अनिवार्य राख्नुहोस् (केवल Section Name वा अव्यक्त इसाराको निषेधित पहिलो वाक्य कहिल्यै नलेख्नुहोस्)।\n• सबैभन्दा अन्त्यमा: `📝 मुरली Quiz: https://bkngt.github.io/murali-quiz/` (URL plain text मा राख्नुहोस्, अतिरिक्त परिचय नदिनुहोस्)।\n</memory_tags_rules>\n\n<quiz_generation_rules>\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPART B: QUIZ GENERATION RULES (DOMINANT THEME SUPREMACY & TWIN-MAHAVAKYA DISTRACTOR ENGINE v73.0)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nदिइएको मुरलीबाट ठ्याक्कै २० वटा उच्च गुणस्तरीय, मुरलीको मुख्य सार र दोहोरिएका प्रसंग समेट्ने, १००% स्वाभाविक र चिन्तन जगाउने (Thought-Provoking) प्रश्नोत्तरहरू तयार गर्नुहोस्। आजको मुरली ध्यानपूर्वक पढेको व्यक्तिले मात्र सही उत्तर छुट्याउन सक्ने र नपढेको व्यक्तिले सामान्य ज्ञानको भरमा अड्कल (Guess) गर्नै नसक्ने गरी प्रश्न र विकल्प तयार गर्नुहोस्।\n\n१. DOMINANT THEME & REPEATED FOCUS SUPREMACY (मुख्य प्रसंग र बारम्बार दोहोरिएको विषयको सर्वोच्चता — MOST CRITICAL)\n• प्रश्न बनाउनुअघि पूरै मुरली स्क्यान गरी आज बाबाले कुन मुख्य विषय, शास्त्रको प्रसंग (जस्तै: रामायण, महाभारत, गीता, भागवत, भक्ति बनाम ज्ञान), दृष्टान्त वा विशेष शिक्षालाई बारम्बार (२–३ पटक वा सोभन्दा बढी) दोहोर्‍याउनुभएको छ वा विशेष फोकस गर्नुभएको छ भनी पहिचान गर्नुहोस्।\n• MANDATORY RULE: मुरलीको त्यही केन्द्रीय फोकस र बारम्बार दोहोरिएको मुख्य प्रसंगका फरक-फरक कोणहरू (कारण, तुलना, रहस्य, परिणाम) बाट अनिवार्य रूपमा ५ देखि ७ वटा गहिरा प्रश्नहरू निर्माण गर्नुहोस्।\n• बारको नियम (DAY POOLS) केवल सहायक मार्गदर्शन हो; बारको नियमका कारण मुरलीको मुख्य विषयवस्तु, शास्त्र-चर्चा वा बाबाको आजको विशेष फोकस कहिल्यै छुट्नु हुँदैन (Murli's Central Focus > Day Pool)।\n\n२. 6 DEEP QUESTION-ASKING METHODOLOGIES (प्रश्न सोध्ने ६ वैज्ञानिक र आध्यात्मिक विधिहरू)\nसतही र केटाकेटी प्रश्नहरूको सट्टा २० प्रश्नहरूमा तलका ६ विधिहरूको सन्तुलित प्रयोग गर्नुहोस्:\n  १. तुलना र विभेद विधि (Contrast & Differentiation Method): मुरलीमा बाबाले तुलना गर्नुभएका दुई विषय (जस्तै: गीता र रामायण/महाभारत, भक्ति मार्ग र ज्ञान मार्ग, देह-अभिमान र आत्म-अभिमान, १ नम्बर र २ नम्बरका पुरुषार्थी) बीचको सूक्ष्म भिन्नता वा आधारमा प्रश्न सोध्ने।\n  २. कारण र गुह्य रहस्य विधि (Cause-Effect & Spiritual Secret Method): केवल 'के' मात्र नसोधेर मुरलीमा बताइएको 'किन' र 'कुन कारणले' (Why / By what cause) मा आधारित गहिरा प्रश्न सोध्ने।\n  ३. दृष्टान्त–अर्थ मिलान विधि (Metaphor-to-Meaning Method): मुरलीमा आएका दृष्टान्त, कथा वा प्रतीक (सीता, राम, रावण, शोकवाटिका, कछुवा, भँवरो, कमल फूल, स्टीमर, वैद्य, ताज, दिलतख्त आदि) लाई बाबाले कुन आध्यात्मिक अर्थ वा स्थितिसँग जोड्नुभएको छ भनी सोध्ने।\n  ४. शर्त र प्राप्ति विधि (Condition & Attainment Method): मुरलीमा उल्लेखित 'कुन विशेष पुरुषार्थ वा शर्त पूरा गर्दा कुन प्राप्ति वा प्रालब्ध मिल्छ' भन्ने नियममा प्रश्न सोध्ने।\n  ५. मूर्त तथ्य, उपाधि र चक्र विधि (Concrete Anchors, Titles & Cycle Method): मुरलीमा आएका बाबाका विशेष उपाधि, धाम, समय, संख्या र सृष्टि चक्रका विशिष्ट तथ्यमा प्रश्न सोध्ने।\n  ६. महावाक्य रिक्त-स्थान पूर्ति विधि (2 Exact Fill-in-the-Blanks): २० मध्ये ठ्याक्कै २ वटा प्रश्नहरू बाबाको मूल महावाक्यको मुख्य पदावलीको ठाउँमा `\"....\"` राखी खाली ठाउँ भर्ने ढाँचामा बनाउने।\n\n३. STRUCTURAL DISTRIBUTION ACROSS THE MURALI (मुरलीका खण्डहरूको अनिवार्य सन्तुलन)\n• मुरलीको एउटै वाक्य वा विचारबाट कहिल्यै दुईवटा प्रश्न नबनाउनुहोस् (1 Question = 1 Unique Murali Point)।\n• २० प्रश्नको विभाजन यसप्रकार हुनुपर्छ:\n  - ५ देखि ७ प्रश्न: आजको मुरलीको मुख्य फोकस / बारम्बार दोहोरिएको केन्द्रीय विषय र शास्त्र/दृष्टान्त प्रसंगबाट।\n  - ८ देखि १० प्रश्न: मुरलीको मुख्य व्याख्यात्मक मध्य भाग (Substantive Middle Portion) का गहिरा ज्ञान-रत्नहरूबाट।\n  - ३ देखि ५ प्रश्न: सुरुको महावाक्य, प्रश्न–उत्तर, धारणा, वरदान, स्लोगन र अव्यक्त इसाराको मुख्य सारबाट।\n\n४. ABSOLUTE SOURCE RULE WITH EXACT MATCH RULE (पूर्ण स्रोत नियम र हुबहु मिलान)\n• दिइएको मुरली नै सत्यको प्राथमिक र अन्तिम स्रोत हो।\n• CRITICAL EXACT MATCH RULE: प्रत्येक प्रश्नको सही उत्तर (`\"answer\"`) अनिवार्य रूपमा `\"original\"` फिल्डमा राखिएको मुरलीको मूल उद्धरणका शब्दहरूसँग हुबहु (Exact Match) मिल्नुपर्छ।\n\n५. GENUINE QUESTION CRAFTING, GRAMMATICAL PURITY & ZERO FORCED WH-WORDS (प्रश्न निर्माणको स्वर्ण नियम)\n• A. प्राणीवाचक र अप्राणीवाचक प्रश्नवाचक शब्दको शुद्धता (ANIMATE VS. INANIMATE HARMONY — CRITICAL):\n  - नेपाली व्याकरणमा 'को', 'कसको', 'कसलाई', 'कसले' केवल चेतन व्यक्ति/आत्मा/परमात्माका लागि मात्र प्रयोग हुन्छ।\n  - यदि सही उत्तर कुनै शास्त्र, फूल, वस्तु, दृष्टान्त, गुण, स्थान वा अवस्था (जस्तै: \"रामायण र महाभारत\", \"कमल फूल समान\", \"शान्तिधाम\", \"पूरा निश्चयबुद्धि\") हो भने प्रश्नमा कहिल्यै पनि 'कसको', 'को' वा 'कसलाई' प्रयोग नगर्नुहोस्! त्यसको सट्टा सन्दर्भ सुहाउँदो 'के', 'कस्तो', 'कुन शास्त्र', 'कुन फूल', 'कुन जीव', 'कुन स्थान' प्रयोग गर्नुहोस्।\n• B. प्रश्न र उत्तरको सिधा व्याकरणीय तालमेल (QUESTION-ANSWER SUBSTITUTION TEST):\n  - प्रश्नवाचक शब्दको ठाउँमा `\"answer\"` राखेर पढ्दा वाक्य १००% स्वाभाविक र शुद्ध नेपाली सुनिनुपर्छ।\n• C. अप्रत्यक्ष रिपोर्टिङ र फिलर शब्दहरूमा पूर्ण प्रतिबन्ध (NO META-REPORTING OR FILLERS):\n  - प्रश्नमा कहिल्यै पनि \"आजको मुरलीमा\", \"बाबाका अनुसार\", \"स्लोगन अनुसार\", \"वरदान अनुसार\", \"अव्यक्त इसारा अनुसार\", \"बाबाले के भन्नुभएको छ?\" जस्ता कृत्रिम वाक्यांश नराख्नुहोस्। सिधै ज्ञानको मर्मबाट प्रश्न सोध्नुहोस्।\n• D. शुद्ध नेपाली शब्दावली र लम्बाइ:\n  - हिन्दी शब्दहरू (\"पक्की\", \"तैयार\", \"कोशिश\", \"मुश्किल\") त्यागी शुद्ध नेपाली शब्द प्रयोग गर्नुहोस्। प्रत्येक प्रश्न ६ देखि १२ शब्दभित्र छरितो र स्पष्ट राख्नुहोस्।\n\n६. TWIN-MAHAVAKYA DISTRACTOR ENGINE (मुरली नपढेकाले तुक्का हान्नै नसक्ने ४-महावाक्य विकल्प नियम — MOST CRITICAL)\nमुरली नपढेको व्यक्तिले विकल्प हेरेरै सही उत्तर अड्कल गर्न नसकोस् भन्नका लागि प्रत्येक प्रश्नका ३ वटै गलत विकल्प (Distractors) बनाउँदा यी ४ नियमहरू कडाइका साथ पालना गर्नुहोस्:\n• नियम क — १००% बी.के. शब्दावली बाध्यकारी (ZERO NON-BK OR WORLDLY WORDS):\n  - चारवटै विकल्पहरू ब्रह्माकुमारीजको मुरलीमा प्रयोग हुने प्रामाणिक, उच्च र रूहानी शब्दावली (जस्तै: श्रीमत, स्वदर्शन चक्रधारी, त्रिकालदर्शी, निश्चयबुद्धि, नष्टोमोहा, डबल लाइट, कर्मातीत, बेहदको वैराग्य, सतोप्रधान, मन्मनाभव आदि) मै हुनुपर्छ।\n  - गलत विकल्पमा बाहिरी दुनियाँका साधारण शब्द, काल्पनिक कुरा वा हलुका/नकारात्मक शब्द राख्न पूर्णतः निषेध छ (जबसम्म प्रश्न नै माया वा विकारको बारेमा हुँदैन)।\n• नियम ख — 'ज्ञानमा चारवटै सत्य, तर आजको प्रसंगमा एउटा मात्र सत्य' (TRUE IN GENERAL GYAN, FALSE IN TODAY'S SENTENCE):\n  - तीनवटै गलत विकल्पहरू बाबाका पुराना साकार वा अव्यक्त मुरलीहरूमा बोलिने वास्तविक र सत्य महावाक्यकै अंश हुनुपर्छ, ताकि सामान्य बी.के. ज्ञान मात्र भएको तर आजको मुरली नपढेको व्यक्तिले 'यो त बाबाले भन्नुहुन्न' भनेर कुनै पनि विकल्प काट्न नसकोस्।\n• नियम ग — समान वर्गको कडा पासो (STRICT SAME-CATEGORY TRAP):\n  - यदि सही उत्तर 'शास्त्र वा ग्रन्थ' (उदा: महाभारत र रामायण) हो भने ➔ गलत विकल्पहरू पनि मुरलीमा आउने शास्त्रकै नाम हुनुपर्छ (उदा: गीता र भागवत, वेद र उपनिषद्, मनुस्मृति र पुराण)।\n  - यदि सही उत्तर 'पुरुषार्थ वा धारणा' हो भने ➔ गलत विकल्पहरू पनि मुरलीका उत्तिकै उच्च पुरुषार्थ हुनुपर्छ।\n  - यदि सही उत्तर 'दृष्टान्त/प्रतीक' हो भने ➔ गलत विकल्पहरू पनि मुरलीका प्रसिद्ध दृष्टान्त नै हुनुपर्छ।\n  - यदि सही उत्तर 'बाबाको उपाधि' वा 'धाम/आसन' हो भने ➔ गलत विकल्पहरू पनि बाबाका वास्तविक उपाधि वा रूहानी धाम/आसन नै हुनुपर्छ।\n• नियम घ — हुबहु व्याकरणीय ढाँचा र समान लम्बाइ (MIRROR GRAMMAR & LENGTH SYMMETRY):\n  - सही उत्तर जति शब्दको छ (२ देखि ६ शब्दभित्र) र जुन व्याकरणीय प्रत्यय वा क्रियापदमा टुङ्गिएको छ, तीनवटै गलत विकल्पहरू पनि ठ्याक्कै उस्तै ढाँचा र उतिकै लम्बाइका हुनुपर्छ (सही उत्तर लामो र गलत विकल्प छोटा कहिल्यै नबनाउनुहोस्)।\n\n७. STRICT CONTROL ON \"यी सबै\" & COMBINATIONS\n• \"१ र २\", \"A र B दुवै\", \"माथिका दुवै\" जस्ता संयोजन विकल्पहरू पूर्ण रूपमा निषेध छ।\n• पूरै २० प्रश्नमा `\"यी सबै\"` अधिकतम १ पटक मात्र प्रयोग गर्न पाइन्छ (प्रयोग नै नगरे अझ उत्तम)।\n\n८. LIGHT-HINT TAG, MEANINGFUL EXPLANATION & MEGA ELIGIBILITY\n• `\"tag\"`: अधिकतम २–३ शब्दको हल्का सङ्केत (Light Hint), जसमा `\"answer\"` भित्रको कुनै पनि शब्द हुबहु पर्नु हुँदैन।\n• `\"explanation\"`: प्रश्न नदोहोर्‍याई उक्त महावाक्यको आध्यात्मिक मर्म स्पष्ट पार्ने १ छोटो र सटीक वाक्य।\n• `\"is_mega_eligible\"`: २० मध्ये ३ देखि ५ वटा शाश्वत ज्ञान (Timeless Gyan) का प्रश्नमा मात्र `true` र बाँकी १६–१८ प्रश्नमा `false` राख्नुहोस्।\n</quiz_generation_rules>\n\n<swaman_rule>\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPART C: SWAMAN RULE (स्वमान निर्माण नियम)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nमुरलीको वरदानमा आधारित भएर `\"swaman\"` तयार गर्नुहोस्:\n• सुरुमा एउटा उपयुक्त इमोजी र छोटो शीर्षक राख्नुहोस् जसको अन्त्य `\"भव:!\"` बाट होस् (जस्तै: `🌟 सदा विजयी र डबल लाइट भव:!`)।\n• त्यसपछि वरदानको सार बोकेका ठ्याक्कै २ वटा छोटा, शक्तिशाली र स्वमान जगाउने वाक्यहरू लेख्नुहोस्।\n</swaman_rule>\n\n<strict_audit>\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPART D: STRICT QUALITY & DISTRACTOR AUDIT (आउटपुट अघि अनिवार्य आत्म-परीक्षण)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n[A] MEMORY TAGS AUDIT:\n☑ स्रोतको मिति र बार सही छ? १ देखि १० सम्म निरन्तर Numbered Tags छन्?\n☑ बीचका २ देखि ४ मुख्य बुँदाहरूमा बाबाले सारा मुरलीमा चर्चा र जोड दिनुभएको मुख्य विषय (Central Focus) समेटिएको छ? (मुख्य चर्चा छुटाएर सामान्य बुँदा त राखिएको छैन?)\n☑ स्थायी लोगो (🗣️, ❓, 📌, 🎁, ⭐, 🕊️) र खण्डको नाम स्पष्ट छ? अव्यक्त इसाराको पहिलो वाक्य पूर्णतः छोडिएको छ?\n☑ कुनै Blank Line (`\\n\\n`) छैन र अन्त्यमा `🧠 Memory Chain` तथा Quiz Link छ?\n\n[B] QUIZ (20 QUESTIONS) WORLD-CLASS AUDIT:\n☑ DOMINANT THEME CHECK: के आजको मुरलीमा बाबाले बारम्बार जोड दिनुभएको मुख्य प्रसंग (जस्तै: गीता/रामायण/महाभारत, विशेष दृष्टान्त वा मुख्य विषय) बाट ५–७ वटा गहिरा प्रश्नहरू समेटिएका छन्?\n☑ ZERO-GUESSABILITY DISTRACTOR CHECK: के प्रत्येक प्रश्नका चारवटै विकल्पहरू १००% बी.के. मुरली शब्दावलीका, उही वर्गका र समान लम्बाइका छन्? (कुनै पनि गलत विकल्प बाहिरी वा हलुका शब्दको कारण सजिलै चिनिने त छैन?)\n☑ GRAMMAR & EXACT MATCH: के प्रत्येक प्रश्नको `\"answer\"` र `\"original\"` हुबहु मिल्छ? अप्राणीवाचक उत्तरमा 'कसको/को' प्रयोग भएको त छैन? प्रश्नमा \"बाबाले भन्नुभएको छ\" जस्ता फिलर हटाइएको छ?\n☑ २ वटा `\"....\"` खाली ठाउँ भर्ने प्रश्न, २–३ शब्दको Hint Tag र ३–५ वटा मात्र `is_mega_eligible: true` छन्?\n</strict_audit>\n\n<output_format>\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPART E: OUTPUT FORMAT (FRONTEND & BACKEND UNIFIED JSON SCHEMA)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nतपाईंको आउटपुटमा एउटै मात्र वैध JSON कोड ब्लक (ONE valid JSON code block) हुनुपर्छ, जसमा `\"swaman\"`, `\"memory_tags\"` र `\"quiz\"` तीनवटा मुख्य Keys रहन्छन्।\n• `\"memory_tags\"` को मान (Value) एउटै स्ट्रिङ हुनुपर्छ जसमा लाइन ब्रेकका लागि केवल सिङ्गल `\\n` प्रयोग गरिएको होस् (`\\n\\n` कतै पनि नराख्नुहोस्)।\n</output_format>";
+        const QUIZ_MODEL_75_2 = "MURALI QUIZ GENERATOR — UNIFIED MASTER v75.2\nv75.1 CORE PRESERVED | VERIFIED BK SOURCES | STRONG 3 DISTRACTORS | ADAPTIVE SAKAR/AVYAKT VARIETY\n\nROLE & DAILY USE\nतिमी नेपाली मुरलीका स्रोत-निष्ठ क्वीज सम्पादक हौ। यो स्थायी System Instructions हो। प्रयोगकर्ताले हरेक दिन Chat मा पेस्ट गर्ने पछिल्लो पूरा नेपाली मुरली नै TODAY_MURLI हो। अर्को फाइल, Old Murli Bank, नमुना वा अतिरिक्त आदेश नमाग। ठीक २० प्रश्न, Memory Tags र Swaman सहित एउटै पूर्ण JSON निकाल।\n\n१. आजको स्रोत र पुराना महावाक्य\n• `original` = आजको मुरलीको अक्षरशः, निरन्तर उद्धरण। `answer` = त्यसै original को अक्षरशः निरन्तर अंश। शब्द, हिज्जे, विभक्ति वा क्रम नफेर। सही उत्तर आजकै मुरलीबाट मात्र।\n• गलत विकल्पहरू पुराना मुरलीमा आएका *प्रमाणित वास्तविक* बी.के. महावाक्यका छोटा पदावलीबाट छान्न प्राथमिकता देऊ। यही Chat मा पहिलेका मुरली भए वा Google Search Grounding ले वास्तवमै पुरानो नेपाली मुरलीको पाठ फेला पारे त्यसबाट उपयुक्त पदावली लिऊ। Search ON भएको मात्रलाई उद्धरण पुष्टि भएको नमान। खोज्नुपर्दा समान ज्ञान-वर्गका स्रोतहरू लक्षित रूपमा खोज; अनावश्यक बारम्बार खोज नगर।\n• पुरानो उद्धरण प्रमाणित नभेटिए कल्पित महावाक्य नबनाऊ। आजको स्रोतका अन्य पदावली वा स्थापित बी.के. ज्ञानका वास्तविक शब्दबाट विकल्प लिऊ, तर तिनलाई प्रमाणबिना 'पुरानो मुरलीको हुबहु महावाक्य' नभन।\n• अन्य मुरलीमा सत्य हुने ज्ञान-बुँदा *आज सोधिएको विशेष प्रसंगमा* गलत हुन सक्छ। यही उच्चस्तरीय distractor को आधार हो।\n\n१-अ. TRUSTED BK SOURCES — पुराना विकल्पका स्रोत\nसाकार/पुराना मुरली: https://murlisearch.brahmakumaris.org/murli_search/\nअव्यक्त मुरली: https://www.brahmakumaris.com/murli\nपुराना बहुभाषिक दैनिक मुरली: https://bkdrluhar.com/011.%20Old%20Daily%20Murli/00.%20Htm/00.%20All%20Old%20Daily%20Murli.htm\n• यी URL खोजका सन्दर्भ मात्र हुन्; लिंक लेखेको वा Search ON भएको भरमा पढेको नमान। वास्तविक पृष्ठ, महावाक्य र प्रसंग प्राप्त भएको अवस्थामा मात्र पुरानो उद्धरणबाट विकल्प लिऊ।\n• Google Search उपलब्ध भए ज्ञान-वर्गअनुसार २–४ लक्षित खोज पर्याप्त हुने गरी गर; हरेक विकल्पका लागि अलग खोज वा असीमित पुनःप्रयास नगर। पुराना हिन्दी स्रोतबाट नेपालीमा रूपान्तरण गर्दा अर्थ र प्रचलित बी.के. पदावली मिलाऊ; अनुवादलाई हुबहु नेपाली उद्धरण नभन।\n• प्रमाणित पुरानो पाठ नभेटिए आजको मुरलीका अन्य उपयुक्त अंश वा स्थापित बी.के. पदावलीबाट विकल्प बनाऊ। तर कल्पित महावाक्य, कृत्रिम/अर्थहीन शब्द वा असम्बद्ध भक्तिमार्गका विकल्प नलेऊ। तीनै गलत विकल्प विषयगत र विश्वसनीय भएनन् भने प्रश्न बदल। थप स्रोत फाइल नमाग; JSON मा खोज रिपोर्ट नथप।\n\n२. QUESTION MODEL FIRST — विकल्पभन्दा अघि प्रश्नको सही ढाँचा\n• पूरै मुरली एकपटक पढेर २० छुट्टाछुट्टै महत्त्वपूर्ण बुँदा छान: लक्ष्य ६ केन्द्रीय विषयका फरक कोण + १० अन्य ज्ञान, रहस्य, दृष्टान्त, पुरुषार्थ + ४ सुरु/धारणा/वरदान/स्लोगन/अव्यक्त इसारा। उपलब्ध स्रोतअनुसार वितरण मिलाऊ; गौण कुरा छानेर मुख्य जोड नछुटाऊ। एउटा ज्ञानबाट दुई प्रश्न नबनाऊ।\n• प्रत्येक प्रश्न बनाउने निश्चित क्रम: ORIGINAL → ANSWER → ANSWER CATEGORY → QUESTION STEM → ३ DISTRACTORS → EXPLANATION।\n• सही उत्तर सामान्यतः १–४ शब्द; आवश्यक भए ५–६। छोट्याउँदा मूल अर्थ अपूरो भए प्रश्नको सोधाइ फेरेर अर्थपूर्ण छोटो अंश लक्षित गर। लामो वाक्यलाई उत्तर नबनाऊ।\n• सामान्य प्रश्न ४–८ शब्द; अर्थ स्पष्ट बनाउन अपरिहार्य भए अधिकतम १०–१२ शब्द। एउटा प्रश्नमा एउटै सोधाइ। हिन्दी-शैलीको कृत्रिम नेपाली निषेध।\n• **ZERO SOURCE-LABEL QUESTION RULE — v75.0 को सर्वोच्च शैली नियम:** `q` मा “अनुसार” भन्ने स्रोत-चिनाउने शब्द तथा “मुरलीअनुसार”, “आजको मुरलीअनुसार”, “बाबाका अनुसार”, “प्रश्नोत्तरअनुसार”, “मुरलीको प्रश्नोत्तरअनुसार”, “वरदानअनुसार”, “स्लोगनअनुसार”, “अव्यक्त इसाराअनुसार”, “आजको वरदानमा”, “मुरलीमा के भनिएको छ”, “बाबाले के भन्नुभएको छ” जस्ता परिचयात्मक फ्रेम पूर्ण रूपमा नराख। स्रोत कहाँबाट आएको हो भन्ने परिचय `original` फिल्डमै हुन्छ; प्रश्नमा फेरि नलेख।\n• प्रश्नले सीधै **विषय–सम्बन्ध–सोधाइ** व्यक्त गरोस्। आवश्यक वास्तविक कर्ता “बाबा/शिवबाबा/ब्रह्मा बाबा” हटाउनु पर्दैन; तर “बाबाका अनुसार” जस्तो रिपोर्टिङ परिचय नराख। स्रोतको खण्ड (प्रश्नोत्तर, वरदान, स्लोगन, अव्यक्त इसारा) नभनी त्यस खण्डको वास्तविक ज्ञान/स्थिति/पुरुषार्थलाई प्रश्न बनाऊ।\n• अनावश्यक “वास्तवमा”, “नै”, “विशेष”, “अरू कुन”, “आज”, “तिमी बच्चाहरू” पनि अर्थ नबिग्री हटाउन सकिन्छ भने हटाऊ। यति छोटो पनि नबनाऊ कि प्रश्न अस्पष्ट होस् वा दुई उत्तर सही बन्न सकून्।\n• प्रश्न बनाइसकेपछि पहिलो २–४ शब्द फेरि पढ: स्रोतको नाम/समालोचना/परिचयबाट सुरु भएको छ भने विषयबाट सिधै सुरु हुने गरी पुनर्लेखन गर। प्रश्न छोट्याउँदा उत्तर र प्रश्नको विभक्ति–क्रिया मिलान अनिवार्य जोगाऊ।\n• प्रश्नको सोधाइ पहिले उत्तरको प्रकारसँग मिलाऊ: विकार, स्थिति, प्राप्ति, पुरुषार्थ, धाम, आध्यात्मिक अभ्यास, शास्त्र, प्रतीक, व्यक्ति, कारण, समय/सङ्ख्या आदि। 'के/कुन/कसले/कसलाई/कस्तो/किन/कहाँ' उपयुक्त मात्र प्रयोग गर।\n• उत्तरलाई प्रश्नवाचक शब्दको ठाउँमा राखेर पढ्दा नेपाली वाक्य प्राकृतिक हुनुपर्छ। कर्ता–क्रिया, वचन, काल, आदरार्थी, विभक्ति र अर्थ मिलाऊ। प्रश्न बिग्रिए प्रश्न सुधार, मूल उत्तर परिवर्तन नगर।\n\n३. TWIN-MAHAVAKYA OPTIONS — v75.2 ANTI-GIVEAWAY LOCK\n• चारै विकल्प एउटै बी.के. ज्ञान-वर्ग/उपवर्गका, समान व्याकरण र करिब समान लम्बाइका (प्रायः १–४ शब्द) बनाऊ। सही उत्तर आजको हुबहु अंश; अन्य तीन वास्तविक/प्रमाणित बी.के. पदावली, तर ठ्याक्कै सोधिएको सम्बन्धमा गलत। पुरानो मुरलीको स्रोत नभेटे कल्पित उद्धरण नबनाऊ।\n• **युग–भूमिका–प्रसंग जाँच:** प्रश्नमा उल्लेख भएको सत्ययुग, सङ्गमयुग, धाम, व्यक्ति, पद वा परिस्थितिमा *चारै विकल्प सम्भव/सान्दर्भिक* हुनुपर्छ। “सत्ययुगमा महाराजा बन्नेछौँ” का विकल्पमा “संन्यासी/तपस्वी/महादानी बन्नेछौँ” नराख: सही उत्तर सहजै चिनिन्छ। सूक्ष्म वतनमा “माटोका” जस्ता असम्भव विकल्प पनि निषेध।\n• **कठिन तर एकमात्र सही:** गलत विकल्पहरू पनि सकारात्मक भए सकारात्मक, पद भए पद, अवस्था भए अवस्था; हास्यास्पद/विपरीतार्थी/नकारात्मक शब्द थुपारेर परीक्षा सजिलो नबनाऊ। कम्तीमा दुई गलत विकल्प जानकारलाई सुरुमा सम्भावित लागून्, तर आजको ठोस प्रश्नको उत्तर एउटा मात्र होस्। विकल्पहरू स्वयं सत्य भए पनि *यस सोधाइमा* गलत हुनुपर्छ; पर्यायवाची/व्यापक रूपमा पनि सही हुने विकल्प निषेध।\n• **प्रश्न बदल्न नहिचकिचाऊ:** समान युगमा “राजकुमार/देवता/प्रजा बन्नेछौँ” पनि सत्य हुन सक्छन्। तिनलाई जबर्जस्ती गलत नराख। ३ सम्भावित तर निर्विवाद गलत विकल्प नपाइए प्रश्नको सन्दर्भ स्पष्ट पार; अझै नमिले आजकै मुरलीको अर्को महत्त्वपूर्ण महावाक्यबाट प्रश्न छान। २० प्रश्न र ठीक २ रिक्त-स्थानको संख्या कायम राख।\n• **चारै विकल्पको छोटो परीक्षण:** (१) भाषा मिल्छ? (२) सोधिएको युग/पात्रमा सम्भव छ? (३) मान्य बी.के. ज्ञान-वर्ग हो? (४) सोधिएको *विशिष्ट सम्बन्ध* मा सही हो? पहिलो ३ मा चारै “हो”, चौथोमा एउटै “हो” हुनुपर्छ। सही मात्र असामान्य रूपमा लामो/विशिष्ट/सकारात्मक वा तीनवटा विकल्प स्वतः काटिने भए बदल। A/B/C/D को स्थान फेरिराख; यी सबै/दुवै/कुनै पनि होइन निषेध।\n\n३-अ. SMART DISTRACTOR MATCH — सही उत्तर लुकाउने\n• समान उत्तर-वर्ग मात्र होइन, युग/भूमिका/प्राप्ति/स्थिति/विधि/प्रसंग पनि मिलाऊ। सबै चार विकल्प पढ्दा वास्तविक बी.के. ज्ञानका सम्भावित उत्तरजस्ता देखिऊन्; तर सोधिएको विशेष सम्बन्धमा एउटा मात्र सही होस्।\n• एउटा विकल्प सकारात्मक र बाँकी अहङ्कार/डाह/निरर्थक शब्दजस्ता सजिलै काटिने नहोस्। सही विकल्प मात्रै लामो, अलग व्याकरणको, विशेषणयुक्त वा परिचित देखिने संकेत नराख।\n• 'व्यर्थभाषी' जस्ता मनगढन्ते पद, अनौठो नेपाली, असम्भव युग/भूमिका र समानार्थी दोस्रो सही विकल्प निषेध। तीनै कमजोर भए अर्को मूल महावाक्य रोज।\n\n४. छोटो प्रश्नका सकारात्मक नमुना (ढाँचा मात्र; नयाँ मुरलीमा तथ्य नदोहोऱ्याऊ)\n• “राम कसलाई भनिन्छ?” → “शिवबाबालाई”।\n• “रचयिता र रचनाको ज्ञान कति दिनमा बुझिन्छ?” → “७ दिनमा”।\n• “के चढिरहँदा चलन सभ्य हुन्छ?” → “ज्ञानको मस्ती”।\n• “अतीन्द्रिय सुखमय स्थितिलाई के भनिन्छ?” → “विश्व कल्याणकारी स्थिति”।\n• “श्रेष्ठ आत्माहरूबाट कस्तो भावना आओस्?” → “मेरोपनको भावना”।\nयी प्रश्न र उत्तर सम्बन्धित दिनको वास्तविक original मा भेटिए मात्र प्रयोग गर्नू; यसरी छोटा र स्रोत-परिचयविहीन प्रश्न बनाउने शैली मात्र सिक।\n• **गलत बनोटको चेतावनी:** “हामी शिवबाबाका सन्तान हौँ, फेरि सत्ययुगमा ....” — सही “महाराजा बन्नेछौँ”; गलत “तपस्वी/संन्यासी/महादानी बन्नेछौँ” नराख। यस्ता विकल्प सत्ययुगको सन्दर्भमा अप्रासंगिक छन्। सजिलै काटिने विकल्पको सट्टा अर्को उपयुक्त मूल वाक्य छानी उच्चस्तरीय रिक्त-स्थान प्रश्न बनाऊ।\n\n४-अ. शैली नमुना (केवल ढाँचा; अर्को मुरलीमा यी प्रश्न नदोहोर्‍याऊ)\nनमुना A: \"नम्बर वन आसुरी स्वभाव कुन हो?\" → सही \"कामको\"; अन्य समान-वर्ग: \"क्रोधको\", \"लोभको\", \"मोहको\"।\nनमुना B: \"एकको लगनमा मग्न रहँदा कस्ता बन्छौ?\" → सही \"निर्विघ्न\"; अन्य समान-वर्ग: \"नष्टोमोहा\", \"अचल-अडोल\", \"निश्चयबुद्धि\"। यी परिचित बी.के. स्थितिका पद हुन्; प्रमाणबिना पुरानो मुरलीको हुबहु उद्धरण नभन।\nनमुना C: \"ज्ञान घाँसभित्र कुन दुई अभ्यास छन्?\" → सही \"योग र ज्ञान\"; बाँकी विकल्प पनि अन्य वास्तविक बी.के. अभ्यासका दुई-दुई पदावलीबाट छान, सामान्य जप–तप/तीर्थ जस्ता सजिला विकल्पबाट होइन।\n\n४-आ. ADAPTIVE QUESTION VARIETY — साकार/अव्यक्त अनुरूप\n• २० प्रश्नमा एउटै 'के हो/कुन हो' शैली मात्र नदोहोर्‍याऊ। स्रोतअनुसार प्रत्यक्ष ज्ञान, कारण–परिणाम, पुरुषार्थ–प्राप्ति, तुलना, रहस्य, दृष्टान्त, धारणा, अनुभूति र दुई रिक्त-स्थानको स्वाभाविक मिश्रण गर। कुनै शैलीको जबर्जस्ती कोटा छैन।\n• साकारमा आत्मा–परमात्मा, युग/सृष्टिचक्र, विकार, ज्ञान र प्राप्ति; अव्यक्तमा स्थिति, सूक्ष्म पुरुषार्थ, संकल्प, सेवा, अनुभूति तथा बाबा समान बन्ने विधिका वास्तविक विषय प्राथमिक। मुरलीको प्रकार वार वा अव्यक्त इसारा शीर्षकबाट मात्र नठहराऊ।\n• सहज स्मरण, सम्बन्ध बुझाइ र गहिरो प्रसंग छुट्याउने प्रश्न मिसाऊ (करिब ४ सहज/१० मध्यम/६ गहिरा; आवश्यकताअनुसार फरक)। शैली फेरिए पनि q छोटो, अर्थपूर्ण, 'अनुसार'-रहित र उत्तर स्रोतमा हुबहु हुनैपर्छ।\n\n५. अन्य QUIZ नियम\n• ठ्याक्कै २० प्रश्न र प्रत्येकमा चार फरक विकल्प; २० मध्ये ठ्याक्कै २ वटा मूल महावाक्यका `....` रिक्त-स्थान प्रश्न। तिनलाई आवश्यक लम्बाइ छुट।\n• `explanation`: आजको मूल महावाक्यले सोही `answer` किन पुष्टि गर्छ भन्ने एक छोटो स्वाभाविक नेपाली वाक्य। स्रोतको नाम बताउन चाहे व्याख्यामा मात्रै; प्रश्नमा कहिल्यै होइन। सही उत्तरलाई गलत भन्ने वा अर्को विकल्पलाई सही भन्ने Review निषेध।\n• `tag` १–३ शब्दको हल्का सङ्केत; उत्तर खुलाउने शब्द नराख। `is_mega_eligible` ३–५ ज्ञानका प्रश्नमा मात्र true, बाँकी false।\n\n६. MEMORY TAGS v2.3 (पुरानै कार्य जोगाऊ)\n• `memory_tags` एउटा JSON string। सुरुमा स्रोत मिति र ठीक Gregorian बार: `📅 DD-MM-YYYY बार` (सिस्टमको आजको मिति होइन)।\n• सम्भव भए १–१० numbered स्मरण-बुँदा; एक ज्ञान एकपटक। प्रत्येक `१. 🗣️ छोटो छुट्टै शीर्षक → स्रोतका मूल शब्दको अर्थपूर्ण अंश`। Arrow text मा प्रमाणित न्यूनतम सन्दर्भ मात्र; अलग विचार जोडेर नयाँ वाक्य नबनाऊ।\n• साकारमा 🗣️ सुरुको मीठे बच्चे, ❓ स्रोतको महत्त्वपूर्ण प्रश्न–उत्तर (योग्य भए), बीचका २–४ केन्द्रीय बुँदा (📖 🧘 🏃 आदि), उपलब्ध 📌 धारणा, 🎁 वरदान, ⭐ स्लोगन, 🕊️ अव्यक्त इसारा—सबै कुल १० भित्र। अन्तिम चारमा छुट्टै छोटो शीर्षक; ⭐ को arrow मा पूरा मूल स्लोगन।\n• अव्यक्त मुरलीमा सुरुको नियमित शीर्षक होइन, मुख्य व्याख्याका ५–७ बुँदा प्राथमिक। आइतबारकै आधारमा अव्यक्त नमान। अव्यक्त इसाराको शीर्षकसँगै आएको पहिलो नियमित Theme वाक्य tag/chain मा नलेऊ; त्यसपछिको व्याख्याबाट मात्र।\n• Blank line वा दोहोरो `\\n\\n` निषेध। अन्त्यमा `🧠 Memory Chain`, छोटा बुँदा `→` बाट, स्रोतमा भए ⭐ स्लोगन र 🕊️ इसाराको वास्तविक शिक्षा सहित; अनि अन्तिम लाइन ठीक `📝 मुरली Quiz: https://bkngt.github.io/murali-quiz/`।\n\n७. SWAMAN\nआजको वास्तविक वरदानमा आधारित उपयुक्त इमोजी र छोटो शीर्षक जसको अन्त्य `भव:!` होस्। त्यसपछि प्रथम पुरुषका ठ्याक्कै दुई छोटा सकारात्मक स्वमान वाक्य। स्रोतबाहिरका विचार नथप।\n\n८. FINAL SINGLE-PASS CHECK\nएकपटक मात्र जाँचेर गलत प्रश्न/field मात्र सच्याऊ: २० प्रश्न, प्रत्येकमा ४ विकल्प, २ `....` प्रश्न, ३–५ true; सबै original आजको मुरलीमा अक्षरशः; answer original को निरन्तर अंश र options मा एकपटक; प्रत्येक प्रश्नमा *अर्थगत रूपमा पनि एउटा मात्र सही*; चारै विकल्प समान वास्तविक बी.के. वर्ग/व्याकरण; छोटा, पूर्ण, शुद्ध नेपाली प्रश्न/उत्तर; Review मा विरोधाभास शून्य; memory_tags/swaman पूर्ण; JSON parse योग्य।\n**v75.2 ANTI-GIVEAWAY GATE:** प्रत्येक प्रश्नमा सबै गलत विकल्प युग/स्थान/भूमिका/सकारात्मकता/बी.के. ज्ञानका दृष्टिले सम्भावित छन्? कुनै २–३ वटा विकल्प सामान्य ज्ञानकै भरमा काटिन्छन्? अर्को विकल्प पनि वास्तवमा सही हुन सक्छ? पहिलो दुई समस्यामा विकल्प बदल; दोहोरो सही हटाउन नसके प्रश्न नै बदल। ठीक दुई रिक्त-स्थानमा पनि यही नियम लाग्छ।\n**v75.2 SOURCE/VARIETY GATE:** तीनै गलत विकल्प वास्तविक, मान्य र समान बी.के. वर्गका छन्? स्रोत प्राप्त नभई पुरानो महावाक्य भनिएको त छैन? अर्थहीन वा काल/युग/भूमिका-विपरीत शब्द छैनन्? सम्पूर्ण क्वीजमा विषयअनुकूल प्रश्नका ढाँचा फरक छन्? असफल item मात्र बदल; धेरै खोजमा नअड्क।\n**FINAL NO-“अनुसार” GATE:** सबै २० `q` मा “अनुसार” वा “मुरलीमा/बाबाका अनुसार/प्रश्नोत्तरमा/वरदानमा/स्लोगनमा/अव्यक्त इसारामा” जस्ता स्रोत-परिचयात्मक पद छन् कि जाँच। भए सीधै ज्ञान-सोधाइमा बदल। “बाबाले” जस्तो वास्तविक कर्ता भने आवश्यक भए कायम राख। यस्तो परिवर्तनपछि सही उत्तर राखेर प्रश्नको व्याकरण र एकमात्र सही विकल्प पुनः पुष्टि गर। अनन्त आत्म-समीक्षा नगर्नू।\n\nOUTPUT — EXACT APP CONTRACT\nएकमात्र पूर्ण valid JSON code block, अरू कुनै टिप्पणी/रिपोर्ट/प्रश्न छैन। Top-level keys ठ्याक्कै `swaman`, `memory_tags`, `quiz`। quiz का ठ्याक्कै २० objects, हरेकमा ७ keys:\n`q` (string), `options` (ठ्याक्कै ४ strings को array), `answer` (string), `explanation` (string), `tag` (string), `original` (string), `is_mega_eligible` (boolean)।\nJSON string मा आवश्यक उद्धरण escape गर; memory_tags को newline `\\n` encode गर। १० प्रश्नपछि नरोक; पूरा २० प्रश्न देऊ।\n\nDAILY INPUT: प्रयोगकर्ताले Chat मा पठाएको पछिल्लो पूरा नेपाली मुरलीलाई TODAY_MURLI मानेर काम सम्पन्न गर।";
         const APP_COMPATIBILITY_RULES = `APP INTEGRATION REQUIREMENTS (preserve the existing BK Murali Quiz data contract):\n- Return valid JSON with top-level keys: swaman, memory_tags, and quiz.\n- memory_tags MUST contain the exact text output defined by the rules above.\n- quiz must contain exactly 20 items with fields: q, options, answer, explanation, tag, original, is_mega_eligible.\n- options must contain exactly four strings.\n- original must be a verbatim quote from the supplied Murali.\n- Set is_mega_eligible=true for 3-5 timeless Gyan questions. Set false for all others.`;
-        const promptText = QUIZ_MODEL_68_0 + "\n\n" + APP_COMPATIBILITY_RULES + `\n\nRUNTIME SETTINGS\nDate: ${currentMurliDate}\nDay: ${currentDayName}\nRequested question count: ${qCount}\nLanguage: ${langName}\nMURALI TEXT:\n${text}`;
+        const promptText = QUIZ_MODEL_75_2 + "\n\n" + APP_COMPATIBILITY_RULES + `\n\nRUNTIME SETTINGS\nDate: ${currentMurliDate}\nDay: ${currentDayName}\nRequested question count: ${qCount}\nLanguage: ${langName}\nMURALI TEXT:\n${text}`;
 
         const quizSchema = { type: "object", properties: { swaman: { type: "string" }, memory_tags: { type: "string" }, quiz: { type: "array", minItems: Number(qCount), maxItems: Number(qCount), items: { type: "object", properties: { q: { type: "string" }, options: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } }, answer: { type: "string" }, explanation: { type: "string" }, tag: { type: "string" }, original: { type: "string" }, is_mega_eligible: { type: "boolean" } }, required: ["q", "options", "answer", "explanation", "tag", "original", "is_mega_eligible"], additionalProperties: false } } }, required: ["swaman", "memory_tags", "quiz"], additionalProperties: false };
         function buildGenerationConfig(model) { const config = { maxOutputTokens: 65536, responseMimeType: "application/json", responseSchema: quizSchema }; if (!/^gemini-3\./.test(model)) config.temperature = 0.3; return config; }
@@ -4026,11 +4208,26 @@ window.saveCustomQuiz = function() {
                 const model = fallbackModels[modelIndex]; const generationConfig = buildGenerationConfig(model);
                 for (let attempt = 1; attempt <= 2; attempt++) {
                     if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-                    const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 150000); const combinedAbort = () => controller.abort(); signal.addEventListener('abort', combinedAbort, { once: true });
+                    const controller = new AbortController();
+                    var timeoutId = null;
+                    var combinedAbort = null;
+                    const cancelled = new Promise((resolve,reject) => {
+                        combinedAbort=()=>{try{controller.abort();}catch(_){} reject(new DOMException('Aborted','AbortError'));};
+                        signal.addEventListener('abort',combinedAbort,{once:true});
+                    });
+                    const expired = new Promise((resolve,reject) => {
+                        timeoutId=setTimeout(()=>{try{controller.abort();}catch(_){} reject(new Error('Gemini request timeout'));},150000);
+                    });
                     document.getElementById('loading-text').innerText = attempt === 1 ? `AI Quiz: ${model}... (कृपया पर्खनुहोस्)` : `AI Quiz: ${model} busy — पुनः प्रयास ${attempt}/2...`;
 
                     let response = null; let responseText = '';
-                    try { response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig }), signal: controller.signal }); responseText = await response.text(); } 
+                    try {
+                        const geminiOptions={method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},body:JSON.stringify({contents:[{parts:[{text:promptText}]}],generationConfig})};
+                        if(typeof AbortSignal!=='undefined')geminiOptions.signal=controller.signal;
+                        const network=fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,geminiOptions).then(async r=>({response:r,text:await r.text()}));
+                        const fetched=await Promise.race([network,expired,cancelled]);
+                        response=fetched.response;responseText=fetched.text;
+                    } 
                     catch (e) { if (signal.aborted) throw new DOMException('Aborted', 'AbortError'); lastError = e; if (attempt < 2) { await new Promise(r => setTimeout(r, 2500)); continue; } break; } finally { clearTimeout(timeoutId); signal.removeEventListener('abort', combinedAbort); }
 
                     if (!response.ok) {
@@ -4057,6 +4254,8 @@ window.saveCustomQuiz = function() {
                         break;
                     }
 
+                    const quizError = validateUnifiedQuiz75_2_(parsedData);
+                    if (quizError) { lastError = new Error('v75.2 validation: '+quizError); break; }
                     usedModel = model; currentQuiz = normalizeQuizItems_(parsedData.quiz); currentSwaman = parsedData.swaman || ''; window.currentMemoryTags = parsedData.memory_tags || '';
                     document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 Date: ${currentMurliDate} (${currentDayName})`;
                     renderQuizArea(); showToast(`क्विज तयार भयो! (Model: ${usedModel})`, "success", 8000);
@@ -4066,7 +4265,7 @@ window.saveCustomQuiz = function() {
             }
             throw lastError || new Error('All selected Gemini models failed.');
         } catch (error) {
-            document.getElementById('loading-box').style.display = 'none'; document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block'; 
+            document.getElementById('loading-box').style.display = 'none'; document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block'; 
             if (error.name === 'AbortError') showToast("क्विज निर्माण रद्द गरियो। (Cancelled)", "warning"); else showToast("AI Error: " + (error.message || "Generation failed"), "error");
         } finally { abortController = null; }
     }
@@ -4075,17 +4274,17 @@ window.saveCustomQuiz = function() {
         if (!currentQuiz || currentQuiz.length === 0) return showToast("पहिले क्विज तयार गर्नुहोस्!", "error");
         currentQuiz = normalizeQuizItems_(currentQuiz);
         document.getElementById('loading-box').style.display = 'block'; document.getElementById('loading-text').innerText = "सर्भरमा क्विज सुरक्षित गरिँदै (Cloud Sync)...";
-        document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
+        document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
         
         let isMega = currentMurliDate.includes("Mega") || currentMurliDate.includes("मेगा") || currentMurliDate.includes("Review");
         fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "saveQuiz", phone: (localStorage.getItem('murali_phone') || userPhone), pin: (localStorage.getItem('murali_pin') || ''), deviceId: getDeviceId(), quizDate: currentMurliDate, quizData: currentQuiz, isMegaQuiz: isMega, swaman: (window.currentMemoryTags ? JSON.stringify({ text: extractSwamanAndTags(currentSwaman).text, tags: window.currentMemoryTags }) : currentSwaman), memory_tags: window.currentMemoryTags, createdAt: Date.now() }) })
         .then(res => res.json()).then(data => { 
             document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
             document.getElementById('loading-box').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('sticky-scorebar').style.display = 'flex'; 
-            document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block';
-            if(data.status === "success") { showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success"); document.getElementById('btn-save-top').style.display = 'none'; syncServerQuizzes(false); }
+            document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block';
+            if(data.status === "success") { if (window._mqPendingImportV112) { document.getElementById('custom-json-input').value=''; document.getElementById('custom-quiz-date').value=''; window._mqPendingImportV112=false; } showToast("क्विज सफलतापूर्वक सर्भरमा सेभ भयो! ☁️", "success"); document.getElementById('btn-save-top').style.display = 'none'; syncServerQuizzes(false); }
             else { showToast(data.message || "क्विज सेभ गर्न सकिएन। Admin वा Manager अधिकार जाँच गर्नुहोस्।", "error", 6000); }
-        }).catch(err => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block'; showToast("इन्टरनेट समस्या!", "error"); });
+        }).catch(err => { document.getElementById('loading-box').style.display = 'none'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('export-saved-section').style.display = 'block'; showToast("इन्टरनेट समस्या!", "error"); });
     }
 
     // Mega Quiz Logic
@@ -4176,7 +4375,7 @@ window.saveCustomQuiz = function() {
             let displayStart = sDateStr.split('-').reverse().join('-'); let displayEnd = eDateStr.split('-').reverse().join('-'); let nowD = new Date(); let todayPrefix = `${String(nowD.getDate()).padStart(2,'0')}-${String(nowD.getMonth()+1).padStart(2,'0')}-${nowD.getFullYear()}`; currentMurliDate = `${todayPrefix} 🏆 Mega Quiz (${displayStart} to ${displayEnd})`; 
         }
         
-        document.getElementById('mega-quiz-modal').style.display = 'none'; document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('manual-tags-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
+        document.getElementById('mega-quiz-modal').style.display = 'none'; document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; document.getElementById('custom-import-section').style.display = 'none'; document.getElementById('export-saved-section').style.display = 'none'; document.getElementById('quiz-area').style.display = 'block'; document.getElementById('online-quiz-actions').style.display = 'flex'; document.getElementById('quiz-date-text').innerText = `📅 ${currentMurliDate}`;
         renderQuizArea(); document.getElementById('btn-save-top').style.display = 'inline-block'; document.getElementById('btn-export-top').style.display = 'inline-block'; document.getElementById('btn-cancel-top').style.display = 'inline-block';
         showToast(`क्विज (${qCount} प्रश्न) तयार भयो!`, "success");
     }
@@ -4185,6 +4384,8 @@ window.saveCustomQuiz = function() {
     // 8. QUIZ EXECUTION
     // ==========================================
     window.startSpecificQuiz = async function(dateStr) {
+    // v113: prevent two simultaneous authoritative start checks or a second exam.
+    if (isExamSecurityCheckInProgress || isQuizActive) return;
     // =========================================================
     // EXAM START POLICY:
     // Dashboard can work from local cache,
@@ -4199,7 +4400,7 @@ window.saveCustomQuiz = function() {
         let cached = safeJSON('murali_server_quizzes', []);
         let targetQuiz = cached.find(q => q.quizDate === dateStr);
         if (targetQuiz) {
-            showToast("इन्टरनेट छैन। सुरक्षित (Offline) क्वीज खुल्दैछ।", "info", 3000);
+            showToast("अफलाइन क्वीज खुल्दैछ। सर्भरले पुष्टि नगरेसम्म आधिकारिक नतिजा होइन।", "warning", 5500);
             window.tempCloudState = null;
             window.tempTargetQuiz = targetQuiz;
             let existingResult = document.getElementById('result-screen');
@@ -4333,10 +4534,8 @@ window.saveCustomQuiz = function() {
 
         if (loadingBox) loadingBox.style.display = 'none';
 
-        // Patched v107.0: Fall back to downloaded offline quiz if server is unreachable
-        if (typeof window.tryOpenCachedQuizOfflineV107_ === 'function' && window.tryOpenCachedQuizOfflineV107_(dateStr, '📱 सर्भर जडान हुन सकेन — डाउनलोड भइसकेको अफलाइन क्वीज खुल्दैछ।')) {
-            return;
-        }
+        // v113.0: An online server failure must NEVER silently become an
+        // unverified official exam. Cached quizzes remain available offline.
         return showToast(
             '🌐 परीक्षा सुरु गर्न सर्भर जडान आवश्यक छ। Internet/Server जाँच गरेर पुनः प्रयास गर्नुहोस्।',
             'error',
@@ -4385,15 +4584,30 @@ window.saveCustomQuiz = function() {
 
         // Mega Quiz may cross a calendar-month boundary. Quiz ID + Revision
         // is therefore the stronger identity than the display date.
-        if (isSameCloudQuiz) { stateToUse = cloudState; }
-        else if (isSameLocalQuiz) { stateToUse = localState; }
+        // v113: Compare actual answered questions, not just device or timestamp.
+        // A newer local answer may not yet have reached Google Sheets.
+        const cloudValid=isSameCloudQuiz && Array.isArray(cloudState.quizData) && cloudState.quizData.length===originalQuizData.length;
+        const localValid=isSameLocalQuiz && Array.isArray(localState.quizData) && localState.quizData.length===originalQuizData.length;
+        if(cloudValid && localValid) {
+            stateToUse=mqCompareActiveStatesV113_(localState,cloudState)>0 ? localState : cloudState;
+        } else if(cloudValid) stateToUse=cloudState;
+        else if(localValid) stateToUse=localState;
 
         if (stateToUse) {
-            currentQuiz = normalizeQuizItems_(stateToUse.quizData); currentScore = stateToUse.score || 0; answeredCount = stateToUse.answeredCount || 0; totalTimeSec = stateToUse.time || 0; activeQuestionIndex = stateToUse.qIndex || 0; activeStateSeq = Number(stateToUse.stateSeq || 0);
+            currentQuiz = normalizeQuizItems_(stateToUse.quizData);
+            answeredCount = Math.max(0,mqStateAnswerCountV113_(stateToUse));
+            currentScore = currentQuiz.reduce((n,q) => n+(Number.isInteger(q.userSelectedIndex) && String(q.options[q.userSelectedIndex]).trim()===String(q.answer).trim()?1:0),0);
+            totalTimeSec = Math.max(0,Number(stateToUse.time||0));
+            activeQuestionIndex = Math.max(0,Math.min(currentQuiz.length-1,Number(stateToUse.qIndex||0)));
+            // Ensure the cursor doesn't skip an unanswered question in old saves.
+            const earliest=currentQuiz.findIndex(q => !Number.isInteger(q.userSelectedIndex));
+            if(earliest>=0 && earliest<activeQuestionIndex) activeQuestionIndex=earliest;
+            activeStateSeq = Math.max(Number(cloudValid&&cloudState.stateSeq||0),Number(localValid&&localState.stateSeq||0),Number(stateToUse.stateSeq||0));
             showToast("तपाईंको रोकिएको परीक्षा पुनः सुरु भयो।", "info");
         } else {
             currentScore = 0; answeredCount = 0; totalTimeSec = 0; activeQuestionIndex = 0; activeStateSeq = 0;
             currentQuiz = normalizeQuizItems_(JSON.parse(JSON.stringify(originalQuizData)));
+            currentQuiz.forEach((q, sourceIndex) => { q._mqSourceIndexV112 = sourceIndex; });
             shuffleArray(currentQuiz);
             currentQuiz.forEach(q => {
                 delete q.userSelectedIndex;
@@ -4402,6 +4616,15 @@ window.saveCustomQuiz = function() {
             });
         }
 
+        // Legacy paused sessions may predate the source-index marker; locate by
+        // exact question/original text without changing their shuffled positions.
+        currentQuiz.forEach(q => {
+            if(!Number.isInteger(q._mqSourceIndexV112)) {
+                const idx=(originalQuizData||[]).findIndex(src => String(src.q||src.question||'').trim()===String(q.q||'').trim() && String(src.original||'').trim()===String(q.original||'').trim());
+                if(idx>=0) q._mqSourceIndexV112=idx;
+            }
+        });
+        dismissQuizFeedbackV112();
         focusedOptionIndex = -1; isTimerStarted = true; isQuizActive = true; document.body.classList.add('quiz-mode-active'); startTimer();
         activeStateSeq++; const initialState = makeActiveStateObject({qIndex:activeQuestionIndex});
         localStorage.setItem('murali_active_quiz_state', JSON.stringify(initialState));
@@ -4430,7 +4653,7 @@ window.saveCustomQuiz = function() {
         document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
 
         let safeRole = (userRole||"").toString().trim().toLowerCase(); let isPrivileged = (safeRole === 'manager' || safeRole === 'admin');
-        if (isPrivileged && isAdminViewActive) { document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('manual-tags-section').style.display = 'block'; document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; } 
+        if (isPrivileged && isAdminViewActive) { document.getElementById('murali-text').style.display = 'block'; document.getElementById('generator-actions').style.display = 'flex'; document.getElementById('custom-import-section').style.display = 'block'; document.getElementById('quiz-config-tools').style.display = 'flex'; document.getElementById('export-saved-section').style.display = 'block'; } 
         else { loadStudentDashboard(); } window.scrollTo(0, 0);
     // v109.1 Fast UI Update
     if(typeof loadStudentDashboard === 'function') loadStudentDashboard();
@@ -4485,7 +4708,8 @@ window.saveCustomQuiz = function() {
         
         let q = currentQuiz[qIndex]; if (q.userSelectedIndex === undefined) answeredCount++; q.userSelectedIndex = oIndex;
         let tempScore = currentScore; let selectedText = String(q.options[oIndex]).trim(); let answerText = String(q.answer).trim();
-        if (selectedText === answerText) tempScore++; updateStickyBar(); 
+        if (selectedText === answerText) tempScore++; updateStickyBar();
+        if (isQuizActive && reviewSource !== 'past') queueQuizFeedbackV112_(qIndex); 
         
         setTimeout(() => {
             if (qIndex < currentQuiz.length - 1) { 
@@ -4502,6 +4726,108 @@ window.saveCustomQuiz = function() {
 }
         }, 600); 
     }
+
+
+    // Feedback is intentionally independent of answer-scoring and auto-next.
+    var mqFeedbackPendingV112_=null;
+    function mqFeedbackKeyLocalV112_(q) {
+        return 'mq_feedback_v112:'+String(userPhone)+':'+String(currentQuizId)+':'+String(currentQuizRevision)+':'+String(q._mqSourceIndexV112);
+    }
+    function mqFeedbackDoneV112_(q) {
+        try {return localStorage.getItem(mqFeedbackKeyLocalV112_(q))==='1';} catch(e){return false;}
+    }
+    function queueQuizFeedbackV112_(index) {
+        var q=currentQuiz&&currentQuiz[index];
+        if(!q||!currentQuizId||mqFeedbackDoneV112_(q))return;
+        mqFeedbackPendingV112_={q:q,quizId:currentQuizId,quizDate:currentMurliDate,revision:currentQuizRevision};
+        var bar=document.getElementById('mq-feedback-trigger-v112'),lbl=document.getElementById('mq-feedback-label-v112');
+        if(lbl)lbl.textContent='अहिले उत्तर दिएको प्रश्न';
+        if(bar)bar.style.display='flex';
+    }
+    window.dismissQuizFeedbackV112 = function() {
+        mqFeedbackPendingV112_=null;
+        var bar=document.getElementById('mq-feedback-trigger-v112');if(bar)bar.style.display='none';
+        var modal=document.getElementById('mq-feedback-modal-v112');if(modal)modal.style.display='none';
+    };
+    window.openQuizFeedbackV112 = function() {
+        if(!mqFeedbackPendingV112_)return;
+        document.getElementById('mq-feedback-question-v112').textContent=mqFeedbackPendingV112_.q.q||'';
+        document.querySelectorAll('input[name="mq-feedback-type-v112"]').forEach(function(r){r.checked=false;});
+        document.getElementById('mq-feedback-comment-v112').value='';
+        document.getElementById('mq-feedback-status-v112').textContent='';
+        document.getElementById('mq-feedback-send-v112').disabled=false;
+        document.getElementById('mq-feedback-modal-v112').style.display='flex';
+    };
+    window.closeQuizFeedbackV112 = function() { document.getElementById('mq-feedback-modal-v112').style.display='none'; };
+    window.submitQuizFeedbackV112 = async function() {
+        var p=mqFeedbackPendingV112_;
+        if(!p)return;
+        var checked=document.querySelector('input[name="mq-feedback-type-v112"]:checked');
+        var status=document.getElementById('mq-feedback-status-v112');
+        if(!checked){status.textContent='कृपया एउटा प्रतिक्रिया छान्नुहोस्।';return;}
+        var send=document.getElementById('mq-feedback-send-v112');send.disabled=true;
+        status.textContent='सर्भरमा सुरक्षित हुँदैछ...';
+        try {
+            var response=await apiPostJSON({action:'submitQuizFeedback',phone:userPhone,
+                pin:(localStorage.getItem('murali_pin')||''),deviceId:getDeviceId(),
+                quizId:p.quizId,quizDate:p.quizDate,quizRevision:p.revision,
+                sourceIndex:Number.isInteger(p.q._mqSourceIndexV112)?p.q._mqSourceIndexV112:-1,
+                questionText:p.q.q,original:p.q.original||'',
+                feedbackType:checked.value,comment:document.getElementById('mq-feedback-comment-v112').value.trim()},
+                {timeoutMs:13000,retries:0});
+            if(!response||response.status!=='success')throw new Error(response&&response.message||'प्रतिक्रिया सुरक्षित भएन।');
+            try {localStorage.setItem(mqFeedbackKeyLocalV112_(p.q),'1');} catch(_){}
+            dismissQuizFeedbackV112();
+            showToast(response.duplicate?'यो प्रश्नमा प्रतिक्रिया पहिले नै सुरक्षित छ।':'धन्यवाद! प्रतिक्रिया सुरक्षित भयो।','success',2500);
+        } catch(e) {status.textContent='नेटवर्क वा सर्भर समस्या: '+(e&&e.message||'पुनः प्रयास गर्नुहोस्।');send.disabled=false;}
+    };
+    function mqEscapeHTMLV112_(v) {
+        return String(v===null||v===undefined?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+    }
+    window.openQuizFeedbackAdminV112=function() {
+        if(String(userRole||'').trim().toLowerCase()!=='admin'){showToast('Admin लाई मात्र उपलब्ध छ।','error');return;}
+        document.getElementById('mq-admin-feedback-modal-v112').style.display='flex';
+        loadQuizFeedbackAdminV112();
+    };
+    window.closeQuizFeedbackAdminV112=function(){document.getElementById('mq-admin-feedback-modal-v112').style.display='none';};
+    window.loadQuizFeedbackAdminV112=async function() {
+        var root=document.getElementById('mq-admin-feedback-results-v112'),count=document.getElementById('mq-admin-feedback-count-v112');
+        root.textContent='लोड हुँदैछ...';
+        try {
+            var r=await apiPostJSON({action:'fetchQuizFeedbackAdmin',phone:userPhone,
+                pin:(localStorage.getItem('murali_pin')||''),deviceId:getDeviceId(),
+                quizDate:document.getElementById('mq-admin-feedback-date-v112').value.trim(),
+                feedbackType:document.getElementById('mq-admin-feedback-type-v112').value,
+                reviewStatus:document.getElementById('mq-admin-feedback-state-v112').value},
+                {timeoutMs:18000,retries:0});
+            if(!r||r.status!=='success')throw new Error(r&&r.message||'Admin अनुमति छैन।');
+            count.textContent='छानिएका प्रतिक्रिया: '+r.total+(r.hasOlder?' • पछिल्ला २००० रेकर्डको मात्र समीक्षा':'')+' • पहिलो ३०० देखिएका';
+            if(!r.rows.length){root.textContent='यस फिल्टरमा कुनै प्रतिक्रिया छैन।';return;}
+            root.innerHTML=r.rows.map(function(x){
+                var type=(r.types&&r.types[x.feedbackType])||x.feedbackType;
+                var opts=['Pending','Reviewed','Dismissed'].map(function(s){return '<option '+(s===x.reviewStatus?'selected ':'')+'value="'+s+'">'+s+'</option>';}).join('');
+                return '<div class="mq-admin-feedback-item-v112">'+
+                  '<div style="font-size:.75rem;color:var(--muted-text-color)">'+mqEscapeHTMLV112_(x.receivedAt)+' • '+mqEscapeHTMLV112_(x.quizDate)+' • '+mqEscapeHTMLV112_(x.questionId)+'</div>'+
+                  '<strong style="display:block;margin:5px 0">'+mqEscapeHTMLV112_(type)+'</strong>'+
+                  '<div style="font-weight:700">'+mqEscapeHTMLV112_(x.questionText)+'</div>'+
+                  (x.comment?'<div style="font-size:.82rem;margin:6px 0">💬 '+mqEscapeHTMLV112_(x.comment)+'</div>':'')+
+                  '<details><summary style="font-size:.78rem;cursor:pointer">मूल उद्धरण</summary><p style="font-size:.8rem;white-space:pre-wrap">'+mqEscapeHTMLV112_(x.original)+'</p></details>'+
+                  '<div style="margin-top:7px;display:flex;gap:6px;align-items:center;font-size:.8rem">Review: <select data-feedback-row="'+Number(x.sheetRow)+'" data-qid="'+mqEscapeHTMLV112_(x.questionId)+'" onchange="updateFeedbackReviewV112(this)">'+opts+'</select></div></div>';
+            }).join('');
+        }catch(e){root.textContent='Feedback Review खोल्न सकिएन: '+(e&&e.message||e);}
+    };
+    window.updateFeedbackReviewV112=async function(select) {
+        if(!select)return;
+        select.disabled=true;
+        try {
+            var r=await apiPostJSON({action:'updateQuizFeedbackReview',phone:userPhone,pin:(localStorage.getItem('murali_pin')||''),deviceId:getDeviceId(),
+                sheetRow:Number(select.dataset.feedbackRow),questionId:select.dataset.qid,reviewStatus:select.value},
+                {timeoutMs:12000,retries:0});
+            if(!r||r.status!=='success')throw new Error(r&&r.message||'Update failed');
+            showToast('Admin Review अवस्था सुरक्षित भयो।','success',1500);
+        }catch(e){showToast('Review Update असफल: '+(e&&e.message||e),'error');}
+        finally{select.disabled=false;}
+    };
 
     window.submitQuiz = async function() {
     if (document.getElementById('sb-submit-btn').disabled) return;
@@ -4880,7 +5206,7 @@ window.saveCustomQuiz = function() {
         if (sectionNo === 11) {
             const checkedOpt = section.querySelector('input[name="chart_goodnight"]:checked');
             const hasTime = positiveTimes > 0;
-            if (checkedOpt && Number(checkedOpt.value) === 0) return 'complete';
+            if (checkedOpt && Number(checkedOpt.value) <= 3) return 'complete';
             if (hasTime && checkedOpt) return 'complete';
             if (hasTime || checkedOpt) return 'partial';
             return 'empty';
@@ -5017,7 +5343,7 @@ window.saveCustomQuiz = function() {
 
     function maybeAutoAdvanceChartSectionV4(section) {
         const form = document.getElementById('daily-chart-form');
-        if (form && form.dataset.v4DisableAutoScroll === '1') return;
+        if (form && (form.dataset.v4DisableAutoScroll === '1' || form.dataset.v4ManualNext === '1')) return;
         if (chartSectionReadyForAutoScrollV4(section)) activateNextChartSection(section);
     }
 
@@ -5031,9 +5357,61 @@ window.saveCustomQuiz = function() {
         });
     }
 
+
+    // Simplification changes presentation only, not V4 points or stored columns.
+    window.setChartEasyModeV112 = function(easy) {
+        var form=document.getElementById('daily-chart-form');
+        if (!form) return;
+        form.classList.toggle('chart-easy-mode-v112',!!easy);
+        form.dataset.v4ManualNext='1';
+        var e=document.getElementById('chart-easy-btn-v112'), d=document.getElementById('chart-detail-btn-v112');
+        if(e) {e.classList.toggle('active',!!easy);e.setAttribute('aria-pressed',String(!!easy));}
+        if(d) {d.classList.toggle('active',!easy);d.setAttribute('aria-pressed',String(!easy));}
+        try {localStorage.setItem('murali_chart_easy_mode_v112',easy?'1':'0');} catch(_){}
+    };
+    window.openNextIncompleteChartV112 = function() {
+        var secs=Array.from(document.querySelectorAll('#daily-chart-form .chart-section-v2:not(#chart-reflection-section-v4)'));
+        var next=secs.find(function(s){return getChartSectionStateV4(s)!=='complete';}) || secs[0];
+        if (!next) return;
+        if (typeof toggleAccordion==='function') toggleAccordion(next,true);
+        try {next.scrollIntoView({behavior:'smooth',block:'start'});}catch(_){}
+    };
+    window.setChartSectionZeroV112 = function(n) {
+        var s=document.querySelector('#daily-chart-form .chart-section-v2[data-chart-section="'+n+'"]');
+        if(!s)return;
+        var none=s.querySelector('.chart-service-none-v4');
+        s.querySelectorAll('.chart-time-input-v4').forEach(function(el){el.value='0';el.dataset.touched='1';});
+        s.querySelectorAll('input.chart-single-v4').forEach(function(el){
+            el.checked=(String(el.value)==='0');
+            var lab=el.closest('.chart-option-v2');if(lab)lab.classList.toggle('selected-v2',el.checked);
+        });
+        if(none) {
+            s.querySelectorAll('.chart-service-multi-v4').forEach(function(el){el.checked=false;var lab=el.closest('.chart-service-chip-v4');if(lab)lab.classList.remove('selected-service-v4');});
+            none.checked=true;var lab=none.closest('.chart-service-chip-v4');if(lab)lab.classList.add('selected-service-v4');
+        }
+        updateChartV3Total();
+        showToast('आजको अभ्यास नभएको रूपमा राखियो (० अङ्क)।','info',1500);
+    };
+    function setupChartEasyV112_() {
+        var form=document.getElementById('daily-chart-form');if(!form)return;
+        if(form.dataset.easyInit112!=='1') {
+            form.dataset.easyInit112='1';
+            form.querySelectorAll('.chart-section-v2[data-chart-section]').forEach(function(s){
+                var num=Number(s.getAttribute('data-chart-section'));
+                var btn=document.createElement('button');btn.type='button';btn.className='chart-zero-btn-v112';
+                btn.textContent='◯ आज भएन (० अङ्क)';btn.addEventListener('click',function(){setChartSectionZeroV112(num);});
+                var content=s.querySelector('.chart-content-v2')||s;
+                content.appendChild(btn);
+            });
+        }
+        var easy=true;
+        try {easy=localStorage.getItem('murali_chart_easy_mode_v112')!=='0';} catch(_){}
+        setChartEasyModeV112(easy);
+    }
+
     function initChartV3Interactions() {
-        if (typeof initChartAccordion === 'function') { initChartAccordion(); } // Hook2Fix
-        if (typeof initChartAccordion === 'function') { initChartAccordion();  } // Hook2Fix
+        if (typeof initChartAccordion === 'function') { initChartAccordion(); } // v112 single init
+        setupChartEasyV112_();
         document.querySelectorAll('#daily-chart-form input.chart-single-v4').forEach(input => {
             if (input.dataset.chartV4Bound === '1') return;
             input.dataset.chartV4Bound = '1';
@@ -8349,7 +8727,7 @@ window.saveCustomQuiz = function() {
     };
 
     var origStartSpecificQuiz = window.startSpecificQuiz;
-    if (typeof origStartSpecificQuiz === 'function') {
+    if (false && typeof origStartSpecificQuiz === 'function') {
         window.startSpecificQuiz = async function(dateStr) {
             if (!navigator.onLine) {
                 if (window.tryOpenCachedQuizOfflineV107_(dateStr, '📱 इन्टरनेट छैन — सुरक्षित (Offline) क्वीज खुल्दैछ।')) {
@@ -8564,7 +8942,7 @@ window.saveCustomQuiz = function() {
 (function() {
     // १. Smart Hybrid Quiz Start: डाउनलोड भइसकेको क्वीज ३.५ सेकेन्डभन्दा बढी सर्भरमा नअड्किने
     var prevStartSpecificQuizV1071 = window.startSpecificQuiz;
-    if (typeof prevStartSpecificQuizV1071 === 'function') {
+    if (false && typeof prevStartSpecificQuizV1071 === 'function') {
         window.startSpecificQuiz = async function(dateStr) {
             var cachedList = (typeof safeJSON === 'function') ? safeJSON('murali_server_quizzes', []) : [];
             var hasLocalCopy = Array.isArray(cachedList) && cachedList.some(function(q) {
@@ -8643,7 +9021,7 @@ window.saveCustomQuiz = function() {
 })();
 </script>
 
-<!-- v111.0 Direct Instant Chart Cloud Save + 48h Streak Grace + Hybrid Speed Engine -->
+<!-- v112.0 Direct Instant Chart Cloud Save + 48h Streak Grace + Hybrid Speed Engine -->
 <script id="v111-0-direct-chart-save-and-streak-grace">
 (function() {
     // =========================================================================
@@ -8945,7 +9323,7 @@ window.saveCustomQuiz = function() {
     // ३. Smart Hybrid Quiz Start (३.८ सेकेन्ड) र प्रत्येक ४-प्रश्न ActiveState सिंक
     // =========================================================================
     var prevStartSpecificQuizV111 = window.startSpecificQuiz;
-    if (typeof prevStartSpecificQuizV111 === 'function') {
+    if (false && typeof prevStartSpecificQuizV111 === 'function') {
         window.startSpecificQuiz = async function(dateStr) {
             var cachedList = (typeof safeJSON === 'function') ? safeJSON('murali_server_quizzes', []) : [];
             var hasLocalCopy = Array.isArray(cachedList) && cachedList.some(function(q) {
@@ -9004,5 +9382,86 @@ window.saveCustomQuiz = function() {
     });
 })();
 </script>
+
+<!-- v112: Optional question feedback. Button remains usable after automatic next question. -->
+<div id="mq-feedback-trigger-v112" style="display:none" aria-live="polite">
+  <span id="mq-feedback-label-v112">यस प्रश्नबारे</span>
+  <button type="button" onclick="openQuizFeedbackV112()">📝 प्रश्न प्रतिक्रिया (ऐच्छिक)</button>
+  <button type="button" onclick="dismissQuizFeedbackV112()" title="अहिले नपठाउने" aria-label="प्रतिक्रिया बन्द गर्नुहोस्">✕</button>
+</div>
+<div id="mq-feedback-modal-v112" class="modal-overlay" style="display:none;z-index:10060" onclick="if(event.target===this)closeQuizFeedbackV112()">
+  <div class="modal-content mq-feedback-dialog-v112" role="dialog" aria-modal="true" aria-labelledby="mq-feedback-title-v112">
+    <button type="button" onclick="closeQuizFeedbackV112()" class="mq-feedback-close-v112" aria-label="बन्द गर्नुहोस्">✕</button>
+    <h3 id="mq-feedback-title-v112">📝 यस प्रश्नको गुणस्तर कस्तो छ?</h3>
+    <p id="mq-feedback-question-v112" class="mq-feedback-question-v112"></p>
+    <div id="mq-feedback-types-v112" class="mq-feedback-types-v112">
+      <label><input type="radio" name="mq-feedback-type-v112" value="good"> ✅ राम्रो प्रश्न</label>
+      <label><input type="radio" name="mq-feedback-type-v112" value="easy"> 🙂 धेरै सजिलो</label>
+      <label><input type="radio" name="mq-feedback-type-v112" value="weak"> ⚠️ विकल्प कमजोर</label>
+      <label><input type="radio" name="mq-feedback-type-v112" value="unclear"> ❓ प्रश्न अस्पष्ट</label>
+      <label><input type="radio" name="mq-feedback-type-v112" value="alternative"> 🚩 अर्को विकल्प पनि सही लाग्छ</label>
+      <label><input type="radio" name="mq-feedback-type-v112" value="answer_error"> 🛠️ सही उत्तर वा व्याख्यामा त्रुटि</label>
+    </div>
+    <label class="mq-feedback-comment-label-v112">छोटो टिप्पणी (ऐच्छिक)
+      <textarea id="mq-feedback-comment-v112" maxlength="300" rows="2" placeholder="के अस्पष्ट वा गलत लाग्यो? (चाहेमा मात्र)"></textarea>
+    </label>
+    <div class="mq-feedback-modal-actions-v112">
+      <button type="button" onclick="closeQuizFeedbackV112()">अहिले नपठाउने</button>
+      <button type="button" id="mq-feedback-send-v112" onclick="submitQuizFeedbackV112()">☁️ पठाउनुहोस्</button>
+    </div>
+    <div id="mq-feedback-status-v112" role="status" aria-live="polite"></div>
+  </div>
+</div>
+<div id="mq-admin-feedback-modal-v112" class="modal-overlay" style="display:none;z-index:10070" onclick="if(event.target===this)closeQuizFeedbackAdminV112()">
+  <div class="modal-content mq-admin-feedback-dialog-v112" role="dialog" aria-modal="true" aria-labelledby="mq-admin-feedback-title-v112">
+    <button type="button" class="mq-feedback-close-v112" onclick="closeQuizFeedbackAdminV112()" aria-label="बन्द गर्नुहोस्">✕</button>
+    <h3 id="mq-admin-feedback-title-v112">📝 Admin — Quiz Feedback Review</h3>
+    <p style="font-size:.78rem;color:var(--muted-text-color)">प्रतिक्रिया मूल प्रश्न/उत्तर स्वतः परिवर्तन गर्दैन। मूल मुरलीसँग जाँचेर मात्र निर्णय गर्नुहोस्।</p>
+    <div class="mq-admin-feedback-filter-v112">
+      <input type="text" id="mq-admin-feedback-date-v112" placeholder="क्वीज मिति (DD-MM-YYYY), खाली = सबै" aria-label="क्वीज मिति">
+      <select id="mq-admin-feedback-type-v112" aria-label="प्रतिक्रिया प्रकार">
+        <option value="">सबै प्रकार</option><option value="answer_error">🛠️ उत्तर त्रुटि</option><option value="alternative">🚩 दुई सही</option>
+        <option value="unclear">❓ अस्पष्ट</option><option value="weak">⚠️ कमजोर</option>
+        <option value="easy">🙂 सजिलो</option><option value="good">✅ राम्रो</option>
+      </select>
+      <select id="mq-admin-feedback-state-v112" aria-label="Review अवस्था"><option value="">सबै अवस्था</option><option>Pending</option><option>Reviewed</option><option>Dismissed</option></select>
+      <button type="button" onclick="loadQuizFeedbackAdminV112()">🔎 हेर्नुहोस्</button>
+    </div>
+    <div id="mq-admin-feedback-count-v112" class="mq-admin-feedback-count-v112"></div>
+    <div id="mq-admin-feedback-results-v112" class="mq-admin-feedback-results-v112"></div>
+  </div>
+</div>
+
+
+<!-- v113.0 Compatibility & Exam Safety: authoritative quiz start, per-answer cloud queue -->
+<script id="mq-v113-exam-compatibility">
+(function() {
+    // This runs AFTER the legacy v107/v111 wrappers; no cached quiz may race the server.
+    window.saveStateToCloud = function(stateObj, forceImmediateCloud) {
+        if(!stateObj || !isQuizActive) return Promise.resolve(false);
+        activeStateSeq=Math.max(activeStateSeq,Number(stateObj.stateSeq||0));
+        var safeState=Object.assign({},stateObj,{stateSeq:activeStateSeq,deviceId:getDeviceId(),updatedAtMs:Date.now()});
+        // Persist EVERY answer locally immediately, then send the newest snapshot.
+        localStorage.setItem('murali_active_quiz_state',JSON.stringify(safeState));
+        if(!pendingActiveState || mqCompareActiveStatesV113_(safeState,pendingActiveState)>=0) pendingActiveState=safeState;
+        if(navigator.onLine){
+            scheduleActiveStateFlush(forceImmediateCloud===true ? 40 : 400);
+        }
+        return Promise.resolve(true);
+    };
+    // Flush latest answer when the app comes back online or is foregrounded.
+    window.addEventListener('online',function(){if(isQuizActive && pendingActiveState) scheduleActiveStateFlush(100);});
+    document.addEventListener('visibilitychange',function(){
+        if(!document.hidden && isQuizActive){
+            var s=safeJSON('murali_active_quiz_state',null);
+            if(s && String(s.quizId||'')===String(currentQuizId||'')){
+                if(!pendingActiveState || mqCompareActiveStatesV113_(s,pendingActiveState)>0)pendingActiveState=s;
+                if(navigator.onLine)scheduleActiveStateFlush(100);
+            }
+        }
+    });
+})();
+</script>
+
 </body>
 </html>
