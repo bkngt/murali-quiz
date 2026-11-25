@@ -9806,6 +9806,170 @@ html[data-theme="dark"] #view-chart.mq-v115-ready,body.dark-mode #view-chart.mq-
 }
 @media(prefers-reduced-motion:reduce){#view-chart.mq-v115-ready .mq-v115-tile{transition:none}}
 </style>
+<style id="mq-v1151-readable-chart-css">
+/* v115.1: Chart-only visual accessibility patch. No score, save, API or quiz logic altered. */
+#view-chart.mq-v115-ready {
+ --mq-card:#ffffff;--mq-pale:#eef4fb;--mq-border:#cfdbe7;
+ --mq-text:#142f43;--mq-muted:#485f72;
+ font-family:'Noto Sans Devanagari','Mukta','Nirmala UI',sans-serif;
+}
+#view-chart.mq-v115-ready,
+#view-chart.mq-v115-ready button,
+#view-chart.mq-v115-ready select,
+#view-chart.mq-v115-ready label,
+#view-chart.mq-v115-ready textarea {
+ font-family:'Noto Sans Devanagari','Mukta','Nirmala UI',sans-serif!important;
+}
+#view-chart.mq-v115-ready > div:first-child h2 {
+ font-size:clamp(1.12rem,2vw,1.42rem)!important;line-height:1.55!important;
+ color:#6333a0!important;letter-spacing:0!important;
+}
+#view-chart.mq-v115-ready > div:first-child button {font-size:.97rem!important;font-weight:800!important;min-height:42px!important;}
+/* Light score header: no dark-on-light fixed background. */
+#view-chart.mq-v115-ready .chart-progress-head-v2 {
+ background:linear-gradient(118deg,#f1eaff 0%,#e7f4f6 100%)!important;
+ border:1px solid #c4d6e2!important;
+ box-shadow:0 3px 12px rgba(41,65,93,.08)!important;
+}
+#view-chart.mq-v115-ready .chart-progress-label-v2{color:#41536b!important;font-size:.92rem!important;}
+#view-chart.mq-v115-ready .chart-total-v2{color:#264165!important;font-size:1.75rem!important;}
+#view-chart.mq-v115-ready .chart-total-max-v2{color:#48617a!important;font-size:1.08rem!important;}
+#view-chart.mq-v115-ready .chart-baba-time-v4{color:#3d5267!important;font-size:.9rem!important;line-height:1.45!important;}
+#view-chart.mq-v115-ready .chart-progress-ring-v2 {
+ background:#ffffff!important;color:#7552ac!important;border-color:#b18ed4!important;
+ font-size:.94rem!important;
+}
+#view-chart.mq-v115-ready .chart-date-btn-v22,
+#view-chart.mq-v115-ready .chart-date-btn-v2 {
+ font-size:.94rem!important;line-height:1.4!important;font-weight:800!important;
+ color:#603c92!important;background:rgba(126,88,180,.10)!important;
+ border:1px solid rgba(126,88,180,.3)!important;
+}
+/* Larger native-readable tile typography, no vw shrink on small phones. */
+#view-chart.mq-v115-ready .mq-v115-tile {
+ gap:3px!important;padding:8px 4px!important;border-radius:13px!important;
+ border-width:1.5px!important;box-shadow:0 3px 10px rgba(19,54,79,.08)!important;
+}
+#view-chart.mq-v115-ready .mq-v115-icon {font-size:clamp(24px,3.2vh,32px)!important;line-height:1.12!important;flex:none;}
+#view-chart.mq-v115-ready .mq-v115-name {
+ font-size:clamp(.93rem,1.16vw,1.08rem)!important;
+ line-height:1.46!important;font-weight:800!important;
+ letter-spacing:0!important;overflow-wrap:normal!important;word-break:normal!important;
+}
+#view-chart.mq-v115-ready .mq-v115-points {
+ font-size:clamp(.86rem,1.1vw,.99rem)!important;
+ line-height:1.33!important;font-weight:900!important;
+}
+#view-chart.mq-v115-ready .mq-v115-done::after {width:17px!important;height:17px!important;font-size:11px!important;}
+#view-chart.mq-v115-ready .mq-v115-detail-title {font-size:clamp(1.05rem,1.55vw,1.3rem)!important;line-height:1.5!important;letter-spacing:0!important;}
+#view-chart.mq-v115-ready .mq-v115-detail-points {font-size:1.06rem!important;min-width:67px!important;color:#245e88!important;}
+#view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {
+ font-size:clamp(.96rem,1.18vw,1.12rem)!important;
+ line-height:1.57!important;padding:9px 11px!important;
+ min-height:43px!important;font-weight:650!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-option-text-v2 {line-height:1.57!important;}
+#view-chart.mq-v115-ready #chart-grid-container .chart-score-v2 {font-size:.92rem!important;min-width:30px!important;}
+#view-chart.mq-v115-ready #chart-grid-container .check-box-v2 {width:21px!important;height:21px!important;flex-basis:21px!important;}
+#view-chart.mq-v115-ready #chart-grid-container .chart-subhead-v4 {font-size:1rem!important;line-height:1.5!important;}
+#view-chart.mq-v115-ready #chart-grid-container .chart-service-chip-v4 {font-size:.96rem!important;line-height:1.5!important;padding:8px 9px!important;}
+#view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label {font-size:.96rem!important;line-height:1.55!important;}
+#view-chart.mq-v115-ready .mq-v115-time {font-size:.93rem!important;min-height:39px!important;width:102px!important;max-width:102px!important;}
+#view-chart.mq-v115-ready .mq-v115-time-step {width:31px!important;height:39px!important;font-size:20px!important;}
+#view-chart.mq-v115-ready .mq-v115-mini,
+#view-chart.mq-v115-ready .mq-v115-back,
+#view-chart.mq-v115-ready .mq-v115-diary-tab {font-size:.94rem!important;line-height:1.35!important;min-height:37px!important;}
+#view-chart.mq-v115-ready #btn-submit-chart {
+ font-size:1.02rem!important;line-height:1.4!important;font-weight:800!important;
+ min-height:46px!important;padding:9px 13px!important;
+}
+#view-chart.mq-v115-ready .chart-final-score-v2 {font-size:.98rem!important;}
+#view-chart.mq-v115-ready .chart-final-score-v2 strong {font-size:1.3rem!important;}
+/* Wider laptop tiles: 3 across x 4 down improves legibility without changing data. */
+@media(min-width:820px){
+ .container.mq-v115-wide {max-width:1190px!important;}
+ #view-chart.mq-v115-ready #daily-chart-form {grid-template-columns:minmax(330px,.96fr) minmax(0,1.1fr)!important;gap:12px!important;}
+ #view-chart.mq-v115-ready #daily-chart-form .mq-v115-tiles {grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:8px!important;}
+ #view-chart.mq-v115-ready #chart-grid-container {padding:14px!important;}
+}
+@media(max-width:819px){
+ #view-chart.mq-v115-ready #daily-chart-form .mq-v115-tiles {gap:6px!important;}
+ #view-chart.mq-v115-ready .mq-v115-name {font-size:.98rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-points {font-size:.89rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-icon {font-size:25px!important;}
+ #view-chart.mq-v115-ready .chart-progress-head-v2 {min-height:72px!important;padding:9px 11px!important;}
+ #view-chart.mq-v115-ready #daily-chart-form>.chart-submit-wrap-v2 {padding:7px 10px!important;}
+ #view-chart.mq-v115-ready #btn-submit-chart {font-size:1rem!important;min-width:147px!important;}
+}
+@media(max-width:360px){
+ #view-chart.mq-v115-ready .mq-v115-name {font-size:.98rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-points {font-size:.94rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-icon {font-size:23px!important;}
+ #view-chart.mq-v115-ready .mq-v115-tile {padding:5px 2px!important;min-height:86px!important;}
+ #view-chart.mq-v115-ready #daily-chart-form .mq-v115-tiles {grid-template-rows:repeat(4,minmax(86px,1fr))!important;overflow-y:auto!important;}
+ #view-chart.mq-v115-ready .mq-v115-time {width:86px!important;max-width:86px!important;font-size:.87rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-time-step {width:27px!important;}
+ #view-chart.mq-v115-ready #chart-grid-container {padding:8px!important;}
+ #view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {font-size:1rem!important;}
+}
+/* Apply dark palette to the whole chart header and controls, not just the tiles. */
+html[data-theme="dark"] #view-chart.mq-v115-ready,
+body[data-theme="dark"] #view-chart.mq-v115-ready {
+ --mq-card:#1e374a;--mq-pale:#182f41;--mq-border:#4a667a;
+ --mq-text:#f3f7fb;--mq-muted:#c8d8e3;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready > div:first-child h2,
+body[data-theme="dark"] #view-chart.mq-v115-ready > div:first-child h2 {color:#e4b5fa!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-head-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-head-v2 {
+ background:linear-gradient(120deg,#102336 0%,#1b3e4c 100%)!important;
+ border-color:#527385!important;box-shadow:0 4px 18px rgba(0,0,0,.22)!important;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-label-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-label-v2 {color:#d5e7f1!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-total-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-total-v2 {color:#f6d99c!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-total-max-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-total-max-v2 {color:#e0edf3!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-baba-time-v4,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-baba-time-v4 {color:#d6e8f0!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-ring-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-progress-ring-v2 {background:#142b3c!important;color:#f5d699!important;border-color:#e3c185!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-date-btn-v22,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-date-btn-v22,
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-date-btn-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-date-btn-v2 {
+ background:#243d55!important;color:#f0d1ff!important;border-color:#695d8c!important;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile {
+ background:#1c3447!important;border-color:#456076!important;box-shadow:0 3px 12px rgba(0,0,0,.2)!important;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-name,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-name {color:#f4f7fa!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-icon,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-icon {filter:brightness(1.4) saturate(1.18);}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-points,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-points {color:#edcb94!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-detail-points,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-detail-points {color:#e9d19d!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready #chart-grid-container .chart-option-v2,
+body[data-theme="dark"] #view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {color:#f2f7fa!important;}
+html[data-theme="dark"] #view-chart.mq-v115-ready .chart-final-score-v2 strong,
+body[data-theme="dark"] #view-chart.mq-v115-ready .chart-final-score-v2 strong {color:#77dfc7!important;}
+/* Laptop: use comfortable reading sizes where there is room. */
+@media(min-width:820px){
+ #view-chart.mq-v115-ready .mq-v115-name {font-size:1.11rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-points {font-size:1.01rem!important;}
+ #view-chart.mq-v115-ready .mq-v115-icon {font-size:29px!important;}
+ #view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {font-size:1.08rem!important;}
+}
+/* Very short screens may scroll the content area instead of shrinking font below readability. */
+@media(max-height:620px){
+ #view-chart.mq-v115-ready #daily-chart-form {min-height:350px!important;}
+ #view-chart.mq-v115-ready .mq-v115-tiles {overflow-y:auto!important;}
+}
+</style>
 <script id="mq-v115-chart-js">
 (function(){
   'use strict';
