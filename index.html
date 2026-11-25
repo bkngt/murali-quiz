@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v116.2">
+    <link rel="manifest" href="manifest.json?v=v116.3">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1506,7 +1506,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 116.2</div>
+        <div>Version: 116.3</div>
     </div>
 </div>
 
@@ -2017,7 +2017,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v116.2').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v116.3').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2028,7 +2028,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "116.2";
+    const APP_VERSION = "116.3";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -3946,7 +3946,7 @@ function getMegaActivationDateUI(quizDate) {
     function getHistoryQuizKey(item) { return String(item && item.date || "") + "-R" + getQuizRevisionValue(item); }
 
 
-    // v116.2: expose only this narrowly scoped authenticated daily result check;
+    // v116.3: expose only this narrowly scoped authenticated daily result check;
     // never expose participant identity or raw result rows to another account.
     window.mqVerifyOwnExamRankV1161_ = function(exactQuizDate) {
         return apiPostJSON({action:'getStudentLeaderboard',targetDate:String(exactQuizDate),
@@ -4011,7 +4011,7 @@ function getMegaActivationDateUI(quizDate) {
             let today = new Date(); let cy = today.getFullYear(); let cm = today.getMonth(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let firstDay = new Date(cy, cm, 1).getDay(); let launchDate = new Date(2026, 7, 13); 
             let quizMap = {}; serverQuizzes.forEach(sq => { let d = getValidDate({date: sq.quizDate}); if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) quizMap[d.getDate()] = sq; });
             let historyMap = {}; history.forEach(h => { let dStr = String(h.date || ""); if (!dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review")) { let d = getValidDate(h); if(d && d.getMonth() === cm && d.getFullYear() === cy) historyMap[d.getDate()] = h; } });
-            // v116.2: a per-account, server-confirmed daily result may predate the
+            // v116.3: a per-account, server-confirmed daily result may predate the
             // local murali_progress cache. Only verified own-rank dates can show ✅.
             let verifiedCalendarDatesV1161 = {};
             if (typeof window.mqGetOwnExamCompletionsV1161_ === 'function') {
@@ -9501,7 +9501,7 @@ window.saveCustomQuiz = function() {
   </div>
 </div>
 
-<!-- v116.2: Chart history chooser, separate from the quiz review library. -->
+<!-- v116.3: Chart history chooser, separate from the quiz review library. -->
 <div id="mq-chart-review-library-v1162" class="modal-overlay" style="display:none;z-index:10051" onclick="if(event.target===this)closeChartReviewLibraryV1162_()">
   <div class="modal-content mq-chart-review-dialog-v1162" role="dialog" aria-modal="true" aria-labelledby="mq-chart-review-title-v1162">
     <button type="button" class="mq-feedback-close-v112" onclick="closeChartReviewLibraryV1162_()" aria-label="बन्द गर्नुहोस्">✕</button>
@@ -10667,7 +10667,7 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
 })();
 </script>
 <style id="mq-v1161-chart-scroll-css">
-/* v116.2: keep selected chart options independently scrollable on touch screens.
+/* v116.3: keep selected chart options independently scrollable on touch screens.
    The existing sticky submit remains outside this scroll region. */
 #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="detail"] #chart-grid-container,
 #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-grid-container {
@@ -10779,7 +10779,7 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
 })();
 </script>
 
-<!-- v116.2: compact review links, always-accessible Chart Rank and clear 12-tile separators. -->
+<!-- v116.3: compact review links, always-accessible Chart Rank and clear 12-tile separators. -->
 <style id="mq-v1162-review-rank-style">
 #view-progress .mq-review-quick-v1162{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
 #view-progress .mq-review-quick-btn-v1162{display:flex;align-items:center;justify-content:center;min-height:45px;padding:9px 10px;line-height:1.25;font:800 clamp(.86rem,1.4vw,.97rem) 'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif;letter-spacing:0;border-radius:13px;box-shadow:0 2px 7px rgba(34,57,79,.06);white-space:normal;word-break:normal;overflow-wrap:normal}
@@ -10868,5 +10868,42 @@ html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected
 })();
 </script>
 
+
+<!-- v116.3: restrained, theme-aware tile separators and exam calendar day dividers.
+     Presentation only: does not change any quiz, chart, result or score logic. -->
+<style id="mq-v1163-partition-borders">
+/* Chart: a visible but quiet outline. Keep selected tile's accent color. */
+#view-chart.mq-v115-ready .mq-v115-tile:not(.mq-v115-selected) {
+  border:2px solid #9eb7c9 !important;
+  box-shadow:0 2px 6px rgba(36,72,102,.085),inset 0 0 0 .5px rgba(59,92,120,.09) !important;
+}
+#view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected {
+  border:2px solid var(--tile-color) !important;
+  box-shadow:0 3px 11px rgba(40,80,114,.14),inset 0 0 0 .5px var(--tile-color) !important;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile:not(.mq-v115-selected),
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile:not(.mq-v115-selected),
+body.dark-mode #view-chart.mq-v115-ready .mq-v115-tile:not(.mq-v115-selected) {
+  border-color:#7f9bb1 !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.20),inset 0 0 0 .5px rgba(202,223,239,.10) !important;
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected,
+body.dark-mode #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected {
+  border-color:var(--tile-color) !important;
+  box-shadow:0 3px 10px rgba(0,0,0,.30),inset 0 0 0 .5px var(--tile-color) !important;
+}
+/* Exam Calendar: subtle inner delineation that does not override the
+   existing green (completed), blue (playable) or grey (future) status borders. */
+#view-generator .calendar-container [title^="Date:"] {
+  outline:1px solid rgba(63,99,126,.32);
+  outline-offset:-4px;
+}
+html[data-theme="dark"] #view-generator .calendar-container [title^="Date:"],
+body[data-theme="dark"] #view-generator .calendar-container [title^="Date:"],
+body.dark-mode #view-generator .calendar-container [title^="Date:"] {
+  outline-color:rgba(201,222,237,.38);
+}
+</style>
 </body>
 </html>
