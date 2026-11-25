@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v115.3">
+    <link rel="manifest" href="manifest.json?v=v115.4">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1505,7 +1505,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 115.3</div>
+        <div>Version: 115.4</div>
     </div>
 </div>
 
@@ -2016,7 +2016,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v115.3').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v115.4').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2027,7 +2027,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "115.3";
+    const APP_VERSION = "115.4";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -10341,5 +10341,117 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+<style id="mq-v1154-chart-readability-css">
+/* v115.4: accessibility / presentation ONLY; original V4 fields, score & save untouched. */
+/* The optional old v112 bulk-zero shortcut is redundant beside the 0-minute picker.
+   Hide its visual line, not the V4 zero choice / legacy action or the service-none choice. */
+#view-chart.mq-v115-ready #daily-chart-form .chart-zero-btn-v112 { display:none!important; }
+
+/* 12 colored cards: minimum legible Devanagari type on S22 AND desktops. */
+#view-chart.mq-v115-ready .mq-v115-tile {
+  padding:6px 4px!important;gap:2px!important;min-width:0!important;
+  justify-content:center!important;align-items:center!important;
+}
+#view-chart.mq-v115-ready .mq-v115-icon {
+  font-size:clamp(24px,3.1vh,33px)!important;line-height:1.1!important;
+}
+#view-chart.mq-v115-ready .mq-v115-name {
+  font-size:clamp(1.08rem,1.6vw,1.24rem)!important;
+  line-height:1.35!important;font-weight:850!important;
+  letter-spacing:0!important;overflow-wrap:break-word!important;
+  word-break:normal!important;hyphens:none!important;
+}
+#view-chart.mq-v115-ready .mq-v115-points {
+  font-size:clamp(.97rem,1.2vw,1.12rem)!important;line-height:1.24!important;
+  font-weight:900!important;
+}
+/* The selected section is meant for reading, not a miniature desktop form. */
+#view-chart.mq-v115-ready .mq-v115-detail-title {
+  font-size:clamp(1.23rem,1.7vw,1.47rem)!important;
+  font-weight:850!important;line-height:1.38!important;
+}
+#view-chart.mq-v115-ready .mq-v115-detail-points {
+  font-size:1.18rem!important;line-height:1.32!important;
+  font-weight:900!important;padding:6px 9px!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {
+  font-size:clamp(1.17rem,1.38vw,1.27rem)!important;
+  font-weight:700!important;line-height:1.54!important;
+  min-height:47px!important;padding:9px 10px!important;
+  overflow-wrap:break-word!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-option-text-v2,
+#view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 span {
+  line-height:1.54!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-score-v2 {
+  font-size:1.06rem!important;font-weight:900!important;min-width:31px!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-subhead-v4 {
+  font-size:1.17rem!important;line-height:1.46!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-service-chip-v4 {
+  font-size:1.09rem!important;line-height:1.5!important;padding:9px!important;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label {
+  font-size:clamp(1.1rem,1.38vw,1.22rem)!important;
+  line-height:1.4!important;font-weight:800!important;
+}
+#view-chart.mq-v115-ready .mq-v115-time {
+  font-size:1.09rem!important;font-weight:850!important;
+}
+#view-chart.mq-v115-ready .mq-v115-diary-tab {
+  font-size:1rem!important;min-height:43px!important;line-height:1.4!important;
+}
+/* Top back arrow: explicit 48px tap target, visibly large glyph. */
+#view-chart.mq-v115-ready #mq-v115-back {
+  display:inline-flex;align-items:center!important;justify-content:center!important;
+  font-family:system-ui,sans-serif!important;font-size:2rem!important;font-weight:800!important;
+  min-width:53px!important;min-height:48px!important;width:53px!important;
+  height:48px!important;line-height:1!important;padding:0!important;
+  color:var(--mq-text)!important;background:var(--mq-pale)!important;
+  border:1.5px solid var(--mq-border)!important;box-shadow:0 1px 5px rgba(8,36,59,.1)!important;
+}
+/* Keep header readable and prevent the enlarged back arrow from squeezing its title. */
+#view-chart.mq-v115-ready .mq-v115-detail-head {gap:6px!important;min-width:0!important;}
+#view-chart.mq-v115-ready .mq-v115-detail-head .mq-v115-detail-title {
+  flex:1 1 auto!important;min-width:0!important;
+}
+/* Bottom previous/next controls also large enough to use with glasses. */
+#view-chart.mq-v115-ready .mq-v115-detail-steps .mq-v115-mini {
+  font-size:1.12rem!important;font-weight:850!important;line-height:1.4!important;
+  min-height:48px!important;min-width:0!important;
+  padding:9px 12px!important;
+}
+@media(max-width:819px){
+  #view-chart.mq-v115-ready .mq-v115-tile {padding:4px 2px!important;}
+  #view-chart.mq-v115-ready .mq-v115-name {
+    font-size:clamp(1.065rem,4.65vw,1.16rem)!important;line-height:1.29!important;
+  }
+  #view-chart.mq-v115-ready .mq-v115-points {font-size:1.01rem!important;}
+  #view-chart.mq-v115-ready .mq-v115-detail-title {font-size:1.22rem!important;}
+  #view-chart.mq-v115-ready #chart-grid-container .chart-option-v2 {font-size:1.17rem!important;}
+  #view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label {font-size:1.13rem!important;}
+  #view-chart.mq-v115-ready .mq-v115-detail-head .mq-v115-diary-tab {
+    min-width:61px!important;padding:5px!important;font-size:.98rem!important;
+  }
+}
+@media(max-width:360px){
+  #view-chart.mq-v115-ready .mq-v115-name {font-size:1.1rem!important;}
+  #view-chart.mq-v115-ready .mq-v115-tile {min-height:90px!important;}
+  #view-chart.mq-v115-ready .mq-v115-detail-title {font-size:1.18rem!important;}
+  #view-chart.mq-v115-ready .mq-v115-detail-points {font-size:1.08rem!important;min-width:0!important;}
+  #view-chart.mq-v115-ready .mq-v115-detail-steps .mq-v115-mini {font-size:1.08rem!important;}
+}
+@media(min-width:350px) and (max-width:819px){
+  #view-chart.mq-v115-ready .mq-v115-name {font-size:1.17rem!important;}
+}
+@media(max-height:650px){
+  /* Allow the tile panel to scroll rather than shrinking the words into unreadability. */
+  #view-chart.mq-v115-ready .mq-v115-tiles {overflow-y:auto!important;}
+}
+</style>
+
 </body>
 </html>
