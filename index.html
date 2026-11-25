@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v115.4">
+    <link rel="manifest" href="manifest.json?v=v116.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1505,7 +1505,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 115.4</div>
+        <div>Version: 116.0</div>
     </div>
 </div>
 
@@ -2016,7 +2016,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v115.4').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v116.0').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2027,7 +2027,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "115.4";
+    const APP_VERSION = "116.0";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -10026,7 +10026,7 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#2444
 <script id="mq-v115-chart-js">
 (function(){
   'use strict';
-  var form,view,tiles,grid,items,detailTitle,detailPoints,steps,container;
+  var form,view,tiles,grid,items,detailTitle,detailPoints,steps,container,sidebar,diarySave;
   var selection=2, mode='home', initialized=false;
   var names=['अमृतवेला','मुरली','स्वमान','ट्राफिक','धारणा','ज्ञान सेवा','स्थूल सेवा','ब्रह्माभोजन','व्यायाम','साँझको याद','गुडनाइट','डिजिटल संयम'];
   var symbols=['☀','📖','✦','◷','♥','📚','♧','✿','⌁','☼','☾','◈'];
@@ -10074,7 +10074,9 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#2444
     detailTitle.textContent=mode==='diary'?'व्यक्तिगत डायरी':(selection+'. '+names[selection-1]);
     detailPoints.style.display=mode==='diary'?'none':'';
     steps.style.display=mode==='diary'?'none':'';
-    var back=byId('mq-v115-back');if(back)back.style.display=isSmall()?'':'none';
+    var back=byId('mq-v115-back');if(back)back.style.display=(mode==='diary'||mode==='detail')?'inline-flex':'none';
+    var close=byId('mq-v116-diary-close');if(close)close.style.display=mode==='diary'?'inline-flex':'none';
+    if(diarySave)diarySave.style.display=mode==='diary'?'flex':'none';
     var prev=byId('mq-v115-prev'),next=byId('mq-v115-next');if(prev)prev.disabled=selection<=1;if(next)next.textContent=selection===12?'१२ बुँदा':'अर्को ❯';
     sync();
     grid.scrollTop=0;
@@ -10083,6 +10085,8 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#2444
   function choose(i){selection=i;mode='detail';render()}
   function home(){mode='home';render()}
   function diary(){mode='diary';render()}
+  window.mqChartNavigateV116=function(target){if(!initialized)return; if(target==='diary')diary();else home();};
+  window.mqChartModeV116=function(){return mode;};
   function fit(){
     if(!initialized||window.getComputedStyle(view).display==='none')return;
     var r=form.getBoundingClientRect();
@@ -10162,17 +10166,24 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#2444
       button.innerHTML='<span class="mq-v115-icon" aria-hidden="true">'+symbols[index]+'</span><span class="mq-v115-name">'+names[index]+'</span><span class="mq-v115-points">—/'+maxPoints[index]+'</span>';
       button.addEventListener('click',function(){choose(i)});tiles.appendChild(button);
     });
-    form.insertBefore(tiles,grid);
+    sidebar=document.createElement('div');sidebar.className='mq-v116-sidebar';sidebar.appendChild(tiles);
+    var diaryOpen=document.createElement('button');diaryOpen.type='button';diaryOpen.id='mq-v116-diary-open';diaryOpen.className='mq-v116-diary-open';diaryOpen.textContent='✎ व्यक्तिगत डायरी';diaryOpen.addEventListener('click',diary);sidebar.appendChild(diaryOpen);
+    form.insertBefore(sidebar,grid);
     var head=document.createElement('header');head.className='mq-v115-detail-head';
     var back=document.createElement('button');back.type='button';back.id='mq-v115-back';back.className='mq-v115-back';back.textContent='←';back.setAttribute('aria-label','१२ बुँदामा फर्कनुहोस्');back.addEventListener('click',home);
     detailTitle=document.createElement('span');detailTitle.className='mq-v115-detail-title';
     detailPoints=document.createElement('span');detailPoints.className='mq-v115-detail-points';
-    var diaryBtn=document.createElement('button');diaryBtn.type='button';diaryBtn.className='mq-v115-diary-tab';diaryBtn.textContent='✎ डायरी';diaryBtn.setAttribute('aria-label','व्यक्तिगत डायरी');diaryBtn.addEventListener('click',diary);
-    head.appendChild(back);head.appendChild(detailTitle);head.appendChild(detailPoints);head.appendChild(diaryBtn);grid.insertBefore(head,grid.firstChild);
+    var closeBtn=document.createElement('button');closeBtn.id='mq-v116-diary-close';closeBtn.type='button';closeBtn.className='mq-v116-diary-close';closeBtn.textContent='✕';closeBtn.setAttribute('aria-label','डायरी बन्द गर्नुहोस्');closeBtn.addEventListener('click',home);
+    head.appendChild(back);head.appendChild(detailTitle);head.appendChild(detailPoints);head.appendChild(closeBtn);grid.insertBefore(head,grid.firstChild);
     steps=document.createElement('div');steps.className='mq-v115-detail-steps';
     var prev=document.createElement('button');prev.id='mq-v115-prev';prev.type='button';prev.className='mq-v115-mini';prev.textContent='❮ अघिल्लो';prev.addEventListener('click',function(){choose(Math.max(1,selection-1))});
     var next=document.createElement('button');next.id='mq-v115-next';next.type='button';next.className='mq-v115-mini';next.textContent='अर्को ❯';next.addEventListener('click',function(){if(selection>=12)home();else choose(selection+1)});
     steps.appendChild(prev);steps.appendChild(next);grid.appendChild(steps);
+    diarySave=document.createElement('div');diarySave.className='mq-v116-diary-actions';diarySave.id='mq-v116-diary-actions';
+    var diaryStatus=document.createElement('span');diaryStatus.className='mq-v116-diary-status';diaryStatus.id='mq-v116-diary-status';diaryStatus.setAttribute('role','status');
+    var diaryButton=document.createElement('button');diaryButton.id='mq-v116-diary-save';diaryButton.type='button';diaryButton.className='mq-v116-diary-save';diaryButton.textContent='✓ डायरी सुरक्षित गर्नुहोस्';
+    diaryButton.addEventListener('click',function(){if(typeof window.saveChartDiaryV116==='function')window.saveChartDiaryV116()});
+    diarySave.appendChild(diaryStatus);diarySave.appendChild(diaryButton);grid.appendChild(diarySave);
     createTimes();
     // Reduce wording without replacing original date field, date validation or submit handler.
     var db=view.querySelector('.chart-date-btn-v2');if(db){Array.from(db.childNodes).forEach(function(node){if(node.nodeType===3 && node.textContent.indexOf('मिति फेर्नुहोस्')>=0){node.textContent='';}});}
@@ -10182,18 +10193,18 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#2444
       new MutationObserver(function(){var edit=resultBox.querySelector('button[onclick="editChartForm()"]');if(edit&&edit.textContent.indexOf('सच्याउनुहोस्')===-1)edit.textContent='✎ सच्याउनुहोस्';}).observe(resultBox,{childList:true});
     }
     form.dataset.v4ManualNext='1';form.dataset.v4DisableAutoScroll='1';
-    selection=2;mode=isSmall()?'home':'detail';initialized=true;
+    selection=2;mode='home';initialized=true;
     if(container&&window.innerWidth>=820)container.classList.add('mq-v115-wide');
     form.addEventListener('input',syncSoon,false);form.addEventListener('change',syncSoon,false);form.addEventListener('reset',syncSoon,false);
-    var cd=byId('chart-date');if(cd)cd.addEventListener('change',function(){syncSoon();setTimeout(syncSoon,120)},false);
+    var cd=byId('chart-date');if(cd)cd.addEventListener('change',function(){home();syncSoon();setTimeout(syncSoon,120);if(typeof window.loadDiaryDraftV116==='function')setTimeout(window.loadDiaryDraftV116,200)},false);
     if(typeof window.loadChartDataForDate==='function'&&!window._mqV115LoadWrapped){
       var oldLoad=window.loadChartDataForDate;window.loadChartDataForDate=function(){var res=oldLoad.apply(this,arguments);syncSoon();setTimeout(syncSoon,170);return res};window._mqV115LoadWrapped=true;
     }
     if(typeof window.editChartForm==='function'&&!window._mqV115EditWrapped){
-      var oldEdit=window.editChartForm;window.editChartForm=function(){var result=oldEdit.apply(this,arguments);form.style.display='grid';setTimeout(function(){render();fit();},0);return result;};window._mqV115EditWrapped=true;
+      var oldEdit=window.editChartForm;window.editChartForm=function(){var result=oldEdit.apply(this,arguments);form.style.display='grid';mode='home';setTimeout(function(){render();fit();},0);return result;};window._mqV115EditWrapped=true;
     }
     if(typeof window.switchTab==='function'&&!window._mqV115SwitchWrapped){
-      var oldSwitch=window.switchTab;window.switchTab=function(){var ret=oldSwitch.apply(this,arguments);if(arguments[0]==='chart'){if(container&&window.innerWidth>=820)container.classList.add('mq-v115-wide');setTimeout(fit,0);setTimeout(syncSoon,70)}else if(container){container.classList.remove('mq-v115-wide')}return ret};window._mqV115SwitchWrapped=true;
+      var oldSwitch=window.switchTab;window.switchTab=function(){var ret=oldSwitch.apply(this,arguments);if(arguments[0]==='chart'){if(container&&window.innerWidth>=820)container.classList.add('mq-v115-wide');mode='home';setTimeout(render,0);setTimeout(fit,0);setTimeout(syncSoon,70)}else if(container){container.classList.remove('mq-v115-wide')}return ret};window._mqV115SwitchWrapped=true;
     }
     window.addEventListener('resize',function(){if(container){container.classList.toggle('mq-v115-wide',window.innerWidth>=820&&view.style.display!=='none')}if(isSmall()&&mode==='detail'){}render()});
     if(typeof MutationObserver!=='undefined'){
@@ -10453,5 +10464,175 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
 }
 </style>
 
+<style id="mq-v116-diary-layout-css">
+/* v116: 12 core V4 items remain unchanged. Diary is an independent final navigation destination. */
+#view-chart.mq-v115-ready #daily-chart-form .mq-v116-sidebar{
+  display:flex;flex-direction:column;gap:9px;min-width:0;min-height:0;height:100%;box-sizing:border-box;
+}
+#view-chart.mq-v115-ready #daily-chart-form .mq-v116-sidebar .mq-v115-tiles{
+  flex:1 1 auto;height:auto;min-height:0;overflow-y:auto;align-content:stretch;
+}
+#view-chart.mq-v115-ready #daily-chart-form .mq-v116-diary-open{
+  flex:0 0 auto;min-height:42px;width:100%;padding:8px 12px;box-sizing:border-box;
+  border-radius:11px;border:1.5px solid var(--mq-border);background:var(--mq-pale);
+  color:var(--mq-text);font:800 1.08rem/1.5 'Noto Sans Devanagari','Mukta','Nirmala UI',sans-serif;
+  cursor:pointer;text-align:center;box-shadow:none;
+}
+#view-chart.mq-v115-ready #daily-chart-form .mq-v116-diary-open:focus-visible,
+#view-chart.mq-v115-ready .mq-v116-diary-close:focus-visible{outline:2px solid #0c91ba;outline-offset:2px}
+#view-chart.mq-v115-ready .mq-v116-diary-close{
+  display:none;align-items:center;justify-content:center;flex:0 0 auto;width:44px;height:44px;
+  border-radius:10px;color:var(--mq-text);background:var(--mq-pale);
+  border:1px solid var(--mq-border);font:900 1.35rem system-ui,sans-serif;cursor:pointer;
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="home"]{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="home"] #chart-grid-container{display:none!important}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] .mq-v116-sidebar{display:none!important}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"]{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-grid-container{
+  display:flex!important;flex-direction:column;gap:8px;min-height:0;overflow-y:auto;
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] .mq-v115-detail-head{
+  position:sticky;top:0;z-index:12;background:var(--mq-card);
+  margin:-3px 0 2px;padding:4px 0 10px;
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] .mq-v115-detail-title{flex:1!important;min-width:0}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #mq-v115-back{display:inline-flex!important}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #mq-v116-diary-close{display:inline-flex!important}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] .mq-v116-diary-actions{
+  display:flex!important;align-items:center;gap:8px;position:sticky;bottom:-11px;z-index:10;
+  padding:10px 6px;margin-top:auto;background:var(--mq-card);border-top:1px solid var(--mq-border);
+}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"]>.chart-submit-wrap-v2{display:none!important}
+#view-chart.mq-v115-ready .mq-v116-diary-actions{display:none;justify-content:flex-end}
+#view-chart.mq-v115-ready .mq-v116-diary-status{
+  flex:1 1 auto;color:var(--mq-muted);font-size:.92rem;line-height:1.45;min-width:0;
+}
+#view-chart.mq-v115-ready .mq-v116-diary-save{
+  flex:0 0 auto;max-width:65%;padding:10px 14px;min-height:45px;border:0;border-radius:11px;
+  font:850 1rem/1.45 'Noto Sans Devanagari','Mukta','Nirmala UI',sans-serif;
+  color:#fff;background:linear-gradient(115deg,#087d73,#147cb8);cursor:pointer;
+}
+#view-chart.mq-v115-ready .mq-v116-diary-save:disabled{opacity:.6;cursor:wait}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-time-note-v4{display:none!important}
+#view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-reflection-section-v4 .chart-title-v2{display:none!important}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-reflection-field-v4{display:block!important;margin:0 0 12px!important}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-reflection-field-v4>span{
+  font-size:1.07rem!important;line-height:1.5!important;
+}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 textarea{
+  display:block!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;margin:5px 0 0!important;
+  font-size:1.02rem!important;line-height:1.6!important;min-height:51px!important;
+}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-service-grid-v4{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+#view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-dream-chip-v4{font-size:.99rem!important}
+@media(min-width:820px){
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="home"] .mq-v115-tiles{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  }
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="detail"] .mq-v115-tiles{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  }
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="detail"] #mq-v115-back{display:inline-flex!important}
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-grid-container{
+    max-width:860px;width:100%;margin:0 auto;
+  }
+}
+@media(max-width:819px){
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="detail"] .mq-v116-sidebar{display:none!important}
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="home"] .mq-v116-sidebar{display:flex!important}
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="home"] .mq-v115-tiles{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  }
+  #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-grid-container{padding:9px!important}
+  #view-chart.mq-v115-ready #chart-reflection-section-v4 .chart-service-grid-v4{grid-template-columns:minmax(0,1fr)!important}
+  #view-chart.mq-v115-ready .mq-v116-diary-status{font-size:.84rem}
+  #view-chart.mq-v115-ready .mq-v116-diary-save{padding:9px 10px;font-size:.94rem}
+}
+@media(max-height:650px){
+  #view-chart.mq-v115-ready #daily-chart-form .mq-v116-sidebar{gap:5px}
+  #view-chart.mq-v115-ready #daily-chart-form .mq-v116-diary-open{min-height:39px;padding:5px 10px}
+}
+</style>
+<script id="mq-v116-diary-save-js">
+(function(){
+ 'use strict';
+ var bound=false, saving=false;
+ var FIELDS=['dailyWeakness','tomorrowResolution','dreamType','dreamNote'];
+ function el(id){return document.getElementById(id)}
+ function date(){var d=el('chart-date');return d?d.value:''}
+ function phone(){try{return String(userPhone||localStorage.getItem('murali_phone')||'')}catch(e){return localStorage.getItem('murali_phone')||''}}
+ function normalizePhone(p){try{if(typeof window.normalizePhoneForChartV30_==='function')return window.normalizePhoneForChartV30_(p)}catch(e){}return String(p||'').replace(/\D/g,'')}
+ function key(d){return 'mq_chart_diary_draft_v116_'+normalizePhone(phone())+'_'+String(d||date())}
+ function vals(){var chosen=document.querySelector('#daily-chart-form input.chart-dream-type-v4:checked');return {
+  dailyWeakness:((el('chart-daily-weakness')&&el('chart-daily-weakness').value)||'').trim().slice(0,240),
+  tomorrowResolution:((el('chart-tomorrow-resolution')&&el('chart-tomorrow-resolution').value)||'').trim().slice(0,240),
+  dreamType:chosen?chosen.value:'',
+  dreamNote:((el('chart-dream-note')&&el('chart-dream-note').value)||'').trim().slice(0,240)
+ }}
+ function isValidDate(d){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&(!el('chart-date')||d<=el('chart-date').max)}
+ function status(t){var box=el('mq-v116-diary-status');if(box)box.textContent=t||''}
+ function storeDraft(){var d=date();if(!isValidDate(d))return;try{localStorage.setItem(key(d),JSON.stringify({date:d,phone:normalizePhone(phone()),data:vals(),at:Date.now()}))}catch(e){}}
+ function restoreDraft(){var d=date();if(!isValidDate(d))return;var draft;try{draft=JSON.parse(localStorage.getItem(key(d))||'null')}catch(e){};if(!draft||!draft.data||draft.date!==d||draft.phone!==normalizePhone(phone()))return;
+  var x=draft.data;
+  if(el('chart-daily-weakness'))el('chart-daily-weakness').value=x.dailyWeakness||'';
+  if(el('chart-tomorrow-resolution'))el('chart-tomorrow-resolution').value=x.tomorrowResolution||'';
+  if(el('chart-dream-note'))el('chart-dream-note').value=x.dreamNote||'';
+  document.querySelectorAll('#daily-chart-form .chart-dream-type-v4').forEach(function(c){c.checked=(!!x.dreamType&&c.value===x.dreamType);var label=c.closest('.chart-dream-chip-v4');if(label)label.classList.toggle('selected-dream-v4',c.checked)});
+  if(typeof window.resizeChartReflectionTextareasV4==='function')window.resizeChartReflectionTextareasV4();
+ }
+ window.loadDiaryDraftV116=restoreDraft;
+ function findLocal(){var list=[];try{list=JSON.parse(localStorage.getItem('murali_daily_charts')||'[]')}catch(e){};if(!Array.isArray(list))return null;
+  var p=normalizePhone(phone()),d=date();return list.find(function(x){return x&&String(x.date)===d&&normalizePhone(x.phone)===p&&Number(x.chartVersion||x.schemaVersion||0)>=4})||null;
+ }
+ function patchLocal(data,savedDate){var charts=[];try{charts=JSON.parse(localStorage.getItem('murali_daily_charts')||'[]')}catch(e){};if(!Array.isArray(charts))return;
+  var p=normalizePhone(phone()),d=savedDate,changed=false;
+  charts.forEach(function(x){if(x&&String(x.date)===d&&normalizePhone(x.phone)===p&&Number(x.chartVersion||x.schemaVersion||0)>=4){FIELDS.forEach(function(k){x[k]=data[k]});changed=true}});
+  if(changed){try{localStorage.setItem('murali_daily_charts',JSON.stringify(charts))}catch(e){}}
+ }
+ window.saveChartDiaryV116=async function(){
+  if(saving)return;
+  var d=date();if(!isValidDate(d)){status('मिति मिलेन');return}
+  storeDraft();var data=vals();
+  if(!navigator.onLine){status('अफलाइन Draft सुरक्षित छ; अनलाइनमा पुनः सेभ गर्नुहोस्');return}
+  var btn=el('mq-v116-diary-save');saving=true;if(btn)btn.disabled=true;status('सुरक्षित हुँदैछ…');
+  try{
+   var local=findLocal();
+   if(local&&local.synced!==true&&typeof window.syncPendingCharts==='function'){
+    await window.syncPendingCharts();
+    local=findLocal();
+    if(local&&local.synced!==true){status('चार्ट Cloud Sync बाँकी छ; डायरी Draft सुरक्षित छ');return}
+   }
+   var response=await apiPostJSON({action:'saveChartDiaryV116',phone:phone(),pin:localStorage.getItem('murali_pin')||'',deviceId:getDeviceId(),date:d,
+    dailyWeakness:data.dailyWeakness,tomorrowResolution:data.tomorrowResolution,dreamType:data.dreamType,dreamNote:data.dreamNote},
+    {retries:1,timeoutMs:16000});
+   if(!response||response.status!=='success'){
+    status(response&&response.code==='CHART_NOT_FOUND'?'डायरी Draft सुरक्षित छ; पहिले यो मितिको चार्ट Submit गर्नुहोस्':((response&&response.message)||'सुरक्षित हुन सकेन; Draft सुरक्षित छ'));
+    return;
+   }
+   patchLocal(data,d);
+   try{localStorage.removeItem(key(d))}catch(e){}
+   if(date()===d)status('✓ डायरी Google Sheets मा सुरक्षित भयो');
+  }catch(e){status('नेटवर्क समस्या; डायरी Draft सुरक्षित छ')}finally{saving=false;if(btn)btn.disabled=false}
+ };
+ function start(){if(bound)return;var sec=el('chart-reflection-section-v4');if(!sec)return;bound=true;
+  sec.addEventListener('input',function(){storeDraft();status('')},false);
+  sec.addEventListener('change',function(){storeDraft();status('')},false);
+  var chartDate=el('chart-date');if(chartDate)chartDate.addEventListener('change',function(){status('');setTimeout(restoreDraft,260)},false);
+  if(typeof window.loadChartDataForDate==='function'&&!window._mqDiaryLoadWrappedV116){var old=window.loadChartDataForDate;
+    window.loadChartDataForDate=function(){var result=old.apply(this,arguments);setTimeout(restoreDraft,80);return result};window._mqDiaryLoadWrappedV116=true;
+  }
+  setTimeout(restoreDraft,180);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();
+</script>
 </body>
 </html>
