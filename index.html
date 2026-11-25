@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v115.0">
+    <link rel="manifest" href="manifest.json?v=v115.2">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1505,7 +1505,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 115.0</div>
+        <div>Version: 115.2</div>
     </div>
 </div>
 
@@ -2016,7 +2016,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v115.0').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v115.2').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2027,7 +2027,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "115.0";
+    const APP_VERSION = "115.2";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -9970,6 +9970,59 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .chart-final-score-v2 strong {
  #view-chart.mq-v115-ready .mq-v115-tiles {overflow-y:auto!important;}
 }
 </style>
+
+<style id="mq-v1152-quick-time-css">
+/* v115.2: only the seven existing V4 time rows. No change to data / scoring. */
+#view-chart.mq-v115-ready #chart-grid-container .chart-time-list-v4{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:8px!important;margin-top:1px!important;width:100%;max-width:530px;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  gap:10px!important;padding:7px 9px!important;min-height:54px;
+}
+#view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label{
+  flex:1 1 auto!important;min-width:0!important;max-width:190px!important;
+  font-size:1rem!important;line-height:1.45!important;font-weight:750!important;
+}
+#view-chart.mq-v115-ready .mq-v115-time-set{
+  display:flex!important;align-items:center!important;flex:0 0 auto!important;
+  gap:5px!important;white-space:nowrap;
+}
+#view-chart.mq-v115-ready .mq-v115-time{
+  width:91px!important;max-width:91px!important;min-width:80px!important;
+  min-height:42px!important;padding:6px 5px!important;
+  border:1px solid var(--mq-border)!important;border-radius:10px!important;
+  background:var(--mq-card)!important;color:var(--mq-text)!important;
+  font-size:1rem!important;font-weight:850!important;font-variant-numeric:tabular-nums;
+}
+#view-chart.mq-v115-ready .mq-v115-time-step{
+  width:37px!important;height:42px!important;min-width:37px!important;
+  border-radius:10px!important;border:1px solid var(--mq-border)!important;
+  background:var(--mq-card)!important;color:var(--mq-text)!important;
+  font-size:24px!important;line-height:1!important;font-weight:800!important;
+  box-shadow:0 2px 6px rgba(15,38,65,.045)!important;touch-action:manipulation;
+}
+#view-chart.mq-v115-ready .mq-v115-time-step:active{background:var(--mq-pale)!important;transform:scale(.96)}
+@media(max-width:480px){
+ #view-chart.mq-v115-ready #chart-grid-container .chart-time-list-v4{gap:7px!important;max-width:100%!important}
+ #view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4{gap:5px!important;min-height:49px!important;padding:5px 7px!important}
+ #view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label{font-size:.97rem!important;max-width:none!important;line-height:1.35!important}
+ #view-chart.mq-v115-ready .mq-v115-time-set{gap:4px!important}
+ #view-chart.mq-v115-ready .mq-v115-time{width:76px!important;max-width:76px!important;min-width:76px!important;min-height:40px!important;padding:4px 3px!important;font-size:.95rem!important}
+ #view-chart.mq-v115-ready .mq-v115-time-step{width:33px!important;min-width:33px!important;height:40px!important;font-size:23px!important}
+}
+@media(max-width:340px){
+ #view-chart.mq-v115-ready #chart-grid-container .chart-time-row-v4 label{font-size:.9rem!important}
+ #view-chart.mq-v115-ready .mq-v115-time{width:73px!important;max-width:73px!important;min-width:73px!important;font-size:.9rem!important}
+ #view-chart.mq-v115-ready .mq-v115-time-step{width:30px!important;min-width:30px!important}
+}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time-step,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time-step{background:#244457!important;color:#f4f7fb!important;border-color:#527086!important}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time,
+body[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-time{background:#244457!important;color:#f4f7fb!important;border-color:#527086!important}
+</style>
+
 <script id="mq-v115-chart-js">
 (function(){
   'use strict';
@@ -10036,41 +10089,61 @@ body[data-theme="dark"] #view-chart.mq-v115-ready .chart-final-score-v2 strong {
     var h=Math.max(255,Math.min(720,window.innerHeight-r.top-reserved));
     form.style.setProperty('--mq-chart-available',h+'px');
   }
-  function minuteChoices(){
-    var x=[0,1,2,3,4,5,6,7,8,9,10];for(var n=15;n<=180;n+=5)x.push(n);for(var j=210;j<=720;j+=30)x.push(j);x.push(900,1080,1200,1440);
-    return x;
-  }
+  // v115.2: Four sensible presets per existing V4 field; never modify its saved schema.
+  var quickTimeConfig = {
+    'chart-time-amritvela':{label:'अमृतवेला',values:[0,15,30,60]},
+    'chart-time-murli-before':{label:'मुरली अघि',values:[0,5,15,30]},
+    'chart-time-murli-after':{label:'मुरली पछि',values:[0,5,15,30]},
+    'chart-time-sthool-sewa':{label:'सेवा समय',values:[0,10,30,60]},
+    'chart-time-daytime-yoga':{label:'दिउँसो याद',values:[0,15,30,60]},
+    'chart-time-evening-yoga':{label:'साँझ योग',values:[0,15,30,60]},
+    'chart-time-goodnight':{label:'गुडनाइट याद',values:[0,5,15,30]}
+  };
   function fillTimeSelect(sel,input){
-    var value=input.value;
+    var value=String(input.value==null?'':input.value);
+    // Keep exactly four fixed choices. A previously saved arbitrary minute is an
+    // ephemeral fifth option, removed on the next edit; never round old records.
+    Array.prototype.slice.call(sel.querySelectorAll('option[data-mq-custom="1"]')).forEach(function(opt){sel.removeChild(opt)});
     if(value!==''&&!Array.prototype.some.call(sel.options,function(o){return o.value===value;})){
-      var extra=document.createElement('option');extra.value=value;extra.textContent=value+' मिनेट';sel.appendChild(extra);
+      var exact=document.createElement('option');exact.value=value;exact.textContent=value+' मि.';exact.dataset.mqCustom='1';
+      sel.appendChild(exact);
     }
-    sel.value=value===''?'':value;
+    sel.value=value;
   }
   function setTime(input,sel,value){
     if(value===''){input.value='';}
     else input.value=String(Math.max(0,Math.min(1440,Math.floor(Number(value)||0))));
     fillTimeSelect(sel,input);
-    try{input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){var evt=document.createEvent('Event');evt.initEvent('input',true,false);input.dispatchEvent(evt)}
+    try{input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}
+    catch(e){var evt=document.createEvent('Event');evt.initEvent('input',true,false);input.dispatchEvent(evt);}
     input.dataset.touched='1';
     window._chartFormDirtyV107=true;
     syncSoon();
   }
-  function syncTime(){form.querySelectorAll('.chart-time-input-v4').forEach(function(input){var row=input.closest('.chart-time-row-v4');if(!row)return;var select=row.querySelector('.mq-v115-time');if(select)fillTimeSelect(select,input)})}
+  function syncTime(){form.querySelectorAll('.chart-time-input-v4').forEach(function(input){
+    var row=input.closest('.chart-time-row-v4');if(!row)return;
+    var select=row.querySelector('.mq-v115-time');if(select)fillTimeSelect(select,input);
+  })}
   function createTimes(){
     form.querySelectorAll('.chart-time-input-v4').forEach(function(input){
-      if(input.dataset.mqV115==='1')return;input.dataset.mqV115='1';
+      if(input.dataset.mqV115==='1')return;
       var row=input.closest('.chart-time-row-v4');if(!row)return;
+      input.dataset.mqV115='1';
+      var config=quickTimeConfig[input.id]||{label:'समय',values:[0,15,30,60]};
+      var label=row.querySelector('label');if(label)label.textContent=config.label;
       var shell=document.createElement('span');shell.className='mq-v115-time-set';
-      var minus=document.createElement('button');minus.type='button';minus.className='mq-v115-time-step';minus.textContent='−';minus.setAttribute('aria-label','मिनेट घटाउनुहोस्');
-      var sel=document.createElement('select');sel.className='mq-v115-time';sel.setAttribute('aria-label',input.getAttribute('aria-label')||'मिनेट');
+      var minus=document.createElement('button');minus.type='button';minus.className='mq-v115-time-step';
+      minus.textContent='−';minus.setAttribute('aria-label',config.label+' ५ मिनेट घटाउनुहोस्');
+      var sel=document.createElement('select');sel.className='mq-v115-time';
+      sel.setAttribute('aria-label',config.label+' मिनेट');
       var empty=document.createElement('option');empty.value='';empty.textContent='—';sel.appendChild(empty);
-      minuteChoices().forEach(function(n){var opt=document.createElement('option');opt.value=String(n);opt.textContent=n+' मिनेट';sel.appendChild(opt)});
-      var plus=document.createElement('button');plus.type='button';plus.className='mq-v115-time-step';plus.textContent='+';plus.setAttribute('aria-label','मिनेट बढाउनुहोस्');
+      config.values.forEach(function(n){var opt=document.createElement('option');opt.value=String(n);opt.textContent=n+' मि.';sel.appendChild(opt)});
+      var plus=document.createElement('button');plus.type='button';plus.className='mq-v115-time-step';
+      plus.textContent='+';plus.setAttribute('aria-label',config.label+' ५ मिनेट बढाउनुहोस्');
       shell.appendChild(minus);shell.appendChild(sel);shell.appendChild(plus);row.appendChild(shell);
       sel.addEventListener('change',function(){setTime(input,sel,sel.value)});
-      minus.addEventListener('click',function(){var cur=Number(input.value)||0;setTime(input,sel,Math.max(0,cur-(cur<=10?1:5)))});
-      plus.addEventListener('click',function(){var cur=Number(input.value)||0;setTime(input,sel,Math.min(1440,cur<10?cur+1:cur+5))});
+      minus.addEventListener('click',function(){var cur=Number(input.value)||0;setTime(input,sel,Math.max(0,cur-5))});
+      plus.addEventListener('click',function(){var cur=Number(input.value)||0;setTime(input,sel,Math.min(1440,cur+5))});
       fillTimeSelect(sel,input);
     });
   }
