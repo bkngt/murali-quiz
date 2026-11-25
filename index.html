@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v116.1">
+    <link rel="manifest" href="manifest.json?v=v116.2">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1229,7 +1229,7 @@
     <div id="view-chart" style="display: none;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; border-bottom:1px dashed var(--border-color); padding-bottom:8px;">
             <h2 style="color:var(--chart-color); margin:0; font-weight:800; font-size:1.1rem;">📊 मेरो चार्ट (१०० अंक)</h2>
-            <button class="btn-small" type="button" onclick="openChartLeaderboard()" style="background:var(--chart-color); color:#fff; border:none; padding:.3rem .75rem; font-weight:800; border-radius:8px;">👥 सहभागी</button>
+            <button class="btn-small" type="button" onclick="openChartLeaderboard()" id="mq-chart-rank-entry-v1162" title="चार्ट Rank" style="background:var(--chart-color); color:#fff; border:none; padding:.3rem .75rem; font-weight:800; border-radius:8px;">🏆 Chart Rank</button>
         </div>
 
         <div class="chart-topbar-v2" style="margin-bottom:8px;">
@@ -1422,8 +1422,9 @@
     </div>
 <!-- Progress View -->
     <div id="view-progress" style="display: none;">
-        <div class="mq-review-library-wrap-v114">
-          <button type="button" onclick="openReviewLibraryV114_()" class="mq-review-library-main-v114">📋 मेरा पुराना परीक्षा Review</button>
+        <div class="mq-review-quick-v1162" role="group" aria-label="पुराना अभिलेख समीक्षा">
+          <button type="button" onclick="openReviewLibraryV114_()" class="mq-review-quick-btn-v1162 mq-quiz-review-v1162">📝 परीक्षा Review</button>
+          <button type="button" onclick="openChartReviewLibraryV1162_()" class="mq-review-quick-btn-v1162 mq-chart-review-v1162">📊 चार्ट Review</button>
         </div>
         <div id="spiritual-badge-container-v11" style="margin-bottom:12px;">
             <button type="button" onclick="openSpiritualCardModalV11()" style="width:100%; background:linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05)); color:var(--text-color); border:1px solid #f59e0b; padding:0.6rem 0.8rem; border-radius:12px; font-weight:800; font-size:0.95rem; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(245,158,11,0.15);">
@@ -1505,7 +1506,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 116.1</div>
+        <div>Version: 116.2</div>
     </div>
 </div>
 
@@ -2016,7 +2017,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v116.1').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v116.2').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2027,7 +2028,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "116.1";
+    const APP_VERSION = "116.2";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -3945,7 +3946,7 @@ function getMegaActivationDateUI(quizDate) {
     function getHistoryQuizKey(item) { return String(item && item.date || "") + "-R" + getQuizRevisionValue(item); }
 
 
-    // v116.1: expose only this narrowly scoped authenticated daily result check;
+    // v116.2: expose only this narrowly scoped authenticated daily result check;
     // never expose participant identity or raw result rows to another account.
     window.mqVerifyOwnExamRankV1161_ = function(exactQuizDate) {
         return apiPostJSON({action:'getStudentLeaderboard',targetDate:String(exactQuizDate),
@@ -4010,7 +4011,7 @@ function getMegaActivationDateUI(quizDate) {
             let today = new Date(); let cy = today.getFullYear(); let cm = today.getMonth(); let daysInMonth = new Date(cy, cm + 1, 0).getDate(); let firstDay = new Date(cy, cm, 1).getDay(); let launchDate = new Date(2026, 7, 13); 
             let quizMap = {}; serverQuizzes.forEach(sq => { let d = getValidDate({date: sq.quizDate}); if(d && d.getMonth() === cm && d.getFullYear() === cy && !sq.isMegaQuiz) quizMap[d.getDate()] = sq; });
             let historyMap = {}; history.forEach(h => { let dStr = String(h.date || ""); if (!dStr.includes("Mega") && !dStr.includes("मेगा") && !dStr.includes("Review")) { let d = getValidDate(h); if(d && d.getMonth() === cm && d.getFullYear() === cy) historyMap[d.getDate()] = h; } });
-            // v116.1: a per-account, server-confirmed daily result may predate the
+            // v116.2: a per-account, server-confirmed daily result may predate the
             // local murali_progress cache. Only verified own-rank dates can show ✅.
             let verifiedCalendarDatesV1161 = {};
             if (typeof window.mqGetOwnExamCompletionsV1161_ === 'function') {
@@ -9500,6 +9501,15 @@ window.saveCustomQuiz = function() {
   </div>
 </div>
 
+<!-- v116.2: Chart history chooser, separate from the quiz review library. -->
+<div id="mq-chart-review-library-v1162" class="modal-overlay" style="display:none;z-index:10051" onclick="if(event.target===this)closeChartReviewLibraryV1162_()">
+  <div class="modal-content mq-chart-review-dialog-v1162" role="dialog" aria-modal="true" aria-labelledby="mq-chart-review-title-v1162">
+    <button type="button" class="mq-feedback-close-v112" onclick="closeChartReviewLibraryV1162_()" aria-label="बन्द गर्नुहोस्">✕</button>
+    <h3 id="mq-chart-review-title-v1162">📊 चार्ट Review</h3>
+    <div id="mq-chart-review-list-v1162"></div>
+  </div>
+</div>
+
 <!-- v114: Question feedback is available only inside completed Result Review. -->
 <div id="mq-feedback-trigger-v112" style="display:none" aria-live="polite">
   <span id="mq-feedback-label-v112">यस प्रश्नबारे</span>
@@ -10657,7 +10667,7 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
 })();
 </script>
 <style id="mq-v1161-chart-scroll-css">
-/* v116.1: keep selected chart options independently scrollable on touch screens.
+/* v116.2: keep selected chart options independently scrollable on touch screens.
    The existing sticky submit remains outside this scroll region. */
 #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="detail"] #chart-grid-container,
 #view-chart.mq-v115-ready #daily-chart-form[data-mq-mode="diary"] #chart-grid-container {
@@ -10768,5 +10778,95 @@ body[data-theme="dark"] #view-chart #chart-result-box.mq-v1153-compact .bk-reope
   };
 })();
 </script>
+
+<!-- v116.2: compact review links, always-accessible Chart Rank and clear 12-tile separators. -->
+<style id="mq-v1162-review-rank-style">
+#view-progress .mq-review-quick-v1162{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 12px}
+#view-progress .mq-review-quick-btn-v1162{display:flex;align-items:center;justify-content:center;min-height:45px;padding:9px 10px;line-height:1.25;font:800 clamp(.86rem,1.4vw,.97rem) 'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif;letter-spacing:0;border-radius:13px;box-shadow:0 2px 7px rgba(34,57,79,.06);white-space:normal;word-break:normal;overflow-wrap:normal}
+#view-progress .mq-quiz-review-v1162{background:rgba(2,132,199,.065);border:1.5px solid #2b8abb;color:#056a9d}
+#view-progress .mq-chart-review-v1162{background:rgba(16,155,118,.07);border:1.5px solid #188e79;color:#08735f}
+#view-progress .mq-review-quick-btn-v1162:focus-visible,#mq-chart-rank-entry-v1162:focus-visible{outline:3px solid #cc9c47;outline-offset:2px}
+html[data-theme="dark"] #view-progress .mq-quiz-review-v1162,body.dark-mode #view-progress .mq-quiz-review-v1162{background:rgba(40,143,190,.16);border-color:#59afd3;color:#c5edff}
+html[data-theme="dark"] #view-progress .mq-chart-review-v1162,body.dark-mode #view-progress .mq-chart-review-v1162{background:rgba(20,164,131,.15);border-color:#40bda5;color:#baf9e6}
+#mq-chart-review-library-v1162 .mq-chart-review-dialog-v1162{max-width:530px;width:min(96vw,530px);max-height:86dvh;overflow-y:auto;overscroll-behavior:contain;padding:17px;box-sizing:border-box}
+#mq-chart-review-title-v1162{margin:0 40px 12px 0;color:var(--chart-color);font-size:1.17rem}
+.mq-chart-review-row-v1162{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--border-color)}
+.mq-chart-review-date-v1162{font-weight:800;color:var(--text-color);font-size:.91rem}
+.mq-chart-review-action-v1162{width:auto;min-width:95px;flex:0 0 auto;padding:8px 11px!important;border-radius:10px;font-size:.84rem!important;background:var(--chart-color);color:white;border:0;box-shadow:none}
+#view-chart.mq-v115-ready #mq-chart-rank-entry-v1162{font-size:clamp(.84rem,1.5vw,.96rem)!important;padding:7px 13px!important;min-height:39px;white-space:nowrap}
+#view-chart.mq-v115-ready .mq-v115-tile{border:1.5px solid #c1d3e3;box-shadow:0 2px 7px rgba(30,65,99,.09),inset 0 0 0 1px rgba(255,255,255,.28)}
+#view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected{border:2px solid var(--tile-color);box-shadow:0 3px 12px rgba(39,80,119,.15),inset 0 0 0 1px var(--tile-color)}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile,body.dark-mode #view-chart.mq-v115-ready .mq-v115-tile{border-color:#688094;box-shadow:0 2px 8px rgba(0,0,0,.25),inset 0 0 0 1px rgba(141,169,190,.1)}
+html[data-theme="dark"] #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected,body.dark-mode #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected{border-color:var(--tile-color);box-shadow:0 3px 14px rgba(0,0,0,.3),inset 0 0 0 1px var(--tile-color)}
+@media(max-width:390px){#view-progress .mq-review-quick-v1162{gap:7px}#view-progress .mq-review-quick-btn-v1162{min-height:44px;padding:7px 5px;font-size:.84rem}#view-chart.mq-v115-ready #mq-chart-rank-entry-v1162{padding:6px 8px!important;font-size:.8rem!important}}
+</style>
+<script id="mq-v1162-chart-review-link">
+(function(){
+  'use strict';
+  var refreshing=false;
+  function validMine(r){
+    if(!r || typeof window.chartRecordBelongsToCurrentUserV4_!=='function' || !window.chartRecordBelongsToCurrentUserV4_(r))return false;
+    // Also match the original Calendar Review's stricter legacy owner guard.
+    // A phone-less chart must match the current profile's name AND address.
+    var digits=function(v){return String(v||'').replace(/\D/g,'');};
+    var rp=digits(r.phone);
+    if(rp)return true;
+    var normalize=function(v){return String(v||'').trim().toLocaleLowerCase();};
+    var name=(typeof userName!=='undefined')?userName:'';
+    var addr=(typeof userAddress!=='undefined')?userAddress:'';
+    return !!(normalize(r.name) && normalize(r.name)===normalize(name) && normalize(r.address)===normalize(addr));
+  }
+  function localChartRows(){
+    var raw=[];try{raw=JSON.parse(localStorage.getItem('murali_daily_charts')||'[]');}catch(_e){}
+    var selected={};(Array.isArray(raw)?raw:[]).forEach(function(r){
+      if(!validMine(r))return;
+      var date=typeof window.normalizeChartDateISO_==='function'?window.normalizeChartDateISO_(r.date):String(r.date||'').replace(/^'/,'').trim();
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+      var old=selected[date];
+      if(!old || Number(r.chartVersion||r.schemaVersion||3)>Number(old.chartVersion||old.schemaVersion||3) ||
+        (Number(r.chartVersion||r.schemaVersion||3)===Number(old.chartVersion||old.schemaVersion||3) && Number(r.updatedAtMs||0)>Number(old.updatedAtMs||0))) selected[date]=r;
+    });
+    return Object.keys(selected).sort().reverse().slice(0,180).map(function(d){return {date:d,record:selected[d]};});
+  }
+  function draw(){
+    var list=document.getElementById('mq-chart-review-list-v1162');if(!list)return;
+    list.textContent='';var rows=localChartRows();
+    if(!rows.length){
+      var empty=document.createElement('div');empty.textContent='सुरक्षित चार्ट भेटिएन।';empty.style.cssText='padding:14px 5px;color:var(--muted-text-color);';list.appendChild(empty);return;
+    }
+    rows.forEach(function(row){
+      var box=document.createElement('div');box.className='mq-chart-review-row-v1162';
+      var label=document.createElement('span');label.className='mq-chart-review-date-v1162';
+      label.textContent=row.date+'  ·  '+Number(row.record.totalScore||0)+'/100';
+      var button=document.createElement('button');button.type='button';button.className='mq-chart-review-action-v1162';button.textContent='हेर्नुहोस्';
+      button.onclick=function(){
+        window.closeChartReviewLibraryV1162_();
+        // Reuse the exact existing protected Chart Calendar review renderer and 12-point detail.
+        if(typeof window.showChartCalendarRecordV4_!=='function')return;
+        window.showChartCalendarRecordV4_(row.record);
+        var full=document.getElementById('cal-detail-chart-review-btn');
+        if(full){full.style.display='block';}
+        if(typeof window.toggleChartReviewV4_==='function')window.toggleChartReviewV4_(row.record);
+      };
+      box.appendChild(label);box.appendChild(button);list.appendChild(box);
+    });
+  }
+  window.openChartReviewLibraryV1162_=function(){
+    var modal=document.getElementById('mq-chart-review-library-v1162');if(!modal)return;
+    draw();modal.style.display='flex';
+    // Existing cloud history sync can fill missing dates without touching quiz/exam state.
+    if(!refreshing && navigator.onLine && typeof window.syncMyChartsFromServer==='function'){
+      refreshing=true;
+      Promise.resolve().then(function(){return window.syncMyChartsFromServer();}).then(function(){
+        if(modal.style.display==='flex')draw();
+      }).catch(function(){}).then(function(){refreshing=false;});
+    }
+  };
+  window.closeChartReviewLibraryV1162_=function(){
+    var modal=document.getElementById('mq-chart-review-library-v1162');if(modal)modal.style.display='none';
+  };
+})();
+</script>
+
 </body>
 </html>
