@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v113.0">
+    <link rel="manifest" href="manifest.json?v=v114.0">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1202,7 +1202,7 @@
                     Export Q&A List
                 </span>
                 <span style="display:flex; gap:6px;">
-                    <button class="admin-dashboard-only-btn" onclick="openQuizFeedbackAdminV112()" style="width:auto;background:#64748b;color:white;padding:.3rem .8rem;border-radius:8px;font-size:.8rem;box-shadow:none;font-weight:800;">📝 Feedback</button>
+                    <button class="mq-staff-feedback-v114" onclick="openQuizFeedbackAdminV112()" style="width:auto;background:#64748b;color:white;padding:.3rem .8rem;border-radius:8px;font-size:.8rem;box-shadow:none;font-weight:800;">📝 Feedback</button>
                     <button class="admin-dashboard-only-btn" onclick="openLeaderboardModal()" style="width: auto; background: #8b5cf6; color: #fff; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">🏆 Dashboard</button>
                     <button onclick="exportAllSavedQuizzes()" style="width: auto; background: var(--warning-color); color: #000; padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; box-shadow:none; font-weight:800;">📦 ZIP</button>
                 </span>
@@ -1422,6 +1422,9 @@
     </div>
 <!-- Progress View -->
     <div id="view-progress" style="display: none;">
+        <div class="mq-review-library-wrap-v114">
+          <button type="button" onclick="openReviewLibraryV114_()" class="mq-review-library-main-v114">📋 मेरा पुराना परीक्षा Review</button>
+        </div>
         <div id="spiritual-badge-container-v11" style="margin-bottom:12px;">
             <button type="button" onclick="openSpiritualCardModalV11()" style="width:100%; background:linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.05)); color:var(--text-color); border:1px solid #f59e0b; padding:0.6rem 0.8rem; border-radius:12px; font-weight:800; font-size:0.95rem; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(245,158,11,0.15);">
                 <span style="display:flex; align-items:center; gap:8px;">
@@ -1502,7 +1505,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 113.0</div>
+        <div>Version: 114.0</div>
     </div>
 </div>
 
@@ -2013,7 +2016,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v113.0').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v114.0').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2024,7 +2027,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "113.0";
+    const APP_VERSION = "114.0";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -3983,6 +3986,8 @@ function getMegaActivationDateUI(quizDate) {
     };
 
     window.loadStudentDashboard = function() {
+        // v114: non-interactive background refresh may not destroy an open Review.
+        if (window.__mqReviewActiveV114 === true) return;
         try {
             let qArea = document.getElementById('quiz-area'); let skeleton = document.getElementById('dashboard-skeleton');
             let serverQuizzes = safeJSON('murali_server_quizzes', []); let history = safeJSON('murali_progress', []);
@@ -4709,7 +4714,7 @@ window.saveCustomQuiz = function() {
         let q = currentQuiz[qIndex]; if (q.userSelectedIndex === undefined) answeredCount++; q.userSelectedIndex = oIndex;
         let tempScore = currentScore; let selectedText = String(q.options[oIndex]).trim(); let answerText = String(q.answer).trim();
         if (selectedText === answerText) tempScore++; updateStickyBar();
-        if (isQuizActive && reviewSource !== 'past') queueQuizFeedbackV112_(qIndex); 
+        // v114: question-quality feedback is offered only after examination in Result Review. 
         
         setTimeout(() => {
             if (qIndex < currentQuiz.length - 1) { 
@@ -4744,6 +4749,70 @@ window.saveCustomQuiz = function() {
         if(lbl)lbl.textContent='अहिले उत्तर दिएको प्रश्न';
         if(bar)bar.style.display='flex';
     }
+    function renderReviewFeedbackCardsV114_() {
+        // No feedback during a timed attempt; controls belong to completed question review.
+        if(isQuizActive)return;
+        var list=currentQuiz||[];
+        var quizId=String(currentQuizId||''),quizRev=Number(currentQuizRevision||1),quizDate=String(currentMurliDate||'');
+        var serverQuizzes=[];
+        try{serverQuizzes=JSON.parse(localStorage.getItem('murali_server_quizzes')||'[]');}catch(_){}
+        var source=(Array.isArray(serverQuizzes)?serverQuizzes:[]).filter(function(z){
+            return z&&String(z.quizId||'')===quizId&&Number(z.revision||z.quizRevision||1)===quizRev;
+        })[0];
+        list.forEach(function(q,i){
+            if(!Number.isInteger(q._mqSourceIndexV112)){
+                var actualSource=source&&Array.isArray(source.quizData)?source.quizData:[];
+                var srcIndex=actualSource.findIndex(function(other){
+                    return String(other.q||'').trim()===String(q.q||'').trim() && String(other.original||'').trim()===String(q.original||'').trim();
+                });
+                // Historical files without an original-index field still get a unique local key;
+                // backend validates by the canonical question text/original, not this guess.
+                q._mqSourceIndexV112=srcIndex>=0?srcIndex:i;
+            }
+            var box=document.getElementById('qb-'+i);
+            if(!box)return;
+            var existing=box.querySelector('.mq-review-feedback-v114');
+            if(existing)existing.remove();
+            var holder=document.createElement('div');
+            holder.className='mq-review-feedback-v114';
+            var button=document.createElement('button');
+            button.type='button';button.className='mq-review-feedback-btn-v114';
+            var complete=mqFeedbackDoneV112_(q);
+            button.textContent=complete?'✅ प्रतिक्रिया पठाइसकियो':'📝 यस प्रश्नबारे प्रतिक्रिया (ऐच्छिक)';
+            button.disabled=complete;
+            button.addEventListener('click',function(){
+                if(mqFeedbackDoneV112_(q))return;
+                mqFeedbackPendingV112_={q:q,quizId:quizId,quizDate:quizDate,revision:quizRev,reviewIndex:i};
+                window.openQuizFeedbackV112();
+            });
+            holder.appendChild(button);box.appendChild(holder);
+        });
+        // Server is authoritative: after a reload/device change reflect prior submissions.
+        if(quizId && quizDate && navigator.onLine && typeof apiPostJSON==='function'){
+            apiPostJSON({action:'fetchMyQuizFeedbackStatusV114',phone:userPhone,
+                pin:(localStorage.getItem('murali_pin')||''),deviceId:getDeviceId(),
+                quizId:quizId,quizRevision:quizRev,quizDate:quizDate},
+                {timeoutMs:13000,retries:0}).then(function(result){
+                    if(!result||result.status!=='success'||!Array.isArray(result.indices))return;
+                    if(!window.__mqReviewActiveV114||String(currentQuizId)!==quizId||Number(currentQuizRevision)!==quizRev)return;
+                    result.indices.forEach(function(sourceIndex){
+                        list.forEach(function(q,i){
+                            if(Number(q._mqSourceIndexV112)===Number(sourceIndex)){
+                                try{localStorage.setItem(mqFeedbackKeyLocalV112_(q),'1');}catch(_){}
+                                var btn=document.querySelector('#qb-'+i+' .mq-review-feedback-btn-v114');
+                                if(btn){btn.textContent='✅ प्रतिक्रिया पठाइसकियो';btn.disabled=true;}
+                            }
+                        });
+                    });
+                }).catch(function(){});
+            }
+    }
+    window.openQuizFeedbackForReviewV114_=function(index){
+        if(!window.__mqReviewActiveV114)return;
+        var q=currentQuiz&&currentQuiz[index];if(!q||mqFeedbackDoneV112_(q))return;
+        mqFeedbackPendingV112_={q:q,quizId:currentQuizId,quizDate:currentMurliDate,revision:currentQuizRevision,reviewIndex:index};
+        openQuizFeedbackV112();
+    };
     window.dismissQuizFeedbackV112 = function() {
         mqFeedbackPendingV112_=null;
         var bar=document.getElementById('mq-feedback-trigger-v112');if(bar)bar.style.display='none';
@@ -4777,6 +4846,10 @@ window.saveCustomQuiz = function() {
                 {timeoutMs:13000,retries:0});
             if(!response||response.status!=='success')throw new Error(response&&response.message||'प्रतिक्रिया सुरक्षित भएन।');
             try {localStorage.setItem(mqFeedbackKeyLocalV112_(p.q),'1');} catch(_){}
+            if(Number.isInteger(p.reviewIndex)){
+                var doneBtn=document.querySelector('#qb-'+p.reviewIndex+' .mq-review-feedback-btn-v114');
+                if(doneBtn){doneBtn.textContent='✅ प्रतिक्रिया पठाइसकियो';doneBtn.disabled=true;}
+            }
             dismissQuizFeedbackV112();
             showToast(response.duplicate?'यो प्रश्नमा प्रतिक्रिया पहिले नै सुरक्षित छ।':'धन्यवाद! प्रतिक्रिया सुरक्षित भयो।','success',2500);
         } catch(e) {status.textContent='नेटवर्क वा सर्भर समस्या: '+(e&&e.message||'पुनः प्रयास गर्नुहोस्।');send.disabled=false;}
@@ -4785,7 +4858,7 @@ window.saveCustomQuiz = function() {
         return String(v===null||v===undefined?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
     }
     window.openQuizFeedbackAdminV112=function() {
-        if(String(userRole||'').trim().toLowerCase()!=='admin'){showToast('Admin लाई मात्र उपलब्ध छ।','error');return;}
+        if(['admin','manager'].indexOf(String(userRole||'').trim().toLowerCase())<0){showToast('Admin वा Manager लाई मात्र उपलब्ध छ।','error');return;}
         document.getElementById('mq-admin-feedback-modal-v112').style.display='flex';
         loadQuizFeedbackAdminV112();
     };
@@ -4806,13 +4879,14 @@ window.saveCustomQuiz = function() {
             root.innerHTML=r.rows.map(function(x){
                 var type=(r.types&&r.types[x.feedbackType])||x.feedbackType;
                 var opts=['Pending','Reviewed','Dismissed'].map(function(s){return '<option '+(s===x.reviewStatus?'selected ':'')+'value="'+s+'">'+s+'</option>';}).join('');
+                var canModerate=String(userRole||'').trim().toLowerCase()==='admin';
                 return '<div class="mq-admin-feedback-item-v112">'+
                   '<div style="font-size:.75rem;color:var(--muted-text-color)">'+mqEscapeHTMLV112_(x.receivedAt)+' • '+mqEscapeHTMLV112_(x.quizDate)+' • '+mqEscapeHTMLV112_(x.questionId)+'</div>'+
                   '<strong style="display:block;margin:5px 0">'+mqEscapeHTMLV112_(type)+'</strong>'+
                   '<div style="font-weight:700">'+mqEscapeHTMLV112_(x.questionText)+'</div>'+
                   (x.comment?'<div style="font-size:.82rem;margin:6px 0">💬 '+mqEscapeHTMLV112_(x.comment)+'</div>':'')+
                   '<details><summary style="font-size:.78rem;cursor:pointer">मूल उद्धरण</summary><p style="font-size:.8rem;white-space:pre-wrap">'+mqEscapeHTMLV112_(x.original)+'</p></details>'+
-                  '<div style="margin-top:7px;display:flex;gap:6px;align-items:center;font-size:.8rem">Review: <select data-feedback-row="'+Number(x.sheetRow)+'" data-qid="'+mqEscapeHTMLV112_(x.questionId)+'" onchange="updateFeedbackReviewV112(this)">'+opts+'</select></div></div>';
+                  '<div style="margin-top:7px;display:flex;gap:6px;align-items:center;font-size:.8rem">Review: '+(canModerate?'<select data-feedback-row="'+Number(x.sheetRow)+'" data-qid="'+mqEscapeHTMLV112_(x.questionId)+'" onchange="updateFeedbackReviewV112(this)">'+opts+'</select>':mqEscapeHTMLV112_(x.reviewStatus)+' (हेर्ने मात्र)')+'</div></div>';
             }).join('');
         }catch(e){root.textContent='Feedback Review खोल्न सकिएन: '+(e&&e.message||e);}
     };
@@ -5021,6 +5095,7 @@ window.saveCustomQuiz = function() {
 
     window.reviewQuiz = function() {
         let existingResult = document.getElementById('result-screen'); if(existingResult) existingResult.style.display = 'none'; 
+        window.__mqReviewActiveV114 = true;
         let quizArea = document.getElementById('quiz-area'); quizArea.style.display = 'flex'; quizArea.style.flexDirection = 'column';
         document.getElementById('main-header').style.display = 'none'; document.getElementById('main-tabs').style.display = 'none'; document.getElementById('toolbar-right-actions').style.display = 'none';
 
@@ -5030,6 +5105,8 @@ window.saveCustomQuiz = function() {
         backBtn.style.order = "0"; 
         
         backBtn.onclick = () => { 
+            window.__mqReviewActiveV114 = false;
+            dismissQuizFeedbackV112();
             quizArea.style.display = 'none'; quizArea.style.flexDirection = 'initial'; 
             document.getElementById('main-header').style.display = 'flex'; document.getElementById('main-tabs').style.display = 'flex'; document.getElementById('toolbar-right-actions').style.display = 'flex';
             if (reviewSource === 'past') { reviewSource = 'current'; resetToGenerator(); switchTab('prog'); } 
@@ -5055,13 +5132,17 @@ window.saveCustomQuiz = function() {
                     if (rightIndex !== -1) { let rightContainer = document.getElementById(`opt-${qIndex}-${rightIndex}`); if(rightContainer) rightContainer.classList.add('selected-right'); document.getElementById(`fb-title-${qIndex}-${rightIndex}`).innerHTML = `${sIcon} ${d.feedbackRightTitle}`; document.getElementById(`fb-desc-${qIndex}-${rightIndex}`).innerHTML = `<strong>Context:</strong> "${q.original}"`; }
                 }
             }
-        }); window.scrollTo(0, 0);
+        });
+        renderReviewFeedbackCardsV114_();
+        window.scrollTo(0, 0);
     }
 
     window.reviewPastQuiz = function(id) {
         let history = safeJSON('murali_progress', []); let record = history.find(item => item.id === id);
         if(record && record.quizData) {
             currentQuiz = normalizeQuizItems_(record.quizData); currentScore = record.score; currentMurliDate = record.date;
+            currentQuizRevision = Number(record.quizRevision || 1);
+            currentQuizId = String(record.quizId || (String(record.date) + '-R' + currentQuizRevision));
             document.getElementById('murali-text').style.display = 'none'; document.getElementById('generator-actions').style.display = 'none'; reviewSource = 'past'; 
             document.getElementById('tab-gen').classList.add('active'); document.getElementById('tab-chart').classList.remove('active'); document.getElementById('tab-prog').classList.remove('active');
             document.getElementById('view-generator').style.display = 'block'; document.getElementById('view-chart').style.display = 'none'; document.getElementById('view-progress').style.display = 'none'; document.getElementById('sticky-scorebar').style.display = 'none';
@@ -5342,6 +5423,7 @@ window.saveCustomQuiz = function() {
     }
 
     function maybeAutoAdvanceChartSectionV4(section) {
+        if (document.getElementById('daily-chart-form') && document.getElementById('daily-chart-form').classList.contains('mq-chart-simple-v114')) return;
         const form = document.getElementById('daily-chart-form');
         if (form && (form.dataset.v4DisableAutoScroll === '1' || form.dataset.v4ManualNext === '1')) return;
         if (chartSectionReadyForAutoScrollV4(section)) activateNextChartSection(section);
@@ -7556,6 +7638,7 @@ window.saveCustomQuiz = function() {
 
         form.querySelectorAll("input.chart-single-v4").forEach(function(inp) {
             inp.addEventListener("change", function() {
+                if(form.classList.contains('mq-chart-simple-v114'))return;
                 delete form.dataset.v4DisableAutoScroll;
                 var sec = inp.closest(".chart-section-v2");
                 if (!sec || !inp.checked) return;
@@ -7588,6 +7671,7 @@ window.saveCustomQuiz = function() {
 
         form.querySelectorAll("input.chart-service-multi-v4, input.chart-service-none-v4").forEach(function(inp) {
             inp.addEventListener("change", function() {
+                if(form.classList.contains('mq-chart-simple-v114'))return;
                 delete form.dataset.v4DisableAutoScroll;
                 var sec = inp.closest(".chart-section-v2");
                 if (!sec) return;
@@ -9383,7 +9467,18 @@ window.saveCustomQuiz = function() {
 })();
 </script>
 
-<!-- v112: Optional question feedback. Button remains usable after automatic next question. -->
+
+<!-- v114: Review history is independent from calendar refresh and preserves selected exam. -->
+<div id="mq-review-library-modal-v114" class="modal-overlay" style="display:none;z-index:10050" onclick="if(event.target===this)closeReviewLibraryV114_()">
+  <div class="modal-content" style="max-width:550px;max-height:86vh;overflow:auto" role="dialog" aria-modal="true">
+    <button type="button" class="mq-feedback-close-v112" onclick="closeReviewLibraryV114_()" aria-label="बन्द गर्नुहोस्">✕</button>
+    <h3>📋 मेरा सुरक्षित परीक्षा Review</h3>
+    <p style="font-size:.82rem;color:var(--muted-text-color)">दिनांक छान्न फेरि क्यालेन्डर खोल्नुपर्दैन। प्रश्नपत्र सुरक्षित भएका परीक्षा यहाँ खुल्छन्।</p>
+    <div id="mq-review-library-list-v114"></div>
+  </div>
+</div>
+
+<!-- v114: Question feedback is available only inside completed Result Review. -->
 <div id="mq-feedback-trigger-v112" style="display:none" aria-live="polite">
   <span id="mq-feedback-label-v112">यस प्रश्नबारे</span>
   <button type="button" onclick="openQuizFeedbackV112()">📝 प्रश्न प्रतिक्रिया (ऐच्छिक)</button>
@@ -9415,7 +9510,7 @@ window.saveCustomQuiz = function() {
 <div id="mq-admin-feedback-modal-v112" class="modal-overlay" style="display:none;z-index:10070" onclick="if(event.target===this)closeQuizFeedbackAdminV112()">
   <div class="modal-content mq-admin-feedback-dialog-v112" role="dialog" aria-modal="true" aria-labelledby="mq-admin-feedback-title-v112">
     <button type="button" class="mq-feedback-close-v112" onclick="closeQuizFeedbackAdminV112()" aria-label="बन्द गर्नुहोस्">✕</button>
-    <h3 id="mq-admin-feedback-title-v112">📝 Admin — Quiz Feedback Review</h3>
+    <h3 id="mq-admin-feedback-title-v112">📝 Admin / Manager — Quiz Feedback Review</h3>
     <p style="font-size:.78rem;color:var(--muted-text-color)">प्रतिक्रिया मूल प्रश्न/उत्तर स्वतः परिवर्तन गर्दैन। मूल मुरलीसँग जाँचेर मात्र निर्णय गर्नुहोस्।</p>
     <div class="mq-admin-feedback-filter-v112">
       <input type="text" id="mq-admin-feedback-date-v112" placeholder="क्वीज मिति (DD-MM-YYYY), खाली = सबै" aria-label="क्वीज मिति">
@@ -9460,6 +9555,147 @@ window.saveCustomQuiz = function() {
             }
         }
     });
+})();
+</script>
+
+
+<script id="mq-review-library-v114">
+(function(){
+  window.__mqReviewActiveV114 = false;
+  // Explicit navigation may close Review; background sync never does.
+  var originalSwitchTabV114=window.switchTab;
+  if(typeof originalSwitchTabV114==='function'){
+    window.switchTab=function(tab){
+      var wasReview=window.__mqReviewActiveV114===true;
+      if(wasReview){
+        window.__mqReviewActiveV114=false;
+        var area=document.getElementById('quiz-area');if(area)area.style.display='none';
+        ['main-header','main-tabs','toolbar-right-actions'].forEach(function(id){
+          var el=document.getElementById(id);if(el)el.style.display='flex';
+        });
+      }
+      var r=originalSwitchTabV114.apply(this,arguments);
+      if(wasReview&&tab==='gen'&&typeof window.loadStudentDashboard==='function')window.loadStudentDashboard();
+      return r;
+    };
+  }
+  window.openReviewLibraryV114_ = function(){
+    var modal=document.getElementById('mq-review-library-modal-v114');
+    var list=document.getElementById('mq-review-library-list-v114');
+    if(!modal||!list)return;
+    var data=[];try{data=JSON.parse(localStorage.getItem('murali_progress')||'[]');}catch(_){}
+    var phone=localStorage.getItem('murali_phone')||'';
+    var rows=(Array.isArray(data)?data:[]).filter(function(r){return r&&(!phone||String(r.phone)===phone);});
+    rows.sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));});
+    list.textContent='';
+    if(!rows.length){list.textContent='अहिले सुरक्षित समीक्षा फेला परेन।';}
+    rows.slice(0,120).forEach(function(r){
+      var box=document.createElement('div');box.className='mq-review-library-row-v114';
+      var info=document.createElement('span');info.textContent=String(r.date||'')+' · '+String(r.score||0)+'/'+String(r.total||20);
+      var btn=document.createElement('button');btn.type='button';btn.textContent='Review हेर्नुहोस्';
+      btn.disabled=!Array.isArray(r.quizData)||!r.quizData.length;
+      if(btn.disabled)btn.title='यो पुरानो रेकर्डमा प्रश्नगत विवरण उपलब्ध छैन।';
+      btn.onclick=function(){closeReviewLibraryV114_();if(typeof window.reviewPastQuiz==='function')window.reviewPastQuiz(r.id);};
+      box.appendChild(info);box.appendChild(btn);list.appendChild(box);
+    });
+    modal.style.display='flex';
+  };
+  window.closeReviewLibraryV114_ = function(){var modal=document.getElementById('mq-review-library-modal-v114');if(modal)modal.style.display='none';};
+})();
+</script>
+
+
+<style id="mq-simple-chart-v114-css">
+/* v114 - one uncluttered form; legacy V4 scoring, graphs & sheet schema unchanged. */
+#mq-feedback-trigger-v112{display:none!important}
+#chart-easy-toolbar-v112 .chart-easy-actions-v112{display:none!important}
+#chart-easy-toolbar-v112{padding:8px 12px!important;margin:6px 0 12px!important}
+#chart-easy-toolbar-v112 .chart-easy-heading-v112{font-size:.87rem!important}
+#chart-easy-toolbar-v112 .chart-easy-hint-v112{display:none!important}
+#chart-live-section-pill{display:none!important}
+#daily-chart-form.mq-chart-simple-v114 .chart-options-v2[data-single-group]{display:none!important}
+#daily-chart-form.mq-chart-simple-v114 .chart-quick-mins-v22{display:none!important}
+#daily-chart-form.mq-chart-simple-v114 .chart-section-v2:not([data-chart-section="1"]):not([data-chart-section="7"]):not([data-chart-section="10"]) .chart-zero-btn-v112{display:none!important}
+#daily-chart-form.mq-chart-simple-v114 .chart-time-note-v4{font-size:.75rem;line-height:1.4}
+#daily-chart-form.mq-chart-simple-v114 .chart-section-v2{border-radius:14px;margin-bottom:6px;box-shadow:none;transition:none;padding:10px 11px}
+#daily-chart-form.mq-chart-simple-v114 .chart-title-v2{min-height:38px;cursor:pointer}
+#daily-chart-form.mq-chart-simple-v114 .chart-content-v2{padding-top:7px}
+#daily-chart-form.mq-chart-simple-v114 .mq-select-wrap-v114{margin:6px 0 10px}
+#daily-chart-form.mq-chart-simple-v114 .mq-native-chart-select-v114{display:block;width:100%;max-width:100%;background:var(--card-bg);color:var(--text-color);border:1px solid var(--border-color);border-radius:10px;font:600 .89rem 'Noto Sans Devanagari',sans-serif;padding:10px 12px;min-height:43px}
+#daily-chart-form.mq-chart-simple-v114 .mq-native-chart-select-v114:focus{outline:2px solid var(--chart-color);outline-offset:1px}
+#back-to-res{position:sticky;top:6px;z-index:8;align-self:flex-start}
+.mq-review-feedback-v114{margin:12px 0 5px;border-top:1px solid var(--border-color);padding-top:10px}
+.mq-review-feedback-btn-v114{width:auto;max-width:100%;box-shadow:none;background:transparent;color:var(--primary-color);border:1px solid var(--border-color);border-radius:11px;font-size:.85rem;padding:8px 12px}
+.mq-review-feedback-btn-v114:disabled{opacity:1;background:var(--success-bg);color:var(--success-color);cursor:default}
+.mq-review-library-wrap-v114{margin:0 0 12px}
+.mq-review-library-main-v114{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-color);box-shadow:none;font-size:.88rem}
+.mq-review-library-row-v114{display:flex;justify-content:space-between;align-items:center;gap:9px;border-bottom:1px solid var(--border-color);padding:10px 0;font-size:.85rem}
+.mq-review-library-row-v114 button{width:auto;flex:0 0 auto;font-size:.8rem;padding:7px 9px;box-shadow:none}
+@media(max-width:390px){.mq-review-library-row-v114{flex-wrap:wrap}}
+</style>
+<script id="mq-simple-chart-v114-js">
+(function(){
+  function init(){
+    var form=document.getElementById('daily-chart-form');if(!form)return;
+    form.classList.add('mq-chart-simple-v114');
+    // Do not let a previously saved Easy/Detailed toggle bring back competing modes.
+    if(typeof window.setChartEasyModeV112==='function'&&!window._mqEasyModeWrappedV114){
+      var oldMode=window.setChartEasyModeV112;
+      window.setChartEasyModeV112=function(){return oldMode(false);};
+      window._mqEasyModeWrappedV114=true;
+    }
+    if(typeof window.setChartEasyModeV112==='function')window.setChartEasyModeV112(false);
+    form.classList.remove('chart-easy-mode-v112');
+    form.dataset.v4ManualNext='1';
+    form.dataset.v4DisableAutoScroll='1';
+    var groups=form.querySelectorAll('.chart-options-v2[data-single-group]');
+    Array.prototype.forEach.call(groups,function(group){
+      if(group.dataset.mqSimpleV114)return;
+      group.dataset.mqSimpleV114='1';
+      var inputs=group.querySelectorAll('input.chart-single-v4');
+      if(!inputs.length)return;
+      var wrap=document.createElement('div');wrap.className='mq-select-wrap-v114';
+      var sel=document.createElement('select');sel.className='mq-native-chart-select-v114';
+      var head=document.createElement('option');head.value='';head.textContent='अभ्यास छान्नुहोस्';sel.appendChild(head);
+      Array.prototype.forEach.call(inputs,function(inp,i){
+        var label=inp.closest('label');var labelText=label&&label.querySelector('.chart-option-text-v2');
+        var option=document.createElement('option');option.value=String(i);
+        option.textContent=(labelText?labelText.textContent.trim():'विकल्प '+(i+1));
+        sel.appendChild(option);
+      });
+      sel.addEventListener('change',function(){
+        var idx=Number(sel.value),input=inputs[idx];
+        if(sel.value===''||!input)return;
+        form.dataset.v4DisableAutoScroll='1';form.dataset.v4ManualNext='1';
+        if(!input.checked)input.click();
+        form.dataset.v4DisableAutoScroll='1';form.dataset.v4ManualNext='1';
+        if(typeof window.updateChartV3Total==='function')window.updateChartV3Total();
+      });
+      group.parentNode.insertBefore(wrap,group);wrap.appendChild(sel);
+      group._mqSelectV114=sel;
+      syncOne(group);
+    });
+    // Never auto-open or scroll to the next section upon answering.
+    if(typeof window.autoAdvanceFromSectionV23==='function')window.autoAdvanceFromSectionV23=function(){};
+    function syncAll(){Array.prototype.forEach.call(groups,syncOne);form.dataset.v4ManualNext='1';form.dataset.v4DisableAutoScroll='1';}
+    function syncOne(group){
+      if(!group._mqSelectV114)return;
+      var inputs=group.querySelectorAll('input.chart-single-v4');var idx=-1;
+      Array.prototype.forEach.call(inputs,function(inp,i){if(inp.checked)idx=i;});
+      group._mqSelectV114.value=idx<0?'':String(idx);
+    }
+    form.addEventListener('change',function(){setTimeout(syncAll,0);},false);
+    form.addEventListener('input',function(){form.dataset.v4ManualNext='1';},true);
+    // Reset/reload from old cloud chart can change checkboxes without change events.
+    if(typeof window.loadChartDataForDate==='function'&&!window._mqLoadChartWrappedV114){
+      var prev=window.loadChartDataForDate;
+      window.loadChartDataForDate=function(){var res=prev.apply(this,arguments);setTimeout(syncAll,0);return res;};
+      window._mqLoadChartWrappedV114=true;
+    }
+    window.mqSyncChartSelectsV114_=syncAll;
+    setTimeout(syncAll,50);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 
