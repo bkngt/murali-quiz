@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v116.4">
+    <link rel="manifest" href="manifest.json?v=v116.5">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1506,7 +1506,7 @@
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 116.4</div>
+        <div>Version: 116.5</div>
     </div>
 </div>
 
@@ -1858,6 +1858,11 @@
             <button class="chart-date-btn-v2" type="button" onclick="openStudentLeaderboardDatePicker()" style="flex:1;width:100%;background:var(--glass-bg);color:var(--text-color);border:1px solid var(--border-color);padding:.62rem .9rem;border-radius:10px;font-weight:800;box-shadow:none;">📅 <span id="sl-date-label">आज</span></button>
             <input id="sl-date-select" type="date" class="chart-hidden-date" aria-label="परीक्षा मिति छान्नुहोस्">
         </div>
+        <div id="mq-exam-summary-v1165" class="mq-exam-summary-v1165" aria-live="polite">
+          <div class="mq-exam-metric-v1165"><span class="mq-metric-icon-v1165">👥</span><strong id="mq-exam-count-v1165">—</strong><small>परीक्षार्थी</small></div>
+          <div class="mq-exam-metric-v1165"><span class="mq-metric-icon-v1165">🏅</span><strong id="mq-exam-rank-v1165">—</strong><small>मेरो Rank</small></div>
+          <div class="mq-exam-metric-v1165"><span class="mq-metric-icon-v1165">✦</span><strong id="mq-exam-score-v1165">—</strong><small>मेरो अङ्क</small></div>
+        </div>
         <div id="sl-loading" style="text-align:center;padding:20px;font-weight:bold;color:var(--exam-color);">⏳ डाटा लोड हुँदैछ...</div>
         <div id="sl-content" style="display:none;">
             <div style="background:var(--bg-color);border-radius:12px;border:1px solid var(--border-color);overflow:hidden;">
@@ -2017,7 +2022,7 @@
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v116.4').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v116.5').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2028,7 +2033,7 @@
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "116.4";
+    const APP_VERSION = "116.5";
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
@@ -5141,7 +5146,7 @@ window.saveCustomQuiz = function() {
             if (qb) { qb.style.display = 'block'; if (q.userCorrect === false) { qb.style.order = "1"; } else { qb.style.order = "2"; } }
             let timerEl = document.getElementById(`lock-timer-${qIndex}`); if(timerEl) timerEl.style.display = 'none';
             
-            if (q.userSelectedIndex !== undefined) {
+            if (Number.isInteger(q.userSelectedIndex) && q.userSelectedIndex >= 0 && q.userSelectedIndex < 4) {
                 let d = dict[lang]; let oIndex = q.userSelectedIndex; let rightIndex = q.options.findIndex(opt => String(opt).trim() === String(q.answer).trim());
                 let selectedContainer = document.getElementById(`opt-${qIndex}-${oIndex}`); selectedContainer.classList.remove('selected-temp');
                 const sIcon = `<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`; const eIcon = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
@@ -5162,6 +5167,7 @@ window.saveCustomQuiz = function() {
 
     window.reviewPastQuiz = function(id) {
         let history = safeJSON('murali_progress', []); let record = history.find(item => item.id === id);
+        if (!record && window.__mqReviewSession1165_) record = window.__mqReviewSession1165_[String(id)];
         if(record && record.quizData) {
             currentQuiz = normalizeQuizItems_(record.quizData); currentScore = record.score; currentMurliDate = record.date;
             currentQuizRevision = Number(record.quizRevision || 1);
@@ -6453,7 +6459,7 @@ window.saveCustomQuiz = function() {
 
         document.getElementById('student-leaderboard-modal').style.display = 'flex';
         if (selectedQuiz && dateInput.value) fetchStudentLeaderboardData();
-        else { window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display='table-cell'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; document.getElementById('sl-my-rank-box').style.display='none'; }
+        else { if(typeof window.mqRenderExamSummaryV1165_==='function') window.mqRenderExamSummaryV1165_(null, 'empty'); window._examRosterForDownloadV4 = []; window._examRosterDateV4 = ''; document.getElementById('sl-loading').style.display = 'none'; document.getElementById('sl-content').style.display = 'block'; document.getElementById('sl-rank-head').style.display='table-cell'; document.getElementById('sl-score-head').style.display='table-cell'; document.getElementById('sl-table-body').innerHTML = `<tr><td colspan="3" style="text-align:center;padding:15px;color:var(--muted-text-color);font-weight:bold;">अहिले कुनै पनि परीक्षा उपलब्ध छैन।</td></tr>`; document.getElementById('sl-admin-list-note').style.display='none'; document.getElementById('sl-my-rank-box').style.display='none'; }
     };
 
     // Admin-only: load one participant's saved answers from the secured backend.
@@ -6550,11 +6556,13 @@ window.saveCustomQuiz = function() {
         const content = document.getElementById('sl-content');
         const myRankBox = document.getElementById('sl-my-rank-box');
         loading.style.display = 'block'; loading.textContent = '⏳ लिडरबोर्ड लोड हुँदैछ...'; content.style.display = 'none';
+        if (typeof window.mqRenderExamSummaryV1165_ === 'function') window.mqRenderExamSummaryV1165_(null, 'loading');
         if (myRankBox) myRankBox.style.display = 'none';
         if (!navigator.onLine) { loading.innerHTML = '❌ इन्टरनेट कनेक्सन छैन!'; return; }
         try {
             const data = await apiPostJSON({action:'getStudentLeaderboard',targetDate:targetDateStr,phone:userPhone,pin:localStorage.getItem('murali_pin') || '',deviceId:getDeviceId()}, {retries:2, timeoutMs:15000});
             if (!data || data.status !== 'success') throw new Error('exam-leaderboard-failed');
+            if (typeof window.mqRenderExamSummaryV1165_ === 'function') window.mqRenderExamSummaryV1165_(data, 'ready');
             const isAdminViewer = String(userRole || '').trim().toLowerCase() === 'admin';
             const list = isAdminViewer && Array.isArray(data.participants)
                 ? data.participants
@@ -6620,6 +6628,7 @@ window.saveCustomQuiz = function() {
         } catch(err) {
             loading.style.display = 'block'; content.style.display = 'none';
             loading.innerHTML = '❌ लिडरबोर्ड ल्याउन सकिएन। इन्टरनेट जाँचेर फेरि प्रयास गर्नुहोस्।';
+            if (typeof window.mqRenderExamSummaryV1165_ === 'function') window.mqRenderExamSummaryV1165_(null, 'error');
         }
     };
 
@@ -9495,9 +9504,14 @@ window.saveCustomQuiz = function() {
 <div id="mq-review-library-modal-v114" class="modal-overlay" style="display:none;z-index:10050" onclick="if(event.target===this)closeReviewLibraryV114_()">
   <div class="modal-content" style="max-width:550px;max-height:86vh;overflow:auto" role="dialog" aria-modal="true">
     <button type="button" class="mq-feedback-close-v112" onclick="closeReviewLibraryV114_()" aria-label="बन्द गर्नुहोस्">✕</button>
-    <h3>📋 मेरा सुरक्षित परीक्षा Review</h3>
-    <p style="font-size:.82rem;color:var(--muted-text-color)">दिनांक छान्न फेरि क्यालेन्डर खोल्नुपर्दैन। प्रश्नपत्र सुरक्षित भएका परीक्षा यहाँ खुल्छन्।</p>
+    <h3>📋 मेरा परीक्षा Review</h3>
+    <div class="mq-review-tools-v1165">
+      <div class="mq-review-count-v1165" id="mq-review-count-v1165">अभिलेख जाँच्दै...</div>
+      <button type="button" class="mq-review-refresh-v1165" onclick="mqRefreshExamReviewV1165_()" title="Server बाट पुनः जाँच्नुहोस्">⟳ Refresh</button>
+    </div>
+    <input type="search" id="mq-review-search-v1165" placeholder="मिति खोज्नुहोस् · 31-10-2026" autocomplete="off" aria-label="पुराना परीक्षा खोज्नुहोस्" oninput="mqFilterExamReviewV1165_(this.value)">
     <div id="mq-review-library-list-v114"></div>
+    <div id="mq-review-status-v1165" role="status" aria-live="polite"></div>
   </div>
 </div>
 
@@ -10969,5 +10983,131 @@ body.dark-mode #view-chart.mq-v115-ready .mq-v115-tile.mq-v115-selected {
   }
 }
 </style>
+
+<!-- v116.5: server-backed own exam review index & premium exam leaderboard summary.
+     No change to stored results, question scoring, feedback, or backend. -->
+<style id="mq-v1165-review-summary-style">
+#mq-review-library-modal-v114 .modal-content{width:min(94vw,660px);max-width:660px!important;max-height:min(88dvh,780px)!important;box-sizing:border-box;padding:clamp(14px,3vw,24px);background:var(--card-bg,var(--bg-color));color:var(--text-color);overscroll-behavior:contain}
+#mq-review-library-modal-v114 h3{font-family:'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif;font-size:1.25rem;line-height:1.4;margin:0 40px 10px 0;color:var(--text-color)}
+.mq-review-tools-v1165{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.mq-review-count-v1165{flex:1;min-width:0;font-size:.9rem;font-weight:850;color:var(--muted-text-color);font-variant-numeric:tabular-nums}
+.mq-review-refresh-v1165{width:auto!important;flex:0 0 auto;border:1px solid rgba(139,92,246,.38);color:var(--chart-color);background:rgba(139,92,246,.06);border-radius:9px;padding:6px 11px;min-height:36px;font-weight:800;cursor:pointer}
+#mq-review-search-v1165{width:100%;box-sizing:border-box;min-height:43px;margin:0 0 10px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border-color);background:var(--bg-color);color:var(--text-color);font:600 .95rem 'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif}
+#mq-review-search-v1165:focus-visible{outline:2px solid var(--exam-color);outline-offset:2px}
+#mq-review-library-list-v114{display:flex;flex-direction:column;gap:7px}
+#mq-review-library-list-v114 .mq-review-library-row-v114{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid rgba(104,130,159,.32);border-radius:11px;background:var(--bg-color);min-height:54px;box-sizing:border-box}
+#mq-review-library-list-v114 .mq-review-library-row-v114 .mq-review-date-v1165{display:block;color:var(--text-color);font-size:.96rem;line-height:1.4;font-weight:850;font-variant-numeric:tabular-nums}
+#mq-review-library-list-v114 .mq-review-library-row-v114 .mq-review-meta-v1165{display:block;font-size:.78rem;color:var(--muted-text-color);line-height:1.45}
+#mq-review-library-list-v114 .mq-review-library-row-v114 button{width:auto!important;margin:0!important;min-width:94px;min-height:36px;border:0;border-radius:9px;padding:7px 10px;font:800 .86rem 'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif;background:var(--exam-color);color:#fff;white-space:nowrap;cursor:pointer}
+#mq-review-library-list-v114 .mq-review-library-row-v114 button:disabled{background:rgba(121,139,155,.15);color:var(--muted-text-color);border:1px solid var(--border-color);cursor:default;opacity:1}
+#mq-review-status-v1165{font-size:.79rem;font-weight:650;color:var(--muted-text-color);padding:8px 0;line-height:1.4}
+.mq-exam-summary-v1165{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 12px}
+.mq-exam-metric-v1165{background:linear-gradient(155deg,rgba(2,132,199,.11),rgba(139,92,246,.055));border:1px solid rgba(56,133,175,.35);border-radius:12px;min-width:0;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 3px;box-sizing:border-box;text-align:center}
+.mq-metric-icon-v1165{font-size:1rem;line-height:1.2}
+.mq-exam-metric-v1165 strong{font-size:1.36rem;line-height:1.25;font-weight:900;color:var(--exam-color);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.mq-exam-metric-v1165 small{font-size:.74rem;color:var(--text-color);font-weight:800;line-height:1.25}
+#sl-my-rank-box{display:none!important}/* the same private rank is now at the top; no duplicate box below */
+html[data-theme='dark'] .mq-exam-metric-v1165,body.dark-mode .mq-exam-metric-v1165{border-color:rgba(110,191,225,.44);background:linear-gradient(150deg,rgba(37,124,165,.23),rgba(122,89,183,.16))}
+html[data-theme='dark'] .mq-exam-metric-v1165 strong,body.dark-mode .mq-exam-metric-v1165 strong{color:#9edaff}
+html[data-theme='dark'] #mq-review-library-list-v114 .mq-review-library-row-v114,body.dark-mode #mq-review-library-list-v114 .mq-review-library-row-v114{border-color:rgba(164,191,214,.35)}
+@media(max-width:390px){.mq-exam-metric-v1165{min-height:70px;padding:7px 2px}.mq-exam-metric-v1165 strong{font-size:1.16rem}.mq-exam-metric-v1165 small{font-size:.69rem}#mq-review-library-list-v114 .mq-review-library-row-v114{padding:9px 8px}#mq-review-library-list-v114 .mq-review-library-row-v114 button{min-width:77px;padding:7px 8px}}
+</style>
+<script id="mq-v1165-server-exam-review-index">
+(function(){'use strict';
+ var rows=[], loading=false, searched='';
+ var remotes=window.__mqReviewSession1165_=Object.create(null);
+ var modalId='mq-review-library-modal-v114';
+ function node(id){return document.getElementById(id)}
+ function phone(){try{return String((typeof userPhone!=='undefined'&&userPhone!=='N/A'?userPhone:localStorage.getItem('murali_phone'))||'')}catch(e){return ''}}
+ function normPhone(v){return String(v||'').replace(/\D/g,'')}
+ function tstamp(r){
+   var s=String(r&&r.date||'').trim(),m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})/);
+   if(m)return new Date(+m[3],+m[2]-1,+m[1]).getTime();
+   m=s.match(/^(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/);
+   if(m)return new Date(+m[1],+m[2]-1,+m[3]).getTime();
+   return 0;
+ }
+ function hasQuestions(r){return Array.isArray(r&&r.quizData) && r.quizData.length>0 && r.quizData.every(function(q){return q&&Array.isArray(q.options)&&q.options.length>=4})}
+ function baseKey(r){return String(r&&r.date||'').trim().replace(/^'/,'').toLowerCase()+'|'+String(r&&r.quizId||'').trim().toLowerCase()+'|'+String(r&&r.total||'')}
+ function merge(local,server){
+   var all=new Map();
+   local.forEach(function(r){if(r&&r.date)all.set(baseKey(r),r)});
+   server.forEach(function(sr,i){
+     if(!sr||!sr.date)return;
+     var rec={id:'mqserver1165:'+i+':'+String(sr.quizId||sr.date),date:sr.date,score:sr.score,total:sr.total,quizId:sr.quizId,quizRevision:sr.quizRevision,phone:phone(),quizData:Array.isArray(sr.reviewData)&&sr.reviewData.length?sr.reviewData:null,synced:true};
+     var key=baseKey(rec),prior=all.get(key);
+     // Different date notations can represent the same exam. Retain local detail if server row lacks it.
+     if(prior&&!hasQuestions(rec)&&hasQuestions(prior))rec.quizData=prior.quizData;
+     if(!prior){
+       var similar=Array.from(all.values()).find(function(x){return tstamp(x)===tstamp(rec)&&String(x.quizId||'')===String(rec.quizId||'')&&String(x.total||'')===String(rec.total||'')});
+       if(similar){all.delete(baseKey(similar));if(!hasQuestions(rec)&&hasQuestions(similar))rec.quizData=similar.quizData;}
+     }
+     all.set(key,rec);
+   });
+   return Array.from(all.values()).sort(function(a,b){return tstamp(b)-tstamp(a)||String(b.date||'').localeCompare(String(a.date||''))});
+ }
+ function localRows(){
+   var arr=[];try{arr=JSON.parse(localStorage.getItem('murali_progress')||'[]')}catch(e){}
+   var p=normPhone(phone());
+   return (Array.isArray(arr)?arr:[]).filter(function(r){return r&&p&&normPhone(r.phone)===p});
+ }
+ function draw(){
+   var list=node('mq-review-library-list-v114'),count=node('mq-review-count-v1165');if(!list)return;
+   var filtered=rows.filter(function(r){return !searched||String(r.date||'').toLowerCase().includes(searched)||String(r.quizId||'').toLowerCase().includes(searched)});
+   list.replaceChildren();
+   var available=rows.filter(hasQuestions).length;
+   if(count)count.textContent=rows.length+' परीक्षा · '+available+' प्रश्नपत्र';
+   if(!filtered.length){var empty=document.createElement('p');empty.textContent=searched?'मिल्ने मिति भेटिएन।':'अहिले परीक्षा अभिलेख भेटिएन।';list.appendChild(empty);return;}
+   filtered.forEach(function(r){
+     var box=document.createElement('div');box.className='mq-review-library-row-v114';
+     var textBox=document.createElement('div');
+     var top=document.createElement('span');top.className='mq-review-date-v1165';top.textContent=String(r.date||'');
+     var meta=document.createElement('span');meta.className='mq-review-meta-v1165';
+     var ok=hasQuestions(r);meta.textContent=String(r.score==null?'—':r.score)+'/'+String(r.total==null?'20':r.total)+(ok?' · प्रश्नपत्र सुरक्षित':' · प्रश्न विवरण उपलब्ध छैन');
+     textBox.appendChild(top);textBox.appendChild(meta);
+     var btn=document.createElement('button');btn.type='button';btn.textContent=ok?'हेर्नुहोस्':'उपलब्ध छैन';btn.disabled=!ok;
+     if(ok){
+       if(String(r.id).startsWith('mqserver1165:'))remotes[String(r.id)]=r;
+       btn.onclick=function(){window.closeReviewLibraryV114_();if(typeof window.reviewPastQuiz==='function')window.reviewPastQuiz(r.id)};
+     }
+     box.appendChild(textBox);box.appendChild(btn);list.appendChild(box);
+   });
+ }
+ window.mqFilterExamReviewV1165_=function(v){searched=String(v||'').trim().toLowerCase();draw()};
+ window.mqRefreshExamReviewV1165_=async function(){
+   var modal=node(modalId),status=node('mq-review-status-v1165');
+   if(loading)return;
+   loading=true;if(status)status.textContent='☁️ सुरक्षित परीक्षा इतिहास मिलाउँदै...';
+   try{
+     if(!navigator.onLine)throw new Error('offline');
+     if(!phone()||!localStorage.getItem('murali_pin'))throw new Error('auth');
+     var data=await apiPostJSON({action:'fetchMyResults',phone:phone(),pin:localStorage.getItem('murali_pin')||'',deviceId:getDeviceId(),force:true},{retries:1,timeoutMs:22000});
+     if(!data||data.status!=='success'||!Array.isArray(data.results))throw new Error('unavailable');
+     // Do not erase local-only attempts. Append only server-confirmed records of this account.
+     rows=merge(localRows(),data.results);
+     if(modal&&modal.style.display==='flex')draw();
+     if(status&&modal&&modal.style.display==='flex')status.textContent='Google Sheets सँग मिलाइएको · प्रश्नगत विवरण सुरक्षित नभएका परीक्षामा केवल नतिजा देखिन्छ।';
+   }catch(err){if(status&&modal&&modal.style.display==='flex')status.textContent='Server अभिलेख अहिले ल्याउन सकिएन। यो उपकरणमा सुरक्षित परीक्षा देखाइएका छन्।';}
+   finally{loading=false}
+ };
+ window.openReviewLibraryV114_=function(){
+   var modal=node(modalId);if(!modal)return;
+   var input=node('mq-review-search-v1165');if(input)input.value='';searched='';
+   Object.keys(remotes).forEach(function(id){delete remotes[id]});
+   rows=merge(localRows(),[]);draw();modal.style.display='flex';
+   window.mqRefreshExamReviewV1165_();
+ };
+ window.mqRenderExamSummaryV1165_=function(data,state){
+   var a=node('mq-exam-count-v1165'),b=node('mq-exam-rank-v1165'),c=node('mq-exam-score-v1165');
+   if(!a||!b||!c)return;
+   if(state==='loading'){a.textContent='…';b.textContent='…';c.textContent='…';return}
+   if(!data||state==='error'){a.textContent='—';b.textContent='—';c.textContent='—';return}
+   var total=Number(data.total);a.textContent=Number.isFinite(total)&&total>=0?String(total):'—';
+   var myRank=Number(data.myRank);b.textContent=Number.isFinite(myRank)&&myRank>0?String(myRank):'—';
+   var mine=data.myRankData;c.textContent=mine&&mine.total!=null?String(Number(mine.score||0))+'/'+String(Number(mine.total||20)):'—';
+ };
+})();
+</script>
+
 </body>
 </html>
