@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v116.5">
+    <link rel="manifest" href="manifest.json?v=v117.1">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1013,7 +1013,7 @@
 
 /* Legacy graphs remain accessible, but do not dominate the first viewport. */
 #view-progress:not(.mq-old-stats-open-v117) > :not(.mq-review-quick-v1162):not(#mq-progress-hub-v117):not(#mq-progress-old-toggle-v117) {display:none!important}
-.mq-p117{border:1.5px solid rgba(153,122,207,.43);border-radius:17px;padding:13px;background:linear-gradient(145deg,rgba(247,245,255,.94),rgba(239,249,252,.91));margin:0 0 9px;box-shadow:0 5px 18px rgba(47,69,110,.06);color:var(--text-color);font-family:'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif}
+.mq-p117{border:1.5px solid rgba(153,122,207,.43);border-radius:17px;padding:11px;background:linear-gradient(145deg,rgba(247,245,255,.94),rgba(239,249,252,.91));margin:0 0 9px;box-shadow:0 5px 18px rgba(47,69,110,.06);color:var(--text-color);font-family:'Mukta','Noto Sans Devanagari','Nirmala UI',sans-serif}
 .mq-p117-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}
 .mq-p117-head h3{margin:0;font-size:1.12rem;line-height:1.35;color:var(--text-color);font-weight:900}
 .mq-p117-head span{font-size:.77rem;color:var(--muted-text-color);font-weight:700}
@@ -1486,7 +1486,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
         
         <!-- v117 unified monthly progress: exam and chart without historical bulk review downloads -->
         <section id="mq-progress-hub-v117" class="mq-p117" aria-label="मेरो प्रगति">
-          <div class="mq-p117-head"><div><h3>🌸 मेरो प्रगति</h3><span>परीक्षा · दैनिक चार्ट</span></div><span class="mq-p117-chip">क्यालेन्डर + ग्राफ</span></div>
+          <!-- v117.1: redundant stats heading removed to make the calendar visible sooner -->
           <div class="mq-p117-switch" role="group" aria-label="प्रगति प्रकार">
             <button type="button" id="mq-p117-exam" class="active" onclick="mqChooseKind117('exam')">📝 परीक्षा</button>
             <button type="button" id="mq-p117-chart" onclick="mqChooseKind117('chart')">📊 चार्ट</button>
@@ -1595,7 +1595,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div>Version: 116.5</div>
+        <div id="app-version-label">Version: 117.1</div>
     </div>
 </div>
 
@@ -2111,7 +2111,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v116.5').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v117.1').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2122,7 +2122,9 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "117.0";
+    const APP_VERSION = "117.1";
+    // The visible footer uses the same value as the application's cache/reload version.
+    try { var footerVer = document.getElementById('app-version-label'); if (footerVer) footerVer.textContent = 'Version: ' + APP_VERSION; } catch (versionLabelErr) {}
     // ==========================================
     // iOS 12.8 ONLY FALLBACK CHART ENGINE (v110.7)
     // Modern browsers (Android, Windows, modern iOS) keep native Chart.js!
