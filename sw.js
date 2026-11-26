@@ -1,5 +1,5 @@
-/* BK Murali Quiz 117.1 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
-const CACHE_NAME = "murali-quiz-v117-1";
+/* BK Murali Quiz 117.2 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
+const CACHE_NAME = "murali-quiz-v117-2";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
