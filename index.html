@@ -143,7 +143,7 @@
     </script>
     <title>BK Murali Quiz</title>
     
-    <link rel="manifest" href="manifest.json?v=v117.1">
+    <link rel="manifest" href="manifest.json?v=v117.2">
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -1060,6 +1060,65 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
 @media(max-width:350px){.mq-p117{padding:7px}.mq-p117-calendar{gap:3px}.mq-p117-day{min-height:43px}.mq-p117-day .mq-p117-day-value{font-size:.62rem}.mq-p117-metrics strong{font-size:1.1rem}.mq-p117-metrics small{font-size:.65rem}}
 </style>
 
+<style id="mq-v1172-premium-refine">
+/* v117.2: device-safe premium typography; confined to the unified Stats panel. */
+#mq-progress-hub-v117 .mq-p117-switch button{
+  position:relative;font-size:clamp(.92rem,1.25vw,1.01rem);font-weight:900;line-height:1.16;
+  letter-spacing:0;overflow:hidden
+}
+#mq-progress-hub-v117 .mq-p117-switch.small button{
+  font-size:clamp(.90rem,1.15vw,.99rem);line-height:1.1
+}
+#mq-progress-hub-v117 .mq-p117-switch button.active:after{
+  content:"";position:absolute;bottom:1px;left:50%;width:32px;height:3px;
+  transform:translateX(-50%);border-radius:99px;background:#f4d78e;
+  box-shadow:0 0 5px rgba(249,220,153,.38);pointer-events:none
+}
+#mq-progress-hub-v117 .mq-p117-metrics{margin:8px 0}
+#mq-progress-hub-v117 .mq-p117-metrics>div{padding:7px 4px;gap:2px}
+#mq-progress-hub-v117 .mq-p117-metrics small{font-size:clamp(.74rem,1.1vw,.81rem);line-height:1.15;font-weight:850}
+#mq-progress-hub-v117 .mq-p117-metrics strong{font-size:clamp(1.22rem,2vw,1.41rem);line-height:1.1}
+#mq-progress-hub-v117 .mq-p117-month strong{font-size:clamp(.99rem,1.25vw,1.09rem);line-height:1.25}
+#mq-progress-hub-v117 .mq-p117-tools{margin:5px 0 2px;row-gap:6px}
+#mq-progress-hub-v117 .mq-p117-note{min-height:0;margin:3px 0;font-size:.79rem}
+#mq-progress-hub-v117 .mq-p117-note:empty{display:none!important}
+#mq-progress-hub-v117 .mq-p117-calendar{margin-top:0}
+#mq-progress-hub-v117 .mq-p117-weekday{font-size:clamp(.79rem,1.1vw,.91rem);padding:0 0 2px;line-height:1.15}
+#mq-progress-hub-v117 .mq-p117-day{font-size:clamp(.87rem,1.3vw,1.04rem);line-height:1.11;gap:0;padding:3px 1px!important;
+ box-shadow:0 1px 2px rgba(41,70,94,.05)!important}
+#mq-progress-hub-v117 .mq-p117-day .mq-p117-day-value{font-size:clamp(.71rem,1.1vw,.85rem);line-height:1.13}
+#mq-progress-hub-v117 .mq-p117-graph-meta{font-size:clamp(.79rem,1.1vw,.89rem);font-weight:750}
+#mq-progress-hub-v117 .mq-p117-detail{font-size:clamp(.91rem,1.25vw,1.02rem)}
+#mq-progress-hub-v117 .mq-p117-legend{font-size:clamp(.72rem,1.05vw,.82rem);line-height:1.2}
+#mq-progress-old-toggle-v117{font-size:clamp(.86rem,1.15vw,.96rem)!important}
+/* Contrast deliberately differs between light and dark; no changes to ranking or calendar status. */
+html[data-theme="dark"] #mq-progress-hub-v117 .mq-p117-day,
+body.dark-mode #mq-progress-hub-v117 .mq-p117-day,
+body[data-theme="dark"] #mq-progress-hub-v117 .mq-p117-day{
+ box-shadow:inset 0 0 0 1px rgba(199,182,236,.10)!important
+}
+@media(min-width:601px) and (max-width:1200px){
+ #mq-progress-hub-v117 .mq-p117-day{font-size:1.01rem}
+ #mq-progress-hub-v117 .mq-p117-day .mq-p117-day-value{font-size:.80rem}
+ #mq-progress-hub-v117 .mq-p117-weekday{font-size:.87rem}
+ #mq-progress-hub-v117 .mq-p117-switch.small button{font-size:.97rem}
+}
+@media(max-width:600px){
+ #mq-progress-hub-v117 .mq-p117-weekday{font-size:.82rem}
+ #mq-progress-hub-v117 .mq-p117-day{font-size:.96rem;min-height:48px}
+ #mq-progress-hub-v117 .mq-p117-day .mq-p117-day-value{font-size:.76rem}
+ #mq-progress-hub-v117 .mq-p117-switch.small button{font-size:.92rem}
+ #mq-progress-hub-v117 .mq-p117-metrics small{font-size:.75rem}
+}
+@media(max-width:350px){
+ #mq-progress-hub-v117 .mq-p117-calendar{gap:3px}
+ #mq-progress-hub-v117 .mq-p117-day{font-size:.87rem;min-height:43px}
+ #mq-progress-hub-v117 .mq-p117-day .mq-p117-day-value{font-size:.70rem}
+ #mq-progress-hub-v117 .mq-p117-weekday{font-size:.77rem}
+ #mq-progress-hub-v117 .mq-p117-switch.small button{font-size:.88rem}
+ #mq-progress-hub-v117 .mq-p117-metrics small{font-size:.70rem}
+}
+</style>
 </head>
 <body>
 <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;"></canvas>
@@ -1595,7 +1654,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     <div id="app-footer-version" class="app-footer-version" style="font-size: 0.85rem; color: var(--muted-text-color); text-align: center; font-weight: 700; padding-top: 10px; border-top: 1px dashed var(--border-color); margin-top: 10px;">
         <div style="color: var(--primary-color); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;">✨ BK Murali Quiz</div>
         <div style="margin-bottom: 4px;">Brahmakumaris NGT, Nepal</div>
-        <div id="app-version-label">Version: 117.1</div>
+        <div id="app-version-label">Version: 117.2</div>
     </div>
 </div>
 
@@ -2111,7 +2170,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     // नयाँ SW download हुन्छ, तर चलिरहेको exam/page लाई forced reload हुँदैन।
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=v117.1').then(reg => {
+            navigator.serviceWorker.register('sw.js?v=v117.2').then(reg => {
                 reg.update().catch(() => {});
                 setInterval(() => reg.update().catch(() => {}), 5 * 60 * 1000);
             }).catch(err => console.log('SW Reg Failed:', err));
@@ -2122,7 +2181,7 @@ html[data-theme='dark'] .mq-p117-day.has-data .mq-p117-day-value,body.dark-mode 
     // 2. GLOBAL VARIABLES & CONFIGURATION
     // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbx815jJ32y6Hiid4oE_5oYvlC667su9uCXpizS8fpNLEPTY4QV1Yz_g7tGvob_JjTgBaQ/exec";
-    const APP_VERSION = "117.1";
+    const APP_VERSION = "117.2";
     // The visible footer uses the same value as the application's cache/reload version.
     try { var footerVer = document.getElementById('app-version-label'); if (footerVer) footerVer.textContent = 'Version: ' + APP_VERSION; } catch (versionLabelErr) {}
     // ==========================================
@@ -11206,6 +11265,8 @@ html[data-theme='dark'] #mq-review-library-list-v114 .mq-review-library-row-v114
 var state={kind:'exam',view:'calendar',metric:'score',year:new Date().getFullYear(),month:new Date().getMonth()+1,days:null,picked:'',token:0,cache:{},loading:false};
 var monthNames=['जनवरी','फेब्रुअरी','मार्च','अप्रिल','मे','जुन','जुलाई','अगस्ट','सेप्टेम्बर','अक्टोबर','नोभेम्बर','डिसेम्बर'];
 function el(id){return document.getElementById(id)}
+// Older iPad Safari lacks Element.replaceChildren (Safari < 14).
+function clearNode(node){while(node&&node.firstChild)node.removeChild(node.firstChild)}
 function isoOf(s){s=String(s||'').replace(/^'/,'').trim();var m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);if(m)return m[1]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[3]).slice(-2);m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);return m?m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2):''}
 function key(){return state.year+'-'+('0'+state.month).slice(-2)}
 function curData(){return state.days&&Array.isArray(state.days[state.kind])?state.days[state.kind]:[]}
@@ -11239,7 +11300,7 @@ function show(){
  if(state.view==='calendar')renderCalendar();else renderGraph();renderPicked();
 }
 function renderCalendar(){
- var root=el('mq-p117-calendar');if(!root)return;root.replaceChildren();
+ var root=el('mq-p117-calendar');if(!root)return;clearNode(root);
  var dNames=['आ','सो','मं','बु','बि','शु','श'];dNames.forEach(function(n){var h=document.createElement('div');h.className='mq-p117-weekday';h.textContent=n;root.appendChild(h)});
  var first=new Date(state.year,state.month-1,1).getDay();for(var i=0;i<first;i++){var empty=document.createElement('div');empty.className='mq-p117-empty';root.appendChild(empty)}
  var last=new Date(state.year,state.month,0).getDate(),indexed={};curData().forEach(function(r){indexed[r.iso]=r});var now=new Date(),today=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
@@ -11251,7 +11312,7 @@ function renderCalendar(){
  }
 }
 function renderGraph(){
- var root=el('mq-p117-graph');if(!root)return;root.replaceChildren();
+ var root=el('mq-p117-graph');if(!root)return;clearNode(root);
  var wrap=document.createElement('div');wrap.className='mq-p117-graph-meta';
  var left=document.createElement('span');left.textContent=state.kind==='exam'?'मासिक परीक्षा अङ्क':'मासिक चार्ट अङ्क';wrap.appendChild(left);
  if(state.kind==='chart'){
@@ -11270,7 +11331,7 @@ function renderGraph(){
  root.appendChild(svg);if(!coords.length){var p=document.createElement('p');p.textContent='यस महिनाको अभिलेख छैन।';p.style.cssText='text-align:center;font-size:.86rem;color:var(--muted-text-color)';root.appendChild(p)}
 }
 function renderPicked(){
- var target=el('mq-p117-detail');if(!target)return;target.replaceChildren();
+ var target=el('mq-p117-detail');if(!target)return;clearNode(target);
  if(!state.picked){target.style.display='none';return}var record=curData().find(function(x){return x.iso===state.picked});target.style.display='block';
  var dateText=state.picked.slice(-2)+'-'+state.picked.slice(5,7)+'-'+state.picked.slice(0,4);
  var h=document.createElement('strong');h.textContent='📅 '+dateText;target.appendChild(h);
@@ -11311,9 +11372,22 @@ window.mqShiftMonth117=function(delta){var d=new Date(state.year,state.month-1+d
 window.mqToggleDetailed117=function(){var v=el('view-progress');if(!v)return;var isOpen=v.classList.toggle('mq-old-stats-open-v117');setText('mq-p117-more-arrow',isOpen?'⌃':'⌄');if(isOpen&&typeof window.renderDashboard==='function')requestAnimationFrame(function(){try{window.renderDashboard();if(typeof refreshChartHistoryOnDashboardV4_==='function')refreshChartHistoryOnDashboardV4_()}catch(e){}})};
 window.mqProgressRefresh117=function(){state.cache={};fetchMonth(true)};
 var original=window.switchTab;
-if(typeof original==='function')window.switchTab=function(tab){var r=original.apply(this,arguments);if(tab==='prog'){var sticky=el('sticky-scorebar');if(sticky)sticky.style.display='none';fetchMonth(true)}return r};
+if(typeof original==='function')window.switchTab=function(tab){
+ if(tab==='prog'){
+  // Keep the old Stats accessible via the Details control, but don't return to it on iPad.
+  var stats=el('view-progress');if(stats)stats.classList.remove('mq-old-stats-open-v117');
+  var hub=el('mq-progress-hub-v117');if(hub)hub.style.display='block';
+  setText('mq-p117-more-arrow','⌄');
+ }
+ var r=original.apply(this,arguments);
+ if(tab==='prog'){
+  var sticky=el('sticky-scorebar');if(sticky)sticky.style.display='none';
+  try{fetchMonth(true)}catch(err){setNote('क्यालेन्डर अहिले खोल्न सकिएन। विस्तृत तथ्याङ्क उपलब्ध छ।')}
+ }
+ return r;
+};
 // Initial render is local-only until the user opens Stats.
-if(el('mq-progress-hub-v117')){state.days=localMonth();show();setNote('क्यालेन्डर खोल्दा मासिक अभिलेख मिलाइन्छ।')}
+if(el('mq-progress-hub-v117')){state.days=localMonth();try{show();setNote('क्यालेन्डर खोल्दा मासिक अभिलेख मिलाइन्छ।')}catch(err){setNote('क्यालेन्डर खोल्न Stats थिच्नुहोस्।')}}
 })();
 </script>
 
