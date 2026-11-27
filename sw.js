@@ -1,5 +1,5 @@
-/* BK Murali Quiz 117.2 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
-const CACHE_NAME = "murali-quiz-v117-2";
+/* BK Murali Quiz 118.0 Service Worker - Instant Offline-First App Shell + iOS 12.8 & AdGuard Safe */
+const CACHE_NAME = "murali-quiz-v118-0-1";
 const CACHE_PREFIX = "murali-quiz-v";
 const APP_SHELL = new URL("./index.html", self.registration.scope).href;
 
@@ -23,10 +23,10 @@ self.addEventListener("install", event => {
     // Do not force a new Service Worker to take over an exam already in progress.
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
-        await Promise.all([
-            safeCacheAdd_(cache, "./index.html"),
-            safeCacheAdd_(cache, "./manifest.json")
-        ]);
+        const shell = await fetch(new Request(APP_SHELL, {cache:"reload"}));
+        if (!isValidHtmlResponse_(shell, APP_SHELL)) throw new Error("App shell unavailable");
+        await cache.put(APP_SHELL, shell);
+        await safeCacheAdd_(cache, "./manifest.json");
         await safeCacheAdd_(cache, "./");
     })());
 });
@@ -61,7 +61,7 @@ self.addEventListener("fetch", event => {
                     fromNet.then(r=>({ok:true,r}),()=>({ok:false})),
                     new Promise(resolve=>setTimeout(()=>resolve({ok:false}),2600))
                 ]);
-                if(outcome.ok && outcome.r && outcome.r.ok) return outcome.r;
+                if(outcome.ok && isValidHtmlResponse_(outcome.r,req.url)) return outcome.r;
                 fromNet.catch(()=>{});
                 return cached;
             }
